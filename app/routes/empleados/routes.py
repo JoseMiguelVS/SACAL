@@ -10,7 +10,7 @@ from ..utils.utils import get_db_connection, paginador1, allowed_username
 # Definir Blueprint
 empleados = Blueprint('empleados', __name__)
 
-# --------------------------------------consulta de roles-----------------------------------------------------------
+# --------------------------------------consulta de roles---------------------------------------------
 def lista_rol():
     conn=get_db_connection()
     cur=conn.cursor()
@@ -20,7 +20,7 @@ def lista_rol():
     conn.close()
     return roles
 
-#------------------------------------------------------------------------------------------------------------------
+#--------------------------------BUSCAR EMPLEADO / CONSULTA INICIAL--------------------------------------
 @empleados.route("/empleados")
 @login_required
 def empleadosBuscar():
@@ -37,12 +37,16 @@ def empleadosBuscar():
                            total_pages=paginado[4],
                            search_query = search_query)
 
+#---------------------------------------AGREGAR EMPLEADO--------------------------------------------------
+
 @empleados.route("/empleados/agregar")
+@login_required
 def empleado_agregar():
     titulo = "Agregar empleado"
     return render_template('empleados/empleados_agregar.html',titulo = titulo, roles=lista_rol())
 
 @empleados.route("/empleados/agregar/nuevo", methods=('GET', 'POST'))
+@login_required
 def empleado_nuevo():
     if request.method == 'POST':
         nombre_usuario= request.form['nombre_usuario']
@@ -81,7 +85,10 @@ def empleado_nuevo():
             return redirect(url_for('empleados.empleado_agregar'))
     return redirect(url_for('empleados.empleado_agregar'))
 
+#-----------------------------DETALLES DE EMPLEADO-------------------------------
+
 @empleados.route('/empleados/detalles/<int:id>')
+@login_required
 def empleado_detalles(id):
     with get_db_connection() as con:
         with con.cursor(cursor_factory=RealDictCursor) as cur:
@@ -93,6 +100,7 @@ def empleado_detalles(id):
         return redirect(url_for('empleados.empleadosBuscar'))
     return render_template('empleados/empleado_detalles.html', empleado = empleado)
 
+#-----------------------------------------EDITAR EMPLEADO----------------------------------
 @empleados.route('/empleados/editar/<string:id>')
 def empleado_editar(id):
     con = get_db_connection()
@@ -104,7 +112,9 @@ def empleado_editar(id):
     con.close()
     return render_template('empleados/empleado_editar.html',empleado = empleado[0], roles = lista_rol())
 
+
 @empleados.route('/empleados/editar/<string:id>',methods=['POST'])
+@login_required
 def empleado_actualizar(id):
     if request.method == 'POST':
         nombre_usuario = request.form['nombre_usuario']
@@ -126,23 +136,27 @@ def empleado_actualizar(id):
         flash("Empleado editado correctamente")
     return redirect(url_for('empleados.empleadosBuscar'))
 
+#--------------------------------ELIMINAR EMPLEADO------------------------------
+
 @empleados.route('/empleados/eliminar/<string:id>')
+@login_required
 def empleado_eliminar(id):
     estado = False
-    fecha_editado = datetime.now()
+    fecha_modificacion = datetime.now()
     con = get_db_connection()
     cur = con.cursor()
     sql = "UPDATE empleados SET estado=%s,fecha_modificacion=%s WHERE id_empleado=%s"
-    valores = (estado, fecha_editado, id)
+    valores = (estado, fecha_modificacion, id)
     cur.execute(sql,valores)
     con.commit()
     cur.close()
     con.close()
     flash("Empleado eliminado correctamente")
     return redirect(url_for('empleados.empleadosBuscar'))
-# -------------------------------PAPELERA DE EMPLEADO------------------------------------------------------
+# -----------------------------------------------------------PAPELERA DE EMPLEADO--------------------------------------------------------------------
 
 @empleados.route("/empleados/papelera")
+@login_required
 def empleados_papelera():
     search_query = request.args.get('buscar', '', type=str)
     sql_count ='SELECT COUNT(*) FROM empleados WHERE estado = true AND (nombre_usuario ILIKE %s OR correo_empleado ILIKE %s);'
@@ -156,7 +170,10 @@ def empleados_papelera():
                            total_pages=paginado[4],
                            search_query = search_query)
 
+#-----------------------------------------------DETALLES DE EMPLEADO ELIMINADO--------------------------------------------------
+
 @empleados.route('/empleados/papelera/detalles/<int:id>')
+@login_required
 def empleado_detallesPapelera(id):
     with get_db_connection() as con:
         with con.cursor(cursor_factory=RealDictCursor) as cur:
@@ -168,7 +185,10 @@ def empleado_detallesPapelera(id):
         return redirect(url_for('empleados.empleadosBuscar'))
     return render_template('empleados/empleado_detallesPapelera.html')
 
+#----------------------------------------------RESTAURAR EMPLEADO-----------------------------------------
+
 @empleados.route('/empleados/papelera/restaurar/<string:id>')
+@login_required
 def empleados_restaurar(id):
     estado = True
     fecha_modificacion = datetime.now()

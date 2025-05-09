@@ -2,6 +2,7 @@ from flask import Flask, render_template, url_for, redirect, request, flash
 from flask_login import LoginManager
 
 from routes.empleados.routes import empleados
+from routes.ponentes.routes import ponentes
 
 from flask import Flask, render_template, url_for, redirect, request, flash
 from flask import Flask
@@ -53,6 +54,7 @@ def logout():
 
 # Registro de Blueprints
 app.register_blueprint(empleados)
+app.register_blueprint(ponentes)
 
 # Rutas principales
 @app.route("/")

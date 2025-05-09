@@ -21,14 +21,13 @@
         <a class="botones" href="{{url_for('ponentes.ponente_agregar')}}"><i class="fa fa-plus"
             style="font-size: 18px;"></i></a>
             <!-- -------------------------------------BUSCADOR------------------------------------------ -->
-                <form method="get" action="{{ url_for('ponentes.ponentesBuscar') }}" class="d-flex">
+                <form method="get" action="{{ url_for('ponentes.ponentes_buscar') }}" class="d-flex">
                         <input class="form-control" type="text" name="buscar" value="{{ search_query }}"
                                 placeholder="Buscar..." required>
-                        <button type="submit"><i class="fas fa-search"></i> </button>
+                        <button type="submit"><i class="fas fa-search"></i></button>
                 </form>
         </div>
 </div>
-
 
 <!-- ------------------------------TABLE -------------------------------- -->
 <div class="tables">
@@ -36,9 +35,9 @@
                 <thead>
                         <tr>
                                 <th>Ver</th>
-                                <th>Nombre usuario</th>
-                                <th>Nombre empleado</th>
-                                <th>Correo</th>
+                                <th>Nombre ponente</th>
+                                <th>CURP</th>
+                                <th>Cedula</th>
                                 <th>Editar</th>
                                 <th>Eliminar</th>
                         </tr>
@@ -54,9 +53,9 @@
                                                 <li class="fa fa-eye" style="font-size: 18px;"></li>
                                         </a>
                                 </td>
-                                <td>{{ponente.nombre_usuario}}</td>
-                                <td>{{ponente.nombre_empleado}}</td>
-                                <td>{{ponente.correo_empleado}}</td>
+                                <td>{{ponente.nombre_ponente}}</td>
+                                <td>{{ponente.curp_ponente}}</td>
+                                <td>{{ponente.cedula_ponente}}</td>
                                 <td>
                                         <a class="botones-editar"
                                                 href="{{ url_for('ponentes.ponente_editar', id = ponente.id_ponente) }}">
@@ -73,7 +72,7 @@
                                 {% endfor %}
                                 {% else %}
                         <tr>
-                                <td align="center" colspan="8">No existen empleados</td>
+                                <td align="center" colspan="8">No existen ponentes</td>
                         </tr>
                         {% endif %}
                         </tr>
@@ -86,38 +85,38 @@
                 {% if page > 1 %}
                 <li class="page-item">
                         <a class="page-link bg-warning"
-                                href="{{url_for('ponentesBuscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                                href="{{url_for('ponentes_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
                                 aria-label="Previous">
                                 <span aria-hidden="true">&laquo;</span>
                         </a>
                 </li>
                 {% if page != 1 and page != 2 %}
-                <li class="page-item"><a class="page-link bg-warning" href="{{url_for('ponentesBuscar')}}">1</a></li>
+                <li class="page-item"><a class="page-link bg-warning" href="{{url_for('ponentes_buscar')}}">1</a></li>
                 {% if page != 3 %}
                 <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
                 {% endif %}
                 {% endif %}
                 <li class="page-item"><a class="page-link bg-warning"
-                                href="{{url_for('ponentesBuscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+                                href="{{url_for('ponentes_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
                 </li>
                 {% endif %}
 
                 <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
 
                 {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
-                                href="{{url_for('ponentesBuscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+                                href="{{url_for('ponentes_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
                         </li>
                         {% if page != total_pages and page != total_pages-1 %}
                         {% if page != total_pages-2 %}
                         <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
                         {% endif %}
                         <li class="page-item"><a class="page-link bg-warning"
-                                        href="{{url_for('ponentesBuscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                                        href="{{url_for('ponentes_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
                         </li>
                         {% endif %}
                         <li class="page-item">
                                 <a class="page-link bg-warning"
-                                        href="{{url_for('ponentesBuscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                                        href="{{url_for('ponentes_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
                                         aria-label="Next">
                                         <span aria-hidden="true">&raquo;</span>
                                 </a>
