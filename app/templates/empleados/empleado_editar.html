@@ -1,0 +1,66 @@
+{% extends './layout.html' %}
+{% block body %}
+
+<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
+  {% endif %} alert-dismissible fade show" role="alert">
+  <strong>{{message}}</strong>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+<!-- -------------------------------------------------------------------------- -->
+
+<div class="form-container">
+  <form class="formulario" method="POST" action="{{url_for('empleados.empleado_actualizar',id=empleado[0])}}">
+    <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+    <div>
+      <div class="espacio_form">
+        <input type="text" id="nombre_empleado" placeholder="Nombre Usuario" name="nombre_empleado"
+          value="{{empleado[1]}}">
+      </div>
+      <div class="espacio_form">
+        <input type="text" id="nombre_usuario" placeholder="Nombre Usuario" name="nombre_usuario"
+          value="{{empleado[2]}}">
+      </div>
+
+      <div class="espacio_form">
+        <input type="text" id="correo_empleado" placeholder="Correo Electronico" name="correo_empleado"
+          value="{{empleado[3]}}">
+      </div>
+
+      <!-- ------------------------------------desplegable-------------------------------------------------------------- -->
+      <div class="espacio-form">
+        <select name="id_rol" id="id_rol" class="form-select" aria-label="Default select example">
+          <option value="true" selected>------Seleccione el cargo--------</option>
+          {% if roles %}
+          {% for rol in roles %}
+          <option value="{{rol.0}}">{{rol.1}}</option>
+          {% endfor %}
+          {% else %}
+          <option>Aún no hay registros</option>
+          {% endif %}
+        </select>
+      </div>
+      <div class="espacio-form">
+        <label for="contrasenia">Contraseña</label>
+        <input type="password" name="contrasenia_empleado" id="contrasenia_empleado">
+      </div>
+
+      <div class="espacio-form text-center">
+        <a class="botones" href="{{url_for('empleados.empleadosBuscar')}}">
+          Cancelar
+        </a>
+        <button class="botones" type="submit">
+          Guardar
+        </button>
+      </div>
+      
+    </div>
+  </form>
+</div>
+{% endblock %}

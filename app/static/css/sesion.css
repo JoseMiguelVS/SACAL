@@ -1,0 +1,36 @@
+.body1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-image: url(/static/images/logo.png);
+    background-size: contain; /* Ajusta la imagen para cubrir todo el contenedor */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
+    background-position: center; /* Centra la imagen */
+}
+
+.container1 {
+    max-width: 400px;
+    padding: 50px;
+    background-color: #ffffff;
+    opacity: 0.9;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    font-weight: bold;
+}
+.form-group input {
+    padding: 10px;
+    border: 1px solid #050303;
+    border-radius: 3px;
+}
+.form-group input[type="submit"] {
+    background-color: #110a0a;
+    color: #ffffff;
+    cursor: pointer;
+}

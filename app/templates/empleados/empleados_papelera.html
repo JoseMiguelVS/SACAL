@@ -1,0 +1,140 @@
+{% extends './layout.html' %}
+{% block body %}
+<h2>Empleados</h2>
+<br>
+<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
+        {% endif %} alert-dismissible fade show" role="alert">
+        <strong>{{message}}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<!-- -------------------------------------BUSCADOR------------------------------------------ -->
+<div>
+        <div class="form-container">
+                <form method="get" action="{{ url_for('empleados.empleados_papelera') }}" class="d-flex">
+                        <input class="form-control" type="text" name="buscar" value="{{ search_query }}"
+                                placeholder="Buscar..." required>
+                        <button type="submit"><i class="fas fa-search"></i> </button>
+                </form>
+        </div>
+</div>
+
+
+<!-- ------------------------------TABLE -------------------------------- -->
+<table>
+        <thead>
+                <tr>
+                        <th>Nombre usuario</th>
+                        <th>Nombre empleado</th>
+                        <th>Correo</th>
+                        <th>Restaurar</th>
+                </tr>
+        </thead>
+        <tbody>
+                {% if empleados %}
+                {% for empleado in empleados %}
+                {% if empleado.estado == False %}
+                <tr>
+                        <td>{{empleado.nombre_usuario}}</td>
+                        <td>{{empleado.nombre_empleado}}</td>
+                        <td>{{empleado.correo_empleado}}</td>
+                        <td>
+                                <button class="botones" type="button" data-bs-toggle="modal"
+                                        data-bs-target="#staticBackdrop-{{empleado.id_empleado}}"><i class="fas fa-sync-alt" style="font-size: 18px;"></i>
+                                </button>
+                        </td>
+
+                        {% endif %}
+                        {% endfor %}
+                        {% else %}
+                <tr>
+                        <td align="center" colspan="8">No existen empleados</td>
+                </tr>
+                {% endif %}
+                </tr>
+        </tbody>
+</table>
+<!-- -------------------------------------------------PAGINADOR----------------------------------------------- -->
+<nav class="paginati" aria-label="Page navigation" class="justify-content-center">
+        <ul class="pagination justify-content-center" style="margin:20px 0">
+                {% if page > 1 %}
+                <li class="page-item">
+                        <a class="page-link bg-warning"
+                                href="{{url_for('empleados_papelera')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                                aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                        </a>
+                </li>
+                {% if page != 1 and page != 2 %}
+                <li class="page-item"><a class="page-link bg-warning" href="{{url_for('empleados_papelera')}}">1</a></li>
+                {% if page != 3 %}
+                <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
+                {% endif %}
+                {% endif %}
+                <li class="page-item"><a class="page-link bg-warning"
+                                href="{{url_for('empleados_papelera')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+                </li>
+                {% endif %}
+
+                <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
+
+                {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
+                                href="{{url_for('empleados_papelera')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+                        </li>
+                        {% if page != total_pages and page != total_pages-1 %}
+                        {% if page != total_pages-2 %}
+                        <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
+                        {% endif %}
+                        <li class="page-item"><a class="page-link bg-warning"
+                                        href="{{url_for('empleados_papelera')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                        </li>
+                        {% endif %}
+                        <li class="page-item">
+                                <a class="page-link bg-warning"
+                                        href="{{url_for('empleados_papelera')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                                        aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                </a>
+                        </li>
+                        {% endif %}
+        </ul>
+</nav>
+
+<!-- --------------------------------------------------MODAL--------------------------------------------------- -->
+{% if empleados %}
+{% for empleado in empleados %}
+<div class="modal fade" id="staticBackdrop-{{empleado.id_empleado}}" data-bs-backdrop="static" data-bs-keyboard="false"
+        tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+                <div class="modal-content">
+                        <div class="modal-header">
+                                <h5 class="modal-title" id="staticBackdropLabel">Confirmar acción</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                                ¿Deseas Restaurar a <strong>{{ empleado.nombre_usuario }} {{
+                                        empleado.nombre_empleado}}</strong>?
+                        </div>
+                        <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancelar</button>
+                                <a class="btn btn-danger"
+                                        href="{{ url_for('empleados.empleados_restaurar', id = empleado.id_empleado) }}"
+                                        class="btn-delete"><i class="fas fa-sync-alt"></i>Restaurar</a>
+                        </div>
+                </div>
+        </div>
+</div>
+{% endfor %}
+{% else %}
+{% endif %}
+
+{% endblock %}

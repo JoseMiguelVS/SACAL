@@ -1,0 +1,32 @@
+{% extends './layout.html' %}
+
+{% block body %}
+<h2>Detalles de Empleado</h2>
+<p class="fc">Fecha creación: {{ empleado.fecha_creacion }}</p>
+<p class="fc">Fecha modificación: {{ empleado.fecha_modificacion }}</p>
+<br />
+<!-- ----------------------------------------------------------------------------------------------- -->
+<table>
+  <thead>
+    <tr>
+      <th>Nombre completo</th>
+      <th>Nombre usuario</th>
+      <th>Correo Electrónico</th>
+      <th>Rol</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>{{ empleado.nombre_empleado }}</td>
+      <td>{{ empleado.nombre_usuario }}</td>
+      <td>{{ empleado.correo_empleado }}</td>
+      <td>{{ empleado.rol }}</td>
+    </tr>
+  </tbody>
+</table>
+<div>
+  <a
+    class="botones"
+    href="{{ url_for('empleados.empleadosBuscar') }}">Cancelar</a>
+</div>
+{% endblock %}

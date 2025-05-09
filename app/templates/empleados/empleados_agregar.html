@@ -1,0 +1,68 @@
+{% extends './layout.html' %}
+
+{% block title %} {{titulo}} {% endblock %}
+{% block body %}
+
+<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
+    {% endif %} alert-dismissible fade show" role="alert">
+    <strong>{{message}}</strong>
+    <button type="button" class="" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+<!-- ----------------------------------------------------------------------------------------------- -->
+<h1>Registrar nuevo empleado</h1>
+<div class="form-container">
+    <form class="formulario" method="POST" action="{{url_for('empleados.empleado_nuevo')}}"
+        enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+        <div>
+            <div class="espacio_form">
+                <!-- <label for="nombre_usuario">Nombre de usuario</label> -->
+                <input type="text" id="nombre_usuario" placeholder="Nombre Usuario" name="nombre_usuario"
+                    required>
+            </div>
+            <div class="espacio_form">
+                <!-- <label for="nombre_empleado">Nombre completo</label> -->
+                <input type="text" id="nombre_empleado" placeholder="Nombre Completo" name="nombre_empleado"
+                    required>
+            </div>
+            <div class="espacio_form">
+                <!-- <label for="correo_empleado">Correo Electrónico</label> -->
+                <input type="text" id="correo_empleado" placeholder="Correo Electronico" name="correo_empleado"
+                    required>
+            </div>
+
+            <div class="espacio_form">
+                <select name="id_rol" id="id_rol" aria-label="Default select example">
+                    <option value="true" selected>--Seleccione el Cargo--</option>
+                    {% if roles %}
+                    {% for rol in roles %}
+                    <option value="{{rol.0}}">{{rol.1}}</option>
+                    {% endfor %}
+                    {% else %}
+                    <option>Aún no hay registros</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <div class="espacio_form">
+                <!-- <label for="contrasenia">Contraseña</label> -->
+                <input type="password" id="contrasenia_empleado" placeholder="Contraseña" name="contrasenia_empleado" required>
+            </div>
+            <div class="espacio_form">
+                <button class="botones" type="submit">Guardar</button>
+            </div>
+            <div class="espacio_form">
+                <a class="botones" href="{{url_for('empleados.empleadosBuscar')}}">Cancelar</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
