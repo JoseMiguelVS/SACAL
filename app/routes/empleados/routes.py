@@ -4,9 +4,8 @@ from datetime import datetime
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from werkzeug.security import generate_password_hash
-import json  # Importar el módulo json
 
-from .utils.utils import get_db_connection, paginador1, allowed_username
+from ..utils.utils import get_db_connection, paginador1, allowed_username
 
 # Definir Blueprint
 empleados = Blueprint('empleados', __name__)
@@ -22,7 +21,6 @@ def lista_rol():
     return roles
 
 #------------------------------------------------------------------------------------------------------------------
-
 @empleados.route("/empleados")
 @login_required
 def empleadosBuscar():

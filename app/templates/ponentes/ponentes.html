@@ -1,6 +1,6 @@
 {% extends './layout.html' %}
 {% block body %}
-<h2>Empleados</h2>
+<h2>Ponentes</h2>
 <br>
 <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
 {% with messages = get_flashed_messages() %}
@@ -16,12 +16,12 @@
 {% endwith %}
 
 <div>
-        <div class="form-container">
-                <!-- --------------------------------------NUEVO USUARIO ------------------------------------- -->
-                <a class="botones" href="{{url_for('empleados.empleado_agregar')}}"><i class="fa fa-plus"
-                        style="font-size: 18px;"></i></a>
-                        <!-- -------------------------------------BUSCADOR------------------------------------------ -->
-                <form method="get" action="{{ url_for('empleados.empleadosBuscar') }}" class="d-flex">
+    <div class="form-container">
+        <!-- --------------------------------------NUEVO USUARIO ------------------------------------- -->
+        <a class="botones" href="{{url_for('ponentes.ponente_agregar')}}"><i class="fa fa-plus"
+            style="font-size: 18px;"></i></a>
+            <!-- -------------------------------------BUSCADOR------------------------------------------ -->
+                <form method="get" action="{{ url_for('ponentes.ponentesBuscar') }}" class="d-flex">
                         <input class="form-control" type="text" name="buscar" value="{{ search_query }}"
                                 placeholder="Buscar..." required>
                         <button type="submit"><i class="fas fa-search"></i> </button>
@@ -44,28 +44,28 @@
                         </tr>
                 </thead>
                 <tbody>
-                        {% if empleados %}
-                        {% for empleado in empleados %}
-                        {% if empleado.estado == True %}
+                        {% if ponentes %}
+                        {% for ponente in ponentes %}
+                        {% if ponente.estado == True %}
                         <tr>
                                 <td>
                                         <a class="botones-ver"
-                                                href="{{url_for('empleados.empleado_detalles',id = empleado.id_empleado)}}">
+                                                href="{{url_for('ponentes.ponente_detalles',id = ponente.id_ponente)}}">
                                                 <li class="fa fa-eye" style="font-size: 18px;"></li>
                                         </a>
                                 </td>
-                                <td>{{empleado.nombre_usuario}}</td>
-                                <td>{{empleado.nombre_empleado}}</td>
-                                <td>{{empleado.correo_empleado}}</td>
+                                <td>{{ponente.nombre_usuario}}</td>
+                                <td>{{ponente.nombre_empleado}}</td>
+                                <td>{{ponente.correo_empleado}}</td>
                                 <td>
                                         <a class="botones-editar"
-                                                href="{{ url_for('empleados.empleado_editar', id = empleado.id_empleado) }}">
+                                                href="{{ url_for('ponentes.ponente_editar', id = ponente.id_ponente) }}">
                                                 <li class="fa fa-edit" style="font-size: 18px;"></li>
                                         </a>
                                 </td>
                                 <td>
                                         <button class="botones-delete" type="button" data-bs-toggle="modal"
-                                                data-bs-target="#staticBackdrop-{{empleado.id_empleado}}">
+                                                data-bs-target="#staticBackdrop-{{ponente.id_ponente}}">
                                                 <li class="fa fa-trash" style="font-size: 18px;"></li>
                                         </button>
                                 </td>
@@ -86,38 +86,38 @@
                 {% if page > 1 %}
                 <li class="page-item">
                         <a class="page-link bg-warning"
-                                href="{{url_for('empleadosBuscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                                href="{{url_for('ponentesBuscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
                                 aria-label="Previous">
                                 <span aria-hidden="true">&laquo;</span>
                         </a>
                 </li>
                 {% if page != 1 and page != 2 %}
-                <li class="page-item"><a class="page-link bg-warning" href="{{url_for('empleadosBuscar')}}">1</a></li>
+                <li class="page-item"><a class="page-link bg-warning" href="{{url_for('ponentesBuscar')}}">1</a></li>
                 {% if page != 3 %}
                 <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
                 {% endif %}
                 {% endif %}
                 <li class="page-item"><a class="page-link bg-warning"
-                                href="{{url_for('empleadosBuscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+                                href="{{url_for('ponentesBuscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
                 </li>
                 {% endif %}
 
                 <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
 
                 {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
-                                href="{{url_for('empleadosBuscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+                                href="{{url_for('ponentesBuscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
                         </li>
                         {% if page != total_pages and page != total_pages-1 %}
                         {% if page != total_pages-2 %}
                         <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
                         {% endif %}
                         <li class="page-item"><a class="page-link bg-warning"
-                                        href="{{url_for('empleadosBuscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                                        href="{{url_for('ponentesBuscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
                         </li>
                         {% endif %}
                         <li class="page-item">
                                 <a class="page-link bg-warning"
-                                        href="{{url_for('empleadosBuscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                                        href="{{url_for('ponentesBuscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
                                         aria-label="Next">
                                         <span aria-hidden="true">&raquo;</span>
                                 </a>
@@ -130,7 +130,7 @@
 
 <div>
         <br>
-        <a href="{{ url_for('empleados.empleados_papelera') }}"
+        <a href="{{ url_for('ponentes.ponentes_papelera') }}"
                 class="btn btn-outline-danger d-inline-flex align-items-center">
                 <li class="fa fa-folder" style="font-size: 18px;"></li>
         </a>
@@ -139,7 +139,7 @@
 <!-- --------------------------------------------------MODAL--------------------------------------------------- -->
 {% if empleados %}
 {% for empleado in empleados %}
-<div class="modal fade" id="staticBackdrop-{{empleado.id_empleado}}" data-bs-backdrop="static" data-bs-keyboard="false"
+<div class="modal fade" id="staticBackdrop-{{ponente.id_ponente}}" data-bs-backdrop="static" data-bs-keyboard="false"
         tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
                 <div class="modal-content">
@@ -149,14 +149,14 @@
                                         aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                                ¿Deseas eliminar a <strong>{{ empleado.nombre_usuario }} {{
-                                        empleado.apellido_pat}}</strong>?
+                                ¿Deseas eliminar a <strong>{{ ponente.nombre_usuario }} {{
+                                        ponente.apellido_pat}}</strong>?
                         </div>
                         <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary"
                                         data-bs-dismiss="modal">Cancelar</button>
                                 <a class="btn btn-danger"
-                                        href="{{ url_for('empleados.empleado_eliminar', id = empleado.id_empleado) }}"
+                                        href="{{ url_for('ponentes.ponente_eliminar', id = ponente.id_ponente) }}"
                                         class="btn-delete"><i class="fas fa-trash-alt"></i>Eliminar</a>
                         </div>
                 </div>

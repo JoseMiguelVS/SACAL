@@ -1,20 +1,12 @@
-from flask import Flask, Blueprint, render_template, url_for, redirect, request, flash, jsonify
+from flask import Flask, render_template, url_for, redirect, request, flash
 from flask_login import LoginManager
 
-from routes.empleados import empleados # Importa el Blueprint
+from routes.empleados.routes import empleados
 
-import os
-import uuid
-import re
-import psycopg2
-from psycopg2.extras import RealDictCursor
-from datetime import datetime, timedelta
-from werkzeug.utils import secure_filename
-from flask import Flask, render_template, url_for, redirect, request, flash, Blueprint, jsonify
+from flask import Flask, render_template, url_for, redirect, request, flash
 from flask import Flask
 from flask_wtf.csrf import CSRFProtect
-from werkzeug.security import generate_password_hash
-from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_login import LoginManager, login_user, logout_user, login_required
 
 from models.ModelUser import ModuleUser
 from models.entities.user import User
