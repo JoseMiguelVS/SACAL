@@ -2,8 +2,9 @@ import os
 import psycopg2
 import re
 from psycopg2.extras import RealDictCursor
-from flask import Flask, request, Blueprint
+from flask import Flask, request
 
+#--------------------------------CONEXION BD------------------------
 def get_db_connection():
     try:
         conn = psycopg2.connect(host='localhost', 
@@ -15,6 +16,7 @@ def get_db_connection():
         print(f"Error de conexión: {error}")
         return None
 
+#-----------------------------EMPLEADOS / USUARIOS
 def allowed_username(nombre_usuario):
     # Define el patrón de la expresión regular para letras y números sin espacios ni caracteres especiales
     pattern = re.compile(r'^[a-zA-Z0-9]+$')
@@ -23,7 +25,28 @@ def allowed_username(nombre_usuario):
         return True
     else:
         return False
+    
+#------------------------------PONENTES---------------------------------
+def allowed_pontname(nombre_ponente):
+    # Define el patrón de la expresión regular para letras y números sin espacios ni caracteres especiales
+    pattern = re.compile(r'^[a-zA-Z0-9]+$')
+    # Comprueba si el nombre de usuario coincide con el patrón
+    if pattern.match(nombre_ponente):
+        return True
+    else:
+        return False
+    
+#------------------------------PONENTES--------------------------------------
+def allowed_catname(nombre_categoria):
+    # Define el patrón de la expresión regular para letras y números sin espacios ni caracteres especiales
+    pattern = re.compile(r'^[a-zA-Z0-9]+$')
+    # Comprueba si el nombre de usuario coincide con el patrón
+    if pattern.match(nombre_categoria):
+        return True
+    else:
+        return False
 
+#---------------------------------PAGINADOR-------------------------
 def paginador1(sql_count: str, sql_lim: str, search_query: str, in_page: int, per_pages: int) -> tuple[list[dict], int, int, int, int]:
     
 # Obtener parámetros de paginación

@@ -3,7 +3,7 @@ from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
 
-from ..utils.utils import get_db_connection, paginador1, allowed_username
+from ..utils.utils import get_db_connection, paginador1, allowed_pontname
 
 #definir blueprint
 ponentes = Blueprint('ponentes', __name__)
@@ -37,7 +37,7 @@ def ponente_agregar():
 def ponente_nuevo():
     if request.method == 'POST':
         curp_ponente = request.form['curp_ponente']
-        if allowed_username(curp_ponente):
+        if allowed_pontname(curp_ponente):
             nombre_ponente = request.form['nombre_ponente']
             curp_ponente = request.form['curp_ponente']
             cedula_ponente = request.form['cedula_ponente']
@@ -57,7 +57,7 @@ def ponente_nuevo():
                 cur.close()
                 conn.close()
                 flash('Error: El curp del ponente ya se encuentra registrado. Intente con otro')
-                return redirect(url_for('ponentes.ponentes_agregar'))
+                return redirect(url_for('ponentes.ponente_agregar'))
             else:
                 sql = 'INSERT INTO ponentes (nombre_ponente, curp_ponente, cedula_ponente, stps_ponente, conocer_ponente, conocer2_ponente, estado, fecha_creacion, fecha_modificacion) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
                 valores = (nombre_ponente, curp_ponente, cedula_ponente, stps_ponente, conocer_ponente, conocer2_ponente, estado, fecha_creacion, fecha_modificacion)
@@ -69,7 +69,7 @@ def ponente_nuevo():
                 return redirect(url_for('ponentes.ponentes_buscar'))
         else:
             flash('Error: El curp no cuenta con las caracteristicas')
-            return redirect(url_for('ponentes.ponentes_agregar'))
+            return redirect(url_for('ponentes.ponente_agregar'))
     return redirect(url_for('ponentes.ponente_agregar'))
 
 #------------------------------------DETALLES DE PONENTES----------------------------
@@ -166,7 +166,7 @@ def ponente_detallesPapelera(id):
     if ponente is None:
         flash('El ponente no existe o ah sido eliminado.')
         return redirect(url_for('ponentes.ponentes_buscar'))
-    return render_template('ponentes/ponente_detallesPapelera.html')
+    return render_template('ponentes/ponente_detallesPapelera.html', ponente = ponente)
 
 #-------------------------------RESTAURAR PONENTE--------------------------
 @ponentes.route('/ponentes/papelera/restaurar/<string:id>')
