@@ -87,3 +87,39 @@ def paginador1(sql_count: str, sql_lim: str, search_query: str, in_page: int, pe
     total_pages = (total_items + per_page - 1) // per_page
 
     return items, page, per_page, total_items, total_pages
+
+#---------------------------------PAGINADOR 2-------------------------
+def paginador2(sql_count: str, sql_lim: str, params_count: tuple, params_lim: tuple, in_page: int, per_pages: int) -> tuple[list[dict], int, int, int, int]:
+    page = request.args.get('page', in_page, type=int)
+    per_page = request.args.get('per_page', per_pages, type=int)
+
+    if page < 1:
+        page = 1
+    if per_page < 1:
+        per_page = 1
+
+    offset = (page - 1) * per_page
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+
+        # Ejecutar consulta para contar total de elementos
+        cursor.execute(sql_count, params_count)
+        total_items = cursor.fetchone()['count']
+
+        # Ejecutar consulta paginada
+        cursor.execute(sql_lim, params_lim + (per_page, offset))
+        items = cursor.fetchall()
+
+    except psycopg2.Error as e:
+        print(f"Error en la base de datos: {e}")
+        items = []
+        total_items = 0
+    finally:
+        cursor.close()
+        conn.close()
+
+    total_pages = (total_items + per_page - 1) // per_page
+
+    return items, page, per_page, total_items, total_pages

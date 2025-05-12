@@ -1,0 +1,26 @@
+{% extends './layout.html' %}
+
+{% block body %}
+<h2>Detalles de Categoria</h2>
+<p class="fc">Fecha creación: {{ categoria.fecha_creacion }}</p>
+<p class="fc">Fecha modificación: {{ categoria.fecha_modificacion }}</p>
+<br />
+<!-- ----------------------------------------------------------------------------------------------- -->
+<table>
+  <thead>
+    <tr>
+      <th>Nombre Categoria</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>{{ categoria.nombre_categoria }}</td>
+    </tr>
+  </tbody>
+</table>
+<div>
+  <a
+    class="botones"
+    href="{{ url_for('categorias.categorias_buscar') }}">Cancelar</a>
+</div>
+{% endblock %}

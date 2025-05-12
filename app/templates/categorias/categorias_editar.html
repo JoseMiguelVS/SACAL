@@ -1,0 +1,39 @@
+{% extends './layout.html' %}
+{% block body %}
+
+<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
+    {% endif %} alert-dismissible fade show" role="alert">
+    <strong>{{message}}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+<!-- -------------------------------------------------------------------------- -->
+
+<div class="form-container">
+    <form class="formulario" method="POST" action="{{url_for('categorias.categoria_actualizar',id=categoria[0])}}">
+        <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+        <div>
+            <div class="espacio_form">
+                <input type="text" id="nombre_categoria" placeholder="Nombre Categoria" name="nombre_categoria"
+                    value="{{ categoria[1] }}">
+            </div>
+
+            <div class="espacio-form text-center">
+                <a class="botones" href="{{url_for('categorias.categorias_buscar')}}">
+                    Cancelar
+                </a>
+                <button class="botones" type="submit">
+                    Guardar
+                </button>
+            </div>
+
+        </div>
+    </form>
+</div>
+{% endblock %}

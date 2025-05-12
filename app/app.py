@@ -3,6 +3,7 @@ from flask_login import LoginManager
 
 from routes.empleados.routes import empleados
 from routes.ponentes.routes import ponentes
+from routes.categorias.routes import categorias
 
 from flask import Flask, render_template, url_for, redirect, request, flash
 from flask import Flask
@@ -24,7 +25,6 @@ def load_user(idusuarios):
     return ModuleUser.get_by_id(get_db_connection(),idusuarios)
 
 #--------------------------------------------------------inicio de sesion --------------------------------------------
-
 @app.route('/loguear', methods=('GET','POST'))
 def loguear():
     if request.method == 'POST':
@@ -51,10 +51,10 @@ def logout():
     logout_user()
     return redirect(url_for('login'))
 
-
 # Registro de Blueprints
 app.register_blueprint(empleados)
 app.register_blueprint(ponentes)
+app.register_blueprint(categorias)
 
 # Rutas principales
 @app.route("/")

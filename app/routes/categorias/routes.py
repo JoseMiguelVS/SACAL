@@ -3,7 +3,7 @@ from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
 
-from ..utils.utils import get_db_connection, paginador1, allowed_catname
+from ..utils.utils import get_db_connection, paginador2, allowed_catname
 
 #definir blueprint
 categorias = Blueprint('categorias', __name__)
@@ -12,17 +12,29 @@ categorias = Blueprint('categorias', __name__)
 @categorias.route("/categorias")
 @login_required
 def categorias_buscar():
-    search_query = request.args.get('buscar', '', type = str)
-    sql_count = 'SELECT COUNT(*) FROM categorias WHERE estado = true AND (nombre_categoria ILIKE %s, fecha_categoria ILIKE %s);'
-    sql_lim = 'SELECT * FROM categorias WHERE estado = true AND (nombre_categoria ILIKE %s, fecha_categoria ILIKE %s) ORDER BY id_categoria DESC LIMIT %s OFFSET %s;'
-    paginado = paginador1(sql_count,sql_lim,search_query, 1, 5)
+    search_query = request.args.get('buscar', '', type=str).strip()
+
+    if search_query:
+        sql_count = 'SELECT COUNT(*) FROM categorias WHERE estado = true AND nombre_categoria ILIKE %s;'
+        sql_lim = 'SELECT * FROM categorias WHERE estado = true AND nombre_categoria ILIKE %s ORDER BY id_categoria DESC LIMIT %s OFFSET %s;'
+        params_count = (f"%{search_query}%",)
+        params_lim = (f"%{search_query}%",)
+    else:
+        sql_count = 'SELECT COUNT(*) FROM categorias WHERE estado = true;'
+        sql_lim = 'SELECT * FROM categorias WHERE estado = true ORDER BY id_categoria DESC LIMIT %s OFFSET %s;'
+        params_count = ()
+        params_lim = ()
+
+    paginado = paginador2(sql_count, sql_lim, params_count, params_lim, 1, 5)
+
     return render_template('categorias/categorias.html',
-                           categorias = paginado[0],
+                           categorias=paginado[0],
                            page=paginado[1],
                            per_page=paginado[2],
                            total_items=paginado[3],
                            total_pages=paginado[4],
-                           search_query = search_query)
+                           search_query=search_query)
+
 
 #------------------------------AGREGAR CATEGORIA--------------------------------
 @categorias.route('/categorias/agregar')
@@ -51,7 +63,7 @@ def categoria_nuevo():
                 cur.close()
                 con.close()
                 flash('Error: la categoria ya se encuentra registrada')
-                return redirect(url_for('categoria.categorias_buscar'))
+                return redirect(url_for('categorias.categorias_buscar'))
             else:
                 sql = 'INSERT INTO categorias(nombre_categoria, estado, fecha_creacion, fecha_modificacion) VALUES (%s,%s,%s,%s);'
                 valores = (nombre_categoria, estado, fecha_creacion, fecha_modificacion)
@@ -72,12 +84,12 @@ def categoria_nuevo():
 def categoria_detalles(id):
     with get_db_connection() as con:
         with con.cursor(cursor_factory = RealDictCursor) as cur:
-            cur.execute('SELECT * FROM categorias WHERE id_categorias = %s',(id,))
-            categoria =cur.fetchone()
-    if categorias is None:
+            cur.execute('SELECT * FROM categorias WHERE id_categoria = %s',(id,))
+            categoria = cur.fetchone()
+    if categoria is None:
         flash('La categoria no existe o ah sido eliminada.')
         return redirect(url_for('categorias.categorias_buscar'))
-    return render_template('categoria/categorias_detalles.html', categoria = categoria)
+    return render_template('categorias/categorias_detalles.html', categoria = categoria)
 
 #----------------------------------EDITAR CATEGORIA -------------------------------
 @categorias.route('/categorias/editar/<string:id>')
@@ -85,12 +97,12 @@ def categoria_detalles(id):
 def categoria_editar(id):
     con = get_db_connection()
     cur = con.cursor()
-    cur.execute('SELECT * FROM categorias WEHERE id_categoria ={0}'.format(id))
+    cur.execute('SELECT * FROM categorias WHERE id_categoria ={0}'.format(id))
     categoria = cur.fetchall()
     con.commit()
     cur.close()
     con.close()
-    return render_template('categoria/categorias_editar.html', categoria = categoria[0])
+    return render_template('categorias/categorias_editar.html', categoria = categoria[0])
 
 @categorias.route('/categorias/editar/<string:id>', methods = ['POST'])
 @login_required
@@ -118,7 +130,7 @@ def categoria_eliminar(id):
     fecha_modificacion = datetime.now()
     con = get_db_connection()
     cur = con.cursor()
-    sql = "UPDATE cartegorias SET estado = %s, fecha_modificacion = %s WHERE id_categoria = %s"
+    sql = "UPDATE categorias SET estado = %s, fecha_modificacion = %s WHERE id_categoria = %s"
     valores = (estado, fecha_modificacion, id)
     cur.execute(sql, valores)
     con.commit()
@@ -131,22 +143,33 @@ def categoria_eliminar(id):
 @categorias.route("/categorias/papelera")
 @login_required
 def categorias_papelera():
-    search_query = request.args.get('buscar', '', type = str)
-    sql_count = 'SELECT COUNT(*) FROM categorias WHERE estado = false AND (nombre_categoria ILIKE %s, fecha_categoria ILIKE %s);'
-    sql_lim = 'SELECT * FROM categorias WHERE estado = false AND (nombre_categoria ILIKE %s, fecha_categoria ILIKE %s) ORDER BY id_categoria DESC LIMIT %s OFFSET %s;'
-    paginado = paginador1(sql_count, sql_lim, search_query, 1, 5)
+    search_query = request.args.get('buscar', '', type=str).strip()
+
+    if search_query:
+        sql_count = 'SELECT COUNT(*) FROM categorias WHERE estado = false AND nombre_categoria ILIKE %s;'
+        sql_lim = 'SELECT * FROM categorias WHERE estado = false AND nombre_categoria ILIKE %s ORDER BY id_categoria DESC LIMIT %s OFFSET %s;'
+        params_count = (f"%{search_query}%",)
+        params_lim = (f"%{search_query}%",)
+    else:
+        sql_count = 'SELECT COUNT(*) FROM categorias WHERE estado = false;'
+        sql_lim = 'SELECT * FROM categorias WHERE estado = false ORDER BY id_categoria DESC LIMIT %s OFFSET %s;'
+        params_count = ()
+        params_lim = ()
+
+    paginado = paginador2(sql_count, sql_lim, params_count, params_lim, 1, 5)
+
     return render_template('categorias/categorias_papelera.html',
-                           categorias = paginado[0],
+                           categorias=paginado[0],
                            page=paginado[1],
                            per_page=paginado[2],
                            total_items=paginado[3],
                            total_pages=paginado[4],
-                           search_query = search_query)
+                           search_query=search_query)
 
 #------------------------------------DETALLES DE CATEGORIAS ELIMINADO------------------------
 @categorias.route('/categorias/papelera/detalles/<int:id>')
 @login_required
-def categoria_detalles(id):
+def categoria_detallesPapelera(id):
     with get_db_connection() as con:
         with con.cursor(cursor_factory = RealDictCursor) as cur:
             cur.execute('SELECT * FROM categorias WHERE id_categorias = %s',(id,))
@@ -164,7 +187,7 @@ def categoria_restaurar(id):
     fecha_modificacion = datetime.now()
     con = get_db_connection()
     cur = con.cursor()
-    sql = "UPDATE cartegorias SET estado = %s, fecha_modificacion = %s WHERE id_categoria = %s"
+    sql = "UPDATE categorias SET estado = %s, fecha_modificacion = %s WHERE id_categoria = %s"
     valores = (estado, fecha_modificacion, id)
     cur.execute(sql, valores)
     con.commit()
