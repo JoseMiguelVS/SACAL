@@ -1,0 +1,58 @@
+{% extends './layout.html' %}
+
+{% block title %} {{titulo}} {% endblock %}
+{% block body %}
+
+<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
+    {% endif %} alert-dismissible fade show" role="alert">
+    <strong>{{message}}</strong>
+    <button type="button" class="" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+<!-- ----------------------------------------------------------------------------------------------- -->
+<h1>Registrar nuevo ponente</h1>
+<br>
+<div class="form-container">
+    <form class="formulario" method="POST" action="{{url_for('ponentes.ponente_nuevo')}}"
+        enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+        <div>
+            <div class="espacio_form">
+                <input type="text" id="nombre_ponente" placeholder="Nombre Ponente" name="nombre_ponente"
+                    required>
+            </div>
+            <div class="espacio_form">
+                <input type="text" id="curp_ponente" placeholder="Curp" name="curp_ponente"
+                    required>
+            </div>
+            <div class="espacio_form">
+                <input type="text" id="cedula_ponente" placeholder="Cedula profesional" name="cedula_ponente"
+                    required>
+            </div>
+            <div class="espacio_form">
+                <input type="text" id="stps_ponente" placeholder="STPS" name="stps_ponente"
+                    required>
+            </div>
+            <div class="espacio_form">
+                <input type="text" id="conocer_ponente" placeholder="CONOCER" name="conocer_ponente">
+            </div>
+            <div class="espacio_form">
+                <input type="text" id="conocer2_ponente" placeholder="CONOCER" name="conocer2_ponente">
+            </div>
+            <div class="espacio_form">
+                <button class="botones" type="submit">Guardar</button>
+            </div>
+            <div class="espacio_form">
+                <a class="botones" href="{{url_for('ponentes.ponentes_buscar')}}">Cancelar</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

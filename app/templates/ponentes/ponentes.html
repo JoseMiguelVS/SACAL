@@ -49,7 +49,7 @@
                         <tr>
                                 <td>
                                         <a class="botones-ver"
-                                                href="{{url_for('ponentes.ponente_detalles',id = ponente.id_ponente)}}">
+                                                href="{{url_for('ponentes.ponente_detalles',id = ponente.id_ponentes)}}">
                                                 <li class="fa fa-eye" style="font-size: 18px;"></li>
                                         </a>
                                 </td>
@@ -58,13 +58,13 @@
                                 <td>{{ponente.cedula_ponente}}</td>
                                 <td>
                                         <a class="botones-editar"
-                                                href="{{ url_for('ponentes.ponente_editar', id = ponente.id_ponente) }}">
+                                                href="{{ url_for('ponentes.ponente_editar', id = ponente.id_ponentes) }}">
                                                 <li class="fa fa-edit" style="font-size: 18px;"></li>
                                         </a>
                                 </td>
                                 <td>
                                         <button class="botones-delete" type="button" data-bs-toggle="modal"
-                                                data-bs-target="#staticBackdrop-{{ponente.id_ponente}}">
+                                                data-bs-target="#staticBackdrop-{{ponente.id_ponentes}}">
                                                 <li class="fa fa-trash" style="font-size: 18px;"></li>
                                         </button>
                                 </td>
@@ -136,9 +136,9 @@
 </div>
 
 <!-- --------------------------------------------------MODAL--------------------------------------------------- -->
-{% if empleados %}
-{% for empleado in empleados %}
-<div class="modal fade" id="staticBackdrop-{{ponente.id_ponente}}" data-bs-backdrop="static" data-bs-keyboard="false"
+{% if ponentes %}
+{% for ponente in ponentes %}
+<div class="modal fade" id="staticBackdrop-{{ponente.id_ponentes}}" data-bs-backdrop="static" data-bs-keyboard="false"
         tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
                 <div class="modal-content">
@@ -148,14 +148,13 @@
                                         aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                                ¿Deseas eliminar a <strong>{{ ponente.nombre_usuario }} {{
-                                        ponente.apellido_pat}}</strong>?
+                                ¿Deseas eliminar a <strong>{{ ponente.nombre_ponente }}</strong>?
                         </div>
                         <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary"
                                         data-bs-dismiss="modal">Cancelar</button>
                                 <a class="btn btn-danger"
-                                        href="{{ url_for('ponentes.ponente_eliminar', id = ponente.id_ponente) }}"
+                                        href="{{ url_for('ponentes.ponente_eliminar', id = ponente.id_ponentes) }}"
                                         class="btn-delete"><i class="fas fa-trash-alt"></i>Eliminar</a>
                         </div>
                 </div>

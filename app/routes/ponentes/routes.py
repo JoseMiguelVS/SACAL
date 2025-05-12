@@ -1,9 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, Flask,make_response
-from flask_login import login_required, current_user
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask_login import login_required
 from datetime import datetime
-import psycopg2
 from psycopg2.extras import RealDictCursor
-from werkzeug.security import generate_password_hash
 
 from ..utils.utils import get_db_connection, paginador1, allowed_username
 
@@ -17,7 +15,7 @@ ponentes = Blueprint('ponentes', __name__)
 def ponentes_buscar():
     search_query = request.args.get('buscar', '', type = str)
     sql_count = 'SELECT COUNT(*) FROM ponentes WHERE estado = true AND (nombre_ponente ILIKE %s OR curp_ponente ILIKE %s);'
-    sql_lim = 'SELECT * FROM ponentes WHERE estado = true AND (nombre_ponente ILIKE %s OR curp_ponente ILIKE %s) ORDER BY id_ponente DESC LIMIT %s OFFSET %s;'
+    sql_lim = 'SELECT * FROM ponentes WHERE estado = true AND (nombre_ponente ILIKE %s OR curp_ponente ILIKE %s) ORDER BY id_ponentes DESC LIMIT %s OFFSET %s;'
     paginado = paginador1(sql_count, sql_lim, search_query, 1, 5)
     return render_template('ponentes/ponentes.html',
                            ponentes = paginado[0],
@@ -27,7 +25,7 @@ def ponentes_buscar():
                            total_pages=paginado[4],
                            search_query = search_query)
 
-#-------------------------------------AGREGAR PONENTE-----------------------------
+#-------------------------------------AGREGAR PONENTE----------------------------------
 @ponentes.route('/ponentes/agregar')
 @login_required
 def ponente_agregar():
@@ -61,7 +59,7 @@ def ponente_nuevo():
                 flash('Error: El curp del ponente ya se encuentra registrado. Intente con otro')
                 return redirect(url_for('ponentes.ponentes_agregar'))
             else:
-                sql = 'INSERT INTO ponentes (nombre_ponente, curp_ponente, cedula_ponente, stps_ponente, conocer_ponente, conocer2_ponente, estado, fecha_creacion, fecha_modificacion)'
+                sql = 'INSERT INTO ponentes (nombre_ponente, curp_ponente, cedula_ponente, stps_ponente, conocer_ponente, conocer2_ponente, estado, fecha_creacion, fecha_modificacion) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
                 valores = (nombre_ponente, curp_ponente, cedula_ponente, stps_ponente, conocer_ponente, conocer2_ponente, estado, fecha_creacion, fecha_modificacion)
                 cur.execute(sql,valores)
                 conn.commit()
@@ -80,12 +78,12 @@ def ponente_nuevo():
 def ponente_detalles(id):
     with get_db_connection() as conn:
         with conn.cursor(cursor_factory = RealDictCursor) as cur:
-            cur.execute('SELECT * FROM ponentes id_ponente = %s, (id,)')
+            cur.execute('SELECT * FROM ponentes WHERE id_ponentes = %s',(id,))
             ponente = cur.fetchone()
     if ponente is None:
         flash('El ponente no existe o ha sido eliminado.')
         return redirect(url_for('ponentes.ponentes_buscar'))
-    return render_template('ponentes/ponentes.detalles.html', ponente = ponente)
+    return render_template('ponentes/ponentes_detalles.html', ponente = ponente)
 
 #------------------------------------EDITAR PONENTE----------------------------------
 @ponentes.route('/ponentes/editar/<string:id>')
@@ -93,7 +91,7 @@ def ponente_detalles(id):
 def ponente_editar(id):
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('SELECT * FROM ponentes WHERE id_ponente={0}'.format(id))
+    cur.execute('SELECT * FROM ponentes WHERE id_ponentes={0}'.format(id))
     ponente = cur.fetchall()
     conn.commit()
     cur.close()
@@ -114,7 +112,7 @@ def ponente_actualizar(id):
 
         conn = get_db_connection()
         cur = conn.cursor()
-        sql = "UPDATE ponentes SET nombre_ponente = %s, curp_ponente = %s, cedula_ponente = %s, stps_ponente = %s, conocer_ponente = %s, conocer2_ponente = %s, fecha_modificacion = %s WHERE id_ponente = %s"
+        sql = "UPDATE ponentes SET nombre_ponente = %s, curp_ponente = %s, cedula_ponente = %s, stps_ponente = %s, conocer_ponente = %s, conocer2_ponente = %s, fecha_modificacion = %s WHERE id_ponentes = %s"
         valores = (nombre_ponente, curp_ponente, cedula_ponente, stps_ponente, conocer_ponente, conocer2_ponente, fecha_modificacion, id)
         cur.execute(sql,valores)
         conn.commit()
@@ -131,7 +129,7 @@ def ponente_eliminar(id):
     fecha_modificacion = datetime.now()
     conn = get_db_connection()
     cur = conn.cursor()
-    sql = "UPDATE ponentes SET estado = %s,fecha_modificacion = %s WHERE id_ponente = %s"
+    sql = "UPDATE ponentes SET estado = %s,fecha_modificacion = %s WHERE id_ponentes = %s"
     valores = (estado, fecha_modificacion, id)
     cur.execute(sql, valores)
     conn.commit()
@@ -147,7 +145,7 @@ def ponente_eliminar(id):
 def ponentes_papelera():
     search_query = request.args.get('buscar', '', type = str)
     sql_count = 'SELECT COUNT(*) FROM ponentes WHERE estado = false AND (nombre_ponente ILIKE %s OR curp_ponente ILIKE %s);'
-    sql_lim = 'SELECT * FROM ponentes WHERE estado = false AND (nombre_ponente ILIKE %s OR curp_ponente ILIKE %s) ORDER BY id_ponente DESC LIMIT %s OFFSET %s;'
+    sql_lim = 'SELECT * FROM ponentes WHERE estado = false AND (nombre_ponente ILIKE %s OR curp_ponente ILIKE %s) ORDER BY id_ponentes DESC LIMIT %s OFFSET %s;'
     paginado = paginador1(sql_count, sql_lim, search_query, 1, 5)
     return render_template('ponentes/ponentes_papelera.html',
                            ponentes = paginado[0],
@@ -163,7 +161,7 @@ def ponentes_papelera():
 def ponente_detallesPapelera(id):
     with get_db_connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute('SELECT * FROM ponentes WHERE id_ponente = %s',(id,))
+            cur.execute('SELECT * FROM ponentes WHERE id_ponentes = %s',(id,))
             ponente = cur.fetchone()
     if ponente is None:
         flash('El ponente no existe o ah sido eliminado.')
@@ -178,7 +176,7 @@ def ponente_restaurar(id):
     fecha_modificacion = datetime.now()
     conn = get_db_connection()
     cur = conn.cursor()
-    sql = "UPDATE ponentes SET estado = %s,fecha_modificacion = %s WHERE id_ponente = %s"
+    sql = "UPDATE ponentes SET estado = %s,fecha_modificacion = %s WHERE id_ponentes = %s"
     valores = (estado, fecha_modificacion, id)
     cur.execute(sql, valores)
     conn.commit()
