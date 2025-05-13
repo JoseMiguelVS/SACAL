@@ -55,6 +55,16 @@ def allowed_paquename(nombre_paquete):
         return True
     else:
         return False
+    
+#------------------------------CURSOS--------------------------------------
+def allowed_paquename(nombre_curso):
+    # Define el patrón de la expresión regular para letras y números sin espacios ni caracteres especiales
+    pattern = re.compile(r'^[a-zA-Z0-9]+$')
+    # Comprueba si el nombre de usuario coincide con el patrón
+    if pattern.match(nombre_curso):
+        return True
+    else:
+        return False
 
 #---------------------------------PAGINADOR-------------------------
 def paginador1(sql_count: str, sql_lim: str, search_query: str, in_page: int, per_pages: int) -> tuple[list[dict], int, int, int, int]:
