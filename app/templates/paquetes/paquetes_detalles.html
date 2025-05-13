@@ -1,0 +1,30 @@
+{% extends './layout.html' %}
+
+{% block body %}
+<h2>Detalles de Paquete</h2>
+<p class="fc">Fecha creación: {{ paquete.fecha_creacion }}</p>
+<p class="fc">Fecha modificación: {{ paquete.fecha_modificacion }}</p>
+<br />
+<!-- ----------------------------------------------------------------------------------------------- -->
+<table>
+  <thead>
+    <tr>
+      <th>Nombre paquete</th>
+      <th>Precio</th>
+      <th>Categoria</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>{{ paquete.nombre_paquete }}</td>
+      <td>{{ paquete.precio_paquete }}</td>
+      <td>{{ paquete.nombre_categoria }}</td>
+    </tr>
+  </tbody>
+</table>
+<div>
+  <a
+    class="botones"
+    href="{{ url_for('paquete.paquetes_buscar') }}">Cancelar</a>
+</div>
+{% endblock %}
