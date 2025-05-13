@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, Flask,make_response
-from flask_login import login_required, current_user
+from flask_login import login_required
 from datetime import datetime
-import psycopg2
 from psycopg2.extras import RealDictCursor
 from werkzeug.security import generate_password_hash
 
@@ -102,6 +101,7 @@ def empleado_detalles(id):
 
 #-----------------------------------------EDITAR EMPLEADO----------------------------------
 @empleados.route('/empleados/editar/<string:id>')
+@login_required
 def empleado_editar(id):
     con = get_db_connection()
     cur = con.cursor()
@@ -133,7 +133,7 @@ def empleado_actualizar(id):
         con.commit()
         cur.close()
         con.close()
-        flash("Empleado editado correctamente")
+        flash("Empleado actualizado correctamente")
     return redirect(url_for('empleados.empleadosBuscar'))
 
 #--------------------------------ELIMINAR EMPLEADO------------------------------
@@ -159,7 +159,7 @@ def empleado_eliminar(id):
 @login_required
 def empleados_papelera():
     search_query = request.args.get('buscar', '', type=str)
-    sql_count ='SELECT COUNT(*) FROM empleados WHERE estado = true AND (nombre_usuario ILIKE %s OR correo_empleado ILIKE %s);'
+    sql_count ='SELECT COUNT(*) FROM empleados WHERE estado = False AND (nombre_usuario ILIKE %s OR correo_empleado ILIKE %s);'
     sql_lim ='SELECT * FROM empleados WHERE estado = false AND (nombre_usuario ILIKE %s OR correo_empleado ILIKE %s) ORDER BY id_empleado DESC LIMIT %s OFFSET %s;'
     paginado = paginador1(sql_count,sql_lim,search_query,1,5)
     return render_template('empleados/empleados_papelera.html',
