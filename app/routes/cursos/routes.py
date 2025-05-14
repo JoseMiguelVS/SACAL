@@ -1,10 +1,9 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, Flask,make_response
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
-from werkzeug.security import generate_password_hash
 
-from ..utils.utils import get_db_connection, paginador1, allowed_curname
+from ..utils.utils import get_db_connection, paginador1
 
 # Definir Blueprint
 cursos = Blueprint('cursos', __name__)
@@ -23,7 +22,7 @@ def lista_categorias():
 def lista_tipos():
     con = get_db_connection()
     cur = con.cursor()
-    cur.execute('SELECT * FROM tipos_cursos ORDER BY id_tipo ASC;')
+    cur.execute('SELECT * FROM tipo_cursos ORDER BY id_tipo ASC;')
     tipo = cur.fetchall()
     cur.close()
     con.close()
@@ -43,8 +42,8 @@ def lista_modalidades():
 @login_required
 def cursos_buscar():
     search_query = request.args.get('buscar', '', type=str)
-    sql_count = 'SELECT COUNT(*) detalles_cursos WHERE estado = True AND (nombre_curso ILIKE %s OR nombre_tipo %s);'
-    sql_lim = 'SELECT * FROM cursos WHERE estado = True AND (nombre_curso ILIKE %s OR nombre_tipo %s) ORDER BY id_curso DESC LIMIT %s OFFSET %s;'
+    sql_count = 'SELECT COUNT(*) FROM detalles_curso WHERE estado = true AND (nombre_curso ILIKE %s OR codigo_curso ILIKE %s);'
+    sql_lim = 'SELECT * FROM detalles_curso WHERE estado = true AND (nombre_curso ILIKE %s OR codigo_curso ILIKE %s) ORDER BY id_curso DESC LIMIT %s OFFSET %s;'
     paginado = paginador1(sql_count,sql_lim, search_query, 1, 5)
     return render_template('cursos/cursos.html',
                            cursos=paginado[0],
@@ -59,14 +58,15 @@ def cursos_buscar():
 @login_required
 def curso_agregar():
     titulo = 'Agregar curso'
-    return render_template('cursos/cursos_agregar.html', titulo = titulo, categorias = lista_categorias(), modalidades = lista_modalidades(), tipos = lista_tipos())
+    return render_template('cursos/cursos_agregar.html', titulo = titulo, modalidades = lista_modalidades(), tipos = lista_tipos())
 
 @cursos.route("/cursos/agregar/nuevo",methods = ('GET', 'POST'))
 @login_required
 def cursos_nuevo():
     if request.method == 'POST':
         nombre_curso = request.form['nombre_curso']
-        categoria_curso = request.form['id_categoria']
+        codigo_curso = request.form['codigo_curso']
+        duracion_curso = request.form['duracion_curso']
         tipo_curso = request.form['id_tipo']
         modalidad_curso = request.form['id_modalidad']
         estado = True
@@ -75,7 +75,7 @@ def cursos_nuevo():
             
         con = get_db_connection()
         cur = con.cursor(cursor_factory=RealDictCursor)
-        sql_validar = 'SELECT * FROM cursos WHERE nombre_curso = %s'
+        sql_validar = 'SELECT COUNT(*) FROM cursos WHERE nombre_curso = %s'
         cur.execute(sql_validar,(nombre_curso,))
         existe = cur.fetchone()['count']
         if existe:
@@ -84,14 +84,14 @@ def cursos_nuevo():
             flash('Error: el curso ya existe. Intente con otro')
             return redirect(url_for('cursos.curso_agregar'))
         else:
-            sql = 'INSERT INTO cursos (nombre_curso, categoria_curso, tipo_curso, modalidad_curso, estado, fecha_creacion, fecha_modificacion) VALUES (%s, %s, %s,%s, %s, %s, %s)'
-            valores = (nombre_curso, categoria_curso, tipo_curso, modalidad_curso, estado, fecha_creacion, fecha_modificacion)
+            sql = 'INSERT INTO cursos (nombre_curso,codigo_curso, tipo_curso, modalidad_curso, duracion_curso, estado, fecha_creacion, fecha_modificacion) VALUES (%s, %s, %s,%s, %s, %s, %s, %s)'
+            valores = (nombre_curso,codigo_curso, tipo_curso, modalidad_curso, duracion_curso, estado, fecha_creacion, fecha_modificacion)
             cur.execute(sql, valores)
             con.commit()
             cur.close()
             con.close()
             flash('Curso agregado correctamente')
-            return redirect(url_for('cursos.curso_agregar'))
+            return redirect(url_for('cursos.cursos_buscar'))
     return redirect(url_for('cursos.curso_agregar'))
 
 #----------------------------------DETALLES DE CURSOS---------------------------
@@ -101,14 +101,14 @@ def curso_detalles(id):
     with get_db_connection() as con:
         with con.cursor(cursor_factory=RealDictCursor) as cur:
             # Asegúrate de usar parámetros para evitar inyección SQL
-            cur.execute('SELECT * FROM detalles_cursos WHERE id_curso = %s',(id,))
+            cur.execute('SELECT * FROM detalles_curso WHERE id_curso = %s',(id,))
             curso = cur.fetchone()
     if curso is None:
         flash('El curso no existe o ha sido eliminado.')
         return redirect(url_for('cursos.cursos_buscar'))
     return render_template('cursos/curso_detalles.html', curso = curso)
 
-#---------------------------------EDITAR EMPLEADO-----------------------------------
+#---------------------------------EDITAR CURSO-----------------------------------
 @cursos.route('/cursos/editar/<string:id>')
 @login_required
 def curso_editar(id):
@@ -119,28 +119,29 @@ def curso_editar(id):
     con.commit()
     cur.close()
     con.close()
-    return render_template('cursos/curso_editar.html',curso = curso[0],categorias = lista_categorias(), modalidades = lista_modalidades(), tipos = lista_tipos() )
+    return render_template('cursos/curso_editar.html',curso = curso[0], modalidades = lista_modalidades(), tipos = lista_tipos() )
 
 @cursos.route('/cursos/editar/<string:id>',methods=['POST'])
 @login_required
 def curso_actualizar(id):
     if request.method == 'POST':
         nombre_curso = request.form['nombre_curso']
-        categoria_curso = request.form['id_categoria']
+        codigo_curso = request.form['codigo_curso']
         tipo_curso = request.form['id_tipo']
+        duracion_curso = request.form['duracion_curso']
         modalidad_curso = request.form['id_modalidad']
         fecha_modificacion= datetime.now()
         
         con = get_db_connection()
         cur = con.cursor()
-        sql="UPDATE cursos SET nombre_curso = %s, categoria_curso = %s, tipo_curso = %s, modalidad_curso = %s, fecha_modificacion=%s WHERE id_curso=%s"
-        valores=(nombre_curso,categoria_curso,tipo_curso,modalidad_curso,fecha_modificacion,id)
+        sql="UPDATE cursos SET nombre_curso = %s, codigo_curso = %s, tipo_curso = %s, modalidad_curso = %s,duracion_curso = %s, fecha_modificacion=%s WHERE id_curso=%s"
+        valores=(nombre_curso,codigo_curso,tipo_curso,modalidad_curso,duracion_curso,fecha_modificacion,id)
         cur.execute(sql,valores)
         con.commit()
         cur.close()
         con.close()
         flash("Curso actualizado correctamente")
-    return redirect(url_for('cursos.cursos_Buscar'))
+    return redirect(url_for('cursos.cursos_buscar'))
 
 #---------------------------ELIMINAR CURSO------------------------------
 @cursos.route('/cursos/eliminar/<string:id>')
@@ -158,15 +159,15 @@ def curso_eliminar(id):
     cur.close()
     con.close()
     flash("Curso eliminado correctamente")
-    return redirect(url_for('cursos.cursos_Buscar'))
+    return redirect(url_for('cursos.cursos_buscar'))
 
 #--------------------------------PAPELERA DE CURSOS---------------------------------
 @cursos.route("/cursos/papelera")
 @login_required
 def cursos_papelera():
     search_query = request.args.get('buscar', '', type=str)
-    sql_count = 'SELECT COUNT(*) detalles_cursos WHERE estado = False AND (nombre_curso ILIKE %s OR nombre_tipo %s);'
-    sql_lim = 'SELECT * FROM cursos WHERE estado = False AND (nombre_curso ILIKE %s OR nombre_tipo %s) ORDER BY id_curso DESC LIMIT %s OFFSET %s;'
+    sql_count = 'SELECT COUNT(*) FROM detalles_curso WHERE estado = False AND (nombre_curso ILIKE %s OR codigo_curso ILIKE %s);'
+    sql_lim = 'SELECT * FROM detalles_curso WHERE estado = False AND (nombre_curso ILIKE %s OR codigo_curso ILIKE %s) ORDER BY id_curso DESC LIMIT %s OFFSET %s;'
     paginado = paginador1(sql_count,sql_lim, search_query, 1, 5)
     return render_template('cursos/cursos_papelera.html',
                            cursos=paginado[0],
@@ -183,7 +184,7 @@ def curso_detallesPapelera(id):
     with get_db_connection() as con:
         with con.cursor(cursor_factory=RealDictCursor) as cur:
             # Asegúrate de usar parámetros para evitar inyección SQL
-            cur.execute('SELECT * FROM detalles_cursos WHERE id_curso = %s',(id,))
+            cur.execute('SELECT * FROM detalles_curso WHERE id_curso = %s',(id,))
             curso = cur.fetchone()
     if curso is None:
         flash('El curso no existe o ha sido eliminado.')
@@ -194,7 +195,7 @@ def curso_detallesPapelera(id):
 @cursos.route('/cursos/papelera/restaurar/<string:id>')
 @login_required
 def curso_restaurar(id):
-    estado = False
+    estado = True
     fecha_modificacion= datetime.now()
         
     con = get_db_connection()
@@ -206,4 +207,4 @@ def curso_restaurar(id):
     cur.close()
     con.close()
     flash("Curso restaurado correctamente")
-    return redirect(url_for('cursos.cursos_Buscar'))
+    return redirect(url_for('cursos.cursos_buscar'))

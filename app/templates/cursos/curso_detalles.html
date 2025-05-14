@@ -1,0 +1,34 @@
+{% extends './layout.html' %}
+
+{% block body %}
+<h2>Detalles de Cursos</h2>
+<p class="fc">Fecha creación: {{ curso.fecha_creacion }}</p>
+<p class="fc">Fecha modificación: {{ curso.fecha_modificacion }}</p>
+<br />
+<!-- ----------------------------------------------------------------------------------------------- -->
+<table>
+  <thead>
+    <tr>
+        <th>Nombre curso</th>
+        <th>Codigo</th>
+        <th>Tema/tipo</th>
+        <th>Modalidad</th>
+        <th>Duracion</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+        <td>{{curso.nombre_curso}}</td>
+        <td>{{curso.codigo_curso}}</td>
+        <td>{{curso.nombre_tipo}}</td>
+        <td>{{curso.nombre_modalidad}}</td>
+        <td>{{curso.duracion_curso}}</td>
+    </tr>
+  </tbody>
+</table>
+<div>
+  <a
+    class="botones"
+    href="{{ url_for('cursos.cursos_buscar') }}">Cancelar</a>
+</div>
+{% endblock %}

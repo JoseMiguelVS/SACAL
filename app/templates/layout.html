@@ -34,8 +34,8 @@
                     <div class="dropdown-content">
                         <a href="{{ url_for('ponentes.ponentes_buscar') }}">Ponentes</a>
                         <a href="{{ url_for('categorias.categorias_buscar') }}">Categorias</a>
-                        <a href="[[ url_for('paquetes.paquetes_buscar') ]]">Paquetes</a>
-                        <a href="#">Cursos</a>
+                        <a href="{{ url_for('paquete.paquetes_buscar') }}">Paquetes</a>
+                        <a href="{{ url_for('cursos.cursos_buscar') }}">Cursos</a>
                         <a href="#">Pagos</a>
                     </div>
                 </div>

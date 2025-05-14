@@ -1,0 +1,77 @@
+{% extends './layout.html' %}
+{% block body %}
+
+<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
+  {% endif %} alert-dismissible fade show" role="alert">
+  <strong>{{message}}</strong>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+<!-- -------------------------------------------------------------------------- -->
+
+<div class="form-container">
+  <form class="formulario" method="POST" action="{{url_for('cursos.curso_actualizar',id=curso[0])}}">
+    <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+    <div>
+        <div class="espacio_form">
+          <input type="text" id="codigo_curso" placeholder="Codigo curso" name="codigo_curso"
+            value="{{curso[2]}}">
+        </div>
+
+      <div class="espacio_form">
+        <input type="text" id="nombre_curso" placeholder="Nombre Curso" name="nombre_curso"
+          value="{{curso[1]}}">
+      </div>
+
+      <div class="espacio_form">
+        <input type="text" id="duracion_curso" placeholder="Duracion Curso" name="duracion_curso"
+          value="{{curso[3]}}">
+      </div>
+
+      <!-- ------------------------------------desplegable-------------------------------------------------------------- -->
+      <div class="espacio-form">
+        <select name="id_rol" id="id_rol" class="form-select" aria-label="Default select example">
+          <option value="true" selected>------Seleccione el tipo--------</option>
+          {% if tipos %}
+          {% for tipo in tipos %}
+          <option value="{{tipo.0}}">{{tipo.1}}</option>
+          {% endfor %}
+          {% else %}
+          <option>Aún no hay registros</option>
+          {% endif %}
+        </select>
+      </div>
+
+      <!-- ----------------------------------------MODALIDAD-------------------------------------------------------- -->
+      <div class="espacio_form">
+        <select name="id_modalidad" id="id_modalidad" aria-label="Default select example">
+            <option value="true" selected>-Seleccione el modalidad-</option>
+            {% if modalidades %}
+            {% for modalidad in modalidades %}
+            <option value="{{modalidad.0}}">{{modalidad.1}}</option>
+            {% endfor %}
+            {% else %}
+            <option>Aún no hay registros</option>
+            {% endif %}
+        </select>
+    </div>
+
+      <div class="espacio-form text-center">
+        <a class="botones" href="{{url_for('cursos.cursos_buscar')}}">
+          Cancelar
+        </a>
+        <button class="botones" type="submit">
+          Guardar
+        </button>
+      </div>
+      
+    </div>
+  </form>
+</div>
+{% endblock %}
