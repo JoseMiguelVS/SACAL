@@ -48,20 +48,6 @@
         </select>
       </div>
 
-      <!-- ----------------------------------------MODALIDAD-------------------------------------------------------- -->
-      <div class="espacio_form">
-        <select name="id_modalidad" id="id_modalidad" aria-label="Default select example">
-            <option value="true" selected>-Seleccione el modalidad-</option>
-            {% if modalidades %}
-            {% for modalidad in modalidades %}
-            <option value="{{modalidad.0}}">{{modalidad.1}}</option>
-            {% endfor %}
-            {% else %}
-            <option>Aún no hay registros</option>
-            {% endif %}
-        </select>
-    </div>
-
       <div class="espacio-form text-center">
         <a class="botones" href="{{url_for('cursos.cursos_buscar')}}">
           Cancelar

@@ -27,15 +27,6 @@ def lista_tipos():
     cur.close()
     con.close()
     return tipo
-#------------------------------CONSULTA DE MODALIDADES--------------------------
-def lista_modalidades():
-    con = get_db_connection()
-    cur = con.cursor()
-    cur.execute('SELECT * FROM modalidades_cursos ORDER BY id_modalidad ASC;')
-    modalidad = cur.fetchall()
-    cur.close()
-    con.close()
-    return modalidad
 
 #-------------------------------BUSCAR CURSO--------------------------
 @cursos.route("/cursos")
@@ -58,7 +49,7 @@ def cursos_buscar():
 @login_required
 def curso_agregar():
     titulo = 'Agregar curso'
-    return render_template('cursos/cursos_agregar.html', titulo = titulo, modalidades = lista_modalidades(), tipos = lista_tipos())
+    return render_template('cursos/cursos_agregar.html', titulo = titulo, tipos = lista_tipos())
 
 @cursos.route("/cursos/agregar/nuevo",methods = ('GET', 'POST'))
 @login_required
@@ -68,7 +59,6 @@ def cursos_nuevo():
         codigo_curso = request.form['codigo_curso']
         duracion_curso = request.form['duracion_curso']
         tipo_curso = request.form['id_tipo']
-        modalidad_curso = request.form['id_modalidad']
         estado = True
         fecha_creacion= datetime.now()
         fecha_modificacion = datetime.now()
@@ -84,8 +74,8 @@ def cursos_nuevo():
             flash('Error: el curso ya existe. Intente con otro')
             return redirect(url_for('cursos.curso_agregar'))
         else:
-            sql = 'INSERT INTO cursos (nombre_curso,codigo_curso, tipo_curso, modalidad_curso, duracion_curso, estado, fecha_creacion, fecha_modificacion) VALUES (%s, %s, %s,%s, %s, %s, %s, %s)'
-            valores = (nombre_curso,codigo_curso, tipo_curso, modalidad_curso, duracion_curso, estado, fecha_creacion, fecha_modificacion)
+            sql = 'INSERT INTO cursos (nombre_curso,codigo_curso, tipo_curso, duracion_curso, estado, fecha_creacion, fecha_modificacion) VALUES (%s, %s, %s, %s, %s, %s, %s)'
+            valores = (nombre_curso,codigo_curso, tipo_curso, duracion_curso, estado, fecha_creacion, fecha_modificacion)
             cur.execute(sql, valores)
             con.commit()
             cur.close()
@@ -119,7 +109,7 @@ def curso_editar(id):
     con.commit()
     cur.close()
     con.close()
-    return render_template('cursos/curso_editar.html',curso = curso[0], modalidades = lista_modalidades(), tipos = lista_tipos() )
+    return render_template('cursos/curso_editar.html',curso = curso[0], tipos = lista_tipos() )
 
 @cursos.route('/cursos/editar/<string:id>',methods=['POST'])
 @login_required
@@ -129,13 +119,12 @@ def curso_actualizar(id):
         codigo_curso = request.form['codigo_curso']
         tipo_curso = request.form['id_tipo']
         duracion_curso = request.form['duracion_curso']
-        modalidad_curso = request.form['id_modalidad']
         fecha_modificacion= datetime.now()
         
         con = get_db_connection()
         cur = con.cursor()
-        sql="UPDATE cursos SET nombre_curso = %s, codigo_curso = %s, tipo_curso = %s, modalidad_curso = %s,duracion_curso = %s, fecha_modificacion=%s WHERE id_curso=%s"
-        valores=(nombre_curso,codigo_curso,tipo_curso,modalidad_curso,duracion_curso,fecha_modificacion,id)
+        sql="UPDATE cursos SET nombre_curso = %s, codigo_curso = %s, tipo_curso = %s, duracion_curso = %s, fecha_modificacion=%s WHERE id_curso=%s"
+        valores=(nombre_curso,codigo_curso,tipo_curso,duracion_curso,fecha_modificacion,id)
         cur.execute(sql,valores)
         con.commit()
         cur.close()
