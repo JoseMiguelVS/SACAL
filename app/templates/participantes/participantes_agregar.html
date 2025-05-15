@@ -1,0 +1,90 @@
+{% extends './layout.html' %}
+
+{% block title %} {{titulo}} {% endblock %}
+{% block body %}
+
+<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
+    {% endif %} alert-dismissible fade show" role="alert">
+    <strong>{{message}}</strong>
+    <button type="button" class="" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+<!-- ----------------------------------------------------------------------------------------------- -->
+<h1>Registrar nuevo participantes</h1>
+<div class="form-container">
+    <form class="formulario" method="POST" action="{{url_for('participantes.participante_nuevo')}}"
+        enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+        <div>
+            <div class="espacio_form">
+                <!-- <label for="nombre_usuario">Nombre de usuario</label> -->
+                <input type="text" id="nombre_participante" placeholder="Nombre del participante"
+                    name="nombre_participante" required>
+            </div>
+            <div class="espacio_form">
+                <!-- <label for="nombre_usuario">Nombre de usuario</label> -->
+                <input type="text" id="num_telefono" placeholder="Numero de telefono" name="num_telefono" required>
+            </div>
+            <div class="espacio_form">
+                <!-- <label for="nombre_usuario">Nombre de usuario</label> -->
+                <input type="text" id="clave_participante" placeholder="Clave" name="clave_participante" required>
+            </div>
+            <!-- ----------------------------------------Sesion-------------------------------------------------------- -->
+            <div class="espacio_form">
+                <select name="id_sesion" id="id_sesion" aria-label="Default select example">
+                    <option value="true" selected>-Seleccione la sesion-</option>
+                    {% if sesiones %}
+                    {% for sesion in sesiones %}
+                    <option value="{{sesion.0}}">{{sesion.2}}</option>
+                    {% endfor %}
+                    {% else %}
+                    <option>Aún no hay registros</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <!-- ----------------------------------------curso-------------------------------------------------------- -->
+            <div class="espacio_form">
+                <select name="id_curso" id="id_curso" aria-label="Default select example">
+                    <option value="true" selected>-Seleccione el curso-</option>
+                    {% if cursos %}
+                    {% for curso in cursos %}
+                    <option value="{{curso.0}}">{{curso.1}}</option>
+                    {% endfor %}
+                    {% else %}
+                    <option>Aún no hay registros</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <!-- ----------------------------------------PAQUETE-------------------------------------------------------- -->
+            <div class="espacio_form">
+                <select name="id_paquete" id="id_paquete" aria-label="Default select example">
+                    <option value="true" selected>-Seleccione el paquete-</option>
+                    {% if paquetes %}
+                    {% for paquete in paquetes %}
+                    <option value="{{paquete.0}}">{{paquete.1}}</option>
+                    {% endfor %}
+                    {% else %}
+                    <option>Aún no hay registros</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <div class="espacio_form">
+                <button class="botones" type="submit">Guardar</button>
+            </div>
+            <div class="espacio_form">
+                <a class="botones" href="{{url_for('participantes.participantes_buscar')}}">Cancelar</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

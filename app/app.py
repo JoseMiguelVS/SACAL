@@ -6,6 +6,8 @@ from routes.ponentes.routes import ponentes
 from routes.categorias.routes import categorias
 from routes.paquetes.routes import paquetes
 from routes.cursos.routes import cursos
+from routes.participantes.routes import participantes
+from routes.sesiones.routes import sesiones
 
 from flask import Flask, render_template, url_for, redirect, request, flash
 from flask import Flask
@@ -59,6 +61,8 @@ app.register_blueprint(ponentes)
 app.register_blueprint(categorias)
 app.register_blueprint(paquetes)
 app.register_blueprint(cursos)
+app.register_blueprint(participantes)
+app.register_blueprint(sesiones)
 
 # Rutas principales
 @app.route("/")

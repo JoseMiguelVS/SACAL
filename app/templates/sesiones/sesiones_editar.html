@@ -1,0 +1,86 @@
+{% extends './layout.html' %}
+{% block body %}
+
+<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
+    {% endif %} alert-dismissible fade show" role="alert">
+    <strong>{{message}}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+<!-- -------------------------------------------------------------------------- -->
+
+<div class="form-container">
+    <form class="formulario" method="POST" action="{{url_for('sesiones.sesion_actualizar',id=sesiones[0])}}">
+        <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+        <div>
+            <div class="espacio_form">
+                <input type="text" id="fecha" placeholder="Fecha" name="fecha" value="{{ sesiones[2] }}">
+            </div>
+            <div class="espacio_form">
+                <input type="text" id="horario_inicio" placeholder="Hora de inicio" name="horario_inicio"
+                    value="{{ sesiones[3] }}">
+            </div>
+            <div class="espacio_form">
+                <input type="text" id="horario_fin" placeholder="Hora de fin" name="horario_fin"
+                    value="{{ sesiones[6] }}">
+            </div>
+
+            <!-- ----------------------------------------CURSO-------------------------------------------------------- -->
+            <div class="espacio_form">
+                <select name="id_curso" id="id_curso" aria-label="Default select example">
+                    <option value="true" selected>-Seleccione el curso-</option>
+                    {% if cursos %}
+                    {% for curso in cursos %}
+                    <option value="{{curso.0}}">{{curso.1}}</option>
+                    {% endfor %}
+                    {% else %}
+                    <option>Aún no hay registros</option>
+                    {% endif %}
+                </select>
+            </div>
+            <!-- ----------------------------------------MES-------------------------------------------------------- -->
+            <div class="espacio_form">
+                <select name="id_mes" id="id_mes" aria-label="Default select example">
+                    <option value="true" selected>-Seleccione el mes-</option>
+                    {% if meses %}
+                    {% for mes in meses %}
+                    <option value="{{mes.0}}">{{mes.1}}</option>
+                    {% endfor %}
+                    {% else %}
+                    <option>Aún no hay registros</option>
+                    {% endif %}
+                </select>
+            </div>
+            <!-- ----------------------------------------SEMANA-------------------------------------------------------- -->
+            <div class="espacio_form">
+                <select name="id_semana" id="id_semana" aria-label="Default select example">
+                    <option value="true" selected>-Seleccione el semana-</option>
+                    {% if semanas %}
+                    {% for semana in semanas %}
+                    <option value="{{semana.0}}">{{semana.1}}</option>
+                    {% endfor %}
+                    {% else %}
+                    <option>Aún no hay registros</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <div class="espacio-form text-center">
+                <a class="botones" href="{{url_for('sesiones.sesiones_buscar')}}">
+                    Cancelar
+                </a>
+                <button class="botones" type="submit">
+                    Guardar
+                </button>
+            </div>
+
+        </div>
+    </form>
+</div>
+{% endblock %}

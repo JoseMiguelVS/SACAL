@@ -1,6 +1,6 @@
 {% extends './layout.html' %}
 {% block body %}
-<h2>Cursos</h2>
+<h2>Sesiones canceladas</h2>
 <br>
 <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
 {% with messages = get_flashed_messages() %}
@@ -18,7 +18,7 @@
 <div>
     <div class="form-container">
         <!-- -------------------------------------BUSCADOR------------------------------------------ -->
-        <form method="get" action="{{ url_for('cursos.cursos_papelera') }}" class="d-flex">
+        <form method="get" action="{{ url_for('sesiones.sesiones_papelera') }}" class="d-flex">
             <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
                 required>
             <button type="submit"><i class="fas fa-search"></i></button>
@@ -31,25 +31,29 @@
     <table>
         <thead>
             <tr>
-                <th>Nombre curso</th>
-                <th>Codigo</th>
-                <th>Tema/tipo</th>
-                <th>Duracion</th>
+                <th>Curso</th>
+                <th>Fecha</th>
+                <th>Hora inicio</th>
+                <th>Hora fin</th>
+                <th>Mes</th>
+                <th>Semana</th>
                 <th>Restaurar</th>
             </tr>
         </thead>
         <tbody>
-            {% if cursos %}
-            {% for curso in cursos %}
-            {% if curso.estado == false %}
+            {% if sesiones %}
+            {% for sesion in sesiones %}
+            {% if sesion.estado == false %}
             <tr>
-                <td>{{curso.nombre_curso}}</td>
-                <td>{{curso.codigo_curso}}</td>
-                <td>{{curso.nombre_tipo}}</td>
-                <td>{{curso.duracion_curso}}</td>
+                <td>{{sesion.nombre_curso}}</td>
+                <td>{{sesion.fecha}}</td>
+                <td>{{sesion.horario_inicio}}</td>
+                <td>{{sesion.horario_fin}}</td>
+                <td>{{sesion.nombre_mes}}</td>
+                <td>{{sesion.semana}}</td>
                 <td>
                     <button class="botones" type="button" data-bs-toggle="modal"
-                        data-bs-target="#staticBackdrop-{{curso.id_curso}}"><i class="fas fa-sync-alt"
+                        data-bs-target="#staticBackdrop-{{sesion.id_sesion}}"><i class="fas fa-sync-alt"
                             style="font-size: 18px;"></i>
                     </button>
                 </td>
@@ -57,7 +61,7 @@
                 {% endfor %}
                 {% else %}
             <tr>
-                <td align="center" colspan="8">No existen cursos eliminados</td>
+                <td align="center" colspan="8">No existen sesiones canceladas</td>
             </tr>
             {% endif %}
             </tr>
@@ -70,37 +74,37 @@
         {% if page > 1 %}
         <li class="page-item">
             <a class="page-link bg-warning"
-                href="{{url_for('cursos_papelera')}}?page={{ page - 1 }}&per_page={{ per_page }}" aria-label="Previous">
+                href="{{url_for('sesiones_papelera')}}?page={{ page - 1 }}&per_page={{ per_page }}" aria-label="Previous">
                 <span aria-hidden="true">&laquo;</span>
             </a>
         </li>
         {% if page != 1 and page != 2 %}
-        <li class="page-item"><a class="page-link bg-warning" href="{{url_for('cursos_papelera')}}">1</a></li>
+        <li class="page-item"><a class="page-link bg-warning" href="{{url_for('sesiones_papelera')}}">1</a></li>
         {% if page != 3 %}
         <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
         {% endif %}
         {% endif %}
         <li class="page-item"><a class="page-link bg-warning"
-                href="{{url_for('cursos_papelera')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+                href="{{url_for('sesiones_papelera')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
         </li>
         {% endif %}
 
         <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
 
         {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
-                href="{{url_for('cursos_papelera')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+                href="{{url_for('sesiones_papelera')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
             </li>
             {% if page != total_pages and page != total_pages-1 %}
             {% if page != total_pages-2 %}
             <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
             {% endif %}
             <li class="page-item"><a class="page-link bg-warning"
-                    href="{{url_for('cursos_papelera')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                    href="{{url_for('sesiones_papelera')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
             </li>
             {% endif %}
             <li class="page-item">
                 <a class="page-link bg-warning"
-                    href="{{url_for('cursos_papelera')}}?page={{ page + 1 }}&per_page={{ per_page }}" aria-label="Next">
+                    href="{{url_for('sesiones_papelera')}}?page={{ page + 1 }}&per_page={{ per_page }}" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>
@@ -109,9 +113,9 @@
 </nav>
 
 <!-- --------------------------------------------------MODAL--------------------------------------------------- -->
-{% if cursos %}
-{% for curso in cursos %}
-<div class="modal fade" id="staticBackdrop-{{curso.id_curso}}" data-bs-backdrop="static" data-bs-keyboard="false"
+{% if sesiones %}
+{% for sesion in sesiones %}
+<div class="modal fade" id="staticBackdrop-{{sesion.id_sesion}}" data-bs-backdrop="static" data-bs-keyboard="false"
     tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -120,11 +124,11 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                ¿Deseas restaurar a <strong>{{ curso.nombre_curso }}</strong>?
+                ¿Deseas restaurar la sesion del dia <strong>{{ sesion.fecha }}</strong>?
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <a class="btn btn-danger" href="{{ url_for('cursos.curso_restaurar', id = curso.id_curso) }}"
+                <a class="btn btn-danger" href="{{ url_for('sesiones.sesion_restaurar', id = sesion.id_sesion) }}"
                     class="btn-delete"><i class="fas fa-trash-alt"></i>Restaurar</a>
             </div>
         </div>

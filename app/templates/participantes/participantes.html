@@ -1,0 +1,114 @@
+{% extends './layout.html' %}
+{% block body %}
+<h2>Participantes</h2>
+<br>
+
+<!-- Alertas -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{% if " Error" in message %}danger{% elif "Advertencia" in message %}warning{% else %}success{%
+    endif %} alert-dismissible fade show" role="alert">
+    <strong>{{ message }}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<!-- Buscador con 3 select -->
+<div>
+    <div class="form-container">
+        <!-- --------------------------------------NUEVO USUARIO ------------------------------------- -->
+        <a class="botones" href="{{url_for('participantes.participante_agregar')}}"><i class="fa fa-plus"
+                style="font-size: 18px;"></i></a>
+
+    </div>
+</div>
+<div>
+    <div class="form-container">
+        <form method="get" action="{{ url_for('participantes.participantes_buscar') }}" class="d-flex">
+            <!-- Curso -->
+            <div class="espacio_form">
+                <select name="nombre_curso" id="nombre_curso">
+                    <option value="">-Seleccione el curso-</option>
+                    {% if cursos %}
+                    {% for curso in cursos %}
+                    <option value="{{ curso.1 }}" {% if request.args.get('nombre_curso')==curso.1 %}selected{% endif %}>
+                        {{ curso.1 }}
+                    </option>
+                    {% endfor %}
+                    {% else %}
+                    <option>Aún no hay registros</option>
+                    {% endif %}
+                </select>
+            </div>
+
+
+            <!-- Mes -->
+            <div class="espacio_form">
+                <select name="nombre_mes" id="nombre_mes">
+                    <option value="">-Seleccione el mes-</option>
+                    {% if meses %}
+                    {% for mes in meses %}
+                    <option value="{{ mes.1 }}" {% if request.args.get('nombre_mes')==mes.1|string %}selected{% endif %}>{{
+                        mes.1 }}</option>
+                    {% endfor %}
+                    {% else %}
+                    <option>Aún no hay registros</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <!-- Semana -->
+            <div class="espacio_form">
+                <select name="nombre_semana" id="nombre_semana">
+                    <option value="">-Seleccione la semana-</option>
+                    {% if semanas %}
+                    {% for semana in semanas %}
+                    <option value="{{ semana.1 }}" {% if request.args.get('nombre_semana')==semana.1|string %}selected{%
+                        endif %}>{{ semana.1 }}</option>
+                    {% endfor %}
+                    {% else %}
+                    <option>Aún no hay registros</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <button type="submit"><i class="fas fa-search"></i></button>
+        </form>
+    </div>
+</div>
+
+<!-- Tabla de resultados -->
+<div class="tables">
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre Participante</th>
+                <th>Nombre Semana</th>
+                <th>Mes</th>
+                <th>Curso</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if participantes %}
+            {% for participantes in participantes %}
+            {% if participantes.estado == True %}
+            <tr>
+                <td>{{ participantes.nombre_participante }}</td>
+                <td>{{ participantes.semana }}</td>
+                <td>{{ participantes.nombre_mes }}</td>
+                <td>{{ participantes.nombre_curso }}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td align="center" colspan="4">No existen participantes</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

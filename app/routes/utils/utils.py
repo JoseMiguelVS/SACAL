@@ -143,3 +143,34 @@ def paginador2(sql_count: str, sql_lim: str, params_count: tuple, params_lim: tu
     total_pages = (total_items + per_page - 1) // per_page
 
     return items, page, per_page, total_items, total_pages
+
+#--------------------------------PAGINADOR 3------------------------
+def paginador3(sql_count: str, sql_lim: str, filtros: list, in_page: int, per_pages: int) -> tuple:
+    page = request.args.get('page', in_page, type=int)
+    per_page = request.args.get('per_page', per_pages, type=int)
+    if page < 1:
+        page = 1
+    if per_page < 1:
+        per_page = 1
+    offset = (page - 1) * per_page
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
+
+        cursor.execute(sql_count, filtros)
+        total_items = cursor.fetchone()['count']
+
+        cursor.execute(sql_lim, filtros + [per_page, offset])
+        items = cursor.fetchall()
+    
+    except Exception as e:
+        print(f"Error en la base de datos: {e}")
+        items = []
+        total_items = 0
+    finally:
+        cursor.close()
+        conn.close()
+
+    total_pages = (total_items + per_page - 1) // per_page
+    return items, page, per_page, total_items, total_pages
