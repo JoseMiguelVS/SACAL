@@ -16,90 +16,127 @@
 {% endif %}
 {% endwith %}
 
-<!-- Buscador con 3 select -->
+<!-- Buscador con 2 select -->
 <div>
     <div class="form-container">
-        <!-- --------------------------------------NUEVO USUARIO ------------------------------------- -->
+        <!-- -------------------------------------- ------------------------------------- -->
         <a class="botones" href="{{url_for('participantes.participante_agregar')}}"><i class="fa fa-plus"
                 style="font-size: 18px;"></i></a>
 
     </div>
-</div>
-<div>
     <div class="form-container">
-        <form method="get" action="{{ url_for('participantes.participantes_buscar') }}" class="d-flex">
-            <!-- Curso -->
-            <div class="espacio_form">
-                <select name="nombre_curso" id="nombre_curso">
-                    <option value="">-Seleccione el curso-</option>
-                    {% if cursos %}
-                    {% for curso in cursos %}
-                    <option value="{{ curso.1 }}" {% if request.args.get('nombre_curso')==curso.1 %}selected{% endif %}>
-                        {{ curso.1 }}
-                    </option>
-                    {% endfor %}
-                    {% else %}
-                    <option>Aún no hay registros</option>
-                    {% endif %}
-                </select>
-            </div>
+        <!-- -------------------------------------- ------------------------------------- -->
+        <a class="botones" href="{{url_for('sesiones.sesiones_buscar')}}">sesiones</a>
 
-
-            <!-- Mes -->
-            <div class="espacio_form">
-                <select name="nombre_mes" id="nombre_mes">
-                    <option value="">-Seleccione el mes-</option>
-                    {% if meses %}
-                    {% for mes in meses %}
-                    <option value="{{ mes.1 }}" {% if request.args.get('nombre_mes')==mes.1|string %}selected{% endif %}>{{
-                        mes.1 }}</option>
-                    {% endfor %}
-                    {% else %}
-                    <option>Aún no hay registros</option>
-                    {% endif %}
-                </select>
-            </div>
-
-            <!-- Semana -->
-            <div class="espacio_form">
-                <select name="nombre_semana" id="nombre_semana">
-                    <option value="">-Seleccione la semana-</option>
-                    {% if semanas %}
-                    {% for semana in semanas %}
-                    <option value="{{ semana.1 }}" {% if request.args.get('nombre_semana')==semana.1|string %}selected{%
-                        endif %}>{{ semana.1 }}</option>
-                    {% endfor %}
-                    {% else %}
-                    <option>Aún no hay registros</option>
-                    {% endif %}
-                </select>
-            </div>
-
-            <button type="submit"><i class="fas fa-search"></i></button>
-        </form>
     </div>
 </div>
 
+<div>
+    <form method="get" action="{{ url_for('participantes.participantes_buscar') }}" class="d-flex">
+        <!-- Buscar por sesión/curso -->
+        <div class="espacio_form">
+            <select name="nombre_curso" id="nombre_curso">
+                <option value="">-Seleccione el curso-</option>
+                {% if cursos %}
+                {% for curso in cursos %}
+                <option value="{{ curso.1 }}" {% if request.args.get('nombre_curso')==curso.1 %}selected{% endif %}>
+                    {{ curso.1 }}
+                </option>
+                {% endfor %}
+                {% else %}
+                <option>Aún no hay registros</option>
+                {% endif %}
+            </select>
+        </div>
+
+        <div class="espacio_form">
+            <select name="sesion" id="sesion">
+                <option value="">-Seleccione la sesion-</option>
+                {% if sesiones %}
+                {% for sesion in sesiones %}
+                <option value="{{ sesion.4 }}" {% if request.args.get('sesion')==sesion.4 %}selected{% endif %}>
+                    {{ sesion.4 }}
+                </option>
+                {% endfor %}
+                {% else %}
+                <option>Aún no hay registros</option>
+                {% endif %}
+            </select>
+            <button type="submit">Aceptar</button>
+        </div>
+
+    </form>
+</div>
+
 <!-- Tabla de resultados -->
-<div class="tables">
+<div class="tables_participantes">
     <table>
         <thead>
             <tr>
+                <th>Clave Participante</th>
                 <th>Nombre Participante</th>
-                <th>Nombre Semana</th>
-                <th>Mes</th>
-                <th>Curso</th>
+                <th>Paquete</th>
+                <th>Pago validado</th>
+                <th>Fecha del pago</th>
+                <th>Factura</th>
+                <th>Forma pago</th>
+                <th>Promotor</th>
+                <th>Confirmacion de grupo de WhatsApp</th>
+                <th>Materiales enviados</th>
+                <th>Grabaciones enviadas</th>
+                <th>Evaluacion recibida</th>
+                <th>Obervaciones</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             {% if participantes %}
-            {% for participantes in participantes %}
-            {% if participantes.estado == True %}
-            <tr>
-                <td>{{ participantes.nombre_participante }}</td>
-                <td>{{ participantes.semana }}</td>
-                <td>{{ participantes.nombre_mes }}</td>
-                <td>{{ participantes.nombre_curso }}</td>
+            {% for p in participantes %}
+            {% if p.estado == True %}
+            <tr data-id="{{ p.id_participante }}">
+                <td><input type="text" name="clave_participante" value="{{ p.clave_participante }}"></td>
+                <td><input type="text" name="nombre_participante" value="{{ p.nombre_participante }}"></td>
+                <td>
+                    <select name="nombre_paquete" id="nombre_paquete" aria-label="Default select example">
+                        <option value="">Paquete</option>
+                        {% if paquetes %}
+                        {% for paquete in paquetes %}
+                        <option value="{{ paquete.0 }}" {% if paquete.0==p.nombre_paquete %}selected{% endif %}>
+                            {{ paquete.1 }}
+                        </option>
+                        {% endfor %}
+                        {% else %}
+                        <option>Aún no hay registros</option>
+                        {% endif %}
+                    </select>
+                </td>
+
+                <td>{{ p.validacion_pago }}</td>
+                <td><input type="date" name="fecha_pago" value="{{ p.fecha_pago }}"></td>
+                <td><input type="checkbox" name="factura_pago" {% if p.factura_pago %}checked{% endif %}></td>
+                <td>
+                    <select name="cuenta_destino" id="cuenta_destino" aria-label="Default select example">
+                        <option value="">Cuenta destino</option>
+                        {% if cuentas %}
+                        {% for cuenta in cuentas %}
+                        <option value="{{ cuenta.0 }}" {% if cuenta.0==p.cuenta_destino %}selected{% endif %}>
+                            {{ cuenta.1 }}
+                        </option>
+                        {% endfor %}
+                        {% else %}
+                        <option>Aún no hay registros</option>
+                        {% endif %}
+                    </select>
+                </td>
+
+                <td> {{ p.nombre_empleado }}</td>
+                <td><input type="checkbox" name="confirmacion_grupo" {% if p.confirmacion_grupo %}checked{% endif %}>
+                </td>
+                <td><input type="checkbox" name="materiales" {% if p.materiales %}checked{% endif %}></td>
+                <td><input type="checkbox" name="grabaciones" {% if p.grabaciones %}checked{% endif %}></td>
+                <td><input type="checkbox" name="evaluacion_dc3" {% if p.evaluacion_dc3 %}checked{% endif %}></td>
+                <td><input type="text" name="observaciones" value="{{ p.observaciones }}"></td>
+                <td><button onclick="guardarCambios(this)">Guardar</button></td>
             </tr>
             {% endif %}
             {% endfor %}
@@ -109,6 +146,42 @@
             </tr>
             {% endif %}
         </tbody>
+
     </table>
 </div>
+
+<script>
+    function guardarCambios(button) {
+        const fila = button.closest("tr");
+        const id = fila.getAttribute("data-id");
+
+        const datos = {};
+        fila.querySelectorAll("input, select").forEach(element => {
+            if (element.type === "checkbox") {
+                datos[element.name] = element.checked;
+            } else {
+                datos[element.name] = element.value;
+            }
+        });
+
+
+        fetch(`/participantes/actualizar/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': "{{ csrf_token() }}"  // si usas CSRF protection
+            },
+            body: JSON.stringify(datos)
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || 'Datos actualizados');
+            })
+            .catch(error => {
+                alert('Error al actualizar');
+                console.error(error);
+            });
+    }
+</script>
+
 {% endblock %}

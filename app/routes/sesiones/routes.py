@@ -37,6 +37,16 @@ def lista_meses():
     con.close()
     return meses
 
+#---------------------------LISTA DE CATEGORIAS--------------------
+def lista_categorias():
+    con = get_db_connection()
+    cur = con.cursor()
+    cur.execute('SELECT * FROM categorias ORDER BY id_categoria ASC')
+    categorias = cur.fetchall()
+    cur.close()
+    con.close()
+    return categorias
+
 #-----------------------------------------BUSCAR SESION-------------------------------------
 @sesiones.route("/participantes/sesiones")
 @login_required
@@ -70,13 +80,22 @@ def sesiones_buscar():
 @login_required
 def sesiones_agregar():
     titulo = 'Agregar sesion'
-    return render_template('sesiones/sesiones_agregar.html', titulo = titulo, cursos = lista_cursos(), semanas = lista_semanas(), meses = lista_meses())
+    return render_template('sesiones/sesiones_agregar.html', titulo = titulo, cursos = lista_cursos(), semanas = lista_semanas(), meses = lista_meses(), categorias = lista_categorias())
 
 @sesiones.route('/participantes/sesiones/agregar/nuevo', methods=("GET", "POST"))
 @login_required
 def sesion_nuevo():
     if request.method == 'POST':
         nombre_curso = request.form['id_curso']
+        curso1 = request.form['id_curso1']
+        curso2 = request.form['id_curso2']
+        curso3 = request.form['id_curso3']
+        curso4 = request.form['id_curso4']
+        curso5 = request.form['id_curso5']
+        curso6 = request.form['id_curso6']
+        curso7 = request.form['id_curso7']
+        curso8 = request.form['id_curso8']
+        curso9 = request.form['id_curso9']
         fecha = request.form['fecha']
         horario_inicio = request.form['horario_inicio']
         horario_fin = request.form['horario_fin']
@@ -86,8 +105,8 @@ def sesion_nuevo():
 
         con = get_db_connection()
         cur = con.cursor(cursor_factory = RealDictCursor)
-        sql = 'INSERT INTO sesiones_curso (nombre_curso, fecha, horario_inicio, horario_fin, mes, semana, estado) VALUES (%s, %s, %s,%s, %s, %s, %s)'
-        valores = (nombre_curso, fecha, horario_inicio, horario_fin, mes, semana, estado)
+        sql = 'INSERT INTO sesiones_curso (nombre_curso,curso1, curso2, curso3, curso4, curso5, curso6, curso7, curso8, curso9, fecha, horario_inicio, horario_fin, mes, semana, estado) VALUES (%s, %s, %s,%s, %s, %s, %s, %s, %s, %s,%s, %s, %s, %s, %s, %s)'
+        valores = (nombre_curso, curso1, curso2, curso3, curso4, curso5, curso6, curso7, curso8, curso9, fecha, horario_inicio, horario_fin, mes, semana, estado)
         cur.execute(sql,valores)
         con.commit()
         cur.close()

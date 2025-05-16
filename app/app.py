@@ -74,5 +74,15 @@ def login():
 def index():
     return render_template('/index.html')
 
-if __name__ == "__main__":
-    app.run(debug=True)
+#-------------------------------errores------------------------------------
+def pagina_no_encontrada(error):
+    return render_template('404.html')
+
+def acceso_no_autorizado(error):
+    return redirect(url_for('login'))
+
+if __name__ == '__main__':
+    csrf.init_app(app)
+    app.register_error_handler(404, pagina_no_encontrada)
+    app.register_error_handler(401, acceso_no_autorizado)
+    app.run(debug=True, port=5000) 

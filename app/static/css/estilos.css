@@ -302,6 +302,13 @@ input {
     align-items: center;
     padding: 1%;
 }
+.tables_participantes table{
+    align-items: center;
+    padding: 1%;
+    font-size: 12px;
+    border-collapse: collapse;
+    width: 100%;
+}
 
 table {
     width: 100%;
@@ -317,7 +324,7 @@ td {
 }
 
 th {
-    background-color: #686868;
+    background-color: #e7e7e7;
     color: rgb(8, 8, 8);
 }
 

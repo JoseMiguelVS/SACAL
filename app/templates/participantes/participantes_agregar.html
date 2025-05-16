@@ -26,6 +26,8 @@
                 <!-- <label for="nombre_usuario">Nombre de usuario</label> -->
                 <input type="text" id="nombre_participante" placeholder="Nombre del participante"
                     name="nombre_participante" required>
+                <input type="hidden" name="nombre_empleado" value="{{ current_user.id_empleado }}">
+
             </div>
             <div class="espacio_form">
                 <!-- <label for="nombre_usuario">Nombre de usuario</label> -->
@@ -41,7 +43,7 @@
                     <option value="true" selected>-Seleccione la sesion-</option>
                     {% if sesiones %}
                     {% for sesion in sesiones %}
-                    <option value="{{sesion.0}}">{{sesion.2}}</option>
+                    <option value="{{sesion.0}}">{{sesion.4}}</option>
                     {% endfor %}
                     {% else %}
                     <option>Aún no hay registros</option>
@@ -86,5 +88,44 @@
         </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const categoriaSelect = document.getElementById('id_categoria');
+        const cursoPrincipal = document.getElementById('id_curso');
+        const cursosEspeciales = [];
+    
+        // Recolectar los selects de cursos del 1 al 9
+        for (let i = 1; i <= 9; i++) {
+            cursosEspeciales.push(document.getElementById(`id_curso${i}`));
+        }
+    
+        function actualizarVisibilidad() {
+            const selectedText = categoriaSelect.options[categoriaSelect.selectedIndex].textContent.trim();
+    
+            if (selectedText === 'Especializaciones') {
+                cursoPrincipal.disabled = true;
+                cursoPrincipal.parentElement.style.display = 'none';
+    
+                cursosEspeciales.forEach(select => {
+                    select.disabled = false;
+                    select.parentElement.style.display = 'block';
+                });
+            } else {
+                cursoPrincipal.disabled = false;
+                cursoPrincipal.parentElement.style.display = 'block';
+    
+                cursosEspeciales.forEach(select => {
+                    select.disabled = true;
+                    select.parentElement.style.display = 'none';
+                });
+            }
+        }
+    
+        categoriaSelect.addEventListener('change', actualizarVisibilidad);
+        actualizarVisibilidad(); // Ejecutar al inicio por si ya hay selección
+    });
+    </script>
+    
 
 {% endblock %}

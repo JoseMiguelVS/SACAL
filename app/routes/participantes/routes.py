@@ -7,6 +7,16 @@ from ..utils.utils import get_db_connection, paginador3
 
 participantes = Blueprint('participantes', __name__)
 
+#-------------------------LISTA DE CUENTAS-----------------------
+def lista_cuentas():
+    con = get_db_connection()
+    cur = con.cursor()
+    cur.execute('SELECT * FROM cuentas ORDER BY id_cuenta ASC')
+    cuentas = cur.fetchall()
+    cur.close()
+    con.close()
+    return cuentas
+
 #--------------------------LISTA DE SESIONES---------------------
 def lista_sesiones():
     con = get_db_connection()
@@ -63,31 +73,29 @@ def lista_paquetes():
 @login_required
 def participantes_buscar():
     nombre_curso = request.args.get('nombre_curso', '', type=str)
-    nombre_mes = request.args.get('nombre_mes', '', type=str)
-    nombre_semana = request.args.get('semana', '', type=str)
+    sesion = request.args.get('sesion', '', type=str)
 
-    sql_count = '''SELECT COUNT(*) FROM vista_asistencias_detalladas
+    sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
                    WHERE (%s = '' OR nombre_curso::text = %s)
-                     AND (%s = '' OR nombre_mes::text = %s)
-                     AND (%s = '' OR semana::text = %s)'''
+                     AND (%s = '' OR fecha ILIKE %s)'''
 
-    sql_lim = '''SELECT * FROM vista_asistencias_detalladas
+    sql_lim = '''SELECT * FROM asistencias_detalladas
                  WHERE (%s = '' OR nombre_curso::text = %s)
-                   AND (%s = '' OR nombre_mes::text = %s)
-                   AND (%s = '' OR semana::text = %s)
+                   AND (%s = '' OR fecha ILIKE %s)
                  ORDER BY nombre_participante DESC
                  LIMIT %s OFFSET %s'''
 
     paginado = paginador3(
         sql_count, sql_lim,
-        [nombre_curso, nombre_curso, nombre_mes, nombre_mes, nombre_semana, nombre_semana],
+        [nombre_curso, nombre_curso, sesion, sesion],
         1, 5
     )
 
     return render_template('participantes/participantes.html',
                            cursos=lista_cursos(),
-                           semanas=lista_semanas(),
-                           meses=lista_meses(),
+                           sesiones = lista_sesiones(),
+                           paquetes = lista_paquetes(),
+                           cuentas = lista_cuentas(),
                            participantes=paginado[0],
                            page=paginado[1],
                            per_page=paginado[2],
@@ -110,6 +118,7 @@ def participante_nuevo():
         nombre_participante = request.form['nombre_participante']
         num_telefono = request.form['num_telefono']
         clave_participante = request.form['clave_participante']
+        nombre_empleado = request.form['nombre_empleado']
         nombre_paquete = request.form['id_paquete']
         curso = request.form['id_curso']
         estado = True
@@ -121,11 +130,11 @@ def participante_nuevo():
         # 1. Insertar participante
         sql = '''
             INSERT INTO participantes 
-            (nombre_participante, num_telefono, clave_participante, nombre_paquete, estado, curso)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            (nombre_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, curso)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
             RETURNING id_participante
         '''
-        valores = (nombre_participante, num_telefono, clave_participante, nombre_paquete, estado, curso)
+        valores = (nombre_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, curso)
         cur.execute(sql, valores)
 
         # 2. Obtener el ID recién creado
@@ -143,3 +152,49 @@ def participante_nuevo():
 
         flash('Participante y asistencia registrados correctamente.')
         return redirect(url_for('participantes.participantes_buscar'))  # o redirige a donde quieras
+    
+#---------------------------------------------------------------------------------------------------------------
+@participantes.route('/participantes/actualizar/<int:id>', methods=['POST'])
+@login_required
+def actualizar_participante(id):
+    datos = request.get_json()
+
+    con = get_db_connection()
+    cur = con.cursor()
+
+    sql = '''
+        UPDATE participantes SET
+            clave_participante = %s,
+            nombre_participante = %s,
+            nombre_paquete = %s,
+            fecha_pago = %s,
+            factura_pago = %s,
+            cuenta_destino = %s,
+            confirmacion_grupo = %s,
+            materiales = %s,
+            grabaciones = %s,
+            evaluacion_dc3 = %s,
+            observaciones = %s
+        WHERE id_participante = %s
+    '''
+    valores = (
+        datos['clave_participante'],
+        datos['nombre_participante'],
+        datos['nombre_paquete'],
+        datos['fecha_pago'] or None,
+        datos['factura_pago'],
+        datos['cuenta_destino'],
+        datos['confirmacion_grupo'],
+        datos['materiales'],
+        datos['grabaciones'],
+        datos['evaluacion_dc3'],
+        datos['observaciones'],
+        id
+    )
+
+    cur.execute(sql, valores)
+    con.commit()
+    cur.close()
+    con.close()
+
+    return jsonify({'message': 'Participante actualizado correctamente'})
