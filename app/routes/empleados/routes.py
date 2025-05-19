@@ -4,20 +4,12 @@ from datetime import datetime
 from psycopg2.extras import RealDictCursor
 from werkzeug.security import generate_password_hash
 
+from app.utils.listas import lista_rol
+
 from ..utils.utils import get_db_connection, paginador1, allowed_username
 
 # Definir Blueprint
 empleados = Blueprint('empleados', __name__)
-
-# --------------------------------------consulta de roles---------------------------------------------
-def lista_rol():
-    conn=get_db_connection()
-    cur=conn.cursor()
-    cur.execute('SELECT * FROM roles ORDER BY id_roles ASC ')
-    roles=cur.fetchall()
-    cur.close()
-    conn.close()
-    return roles
 
 #--------------------------------BUSCAR EMPLEADO / CONSULTA INICIAL--------------------------------------
 @empleados.route("/empleados")

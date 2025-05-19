@@ -3,30 +3,12 @@ from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
 
+from app.utils.listas import lista_tipos
+
 from ..utils.utils import get_db_connection, paginador1
 
 # Definir Blueprint
 cursos = Blueprint('cursos', __name__)
-
-#----------------------------------CONSULTA DE CATEGORIAS-------------------------
-def lista_categorias():
-    con = get_db_connection()
-    cur = con.cursor()
-    cur.execute('SELECT * FROM categorias ORDER BY id_categoria ASC')
-    categoria = cur.fetchall()
-    cur.close()
-    con.close()
-    return categoria
-
-#------------------------------CONSULTA DE TIPOS------------------
-def lista_tipos():
-    con = get_db_connection()
-    cur = con.cursor()
-    cur.execute('SELECT * FROM tipo_cursos ORDER BY id_tipo ASC;')
-    tipo = cur.fetchall()
-    cur.close()
-    con.close()
-    return tipo
 
 #-------------------------------BUSCAR CURSO--------------------------
 @cursos.route("/cursos")

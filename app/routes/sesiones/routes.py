@@ -3,49 +3,11 @@ from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
 
+from app.utils.listas import lista_cursos, lista_meses, lista_semanas
+
 from ..utils.utils import get_db_connection, paginador2
 
 sesiones = Blueprint('sesiones', __name__)
-
-#---------------------------------------LISTA DE CURSOS--------------------------------
-def lista_cursos():
-    con = get_db_connection()
-    cur = con.cursor()
-    cur.execute('SELECT * FROM cursos ORDER BY id_curso ASC')
-    cursos = cur.fetchall()
-    cur.close()
-    con.close()
-    return cursos
-
-#---------------------------------LISTA SEMANAS-------------------------------
-def lista_semanas():
-    con = get_db_connection()
-    cur = con.cursor()
-    cur.execute('SELECT * FROM semanas ORDER BY id_semana ASC')
-    semanas = cur.fetchall()
-    cur.close()
-    con.close()
-    return semanas
-
-#------------------------------LISTA DE MESES-------------------
-def lista_meses():
-    con = get_db_connection()
-    cur = con.cursor()
-    cur.execute('SELECT * FROM meses ORDER BY id_mes ASC')
-    meses = cur.fetchall()
-    cur.close()
-    con.close()
-    return meses
-
-#---------------------------LISTA DE CATEGORIAS--------------------
-def lista_categorias():
-    con = get_db_connection()
-    cur = con.cursor()
-    cur.execute('SELECT * FROM categorias ORDER BY id_categoria ASC')
-    categorias = cur.fetchall()
-    cur.close()
-    con.close()
-    return categorias
 
 #-----------------------------------------BUSCAR SESION-------------------------------------
 @sesiones.route("/participantes/sesiones")

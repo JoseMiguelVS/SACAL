@@ -3,71 +3,12 @@ from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
 
+from app.utils.listas import lista_cuentas, lista_cursos, lista_paquetes, lista_sesiones
+
 from ..utils.utils import get_db_connection, paginador3
 
 participantes = Blueprint('participantes', __name__)
 
-#-------------------------LISTA DE CUENTAS-----------------------
-def lista_cuentas():
-    con = get_db_connection()
-    cur = con.cursor()
-    cur.execute('SELECT * FROM cuentas ORDER BY id_cuenta ASC')
-    cuentas = cur.fetchall()
-    cur.close()
-    con.close()
-    return cuentas
-
-#--------------------------LISTA DE SESIONES---------------------
-def lista_sesiones():
-    con = get_db_connection()
-    cur = con.cursor()
-    cur.execute('SELECT * FROM detalles_sesiones ORDER BY id_sesion ASC')
-    sesiones = cur.fetchall()
-    cur.close()
-    con.close()
-    return sesiones
-
- #---------------------------------------LISTA DE CURSOS--------------------------------
-
-#---------------------------------------LISTA DE CURSOS-----------------------
-def lista_cursos():
-    con = get_db_connection()
-    cur = con.cursor()
-    cur.execute('SELECT * FROM cursos ORDER BY id_curso ASC')
-    cursos = cur.fetchall()
-    cur.close()
-    con.close()
-    return cursos
-
-#---------------------------------LISTA SEMANAS-------------------------------
-def lista_semanas():
-    con = get_db_connection()
-    cur = con.cursor()
-    cur.execute('SELECT * FROM semanas ORDER BY id_semana ASC')
-    semanas = cur.fetchall()
-    cur.close()
-    con.close()
-    return semanas
-
-#------------------------------LISTA DE MESES-------------------
-def lista_meses():
-    con = get_db_connection()
-    cur = con.cursor()
-    cur.execute('SELECT * FROM meses ORDER BY id_mes ASC')
-    meses = cur.fetchall()
-    cur.close()
-    con.close()
-    return meses
-
-#------------------------------LISTA DE PAQUETES----------------------------------
-def lista_paquetes():
-    con = get_db_connection()
-    cur = con.cursor()
-    cur.execute('SELECT * FROM paquetes ORDER BY id_paquete ASC')
-    paquetes = cur.fetchall()
-    cur.close()
-    con.close()
-    return paquetes
 #---------------------------------------------------------------PARTICIPANTES-----------------------------------------------------------------------------------------------------
 @participantes.route("/participantes")
 @login_required

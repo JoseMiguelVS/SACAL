@@ -4,19 +4,11 @@ from datetime import datetime
 from psycopg2.extras import RealDictCursor
 from werkzeug.security import generate_password_hash
 
+from app.utils.listas import lista_categorias
+
 from ..utils.utils import get_db_connection, paginador2, allowed_paquename
 
 paquetes = Blueprint('paquete', __name__)
-
-#----------------------------------CONSULTA DE CATEGORIAS-------------------------
-def lista_categorias():
-    con = get_db_connection()
-    cur = con.cursor()
-    cur.execute('SELECT * FROM categorias ORDER BY id_categoria ASC')
-    categoria = cur.fetchall()
-    cur.close()
-    con.close()
-    return categoria
 
 #-----------------------------BUSCAR PAQUETES / CONSULTA--------------------------
 @paquetes.route("/paquetes")
