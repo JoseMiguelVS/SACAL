@@ -12,9 +12,7 @@
       <th>Nombre completo</th>
       <th>CURP</th>
       <th>Cedula</th>
-      <th>STPS </th>
-      <th>CONOCER </th>
-      <th>CONOCER </th>
+
     </tr>
   </thead>
   <tbody>
@@ -22,15 +20,33 @@
       <td>{{ ponente.nombre_ponente }}</td>
       <td>{{ ponente.curp_ponente }}</td>
       <td>{{ ponente.cedula_ponente }}</td>
-      <td>{{ ponente.stps_ponente }}</td>
-      <td>{{ ponente.conocer_ponente }}</td>
-      <td>{{ ponente.conocer_ponente }}</td>
     </tr>
   </tbody>
 </table>
+
+{% if certificaciones %}
+<h4>Certificaciones</h4>
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Tipo de Certificación</th>
+      <th>Folio</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for cert in certificaciones %}
+    <tr>
+      <td>{{ cert.nombre_tipocer }}</td>
+      <td>{{ cert.folio }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="text-muted">Este ponente no tiene certificaciones registradas.</p>
+{% endif %}
+
 <div>
-  <a
-    class="botones"
-    href="{{ url_for('ponentes.ponentes_buscar') }}">Cancelar</a>
+  <a class="botones" href="{{ url_for('ponentes.ponentes_buscar') }}">Cancelar</a>
 </div>
 {% endblock %}

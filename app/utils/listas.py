@@ -42,3 +42,6 @@ def lista_rol():
 
 def lista_tipos():
     return listar_tabla('tipo_cursos', 'id_tipo')
+
+def lista_tiposCer():
+    return listar_tabla('tipo_certificacion', 'id_tipo')
