@@ -16,18 +16,16 @@
 {% endif %}
 {% endwith %}
 
-<!-- Buscador con 2 select -->
+<!-- Agregar e ir a sesiones -->
 <div>
     <div class="form-container">
         <!-- -------------------------------------- ------------------------------------- -->
         <a class="botones" href="{{url_for('participantes.participante_agregar')}}"><i class="fa fa-plus"
                 style="font-size: 18px;"></i></a>
-
     </div>
     <div class="form-container">
         <!-- -------------------------------------- ------------------------------------- -->
         <a class="botones" href="{{url_for('sesiones.sesiones_buscar')}}">sesiones</a>
-
     </div>
 </div>
 
@@ -55,8 +53,7 @@
                 {% if sesiones %}
                 {% for sesion in sesiones %}
                 <option value="{{ sesion.4 }}" {% if request.args.get('sesion')==sesion.4 %}selected{% endif %}>
-                    {{ sesion.4 }}
-                </option>
+                    {{ sesion.4 }} | {{ sesion.1 }}                </option>
                 {% endfor %}
                 {% else %}
                 <option>Aún no hay registros</option>

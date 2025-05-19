@@ -4,7 +4,7 @@ from datetime import datetime
 from psycopg2.extras import RealDictCursor
 from werkzeug.security import generate_password_hash
 
-from app.utils.listas import lista_categorias
+from utils.listas import lista_categorias
 
 from ..utils.utils import get_db_connection, paginador2, allowed_paquename
 
