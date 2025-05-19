@@ -16,21 +16,9 @@
 {% endif %}
 {% endwith %}
 
-<!-- Agregar e ir a sesiones -->
-<div>
-    <div class="form-container">
-        <!-- -------------------------------------- ------------------------------------- -->
-        <a class="botones" href="{{url_for('participantes.participante_agregar')}}"><i class="fa fa-plus"
-                style="font-size: 18px;"></i></a>
-    </div>
-    <div class="form-container">
-        <!-- -------------------------------------- ------------------------------------- -->
-        <a class="botones" href="{{url_for('sesiones.sesiones_buscar')}}">sesiones</a>
-    </div>
-</div>
 
 <div>
-    <form method="get" action="{{ url_for('participantes.participantes_buscar') }}" class="d-flex">
+    <form method="get" action="{{ url_for('constancias.constancias_buscar') }}" class="d-flex">
         <!-- Buscar por sesión/curso -->
         <div class="espacio_form">
             <select name="nombre_curso" id="nombre_curso">
@@ -53,7 +41,7 @@
                 {% if sesiones %}
                 {% for sesion in sesiones %}
                 <option value="{{ sesion.4 }}" {% if request.args.get('sesion')==sesion.4 %}selected{% endif %}>
-                    {{ sesion.4 }} | {{ sesion.1 }}                </option>
+                    {{ sesion.4 }} | {{ sesion.1 }} </option>
                 {% endfor %}
                 {% else %}
                 <option>Aún no hay registros</option>
@@ -70,45 +58,27 @@
     <table>
         <thead>
             <tr>
+                <th>Ver mas</th>
                 <th>Clave Participante</th>
                 <th>Nombre Participante</th>
-                <th>Paquete</th>
                 <th>Pago validado</th>
-                <th>Fecha del pago</th>
-                <th>Factura</th>
-                <th>Forma pago</th>
-                <th>Promotor</th>
-                <th>Confirmacion de grupo de WhatsApp</th>
-                <th>Materiales enviados</th>
-                <th>Grabaciones enviadas</th>
-                <th>Evaluacion recibida</th>
-                <th>Obervaciones</th>
-                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-            {% if participantes %}
-            {% for p in participantes %}
+            {% if constancias %}
+            {% for p in constancias %}
             {% if p.estado == True %}
             <tr data-id="{{ p.id_participante }}">
-                <td><input type="text" name="clave_participante" value="{{ p.clave_participante }}"></td>
-                <td><input type="text" name="nombre_participante" value="{{ p.nombre_participante }}"></td>
-                <td>
-                    <select name="nombre_paquete" id="nombre_paquete" aria-label="Default select example">
-                        <option value="">Paquete</option>
-                        {% if paquetes %}
-                        {% for paquete in paquetes %}
-                        <option value="{{ paquete.0 }}" {% if paquete.0==p.nombre_paquete %}selected{% endif %}>
-                            {{ paquete.1 }}
-                        </option>
-                        {% endfor %}
-                        {% else %}
-                        <option>Aún no hay registros</option>
-                        {% endif %}
-                    </select>
-                </td>
+                <td>{{ p.clave_participante }}</td>
+                <a class="botones-ver" href="{{url_for('constancias.constancias_detalles',id = constancias.id_participante)}}">
+                    <li class="fa fa-eye" style="font-size: 18px;"></li>
+                </a>
+                <td>{{ p.nombre_participante }}</td>
 
                 <td>{{ p.validacion_pago }}</td>
+                {% endif %}
+                {% endfor %}
+                {% else %}
             <tr>
                 <td align="center" colspan="4">No existen participantes</td>
             </tr>

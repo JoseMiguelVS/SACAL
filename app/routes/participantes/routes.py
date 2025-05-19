@@ -46,7 +46,6 @@ def participantes_buscar():
 @participantes.route("/participantes/agregar")
 @login_required
 def participante_agregar():
-    titulo = 'Agregar participante'
     return render_template('participantes/participantes_agregar.html', 
                            cursos = lista_cursos(),
                            sesiones = lista_sesiones(),
