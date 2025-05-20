@@ -1,0 +1,27 @@
+{% extends './layout.html' %}
+{% block body %}
+
+<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
+    {% endif %} alert-dismissible fade show" role="alert">
+    <strong>{{message}}</strong>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="form-container">
+    <form action="{{ url_for('constancias.constancias_actualizar', id = participante[0]) }}" class="formulario">
+        <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+        <div class="espacio_form">
+            <input type="text" id="clave_participante" placeholder="Clave del participante" name="clave_participante"
+            value="{{ participante[] }}">
+        </div>
+    </form>
+</div>
+
+{% endblock %}

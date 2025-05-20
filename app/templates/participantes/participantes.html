@@ -52,8 +52,8 @@
                 <option value="">-Seleccione la sesion-</option>
                 {% if sesiones %}
                 {% for sesion in sesiones %}
-                <option value="{{ sesion.4 }}" {% if request.args.get('sesion')==sesion.4 %}selected{% endif %}>
-                    {{ sesion.4 }} | {{ sesion.1 }} </option>
+                <option value="{{ sesion.5 }}" {% if request.args.get('sesion')==sesion.5 %}selected{% endif %}>
+                    {{ sesion.5 }} | {{ sesion.1 }} </option>
                 {% endfor %}
                 {% else %}
                 <option>Aún no hay registros</option>

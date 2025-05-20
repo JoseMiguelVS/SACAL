@@ -3,7 +3,7 @@ from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
 
-from utils.listas import lista_cuentas, lista_cursos, lista_paquetes, lista_sesiones
+from utils.listas import lista_categorias, lista_cuentas, lista_cursos, lista_paquetes, lista_ponente, lista_sesiones
 
 from ..utils.utils import get_db_connection, paginador3
 
@@ -48,9 +48,72 @@ def constancias_detalles(id):
      with get_db_connection() as con:
         with con.cursor(cursor_factory=RealDictCursor) as cur:
             # Asegúrate de usar parámetros para evitar inyección SQL
-            cur.execute('SELECT * FROM detalles_participantes WHERE id_participante = %s',(id,))
+            cur.execute('SELECT * FROM asistencias_detalladas WHERE id_participante = %s',(id,))
             participantes = cur.fetchone()
         if participantes is None:
             flash('El participante no exite o ha sido eliminado.')
             return redirect(url_for('constancias.constancias_buscar'))
-        return render_template('constancias/constancias_detalles.html', participantes = participantes)
+        return render_template('constancias/constancias_detalles.html', 
+                               participantes = participantes)
+        
+@constancias.route("/constancias/participantes/<int:id>")
+@login_required
+def constancias_editar(id):
+    con = get_db_connection()
+    cur = con.cursor()
+    cur.execute('SELECT * FROM asistencias_detalladas WHERE id_participante={0}'.format(id))
+    participante = cur.fetchall()
+    con.commit()
+    cur.close()
+    con.close()
+    return render_template('constancias/constancias_editar.html', 
+                           participante = participante[0], 
+                           cursos = lista_cursos(), 
+                           categoria = lista_categorias(), 
+                           ponentes = lista_ponente())
+
+@constancias.route("/constancias/actualizar/<int:id>", methods = ['POST'])
+@login_required
+def actualizar_participante(id):
+    datos = request.get_json()
+    con = get_db_connection()
+    cur = con.cursor()
+
+    sql = '''
+        UPDATE participantes SET
+            clave_participante = %s,
+            nombre_participante = %s
+        WHERE id_participante = %s
+    '''
+    valores = (
+        datos['clave_participante'],
+        datos['nombre_participante'],
+        id
+    )
+
+    sql2 = '''
+        UPDATE sesiones_curso SET
+            nombre_curso = %s,
+            horario_inicio = %s,
+            horario_fin = %s,
+            fecha = %s,
+            categoria = %s,
+            ponente = %s,
+        WHERE id_participante = %s
+    '''
+    valores2 = (
+        datos['nombre_curso'],
+        datos['horario_inicio'],
+        datos['horario_fin'],
+        datos['fecha'],
+        datos['categoria'],
+        datos['ponente'],
+        id
+    )
+
+    cur.execute(sql, valores, sql2, valores2)
+    con.commit()
+    cur.close()
+    con.close()
+
+    return jsonify({'message': 'Participante actualizado correctamente'})
