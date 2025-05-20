@@ -81,7 +81,7 @@ def pagina_no_encontrada(error):
     return render_template('404.html')
 
 def acceso_no_autorizado(error):
-    return redirect(url_for('login'))
+    return redirect(url_for('/'))
 
 if __name__ == '__main__':
     csrf.init_app(app)

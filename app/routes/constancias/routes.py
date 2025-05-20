@@ -42,10 +42,15 @@ def constancias_buscar():
                            total_items=paginado[3],
                            total_pages=paginado[4])
 
-@constancias.route("/constancias/detalles/<ind:id>")
+@constancias.route("/constancias/detalles/<int:id>")
 @login_required
 def constancias_detalles(id):
      with get_db_connection() as con:
         with con.cursor(cursor_factory=RealDictCursor) as cur:
             # Asegúrate de usar parámetros para evitar inyección SQL
-            cur.execute('SELECT * FROM')
+            cur.execute('SELECT * FROM detalles_participantes WHERE id_participante = %s',(id,))
+            participantes = cur.fetchone()
+        if participantes is None:
+            flash('El participante no exite o ha sido eliminado.')
+            return redirect(url_for('constancias.constancias_buscar'))
+        return render_template('constancias/constancias_detalles.html', participantes = participantes)

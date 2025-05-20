@@ -30,6 +30,32 @@
                 <input type="text" id="horario_fin" placeholder="Hora de fin" name="horario_fin"
                     value="{{ sesiones[5] }}">
             </div>
+            <!-- ----------------------------------------PONENTE-------------------------------------------------------- -->
+            <div class="espacio_form">
+                <select name="id_ponente" id="id_ponente" aria-label="Default select example">
+                    <option value="true" selected>-Seleccione el ponente-</option>
+                    {% if ponentes %}
+                    {% for ponente in ponentes %}
+                    <option value="{{ponente.0}}" {% if ponente.0 ==sesiones[9] %} selected {% endif %} >{{ponente.1}}</option>
+                    {% endfor %}
+                    {% else %}
+                    <option>Aún no hay registros</option>
+                    {% endif %}
+                </select>
+            </div>
+            <!-- ----------------------------------------CATEGORIA-------------------------------------------------------- -->
+            <div class="espacio_form">
+                <select name="id_categoria" id="id_categoria" aria-label="Default select example">
+                    <option value="true" selected>-Seleccione la categoria-</option>
+                    {% if categorias %}
+                    {% for categoria in categorias %}
+                    <option value="{{categoria.0}}" {% if categoria.0 == sesiones[8] %} selected {% endif %} >{{categoria.1}}</option>
+                    {% endfor %}
+                    {% else %}
+                    <option>Aún no hay registros</option>
+                    {% endif %}
+                </select>
+            </div>
 
             <!-- ----------------------------------------CURSO-------------------------------------------------------- -->
             <div class="espacio_form">
@@ -37,7 +63,7 @@
                     <option value="true" selected>-Seleccione el curso-</option>
                     {% if cursos %}
                     {% for curso in cursos %}
-                    <option value="{{curso.0}}">{{curso.1}}</option>
+                    <option value="{{curso.0}}" {% if curso.0 == sesiones[1] %} selected {% endif %} >{{curso.1}}</option>
                     {% endfor %}
                     {% else %}
                     <option>Aún no hay registros</option>
@@ -50,7 +76,7 @@
                     <option value="true" selected>-Seleccione el mes-</option>
                     {% if meses %}
                     {% for mes in meses %}
-                    <option value="{{mes.0}}">{{mes.1}}</option>
+                    <option value="{{mes.0}}" {% if mes.0 == sesiones[3] %} selected {% endif %} >{{mes.1}}</option>
                     {% endfor %}
                     {% else %}
                     <option>Aún no hay registros</option>
@@ -63,7 +89,7 @@
                     <option value="true" selected>-Seleccione el semana-</option>
                     {% if semanas %}
                     {% for semana in semanas %}
-                    <option value="{{semana.0}}">{{semana.1}}</option>
+                    <option value="{{semana.0}}" {% if semana.0 == sesiones[4] %} selected {% endif %}>{{semana.1}}</option>
                     {% endfor %}
                     {% else %}
                     <option>Aún no hay registros</option>

@@ -39,7 +39,7 @@
           <option value="true" selected>------Seleccione el cargo--------</option>
           {% if roles %}
           {% for rol in roles %}
-          <option value="{{rol.0}}">{{rol.1}}</option>
+          <option value="{{rol.0}}" {% if rol.0 == empleado[4] %} selected {% endif %}>{{rol.1}}</option>
           {% endfor %}
           {% else %}
           <option>Aún no hay registros</option>

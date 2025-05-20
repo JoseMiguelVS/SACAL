@@ -45,3 +45,6 @@ def lista_tipos():
 
 def lista_tiposCer():
     return listar_tabla('tipo_certificacion', 'id_tipo')
+
+def lista_ponente():
+    return listar_tabla('ponentes', 'id_ponentes')

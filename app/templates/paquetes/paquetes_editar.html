@@ -33,7 +33,7 @@
                     <option value="true" selected>--Seleccione la categoria--</option>
                     {% if categorias %}
                     {% for categoria in categorias %}
-                    <option value="{{categoria.0}}">{{categoria.1}}</option>
+                    <option value="{{categoria.0}}" {% if categoria.0 == paquete[3] %} selected {% endif %}>{{categoria.1}}</option>
                     {% endfor %}
                     {% else %}
                     <option>Aún no hay registros</option>

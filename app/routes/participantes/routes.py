@@ -9,7 +9,7 @@ from ..utils.utils import get_db_connection, paginador3
 
 participantes = Blueprint('participantes', __name__)
 
-#---------------------------------------------------------------PARTICIPANTES-----------------------------------------------------------------------------------------------------
+#---------------------------------------------------------------PARTICIPANTES--------------------------------------------------------------------------
 @participantes.route("/participantes")
 @login_required
 def participantes_buscar():
@@ -49,6 +49,7 @@ def participante_agregar():
     return render_template('participantes/participantes_agregar.html', 
                            cursos = lista_cursos(),
                            sesiones = lista_sesiones(),
+                           cuentas = lista_cuentas(),
                            paquetes = lista_paquetes())
 
 @participantes.route('/participantes/agregar/nuevo', methods=('GET', 'POST'))

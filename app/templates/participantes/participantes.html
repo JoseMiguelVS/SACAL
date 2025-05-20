@@ -53,7 +53,7 @@
                 {% if sesiones %}
                 {% for sesion in sesiones %}
                 <option value="{{ sesion.4 }}" {% if request.args.get('sesion')==sesion.4 %}selected{% endif %}>
-                    {{ sesion.4 }} | {{ sesion.1 }}                </option>
+                    {{ sesion.4 }} | {{ sesion.1 }} </option>
                 {% endfor %}
                 {% else %}
                 <option>Aún no hay registros</option>
@@ -95,10 +95,11 @@
                 <td><input type="text" name="nombre_participante" value="{{ p.nombre_participante }}"></td>
                 <td>
                     <select name="nombre_paquete" id="nombre_paquete" aria-label="Default select example">
-                        <option value="">Paquete</option>
+                        <option value="" disabled {% if not p.nombre_paquete %}selected{% endif %}>Paquete</option>
                         {% if paquetes %}
                         {% for paquete in paquetes %}
-                        <option value="{{ paquete.0 }}" {% if paquete.0==p.nombre_paquete %}selected{% endif %}>
+                        <option value="{{ paquete.0 }}" {% if paquete.0|string==p.nombre_paquete|string %} selected {%
+                            endif %}>
                             {{ paquete.1 }}
                         </option>
                         {% endfor %}
@@ -108,15 +109,17 @@
                     </select>
                 </td>
 
+
                 <td>{{ p.validacion_pago }}</td>
                 <td><input type="date" name="fecha_pago" value="{{ p.fecha_pago }}"></td>
                 <td><input type="checkbox" name="factura_pago" {% if p.factura_pago %}checked{% endif %}></td>
+
                 <td>
                     <select name="cuenta_destino" id="cuenta_destino" aria-label="Default select example">
-                        <option value="">Cuenta destino</option>
+                        <option value="" disabled {% if not p.cuenta_destino %} selected {% endif %}>Cuenta destino</option>
                         {% if cuentas %}
                         {% for cuenta in cuentas %}
-                        <option value="{{ cuenta.0 }}" {% if cuenta.0==p.cuenta_destino %}selected{% endif %}>
+                        <option value="{{ cuenta.0 }}" {% if cuenta.0|string==p.cuenta_destino %} selected {% endif %}>
                             {{ cuenta.1 }}
                         </option>
                         {% endfor %}

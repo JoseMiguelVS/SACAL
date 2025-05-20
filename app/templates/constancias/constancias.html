@@ -70,7 +70,8 @@
             {% if p.estado == True %}
             <tr data-id="{{ p.id_participante }}">
                 <td>{{ p.clave_participante }}</td>
-                <a class="botones-ver" href="{{url_for('constancias.constancias_detalles',id = constancias.id_participante)}}">
+                <a class="botones-ver"
+                    href="{{url_for('constancias.constancias_detalles',id = constancias.id_participante)}}">
                     <li class="fa fa-eye" style="font-size: 18px;"></li>
                 </a>
                 <td>{{ p.nombre_participante }}</td>
