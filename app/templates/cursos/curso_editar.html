@@ -36,11 +36,11 @@
 
       <!-- ------------------------------------desplegable-------------------------------------------------------------- -->
       <div class="espacio-form">
-        <select name="id_rol" id="id_rol" class="form-select" aria-label="Default select example">
-          <option value="true" selected>------Seleccione el tipo--------</option>
-          {% if tipos %}
-          {% for tipo in tipos %}
-          <option value="{{tipo.0}}" {% if tipo.0 == curso[2] %} selected {% endif %}>{{tipo.1}}</option>
+        <select name="id_tema" id="id_tema" class="form-select" aria-label="Default select example">
+          <option value="true" selected>------Seleccione el tema--------</option>
+          {% if temas %}
+          {% for tema in temas %}
+          <option value="{{tema.0}}" {% if tema.0 == curso[8] %} selected {% endif %}>{{tema.1}}</option>
           {% endfor %}
           {% else %}
           <option>Aún no hay registros</option>

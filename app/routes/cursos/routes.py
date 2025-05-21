@@ -3,7 +3,7 @@ from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
 
-from utils.listas import lista_tipos
+from utils.listas import lista_temas
 
 from ..utils.utils import get_db_connection, paginador1
 
@@ -31,7 +31,7 @@ def cursos_buscar():
 @login_required
 def curso_agregar():
     titulo = 'Agregar curso'
-    return render_template('cursos/cursos_agregar.html', titulo = titulo, tipos = lista_tipos())
+    return render_template('cursos/cursos_agregar.html', titulo = titulo, temas = lista_temas())
 
 @cursos.route("/cursos/agregar/nuevo",methods = ('GET', 'POST'))
 @login_required
@@ -40,7 +40,7 @@ def cursos_nuevo():
         nombre_curso = request.form['nombre_curso']
         codigo_curso = request.form['codigo_curso']
         duracion_curso = request.form['duracion_curso']
-        tipo_curso = request.form['id_tipo']
+        tema_curso = request.form['id_tema']
         estado = True
         fecha_creacion= datetime.now()
         fecha_modificacion = datetime.now()
@@ -56,8 +56,8 @@ def cursos_nuevo():
             flash('Error: el curso ya existe. Intente con otro')
             return redirect(url_for('cursos.curso_agregar'))
         else:
-            sql = 'INSERT INTO cursos (nombre_curso,codigo_curso, tipo_curso, duracion_curso, estado, fecha_creacion, fecha_modificacion) VALUES (%s, %s, %s, %s, %s, %s, %s)'
-            valores = (nombre_curso,codigo_curso, tipo_curso, duracion_curso, estado, fecha_creacion, fecha_modificacion)
+            sql = 'INSERT INTO cursos (nombre_curso,codigo_curso, tema_curso, duracion_curso, estado, fecha_creacion, fecha_modificacion) VALUES (%s, %s, %s, %s, %s, %s, %s)'
+            valores = (nombre_curso,codigo_curso, tema_curso, duracion_curso, estado, fecha_creacion, fecha_modificacion)
             cur.execute(sql, valores)
             con.commit()
             cur.close()
@@ -91,7 +91,7 @@ def curso_editar(id):
     con.commit()
     cur.close()
     con.close()
-    return render_template('cursos/curso_editar.html',curso = curso[0], tipos = lista_tipos() )
+    return render_template('cursos/curso_editar.html',curso = curso[0], temas = lista_temas() )
 
 @cursos.route('/cursos/editar/<string:id>',methods=['POST'])
 @login_required
@@ -99,15 +99,15 @@ def curso_actualizar(id):
     if request.method == 'POST':
         nombre_curso = request.form['nombre_curso']
         codigo_curso = request.form['codigo_curso']
-        tipo_curso = request.form['id_tipo']
+        tema_curso = request.form['id_tema']
         duracion_curso = request.form['duracion_curso']
         fecha_modificacion= datetime.now()
         
         con = get_db_connection()
         cur = con.cursor()
-        sql="UPDATE cursos SET nombre_curso = %s, codigo_curso = %s, tipo_curso = %s, duracion_curso = %s, fecha_modificacion=%s WHERE id_curso=%s"
-        valores=(nombre_curso,codigo_curso,tipo_curso,duracion_curso,fecha_modificacion,id)
-        cur.execute(sql,valores)
+        sql="UPDATE cursos SET nombre_curso = %s, codigo_curso = %s, tema_curso = %s, duracion_curso = %s, fecha_modificacion = %s WHERE id_curso = %s"
+        valores=(nombre_curso, codigo_curso, tema_curso, duracion_curso, fecha_modificacion, id)
+        cur.execute(sql, valores)
         con.commit()
         cur.close()
         con.close()

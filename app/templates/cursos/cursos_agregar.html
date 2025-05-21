@@ -29,13 +29,14 @@
                 <!-- <label for="nombre_usuario">Nombre de usuario</label> -->
                 <input type="text" id="nombre_curso" placeholder="Nombre Curso" name="nombre_curso" required>
             </div>
-            <!-- ----------------------------------------TIPO-------------------------------------------------------- -->
+   
+            <!-- ----------------------------------------Tema-------------------------------------------------------- -->
             <div class="espacio_form">
-                <select name="id_tipo" id="id_tipo" aria-label="Default select example">
-                    <option value="true" selected>-Seleccione el tipo-</option>
-                    {% if tipos %}
-                    {% for tipo in tipos %}
-                    <option value="{{tipo.0}}">{{tipo.1}}</option>
+                <select name="id_tema" id="id_tema" aria-label="Default select example">
+                    <option value="true" selected>-Seleccione el tema-</option>
+                    {% if temas %}
+                    {% for tema in temas %}
+                    <option value="{{tema.0}}">{{tema.1}}</option>
                     {% endfor %}
                     {% else %}
                     <option>Aún no hay registros</option>
