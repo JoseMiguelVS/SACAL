@@ -67,11 +67,13 @@
 
 <!-- Tabla de resultados -->
 <div class="tables_participantes">
+    <h2>Informacion de participantes</h2>
     <table>
         <thead>
             <tr>
-                <th>Clave Participante</th>
-                <th>Nombre Participante</th>
+                <th>Clave</th>
+                <th>Nombre</th>
+                <th>Apellidos</th>
                 <th>Paquete</th>
                 <th>Pago validado</th>
                 <th>Fecha del pago</th>
@@ -93,6 +95,7 @@
             <tr data-id="{{ p.id_participante }}">
                 <td><input type="text" name="clave_participante" value="{{ p.clave_participante }}"></td>
                 <td><input type="text" name="nombre_participante" value="{{ p.nombre_participante }}"></td>
+                <td><input type="text" name="apellidos_participante" value="{{ p.apellidos_participante }}"></td>
                 <td>
                     <select name="nombre_paquete" id="nombre_paquete" aria-label="Default select example">
                         <option value="" disabled {% if not p.nombre_paquete %}selected{% endif %}>Paquete</option>

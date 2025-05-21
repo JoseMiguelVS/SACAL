@@ -57,6 +57,7 @@ def participante_agregar():
 def participante_nuevo():
     if request.method == 'POST':
         nombre_participante = request.form['nombre_participante']
+        apellidos_participante = request.form['apellidos_participante']
         num_telefono = request.form['num_telefono']
         clave_participante = request.form['clave_participante']
         nombre_empleado = request.form['nombre_empleado']
@@ -71,11 +72,11 @@ def participante_nuevo():
         # 1. Insertar participante
         sql = '''
             INSERT INTO participantes 
-            (nombre_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, curso)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, curso)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id_participante
         '''
-        valores = (nombre_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, curso)
+        valores = (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, curso)
         cur.execute(sql, valores)
 
         # 2. Obtener el ID recién creado
@@ -107,6 +108,7 @@ def actualizar_participante(id):
         UPDATE participantes SET
             clave_participante = %s,
             nombre_participante = %s,
+            apellidos_participante = %s,
             nombre_paquete = %s,
             fecha_pago = %s,
             factura_pago = %s,
@@ -121,6 +123,7 @@ def actualizar_participante(id):
     valores = (
         datos['clave_participante'],
         datos['nombre_participante'],
+        datos['apellidos_participante'],
         datos['nombre_paquete'],
         datos['fecha_pago'] or None,
         datos['factura_pago'],

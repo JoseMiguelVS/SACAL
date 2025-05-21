@@ -9,7 +9,9 @@
 <table>
   <thead>
     <tr>
-      <th>Nombre completo</th>
+      <th>Nombre(s)</th>
+      <th>Apellido Paterno</th>
+      <th>Apellido Materno</th>
       <th>Nombre usuario</th>
       <th>Correo Electrónico</th>
       <th>Rol</th>
@@ -18,6 +20,8 @@
   <tbody>
     <tr>
       <td>{{ empleado.nombre_empleado }}</td>
+      <td>{{ empleado.apellido_paterno }}</td>
+      <td>{{ empleado.apellido_materno }}</td>
       <td>{{ empleado.nombre_usuario }}</td>
       <td>{{ empleado.correo_empleado }}</td>
       <td>{{ empleado.rol }}</td>
@@ -25,8 +29,6 @@
   </tbody>
 </table>
 <div>
-  <a
-    class="botones"
-    href="{{ url_for('empleados.empleadosBuscar') }}">Cancelar</a>
+  <a class="botones" href="{{ url_for('empleados.empleadosBuscar') }}">Cancelar</a>
 </div>
 {% endblock %}

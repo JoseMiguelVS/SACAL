@@ -43,6 +43,8 @@ def empleado_nuevo():
         nombre_usuario= request.form['nombre_usuario']
         if allowed_username(nombre_usuario):
             nombre_empleado = request.form['nombre_empleado']
+            apellido_pat = request.form['apellido_pat']
+            apellido_mat = request.form['apellido_mat']
             correo_empleado = request.form['correo_empleado']
             rol = request.form['id_rol']
             contrasenia_empleado = request.form['contrasenia_empleado']
@@ -62,8 +64,8 @@ def empleado_nuevo():
                 flash('Error: El correo seleccionado ya esta registrado. Intente con uno diferente')
                 return redirect(url_for('empleados.empleado_agregar'))
             else:
-                sql="INSERT INTO empleados (nombre_empleado, nombre_usuario, correo_empleado, rol, estado, fecha_creacion, fecha_modificacion, contrasenia_empleado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
-                valores=(nombre_empleado, nombre_usuario, correo_empleado, rol, estado, fecha_creacion, fecha_modificacion, Pass)
+                sql="INSERT INTO empleados (nombre_empleado, apellido_mat, apellido_pat, nombre_usuario, correo_empleado, rol, estado, fecha_creacion, fecha_modificacion, contrasenia_empleado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s, %s, %s)"
+                valores=(nombre_empleado, nombre_usuario, apellido_mat, apellido_pat, correo_empleado, rol, estado, fecha_creacion, fecha_modificacion, Pass)
                 cur.execute(sql,valores)
                 con.commit()
                 cur.close()
@@ -111,17 +113,17 @@ def empleado_actualizar(id):
     if request.method == 'POST':
         nombre_usuario = request.form['nombre_usuario']
         nombre_empleado = request.form['nombre_empleado']
+        apellido_mat = request.form['apellido_mat']
+        apellido_pat = request.form['apellido_pat']
         correo_empleado = request.form['correo_empleado']
         rol = request.form['id_rol']
-        contrasenia_empleado = request.form['contrasenia_empleado']
-        Pass = generate_password_hash(contrasenia_empleado)        
         fecha_modificacion= datetime.now()
         
         con = get_db_connection()
         cur = con.cursor()
-        sql="UPDATE empleados SET nombre_usuario=%s,nombre_empleado=%s,correo_empleado=%s,rol=%s,contrasenia_empleado=%s,fecha_modificacion=%s WHERE id_empleado=%s"
-        valores=(nombre_usuario,nombre_empleado,correo_empleado,rol,Pass,fecha_modificacion,id)
-        cur.execute(sql,valores)
+        sql="UPDATE empleados SET nombre_usuario = %s ,nombre_empleado = %s, apellido_mat = %s, apellido_pat = %s, correo_empleado = %s, rol = %s, fecha_modificacion = %s WHERE id_empleado = %s"
+        valores=(nombre_usuario, nombre_empleado,apellido_mat, apellido_pat, correo_empleado, rol, fecha_modificacion, id)
+        cur.execute(sql, valores)
         con.commit()
         cur.close()
         con.close()

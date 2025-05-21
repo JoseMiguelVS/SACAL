@@ -38,6 +38,7 @@
                                 <th>Ver</th>
                                 <th>Nombre usuario</th>
                                 <th>Nombre empleado</th>
+                                <th>Apellidos</th>
                                 <th>Correo</th>
                                 <th>Editar</th>
                                 <th>Eliminar</th>
@@ -54,9 +55,10 @@
                                                 <li class="fa fa-eye" style="font-size: 18px;"></li>
                                         </a>
                                 </td>
-                                <td>{{empleado.nombre_usuario}}</td>
-                                <td>{{empleado.nombre_empleado}}</td>
-                                <td>{{empleado.correo_empleado}}</td>
+                                <td>{{ empleado.nombre_usuario }}</td>
+                                <td>{{ empleado.nombre_empleado }}</td>
+                                <td>{{ empleado.apellido_pat }} {{ empleado.apellido_mat }}</td>
+                                <td>{{ empleado.correo_empleado }}</td>
                                 <td>
                                         <a class="botones-editar"
                                                 href="{{ url_for('empleados.empleado_editar', id = empleado.id_empleado) }}">

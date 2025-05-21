@@ -23,6 +23,16 @@
         <input type="text" id="nombre_empleado" placeholder="Nombre Usuario" name="nombre_empleado"
           value="{{empleado[1]}}">
       </div>
+
+      <div class="espacio_form">
+        <input type="text" id="apellido_pat" placeholder="Apellido Paterno" name="apellido_pat"
+          value="{{empleado[9]}}">
+      </div>
+      <div class="espacio_form">
+        <input type="text" id="apellido_mat" placeholder="Apellido Materno" name="apellido_mat"
+          value="{{empleado[10]}}">
+      </div>
+
       <div class="espacio_form">
         <input type="text" id="nombre_usuario" placeholder="Nombre Usuario" name="nombre_usuario"
           value="{{empleado[2]}}">
@@ -45,10 +55,6 @@
           <option>Aún no hay registros</option>
           {% endif %}
         </select>
-      </div>
-      <div class="espacio-form">
-        <label for="contrasenia">Contraseña</label>
-        <input type="password" name="contrasenia_empleado" id="contrasenia_empleado">
       </div>
 
       <div class="espacio-form text-center">

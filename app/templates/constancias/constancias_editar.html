@@ -19,7 +19,11 @@
         <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
         <div class="espacio_form">
             <input type="text" id="clave_participante" placeholder="Clave del participante" name="clave_participante"
-            value="{{ participante[] }}">
+            value="{{ participante[2] }}">
+        </div>
+        <div class="espacio_form">
+            <input type="text" id="nombre_participante" placeholder="Nombre del participante" name="nombre_participante"
+            value="{{ participante[2] }}">
         </div>
     </form>
 </div>
