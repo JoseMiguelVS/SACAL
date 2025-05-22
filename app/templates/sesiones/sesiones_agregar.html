@@ -32,19 +32,7 @@
                 <input type="text" id="horario_fin" placeholder="Hora de fin" name="horario_fin" required>
             </div>
         </div>
-        <!-- ----------------------------------------PONENTE-------------------------------------------------------- -->
-        <div class="espacio_form">
-            <select name="id_ponente" id="id_ponente" aria-label="Default select example">
-                <option value="true" selected>-Seleccione el ponente-</option>
-                {% if ponentes %}
-                {% for ponente in ponentes %}
-                <option value="{{ponente.0}}">{{ponente.1}}</option>
-                {% endfor %}
-                {% else %}
-                <option>Aún no hay registros</option>
-                {% endif %}
-            </select>
-        </div>
+
         <!-- ----------------------------------------CATEGORIA-------------------------------------------------------- -->
         <div class="espacio_form">
             <select name="id_categoria" id="id_categoria" aria-label="Default select example">
@@ -52,20 +40,6 @@
                 {% if categorias %}
                 {% for categoria in categorias %}
                 <option value="{{categoria.0}}">{{categoria.1}}</option>
-                {% endfor %}
-                {% else %}
-                <option>Aún no hay registros</option>
-                {% endif %}
-            </select>
-        </div>
-        
-        <!-- ----------------------------------------CURSO-------------------------------------------------------- -->
-        <div class="espacio_form">
-            <select name="id_curso" id="id_curso" aria-label="Default select example">
-                <option value="true" selected>-Seleccione el curso-</option>
-                {% if cursos %}
-                {% for curso in cursos %}
-                <option value="{{curso.0}}">{{curso.1}}</option>
                 {% endfor %}
                 {% else %}
                 <option>Aún no hay registros</option>
@@ -98,6 +72,30 @@
                 {% endif %}
             </select>
         </div>
+        <!-- Contenedor para cursos y ponentes dinámicos -->
+        <div id="cursos-container">
+            <div class="curso-group espacio_form">
+                <select name="cursos[]" class="form-select mb-2" required>
+                    <option value="">-Seleccione el curso-</option>
+                    {% for curso in cursos %}
+                    <option value="{{ curso.0 }}">{{ curso.1 }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="ponentes[]" class="form-select mb-2" required>
+                    <option value="">-Seleccione el ponente-</option>
+                    {% for ponente in ponentes %}
+                    <option value="{{ ponente.0 }}">{{ ponente.1 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <!-- Botón para agregar más cursos y ponentes -->
+        <div class="espacio_form">
+            <button type="button" id="agregar-curso" class="botones">Agregar otro curso</button>
+        </div>
+
 </div>
 <div class="espacio_form">
     <button class="botones" type="submit">Guardar</button>
@@ -110,40 +108,15 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const categoriaSelect = document.getElementById('id_categoria');
-        const cursoPrincipal = document.getElementById('id_curso');
-        const cursosEspeciales = [];
+    document.getElementById('agregar-curso').addEventListener('click', function () {
+        const contenedor = document.getElementById('cursos-container');
+        const grupo = contenedor.querySelector('.curso-group');
+        const nuevoGrupo = grupo.cloneNode(true);
 
-        // Recolectar los selects de cursos del 1 al 9
-        for (let i = 1; i <= 9; i++) {
-            cursosEspeciales.push(document.getElementById(`id_curso${i}`));
-        }
+        // Limpia valores seleccionados
+        nuevoGrupo.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
 
-        function actualizarVisibilidad() {
-            const selectedText = categoriaSelect.options[categoriaSelect.selectedIndex].textContent.trim();
-
-            if (selectedText === 'Especializaciones') {
-                cursoPrincipal.disabled = true;
-                cursoPrincipal.parentElement.style.display = 'none';
-
-                cursosEspeciales.forEach(select => {
-                    select.disabled = false;
-                    select.parentElement.style.display = 'block';
-                });
-            } else {
-                cursoPrincipal.disabled = false;
-                cursoPrincipal.parentElement.style.display = 'block';
-
-                cursosEspeciales.forEach(select => {
-                    select.disabled = true;
-                    select.parentElement.style.display = 'none';
-                });
-            }
-        }
-
-        categoriaSelect.addEventListener('change', actualizarVisibilidad);
-        actualizarVisibilidad(); // Ejecutar al inicio por si ya hay selección
+        contenedor.appendChild(nuevoGrupo);
     });
 </script>
 

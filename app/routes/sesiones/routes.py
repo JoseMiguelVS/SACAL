@@ -53,29 +53,48 @@ def sesiones_agregar():
 @login_required
 def sesion_nuevo():
     if request.method == 'POST':
-        nombre_curso = request.form['id_curso']
         fecha = request.form['fecha']
         horario_inicio = request.form['horario_inicio']
         horario_fin = request.form['horario_fin']
         categoria = request.form['id_categoria']
-        ponente = request.form['id_ponente']
         mes = request.form['id_mes']
         semana = request.form['id_semana']
         estado = True
 
+        # Listas dinámicas
+        cursos = request.form.getlist('cursos[]')
+        ponentes = request.form.getlist('ponentes[]')
+
         con = get_db_connection()
-        cur = con.cursor(cursor_factory = RealDictCursor)
-        sql = 'INSERT INTO sesiones_curso (nombre_curso, fecha, horario_inicio, horario_fin, ponente, categoria, mes, semana, estado) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'
-        valores = (nombre_curso, fecha, horario_inicio, horario_fin, ponente, mes, categoria, semana, estado)
-        cur.execute(sql,valores)
+        cur = con.cursor(cursor_factory=RealDictCursor)
+
+        # Insertar sesión base (sin curso ni ponente específicos)
+        sql_sesion = '''
+            INSERT INTO sesiones_curso 
+            (fecha, horario_inicio, horario_fin, categoria, mes, semana, estado)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            RETURNING id_sesion
+        '''
+        valores_sesion = (fecha, horario_inicio, horario_fin, categoria, mes, semana, estado)
+        cur.execute(sql_sesion, valores_sesion)
+        sesion_id = cur.fetchone()['id_sesion']
+
+        # Insertar cada curso + ponente relacionados a esa sesión
+        sql_relacion = '''
+            INSERT INTO cursos_sesion (sesion_id, curso_id, ponente_id)
+            VALUES (%s, %s, %s)
+        '''
+        for curso_id, ponente_id in zip(cursos, ponentes):
+            cur.execute(sql_relacion, (sesion_id, curso_id, ponente_id))
+
         con.commit()
         cur.close()
         con.close()
-        flash("Sesión agregada correctamente")
+
+        flash("Sesión y cursos registrados correctamente.")
         return redirect(url_for('sesiones.sesiones_buscar'))
 
-    return redirect(url_for('sesiones.sesion_agregar'))
-
+    return redirect(url_for('sesiones.sesiones_agregar'))
 
 #------------------------------------EDITAR SESION-------------------------------
 @sesiones.route('/participantes/editar/<string:id>')
@@ -96,7 +115,7 @@ def sesion_editar(id):
                            categorias = lista_categorias(),
                            ponentes = lista_ponente())
 
-@sesiones.route("/participantes/sesiones/editar/<string:id>", methods = ["POST"])
+@sesiones.route("/participantes/sesiones/editar/<string:id>", methods=["POST"])
 @login_required
 def sesion_actualizar(id):
     if request.method == "POST":
@@ -111,14 +130,35 @@ def sesion_actualizar(id):
 
         con = get_db_connection()
         cur = con.cursor()
-        sql = "UPDATE sesiones_curso SET nombre_curso = %s, fecha = %s, horario_inicio = %s, horario_fin = %s, ponete = %s,categoria = %s, mes = %s, semana = %s WHERE id_sesion = %s"
-        valores = (nombre_curso, fecha, horario_inicio, horario_fin, ponente, categoria, mes, semana, id)
-        cur.execute(sql, valores)
+
+        # Actualiza los datos generales de la sesión
+        sql_update_sesion = """
+            UPDATE sesiones_curso 
+            SET fecha = %s, horario_inicio = %s, horario_fin = %s, categoria = %s, mes = %s, semana = %s 
+            WHERE id_sesion = %s
+        """
+        valores_sesion = (fecha, horario_inicio, horario_fin, categoria, mes, semana, id)
+        cur.execute(sql_update_sesion, valores_sesion)
+
+        # Elimina las asociaciones anteriores de cursos/ponentes para esa sesión
+        cur.execute("DELETE FROM cursos_sesion WHERE sesion_id = %s", (id,))
+
+        # Inserta la nueva asociación curso/ponente
+        sql_insert_cs = """
+            INSERT INTO cursos_sesion (sesion_id, curso_id, ponente_id)
+            VALUES (%s, %s, %s)
+        """
+        valores_cs = (id, nombre_curso, ponente)
+        cur.execute(sql_insert_cs, valores_cs)
+
         con.commit()
         cur.close()
         con.close()
-        flash("Sesion actualizada correctamente")
+
+        flash("Sesión actualizada correctamente")
+
     return redirect(url_for("sesiones.sesiones_buscar"))
+
 
 #-----------------------------------CANCELAR SESION---------------------------------
 @sesiones.route("/participantes/sesiones/cancelar/<string:id>")

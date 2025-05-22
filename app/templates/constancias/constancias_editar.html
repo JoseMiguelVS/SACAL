@@ -15,16 +15,32 @@
 {% endwith %}
 
 <div class="form-container">
-    <form action="{{ url_for('constancias.constancias_actualizar', id = participante[0]) }}" class="formulario">
-        <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
-        <div class="espacio_form">
-            <input type="text" id="clave_participante" placeholder="Clave del participante" name="clave_participante"
-            value="{{ participante[2] }}">
-        </div>
-        <div class="espacio_form">
-            <input type="text" id="nombre_participante" placeholder="Nombre del participante" name="nombre_participante"
-            value="{{ participante[2] }}">
-        </div>
+    <form method="POST">
+        <label>Clave participante:</label>
+        <input type="text" name="clave_participante" value="{{ participante.clave_participante }}" required><br><br>
+
+        <label>Nombre participante:</label>
+        <input type="text" name="nombre_participante" value="{{ participante.nombre_participante }}" required><br><br>
+
+        <label>Nombre del curso:</label>
+        <input type="text" name="nombre_curso" value="{{ curso.nombre_curso }}" required><br><br>
+
+        <label>Horario inicio:</label>
+        <input type="time" name="horario_inicio" value="{{ curso.horario_inicio }}" required><br><br>
+
+        <label>Horario fin:</label>
+        <input type="time" name="horario_fin" value="{{ curso.horario_fin }}" required><br><br>
+
+        <label>Fecha:</label>
+        <input type="date" name="fecha" value="{{ curso.fecha }}" required><br><br>
+
+        <label>Categoría:</label>
+        <input type="text" name="categoria" value="{{ curso.categoria }}" required><br><br>
+
+        <label>Ponente:</label>
+        <input type="text" name="ponente" value="{{ curso.ponente }}" required><br><br>
+
+        <button type="submit">Guardar cambios</button>
     </form>
 </div>
 

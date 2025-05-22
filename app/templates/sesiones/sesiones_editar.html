@@ -15,98 +15,121 @@
 {% endwith %}
 <!-- -------------------------------------------------------------------------- -->
 
-<div class="form-container">
-    <form class="formulario" method="POST" action="{{url_for('sesiones.sesion_actualizar',id=sesiones[0])}}">
-        <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
-        <div>
-            <div class="espacio_form">
-                <input type="text" id="fecha" placeholder="Fecha" name="fecha" value="{{ sesiones[7] }}">
-            </div>
-            <div class="espacio_form">
-                <input type="text" id="horario_inicio" placeholder="Hora de inicio" name="horario_inicio"
-                    value="{{ sesiones[2] }}">
-            </div>
-            <div class="espacio_form">
-                <input type="text" id="horario_fin" placeholder="Hora de fin" name="horario_fin"
-                    value="{{ sesiones[5] }}">
-            </div>
-            <!-- ----------------------------------------PONENTE-------------------------------------------------------- -->
-            <div class="espacio_form">
-                <select name="id_ponente" id="id_ponente" aria-label="Default select example">
-                    <option value="true" selected>-Seleccione el ponente-</option>
-                    {% if ponentes %}
-                    {% for ponente in ponentes %}
-                    <option value="{{ponente.0}}" {% if ponente.0 ==sesiones[9] %} selected {% endif %} >{{ponente.1}}</option>
-                    {% endfor %}
-                    {% else %}
-                    <option>Aún no hay registros</option>
-                    {% endif %}
-                </select>
-            </div>
-            <!-- ----------------------------------------CATEGORIA-------------------------------------------------------- -->
-            <div class="espacio_form">
-                <select name="id_categoria" id="id_categoria" aria-label="Default select example">
-                    <option value="true" selected>-Seleccione la categoria-</option>
-                    {% if categorias %}
-                    {% for categoria in categorias %}
-                    <option value="{{categoria.0}}" {% if categoria.0 == sesiones[8] %} selected {% endif %} >{{categoria.1}}</option>
-                    {% endfor %}
-                    {% else %}
-                    <option>Aún no hay registros</option>
-                    {% endif %}
-                </select>
-            </div>
+<form class="formulario" method="POST" action="{{ url_for('sesiones.sesion_actualizar', id=sesiones[0]) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-            <!-- ----------------------------------------CURSO-------------------------------------------------------- -->
-            <div class="espacio_form">
-                <select name="id_curso" id="id_curso" aria-label="Default select example">
-                    <option value="true" selected>-Seleccione el curso-</option>
-                    {% if cursos %}
+    <!-- Otros campos como fecha, horario, etc. -->
+    <div class="espacio_form">
+        <input type="text" name="fecha" placeholder="Fecha" value="{{ sesiones[6] }}">
+    </div>
+    <div class="espacio_form">
+        <input type="text" name="horario_inicio" placeholder="Hora de inicio" value="{{ sesiones[1] }}">
+    </div>
+    <div class="espacio_form">
+        <input type="text" name="horario_fin" placeholder="Hora de fin" value="{{ sesiones[4] }}">
+    </div>
+
+    <!-- -------------------- CATEGORIA -------------------- -->
+    <div class="espacio_form">
+        <select name="id_categoria">
+            <option selected>-Seleccione la categoría-</option>
+            {% for categoria in categorias %}
+            <option value="{{categoria[0]}}" {% if categoria[0]==sesiones[7] %}selected{% endif %}>{{categoria[1]}}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- -------------------- MES -------------------- -->
+    <div class="espacio_form">
+        <select name="id_mes">
+            <option selected>-Seleccione el mes-</option>
+            {% for mes in meses %}
+            <option value="{{mes[0]}}" {% if mes[0]==sesiones[2] %}selected{% endif %}>{{mes[1]}}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- -------------------- SEMANA -------------------- -->
+    <div class="espacio_form">
+        <select name="id_semana">
+            <option selected>-Seleccione la semana-</option>
+            {% for semana in semanas %}
+            <option value="{{semana[0]}}" {% if semana[0]==sesiones[3] %}selected{% endif %}>{{semana[1]}}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- -------------------- CURSOS Y PONENTES -------------------- -->
+    <div id="curso-container">
+        {% for curso_ponente in cursos_sesion %}
+        <div class="espacio_form row align-items-center mb-2">
+            <div class="col-md-5">
+                <select name="cursos[]">
+                    <option selected>-Seleccione el curso-</option>
                     {% for curso in cursos %}
-                    <option value="{{curso.0}}" {% if curso.0 == sesiones[1] %} selected {% endif %} >{{curso.1}}</option>
+                    <option value="{{ curso[0] }}" {% if curso[0]==curso_ponente.curso_id %}selected{% endif %}>{{
+                        curso[1] }}</option>
                     {% endfor %}
-                    {% else %}
-                    <option>Aún no hay registros</option>
-                    {% endif %}
                 </select>
             </div>
-            <!-- ----------------------------------------MES-------------------------------------------------------- -->
-            <div class="espacio_form">
-                <select name="id_mes" id="id_mes" aria-label="Default select example">
-                    <option value="true" selected>-Seleccione el mes-</option>
-                    {% if meses %}
-                    {% for mes in meses %}
-                    <option value="{{mes.0}}" {% if mes.0 == sesiones[3] %} selected {% endif %} >{{mes.1}}</option>
+            <div class="col-md-5">
+                <select name="ponentes[]">
+                    <option selected>-Seleccione el ponente-</option>
+                    {% for ponente in ponentes %}
+                    <option value="{{ ponente[0] }}" {% if ponente[0]==curso_ponente.ponente_id %}selected{% endif %}>{{
+                        ponente[1] }}</option>
                     {% endfor %}
-                    {% else %}
-                    <option>Aún no hay registros</option>
-                    {% endif %}
                 </select>
             </div>
-            <!-- ----------------------------------------SEMANA-------------------------------------------------------- -->
-            <div class="espacio_form">
-                <select name="id_semana" id="id_semana" aria-label="Default select example">
-                    <option value="true" selected>-Seleccione el semana-</option>
-                    {% if semanas %}
-                    {% for semana in semanas %}
-                    <option value="{{semana.0}}" {% if semana.0 == sesiones[4] %} selected {% endif %}>{{semana.1}}</option>
-                    {% endfor %}
-                    {% else %}
-                    <option>Aún no hay registros</option>
-                    {% endif %}
-                </select>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-danger btn-sm"
+                    onclick="this.parentElement.parentElement.remove()">X</button>
             </div>
-
-            <div class="espacio-form text-center">
-                <a class="botones" href="{{url_for('sesiones.sesiones_buscar')}}">
-                    Cancelar
-                </a>
-                <button class="botones" type="submit">
-                    Guardar
-                </button>
-            </div>
-
         </div>
-    </form>
-</div>
+        {% endfor %}
+    </div>
+
+    <div class="text-center my-2">
+        <button type="button" class="btn btn-secondary" onclick="agregarCursoPonente()">+ Agregar curso</button>
+    </div>
+
+    <!-- -------------------- BOTONES -------------------- -->
+    <div class="espacio-form text-center">
+        <a class="botones" href="{{url_for('sesiones.sesiones_buscar')}}">Cancelar</a>
+        <button class="botones" type="submit">Guardar</button>
+    </div>
+</form>
+
+<script>
+    function agregarCursoPonente() {
+        const container = document.getElementById("curso-container");
+        const div = document.createElement("div");
+        div.classList.add("espacio_form", "row", "align-items-center", "mb-2");
+
+        div.innerHTML = `
+        <div class="col-md-5">
+            <select name="cursos[]">
+                <option selected>-Seleccione el curso-</option>
+                {% for curso in cursos %}
+                    <option value="{{ curso[0] }}">{{ curso[1] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-5">
+            <select name="ponentes[]">
+                <option selected>-Seleccione el ponente-</option>
+                {% for ponente in ponentes %}
+                    <option value="{{ ponente[0] }}">{{ ponente[1] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.parentElement.remove()">X</button>
+        </div>
+    `;
+        container.appendChild(div);
+    }
+</script>
+
 {% endblock %}

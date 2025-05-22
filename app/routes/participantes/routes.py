@@ -7,7 +7,7 @@ from utils.listas import lista_cuentas, lista_cursos, lista_paquetes, lista_sesi
 
 from ..utils.utils import get_db_connection, paginador3
 
-participantes = Blueprint('participantes', __name__)
+participantes = Blueprint('participantes', __name__) 
 
 #---------------------------------------------------------------PARTICIPANTES--------------------------------------------------------------------------
 @participantes.route("/participantes")
@@ -17,11 +17,11 @@ def participantes_buscar():
     sesion = request.args.get('sesion', '', type=str)
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
-                   WHERE (%s = '' OR nombre_curso::text = %s)
+                   WHERE (%s = '' OR cursos::text = %s)
                      AND (%s = '' OR fecha ILIKE %s)'''
 
     sql_lim = '''SELECT * FROM asistencias_detalladas
-                 WHERE (%s = '' OR nombre_curso::text = %s)
+                 WHERE (%s = '' OR cursos::text = %s)
                    AND (%s = '' OR fecha ILIKE %s)
                  ORDER BY nombre_participante DESC
                  LIMIT %s OFFSET %s'''
@@ -42,6 +42,7 @@ def participantes_buscar():
                            per_page=paginado[2],
                            total_items=paginado[3],
                            total_pages=paginado[4])
+#-----------------------------------------------------------------------------------------
 
 @participantes.route("/participantes/agregar")
 @login_required
@@ -61,8 +62,8 @@ def participante_nuevo():
         num_telefono = request.form['num_telefono']
         clave_participante = request.form['clave_participante']
         nombre_empleado = request.form['nombre_empleado']
+        cuenta_destino = request.form['id_cuenta']
         nombre_paquete = request.form['id_paquete']
-        curso = request.form['id_curso']
         estado = True
         sesion = request.form['id_sesion']
 
@@ -72,11 +73,11 @@ def participante_nuevo():
         # 1. Insertar participante
         sql = '''
             INSERT INTO participantes 
-            (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, curso)
+            (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id_participante
         '''
-        valores = (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, curso)
+        valores = (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino )
         cur.execute(sql, valores)
 
         # 2. Obtener el ID recién creado

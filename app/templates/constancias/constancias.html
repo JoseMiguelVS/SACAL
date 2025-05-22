@@ -21,12 +21,13 @@
     <form method="get" action="{{ url_for('constancias.constancias_buscar') }}" class="d-flex">
         <!-- Buscar por sesión/curso -->
         <div class="espacio_form">
-            <select name="nombre_curso" id="nombre_curso">
-                <option value="">-Seleccione el curso-</option>
-                {% if cursos %}
-                {% for curso in cursos %}
-                <option value="{{ curso.1 }}" {% if request.args.get('nombre_curso')==curso.1 %}selected{% endif %}>
-                    {{ curso.1 }}
+            <select name="nombre_categoria" id="nombre_categoria">
+                <option value="">-Seleccione la categoria-</option>
+                {% if categorias %}
+                {% for categoria in categorias %}
+                <option value="{{ categoria.1 }}" {% if request.args.get('nombre_categoria')==categoria.1 %}selected{%
+                    endif %}>
+                    {{ categoria.1 }}
                 </option>
                 {% endfor %}
                 {% else %}
@@ -40,8 +41,8 @@
                 <option value="">-Seleccione la sesion-</option>
                 {% if sesiones %}
                 {% for sesion in sesiones %}
-                <option value="{{ sesion.5 }}" {% if request.args.get('sesion')==sesion.5 %}selected{% endif %}>
-                    {{ sesion.5 }} | {{ sesion.1 }} </option>
+                <option value="{{ sesion.1 }}" {% if request.args.get('sesion')==sesion.1 %}selected{% endif %}>
+                    {{ sesion.7 }} | {{ sesion.1 }} </option>
                 {% endfor %}
                 {% else %}
                 <option>Aún no hay registros</option>
@@ -59,6 +60,7 @@
         <thead>
             <tr>
                 <th>Ver mas</th>
+                <th>Generar constancia</th>
                 <th>Clave Participante</th>
                 <th>Nombre Participante</th>
                 <th>Pago validado</th>
@@ -75,8 +77,15 @@
                         <li class="fa fa-eye" style="font-size: 18px;"></li>
                     </a>
                 </td>
+                <td>
+                    <a class="botones-ver"
+                        href="{{ url_for('constancias.constancias_generar', id=p.id_participante, curso=p.nombre_curso, fecha=p.fecha) }}">
+                        <li class="fas fa-download" style="font-size: 18px;"></li>
+                    </a>
+
+                </td>
                 <td>{{ p.clave_participante }}</td>
-                <td>{{ p.nombre_participante }}</td>
+                <td>{{ p.nombre_participante }} {{ p.apellidos_participante }}</td>
                 <td>{{ p.validacion_pago }}</td>
                 {% endif %}
                 {% endfor %}

@@ -1,8 +1,10 @@
-from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash
+from flask import Blueprint, jsonify, render_template, request, redirect, send_file, url_for, flash
 from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
 
+from ..constancias.generador import generar_constancia
+from ..constancias.qr import generar_qr
 from utils.listas import lista_categorias, lista_cuentas, lista_cursos, lista_paquetes, lista_ponente, lista_sesiones
 
 from ..utils.utils import get_db_connection, paginador3
@@ -12,26 +14,27 @@ constancias = Blueprint('constancias', __name__)
 @constancias.route("/constancias")
 @login_required
 def constancias_buscar():
-    nombre_curso = request.args.get('nombre_curso', '', type=str)
+    nombre_categoria = request.args.get('nombre_categoria', '', type=str)
     sesion = request.args.get('sesion', '', type=str)
 
-    sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
-                   WHERE (%s = '' OR nombre_curso::text = %s)
+    sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas_constancias
+                   WHERE (%s = '' OR nombre_categoria::text = %s)
                      AND (%s = '' OR fecha ILIKE %s)'''
 
-    sql_lim = '''SELECT * FROM asistencias_detalladas
-                 WHERE (%s = '' OR nombre_curso::text = %s)
+    sql_lim = '''SELECT * FROM asistencias_detalladas_constancias
+                 WHERE (%s = '' OR nombre_categoria::text = %s)
                    AND (%s = '' OR fecha ILIKE %s)
                  ORDER BY nombre_participante DESC
                  LIMIT %s OFFSET %s'''
 
     paginado = paginador3(
         sql_count, sql_lim,
-        [nombre_curso, nombre_curso, sesion, sesion],
-        1, 5
+        [nombre_categoria, nombre_categoria, sesion, sesion],
+        1, 20
     )
 
     return render_template('constancias/constancias.html',
+                           categorias = lista_categorias(),
                            cursos=lista_cursos(),
                            sesiones = lista_sesiones(),
                            paquetes = lista_paquetes(),
@@ -41,6 +44,8 @@ def constancias_buscar():
                            per_page=paginado[2],
                            total_items=paginado[3],
                            total_pages=paginado[4])
+
+#------------------------------------------------------DETALLES-----------------------------------------------------
 
 @constancias.route("/constancias/detalles/<int:id>")
 @login_required
@@ -55,13 +60,43 @@ def constancias_detalles(id):
             return redirect(url_for('constancias.constancias_buscar'))
         return render_template('constancias/constancias_detalles.html', 
                                participantes = participantes)
+     
+from flask import request
+
+#----------------------------------------------------------GENERADOR DE CONSTANCIAS-------------------------------------------------------------
+
+@constancias.route("/constancias/constancia")
+@login_required
+def constancias_generar():
+    id = request.args.get("id")
+    curso = request.args.get("curso")
+    fecha = request.args.get("fecha")  # formato ISO: 'YYYY-MM-DD'
+
+    if not id or not curso or not fecha:
+        return "Datos incompletos", 400
+
+    with get_db_connection() as con:
+        with con.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute("""
+                SELECT * FROM datos_constancias 
+                WHERE id_participante = %s AND nombre_curso = %s AND fecha = %s
+            """, (id, curso, fecha))
+            participante = cur.fetchone()
+            if not participante:
+                return "Constancia no encontrada", 404
+
+    qr_path = generar_qr(participante)
+    pdf_path = generar_constancia(participante, qr_path)
+    return send_file(pdf_path, as_attachment=True)
+
+#--------------------------------------------------------------EDITAR PARTICIPANTE----------------------------------------------------------------------------
         
 @constancias.route("/constancias/participantes/<int:id>")
 @login_required
 def constancias_editar(id):
     con = get_db_connection()
     cur = con.cursor()
-    cur.execute('SELECT * FROM asistencias_detalladas WHERE id_participante={0}'.format(id))
+    cur.execute('SELECT * FROM asistencias_detalladas_constancias WHERE id_participante={0}'.format(id))
     participante = cur.fetchall()
     con.commit()
     cur.close()

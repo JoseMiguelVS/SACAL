@@ -45,13 +45,13 @@
                 <input type="text" id="num_telefono" placeholder="Numero de telefono" name="num_telefono" required>
             </div>
 
-            <!-- ----------------------------------------Sesion-------------------------------------------------------- -->
+            <!-- ----------------------------------------CUENTA-------------------------------------------------------- -->
             <div class="espacio_form">
                 <select name="id_sesion" id="id_sesion" aria-label="Default select example">
-                    <option value="true" selected>-Seleccione la sesion-</option>
-                    {% if sesiones %}
-                    {% for sesion in sesiones %}
-                    <option value="{{sesion.0}}">{{sesion.4}}</option>
+                    <option value="true" selected>-Seleccione la cuenta destino-</option>
+                    {% if cuentas %}
+                    {% for cuenta in cuentas %}
+                    <option value="{{cuenta.0}}">{{cuenta.1}} || {{ cuenta.7 }}</option>
                     {% endfor %}
                     {% else %}
                     <option>Aún no hay registros</option>
@@ -59,13 +59,13 @@
                 </select>
             </div>
 
-            <!-- ----------------------------------------curso-------------------------------------------------------- -->
+            <!-- ----------------------------------------Sesion-------------------------------------------------------- -->
             <div class="espacio_form">
-                <select name="id_curso" id="id_curso" aria-label="Default select example">
-                    <option value="true" selected>-Seleccione el curso-</option>
-                    {% if cursos %}
-                    {% for curso in cursos %}
-                    <option value="{{curso.0}}">{{curso.1}}</option>
+                <select name="id_sesion" id="id_sesion" aria-label="Default select example">
+                    <option value="true" selected>-Seleccione la sesion-</option>
+                    {% if sesiones %}
+                    {% for sesion in sesiones %}
+                    <option value="{{sesion.0}}">{{sesion.1}} || {{ sesion.7 }}</option>
                     {% endfor %}
                     {% else %}
                     <option>Aún no hay registros</option>
