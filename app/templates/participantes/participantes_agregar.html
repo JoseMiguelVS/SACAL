@@ -48,10 +48,10 @@
             <!-- ----------------------------------------CUENTA-------------------------------------------------------- -->
             <div class="espacio_form">
                 <select name="id_sesion" id="id_sesion" aria-label="Default select example">
-                    <option value="true" selected>-Seleccione la cuenta destino-</option>
+                    <option value="true" selected>Cuenta destino</option>
                     {% if cuentas %}
                     {% for cuenta in cuentas %}
-                    <option value="{{cuenta.0}}">{{cuenta.1}} || {{ cuenta.7 }}</option>
+                    <option value="{{cuenta.0}}">{{cuenta.1}}</option>
                     {% endfor %}
                     {% else %}
                     <option>Aún no hay registros</option>
@@ -62,7 +62,7 @@
             <!-- ----------------------------------------Sesion-------------------------------------------------------- -->
             <div class="espacio_form">
                 <select name="id_sesion" id="id_sesion" aria-label="Default select example">
-                    <option value="true" selected>-Seleccione la sesion-</option>
+                    <option value="true" selected>Sesion</option>
                     {% if sesiones %}
                     {% for sesion in sesiones %}
                     <option value="{{sesion.0}}">{{sesion.1}} || {{ sesion.7 }}</option>
@@ -76,7 +76,7 @@
             <!-- ----------------------------------------PAQUETE-------------------------------------------------------- -->
             <div class="espacio_form">
                 <select name="id_paquete" id="id_paquete" aria-label="Default select example">
-                    <option value="true" selected>-Seleccione el paquete-</option>
+                    <option value="true" selected>Paquetes</option>
                     {% if paquetes %}
                     {% for paquete in paquetes %}
                     <option value="{{paquete.0}}">{{paquete.1}}</option>

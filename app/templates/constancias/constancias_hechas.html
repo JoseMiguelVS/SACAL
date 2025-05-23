@@ -16,6 +16,7 @@
 {% endif %}
 {% endwith %}
 
+
 <div>
     <form method="get" action="{{ url_for('constancias.constancias_buscar') }}" class="d-flex">
         <!-- Buscar por sesión/curso -->
@@ -75,7 +76,7 @@
         <tbody>
             {% if constancias %}
             {% for p in constancias %}
-            {% if p.constancia_enviada == False %}
+            {% if p.constancia_enviada == True %}
             <tr data-id="{{ p.id_participante }}">
                 <td>
                     <a class="botones-ver"

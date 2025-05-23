@@ -64,8 +64,10 @@ def participante_nuevo():
         nombre_empleado = request.form['nombre_empleado']
         cuenta_destino = request.form['id_cuenta']
         nombre_paquete = request.form['id_paquete']
-        estado = True
         sesion = request.form['id_sesion']
+        estado = True
+        constancia_generada = False
+        constancia_enviada = False
 
         con = get_db_connection()
         cur = con.cursor(cursor_factory=RealDictCursor)
@@ -87,6 +89,10 @@ def participante_nuevo():
         sql2 = 'INSERT INTO asistencias (participante, sesion) VALUES (%s, %s)'
         valores2 = (participante_id, sesion)
         cur.execute(sql2, valores2)
+
+        sql3 = "INSERT INTO constancias (participante, constancia_generada, constancia_enviada) VALUES (%s, %s, %s)"
+        valores3 = (participante_id, constancia_generada, constancia_enviada)
+        cur.execute(sql3, valores3)
 
         # 4. Guardar cambios y cerrar conexión
         con.commit()

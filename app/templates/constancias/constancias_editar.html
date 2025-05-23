@@ -15,30 +15,47 @@
 {% endwith %}
 
 <div class="form-container">
-    <form method="POST">
-        <label>Clave participante:</label>
-        <input type="text" name="clave_participante" value="{{ participante.clave_participante }}" required><br><br>
+    <form method="POST" class="" action="{{ url_for('constancias.constancias_actualizar' ,id = participante[0]) }}">
+        <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
 
-        <label>Nombre participante:</label>
-        <input type="text" name="nombre_participante" value="{{ participante.nombre_participante }}" required><br><br>
+        <div class="espacio_form">
+            <label>Clave participante:</label>
+            <input type="text" name="clave_participante" value="{{ participante[2] }}" required>
+        </div>
 
-        <label>Nombre del curso:</label>
-        <input type="text" name="nombre_curso" value="{{ curso.nombre_curso }}" required><br><br>
+        <div class="espacio_form">
+            <label>Nombre participante:</label>
+            <input type="text" name="nombre_participante" value="{{ participante[3] }}" required>
+        </div>
 
-        <label>Horario inicio:</label>
-        <input type="time" name="horario_inicio" value="{{ curso.horario_inicio }}" required><br><br>
+        <div class="espacio_form">
+            <label>Horario inicio:</label>
+            <input type="time" name="horario_inicio" value="{{ participante[22] }}" required>
+        </div>
 
-        <label>Horario fin:</label>
-        <input type="time" name="horario_fin" value="{{ curso.horario_fin }}" required><br><br>
+        <div class="espacio_form">
+            <label>Horario fin:</label>
+            <input type="time" name="horario_fin" value="{{ participante[23] }}" required>
+        </div>
 
-        <label>Fecha:</label>
-        <input type="date" name="fecha" value="{{ curso.fecha }}" required><br><br>
+        <div class="espacio_form">
+            <label>Fecha:</label>
+            <input type="date" name="fecha" value="{{participante[21] }}" required>
+        </div>
 
-        <label>Categoría:</label>
-        <input type="text" name="categoria" value="{{ curso.categoria }}" required><br><br>
-
-        <label>Ponente:</label>
-        <input type="text" name="ponente" value="{{ curso.ponente }}" required><br><br>
+        <div class="espacio_form">
+            <select name="id_categoria" id="id_categoria" class="form-select">
+                <option value="true" selected>Categoria</option>
+                {% if categorias %}
+                {% for categoria in categorias %}
+                <option value="{{categoria.0}}" {% if categoria.1==participante[30] %} selected {% endif %}>{{
+                    categoria.1 }}</option>
+                {% endfor %}
+                {% else %}
+                <option>Aun no hay registros</option>
+                {% endif %}
+            </select>
+        </div>
 
         <button type="submit">Guardar cambios</button>
     </form>
