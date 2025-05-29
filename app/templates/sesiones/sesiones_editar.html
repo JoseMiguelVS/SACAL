@@ -15,58 +15,72 @@
 {% endwith %}
 <!-- -------------------------------------------------------------------------- -->
 
-<form class="formulario" method="POST" action="{{ url_for('sesiones.sesion_actualizar', id=sesiones[0]) }}">
+<form class="container mt-4" method="POST" action="{{ url_for('sesiones.sesion_actualizar', id=sesiones[0]) }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-    <!-- Otros campos como fecha, horario, etc. -->
-    <div class="espacio_form">
-        <input type="text" name="fecha" placeholder="Fecha" value="{{ sesiones[6] }}">
-    </div>
-    <div class="espacio_form">
-        <input type="text" name="horario_inicio" placeholder="Hora de inicio" value="{{ sesiones[1] }}">
-    </div>
-    <div class="espacio_form">
-        <input type="text" name="horario_fin" placeholder="Hora de fin" value="{{ sesiones[4] }}">
+    <h2 class="mb-4 text-center">Editar sesión</h2>
+
+    <!-- Fecha y horario -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label for="fecha" class="form-label">Fecha</label>
+            <input type="date" class="form-control" name="fecha" id="fecha" value="{{ sesiones[6] }}" required>
+        </div>
+        <div class="col-md-4">
+            <label for="horario_inicio" class="form-label">Hora de inicio</label>
+            <input type="time" class="form-control" name="horario_inicio" id="horario_inicio" value="{{ sesiones[1] }}"
+                required>
+        </div>
+        <div class="col-md-4">
+            <label for="horario_fin" class="form-label">Hora de fin</label>
+            <input type="time" class="form-control" name="horario_fin" id="horario_fin" value="{{ sesiones[4] }}"
+                required>
+        </div>
     </div>
 
-    <!-- -------------------- CATEGORIA -------------------- -->
-    <div class="espacio_form">
-        <select name="id_categoria">
-            <option selected>-Seleccione la categoría-</option>
+    <!-- Categoría -->
+    <div class="mb-3">
+        <label for="id_categoria" class="form-label">Categoría</label>
+        <select name="id_categoria" class="form-select" required>
+            <option value="">-Seleccione la categoría-</option>
             {% for categoria in categorias %}
-            <option value="{{categoria[0]}}" {% if categoria[0]==sesiones[7] %}selected{% endif %}>{{categoria[1]}}
+            <option value="{{ categoria[0] }}" {% if categoria[0]==sesiones[7] %}selected{% endif %}>{{ categoria[1] }}
             </option>
             {% endfor %}
         </select>
     </div>
 
-    <!-- -------------------- MES -------------------- -->
-    <div class="espacio_form">
-        <select name="id_mes">
-            <option selected>-Seleccione el mes-</option>
-            {% for mes in meses %}
-            <option value="{{mes[0]}}" {% if mes[0]==sesiones[2] %}selected{% endif %}>{{mes[1]}}</option>
-            {% endfor %}
-        </select>
+    <!-- Mes y Semana -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <label for="id_mes" class="form-label">Mes</label>
+            <select name="id_mes" class="form-select" required>
+                <option value="">-Seleccione el mes-</option>
+                {% for mes in meses %}
+                <option value="{{ mes[0] }}" {% if mes[0]==sesiones[2] %}selected{% endif %}>{{ mes[1] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label for="id_semana" class="form-label">Semana</label>
+            <select name="id_semana" class="form-select" required>
+                <option value="">-Seleccione la semana-</option>
+                {% for semana in semanas %}
+                <option value="{{ semana[0] }}" {% if semana[0]==sesiones[3] %}selected{% endif %}>{{ semana[1] }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
     </div>
 
-    <!-- -------------------- SEMANA -------------------- -->
-    <div class="espacio_form">
-        <select name="id_semana">
-            <option selected>-Seleccione la semana-</option>
-            {% for semana in semanas %}
-            <option value="{{semana[0]}}" {% if semana[0]==sesiones[3] %}selected{% endif %}>{{semana[1]}}</option>
-            {% endfor %}
-        </select>
-    </div>
-
-    <!-- -------------------- CURSOS Y PONENTES -------------------- -->
+    <!-- Cursos y Ponentes -->
     <div id="curso-container">
         {% for curso_ponente in cursos_sesion %}
-        <div class="espacio_form row align-items-center mb-2">
+        <div class="row align-items-end mb-3">
             <div class="col-md-5">
-                <select name="cursos[]">
-                    <option selected>-Seleccione el curso-</option>
+                <label class="form-label">Curso</label>
+                <select name="cursos[]" class="form-select" required>
+                    <option value="">-Seleccione el curso-</option>
                     {% for curso in cursos %}
                     <option value="{{ curso[0] }}" {% if curso[0]==curso_ponente.curso_id %}selected{% endif %}>{{
                         curso[1] }}</option>
@@ -74,62 +88,69 @@
                 </select>
             </div>
             <div class="col-md-5">
-                <select name="ponentes[]">
-                    <option selected>-Seleccione el ponente-</option>
+                <label class="form-label">Ponente</label>
+                <select name="ponentes[]" class="form-select" required>
+                    <option value="">-Seleccione el ponente-</option>
                     {% for ponente in ponentes %}
                     <option value="{{ ponente[0] }}" {% if ponente[0]==curso_ponente.ponente_id %}selected{% endif %}>{{
                         ponente[1] }}</option>
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-2">
-                <button type="button" class="btn btn-danger btn-sm"
-                    onclick="this.parentElement.parentElement.remove()">X</button>
+            <div class="col-md-2 d-grid">
+                <button type="button" class="btn btn-danger mt-4"
+                    onclick="this.closest('.row').remove()">Eliminar</button>
             </div>
         </div>
         {% endfor %}
     </div>
 
-    <div class="text-center my-2">
-        <button type="button" class="btn btn-secondary" onclick="agregarCursoPonente()">+ Agregar curso</button>
+    <!-- Botón para agregar más -->
+    <div class="mb-4 text-center">
+        <button type="button" class="btn btn-outline-primary" onclick="agregarCursoPonente()">+ Agregar curso y
+            ponente</button>
     </div>
 
-    <!-- -------------------- BOTONES -------------------- -->
-    <div class="espacio-form text-center">
-        <a class="botones" href="{{url_for('sesiones.sesiones_buscar')}}">Cancelar</a>
-        <button class="botones" type="submit">Guardar</button>
+    <!-- Botones -->
+    <div class="text-center">
+        <a class="btn btn-secondary me-2" href="{{ url_for('sesiones.sesiones_buscar') }}">Cancelar</a>
+        <button type="submit" class="btn btn-success">Guardar</button>
     </div>
 </form>
 
+<!-- Script para agregar dinámicamente -->
 <script>
     function agregarCursoPonente() {
         const container = document.getElementById("curso-container");
-        const div = document.createElement("div");
-        div.classList.add("espacio_form", "row", "align-items-center", "mb-2");
+        const row = document.createElement("div");
+        row.classList.add("row", "align-items-end", "mb-3");
 
-        div.innerHTML = `
-        <div class="col-md-5">
-            <select name="cursos[]">
-                <option selected>-Seleccione el curso-</option>
-                {% for curso in cursos %}
+        row.innerHTML = `
+            <div class="col-md-5">
+                <label class="form-label">Curso</label>
+                <select name="cursos[]" class="form-select" required>
+                    <option value="">-Seleccione el curso-</option>
+                    {% for curso in cursos %}
                     <option value="{{ curso[0] }}">{{ curso[1] }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-5">
-            <select name="ponentes[]">
-                <option selected>-Seleccione el ponente-</option>
-                {% for ponente in ponentes %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label">Ponente</label>
+                <select name="ponentes[]" class="form-select" required>
+                    <option value="">-Seleccione el ponente-</option>
+                    {% for ponente in ponentes %}
                     <option value="{{ ponente[0] }}">{{ ponente[1] }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-2">
-            <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.parentElement.remove()">X</button>
-        </div>
-    `;
-        container.appendChild(div);
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="button" class="btn btn-danger mt-4" onclick="this.closest('.row').remove()">Eliminar</button>
+            </div>
+        `;
+        container.appendChild(row);
     }
 </script>
+
 
 {% endblock %}

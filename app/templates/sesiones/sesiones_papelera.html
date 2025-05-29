@@ -1,141 +1,149 @@
 {% extends './layout.html' %}
+
 {% block body %}
-<h2>Sesiones canceladas</h2>
-<br>
-<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-{% for message in messages %}
-<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
-    {% endif %} alert-dismissible fade show" role="alert">
-    <strong>{{message}}</strong>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-{% endfor %}
-{% endif %}
-{% endwith %}
+<h2 class="text-center mb-4">Sesiones Canceladas</h2>
+<div class="container mt-4">
 
-<div>
-    <div class="form-container">
-        <!-- -------------------------------------BUSCADOR------------------------------------------ -->
-        <form method="get" action="{{ url_for('sesiones.sesiones_papelera') }}" class="d-flex">
-            <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
-                required>
-            <button type="submit"><i class="fas fa-search"></i></button>
-        </form>
+    <!-- Alertas -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{% if " Error" in message %}danger{% elif "Advertencia" in message %}warning{% else
+        %}success{% endif %} alert-dismissible fade show" role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
 
-<!-- ------------------------------TABLE -------------------------------- -->
-<div class="tables">
-    <table>
-        <thead>
-            <tr>
-                <th>Curso</th>
-                <th>Fecha</th>
-                <th>Hora inicio</th>
-                <th>Hora fin</th>
-                <th>Mes</th>
-                <th>Semana</th>
-                <th>Restaurar</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if sesiones %}
-            {% for sesion in sesiones %}
-            {% if sesion.estado == false %}
-            <tr>
-                <td>{{sesion.nombre_curso}}</td>
-                <td>{{sesion.fecha}}</td>
-                <td>{{sesion.horario_inicio}}</td>
-                <td>{{sesion.horario_fin}}</td>
-                <td>{{sesion.nombre_mes}}</td>
-                <td>{{sesion.semana}}</td>
-                <td>
-                    <button class="botones" type="button" data-bs-toggle="modal"
-                        data-bs-target="#staticBackdrop-{{sesion.id_sesion}}"><i class="fas fa-sync-alt"
-                            style="font-size: 18px;"></i>
-                    </button>
-                </td>
+    <!-- Buscador -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- Botón a la izquierda -->
+        <a href="{{ url_for('sesiones.sesiones_buscar') }}" class="botones">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+
+        <!-- Contenedor centrado para el formulario -->
+        <div class="mx-auto" style="width: 50%;">
+            <form method="get" action="{{ url_for('sesiones.sesiones_papelera') }}" class="d-flex">
+                <input class="form-control me-2" type="text" name="buscar" value="{{ search_query }}"
+                    placeholder="Buscar..." required>
+                <button class="btn btn-outline-primary" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Tabla -->
+    <div class="table-responsive">
+        <table class="table align-middle text-center">
+            <thead class="">
+                <tr>
+                    <th>Curso</th>
+                    <th>Fecha</th>
+                    <th>Hora inicio</th>
+                    <th>Hora fin</th>
+                    <th>Mes</th>
+                    <th>Semana</th>
+                    <th>Restaurar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if sesiones %}
+                {% for sesion in sesiones %}
+                {% if not sesion.estado %}
+                <tr>
+                    <td>{{ sesion.nombre_curso }}</td>
+                    <td>{{ sesion.fecha }}</td>
+                    <td>{{ sesion.horario_inicio }}</td>
+                    <td>{{ sesion.horario_fin }}</td>
+                    <td>{{ sesion.nombre_mes }}</td>
+                    <td>{{ sesion.semana }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-success" type="button" data-bs-toggle="modal"
+                            data-bs-target="#staticBackdrop-{{ sesion.id_sesion }}">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </td>
+                </tr>
                 {% endif %}
                 {% endfor %}
                 {% else %}
-            <tr>
-                <td align="center" colspan="8">No existen sesiones canceladas</td>
-            </tr>
-            {% endif %}
-            </tr>
-        </tbody>
-    </table>
-</div>
-<!-- -------------------------------------------------PAGINADOR----------------------------------------------- -->
-<nav class="paginati" aria-label="Page navigation" class="justify-content-center">
-    <ul class="pagination justify-content-center" style="margin:20px 0">
-        {% if page > 1 %}
-        <li class="page-item">
-            <a class="page-link bg-warning"
-                href="{{url_for('sesiones_papelera')}}?page={{ page - 1 }}&per_page={{ per_page }}" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-            </a>
-        </li>
-        {% if page != 1 and page != 2 %}
-        <li class="page-item"><a class="page-link bg-warning" href="{{url_for('sesiones_papelera')}}">1</a></li>
-        {% if page != 3 %}
-        <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
-        {% endif %}
-        {% endif %}
-        <li class="page-item"><a class="page-link bg-warning"
-                href="{{url_for('sesiones_papelera')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
-        </li>
-        {% endif %}
+                <tr>
+                    <td colspan="7">No existen sesiones canceladas</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
 
-        <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
-
-        {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
-                href="{{url_for('sesiones_papelera')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
-            </li>
-            {% if page != total_pages and page != total_pages-1 %}
-            {% if page != total_pages-2 %}
-            <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
-            {% endif %}
-            <li class="page-item"><a class="page-link bg-warning"
-                    href="{{url_for('sesiones_papelera')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
-            </li>
-            {% endif %}
+    <!-- Paginación -->
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if page > 1 %}
             <li class="page-item">
-                <a class="page-link bg-warning"
-                    href="{{url_for('sesiones_papelera')}}?page={{ page + 1 }}&per_page={{ per_page }}" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                </a>
+                <a class="page-link"
+                    href="{{ url_for('sesiones.sesiones_papelera') }}?page={{ page - 1 }}&per_page={{ per_page }}">&laquo;</a>
             </li>
+            {% if page != 1 and page != 2 %}
+            <li class="page-item"><a class="page-link" href="{{ url_for('sesiones.sesiones_papelera') }}">1</a></li>
+            {% if page != 3 %}
+            <li class="page-item disabled"><span class="page-link">...</span></li>
             {% endif %}
-    </ul>
-</nav>
+            {% endif %}
+            <li class="page-item"><a class="page-link"
+                    href="{{ url_for('sesiones.sesiones_papelera') }}?page={{ page - 1 }}&per_page={{ per_page }}">{{
+                    page - 1 }}</a></li>
+            {% endif %}
 
-<!-- --------------------------------------------------MODAL--------------------------------------------------- -->
-{% if sesiones %}
-{% for sesion in sesiones %}
-<div class="modal fade" id="staticBackdrop-{{sesion.id_sesion}}" data-bs-backdrop="static" data-bs-keyboard="false"
-    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">Confirmar acción</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                ¿Deseas restaurar la sesion del dia <strong>{{ sesion.fecha }}</strong>?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <a class="btn btn-danger" href="{{ url_for('sesiones.sesion_restaurar', id = sesion.id_sesion) }}"
-                    class="btn-delete"><i class="fas fa-trash-alt"></i>Restaurar</a>
+            <li class="page-item active"><span class="page-link">{{ page }}</span></li>
+
+            {% if page < total_pages %} <li class="page-item"><a class="page-link"
+                    href="{{ url_for('sesiones.sesiones_papelera') }}?page={{ page + 1 }}&per_page={{ per_page }}">{{
+                    page + 1 }}</a></li>
+                {% if page != total_pages and page != total_pages - 1 %}
+                {% if page != total_pages - 2 %}
+                <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+                <li class="page-item"><a class="page-link"
+                        href="{{ url_for('sesiones.sesiones_papelera') }}?page={{ total_pages }}&per_page={{ per_page }}">{{
+                        total_pages }}</a></li>
+                {% endif %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="{{ url_for('sesiones.sesiones_papelera') }}?page={{ page + 1 }}&per_page={{ per_page }}">&raquo;</a>
+                </li>
+                {% endif %}
+        </ul>
+    </nav>
+
+    <!-- Modals -->
+    {% if sesiones %}
+    {% for sesion in sesiones %}
+    <div class="modal fade" id="staticBackdrop-{{ sesion.id_sesion }}" data-bs-backdrop="static"
+        data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="staticBackdropLabel">Confirmar restauración</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Deseas restaurar la sesión del día <strong>{{ sesion.fecha }}</strong>?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <a class="btn btn-success" href="{{ url_for('sesiones.sesion_restaurar', id=sesion.id_sesion) }}">
+                        <i class="fas fa-sync-alt"></i> Restaurar
+                    </a>
+                </div>
             </div>
         </div>
     </div>
+    {% endfor %}
+    {% endif %}
 </div>
-{% endfor %}
-{% else %}
-{% endif %}
-
 {% endblock %}

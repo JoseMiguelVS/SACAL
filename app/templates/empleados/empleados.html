@@ -2,37 +2,43 @@
 {% block body %}
 <h2>Empleados</h2>
 <br>
+
+<!-- BOTÓN ATRÁS -->
+<a href="{{ url_for('index') }}" class="botones"><i class="fas fa-arrow-left"></i></a>
+
 <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+<!-- ----------------------------- MENSAJES FLASH ----------------------------- -->
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 {% for message in messages %}
-<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
-        {% endif %} alert-dismissible fade show" role="alert">
-        <strong>{{message}}</strong>
+<div class="alert 
+        {% if 'Error' in message %}alert-danger 
+        {% elif 'Advertencia' in message %}alert-warning 
+        {% else %}alert-success{% endif %} 
+        alert-dismissible fade show" role="alert">
+        <strong>{{ message }}</strong>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% endfor %}
 {% endif %}
 {% endwith %}
 
-<div>
-        <div class="form-container">
-                <!-- --------------------------------------NUEVO USUARIO ------------------------------------- -->
-                <a class="botones" href="{{url_for('empleados.empleado_agregar')}}"><i class="fa fa-plus"
-                        style="font-size: 18px;"></i></a>
-                        <!-- -------------------------------------BUSCADOR------------------------------------------ -->
-                <form method="get" action="{{ url_for('empleados.empleadosBuscar') }}" class="d-flex">
-                        <input class="form-control" type="text" name="buscar" value="{{ search_query }}"
-                                placeholder="Buscar..." required>
-                        <button type="submit"><i class="fas fa-search"></i> </button>
-                </form>
-        </div>
+<!-- ----------------------------- FORMULARIO Y BUSCADOR ----------------------------- -->
+<div class="form-container d-flex align-items-center mb-3">
+        <a class="botones mr-5" href="{{ url_for('empleados.empleado_agregar') }}">
+                <i class="fa fa-plus" style="font-size: 18px;"></i>Nuevo
+        </a>
+
+        <form method="get" action="{{ url_for('empleados.empleadosBuscar') }}" class="d-flex">
+                <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
+                        required>
+                <button type="submit" class="btn btn-primary ms-2"><i class="fas fa-search"></i></button>
+        </form>
 </div>
 
-
-<!-- ------------------------------TABLE -------------------------------- -->
-<div class="tables">
-        <table>
+<!-- ----------------------------- TABLA DE EMPLEADOS ----------------------------- -->
+<div class="tables table-responsive table-striped table-hover ">
+        <table class="table table-bordered">
                 <thead>
                         <tr>
                                 <th>Ver</th>
@@ -46,13 +52,12 @@
                 </thead>
                 <tbody>
                         {% if empleados %}
-                        {% for empleado in empleados %}
-                        {% if empleado.estado == True %}
+                        {% for empleado in empleados if empleado.estado %}
                         <tr>
                                 <td>
                                         <a class="botones-ver"
-                                                href="{{url_for('empleados.empleado_detalles',id = empleado.id_empleado)}}">
-                                                <li class="fa fa-eye" style="font-size: 18px;"></li>
+                                                href="{{ url_for('empleados.empleado_detalles', id=empleado.id_empleado) }}">
+                                                <i class="fa fa-eye" style="font-size: 18px;"></i>
                                         </a>
                                 </td>
                                 <td>{{ empleado.nombre_usuario }}</td>
@@ -61,88 +66,88 @@
                                 <td>{{ empleado.correo_empleado }}</td>
                                 <td>
                                         <a class="botones-editar"
-                                                href="{{ url_for('empleados.empleado_editar', id = empleado.id_empleado) }}">
-                                                <li class="fa fa-edit" style="font-size: 18px;"></li>
+                                                href="{{ url_for('empleados.empleado_editar', id=empleado.id_empleado) }}">
+                                                <i class="fa fa-edit" style="font-size: 18px;"></i>
                                         </a>
                                 </td>
                                 <td>
                                         <button class="botones-delete" type="button" data-bs-toggle="modal"
-                                                data-bs-target="#staticBackdrop-{{empleado.id_empleado}}">
-                                                <li class="fa fa-trash" style="font-size: 18px;"></li>
+                                                data-bs-target="#staticBackdrop-{{ empleado.id_empleado }}">
+                                                <i class="fa fa-trash" style="font-size: 18px;"></i>
                                         </button>
                                 </td>
-                                {% endif %}
-                                {% endfor %}
-                                {% else %}
+                        </tr>
+                        {% endfor %}
+                        {% else %}
                         <tr>
-                                <td align="center" colspan="8">No existen empleados</td>
+                                <td colspan="7" class="text-center">No existen empleados</td>
                         </tr>
                         {% endif %}
-                        </tr>
                 </tbody>
         </table>
 </div>
-<!-- -------------------------------------------------PAGINADOR----------------------------------------------- -->
-<nav class="paginati" aria-label="Page navigation" class="justify-content-center">
-        <ul class="pagination justify-content-center" style="margin:20px 0">
+
+<!-- ----------------------------- PAGINACIÓN ----------------------------- -->
+<nav class="pagination-container mt-4">
+        <ul class="pagination justify-content-center">
                 {% if page > 1 %}
                 <li class="page-item">
                         <a class="page-link bg-warning"
-                                href="{{url_for('empleadosBuscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                                href="{{ url_for('empleadosBuscar') }}?page={{ page - 1 }}&per_page={{ per_page }}"
                                 aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
+                                &laquo;
                         </a>
                 </li>
-                {% if page != 1 and page != 2 %}
-                <li class="page-item"><a class="page-link bg-warning" href="{{url_for('empleadosBuscar')}}">1</a></li>
-                {% if page != 3 %}
-                <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
-                {% endif %}
-                {% endif %}
+
+                {% if page > 2 %}
                 <li class="page-item"><a class="page-link bg-warning"
-                                href="{{url_for('empleadosBuscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
-                </li>
+                                href="{{ url_for('empleadosBuscar') }}?page=1&per_page={{ per_page }}">1</a></li>
+                {% if page > 3 %}
+                <li class="page-item disabled"><span class="page-link bg-warning">...</span></li>
+                {% endif %}
                 {% endif %}
 
-                <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
+                <li class="page-item"><a class="page-link bg-warning"
+                                href="{{ url_for('empleadosBuscar') }}?page={{ page - 1 }}&per_page={{ per_page }}">{{
+                                page - 1 }}</a></li>
+                {% endif %}
+
+                <li class="page-item active"><span class="page-link bg-warning">{{ page }}</span></li>
 
                 {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
-                                href="{{url_for('empleadosBuscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
-                        </li>
-                        {% if page != total_pages and page != total_pages-1 %}
-                        {% if page != total_pages-2 %}
-                        <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
-                        {% endif %}
-                        <li class="page-item"><a class="page-link bg-warning"
-                                        href="{{url_for('empleadosBuscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
-                        </li>
-                        {% endif %}
-                        <li class="page-item">
-                                <a class="page-link bg-warning"
-                                        href="{{url_for('empleadosBuscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
-                                        aria-label="Next">
-                                        <span aria-hidden="true">&raquo;</span>
-                                </a>
-                        </li>
-                        {% endif %}
+                                href="{{ url_for('empleadosBuscar') }}?page={{ page + 1 }}&per_page={{ per_page }}">{{
+                                page + 1 }}</a></li>
+
+                        {% if page < total_pages - 1 %} {% if page < total_pages - 2 %} <li class="page-item disabled">
+                                <span class="page-link bg-warning">...</span></li>
+                                {% endif %}
+                                <li class="page-item"><a class="page-link bg-warning"
+                                                href="{{ url_for('empleadosBuscar') }}?page={{ total_pages }}&per_page={{ per_page }}">{{
+                                                total_pages }}</a></li>
+                                {% endif %}
+
+                                <li class="page-item">
+                                        <a class="page-link bg-warning"
+                                                href="{{ url_for('empleadosBuscar') }}?page={{ page + 1 }}&per_page={{ per_page }}"
+                                                aria-label="Next">
+                                                &raquo;
+                                        </a>
+                                </li>
+                                {% endif %}
         </ul>
 </nav>
 
-<!-- -----------------------------------------------PAPELERA--------------------------------------------------- -->
-
-<div>
-        <br>
-        <a href="{{ url_for('empleados.empleados_papelera') }}"
-                class="btn btn-outline-danger d-inline-flex align-items-center">
-                <li class="fa fa-folder" style="font-size: 18px;"></li>
+<!-- ----------------------------- PAPELERA ----------------------------- -->
+<div class="mt-3">
+        <a href="{{ url_for('empleados.empleados_papelera') }}" class="btn btn-outline-danger">
+                <i class="fa fa-folder" style="font-size: 18px;"></i> Papelera
         </a>
 </div>
 
-<!-- --------------------------------------------------MODAL--------------------------------------------------- -->
-{% if empleados %}
+<!-- ----------------------------- MODALES DE CONFIRMACIÓN ----------------------------- -->
 {% for empleado in empleados %}
-<div class="modal fade" id="staticBackdrop-{{empleado.id_empleado}}" data-bs-backdrop="static" data-bs-keyboard="false"
-        tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="staticBackdrop-{{ empleado.id_empleado }}" data-bs-backdrop="static"
+        data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
                 <div class="modal-content">
                         <div class="modal-header">
@@ -151,21 +156,20 @@
                                         aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                                ¿Deseas eliminar a <strong>{{ empleado.nombre_usuario }} {{
-                                        empleado.apellido_pat}}</strong>?
+                                ¿Deseas eliminar a <strong>{{ empleado.nombre_usuario }} {{ empleado.apellido_pat
+                                        }}</strong>?
                         </div>
                         <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary"
                                         data-bs-dismiss="modal">Cancelar</button>
                                 <a class="btn btn-danger"
-                                        href="{{ url_for('empleados.empleado_eliminar', id = empleado.id_empleado) }}"
-                                        class="btn-delete"><i class="fas fa-trash-alt"></i>Eliminar</a>
+                                        href="{{ url_for('empleados.empleado_eliminar', id=empleado.id_empleado) }}">
+                                        <i class="fas fa-trash-alt"></i> Eliminar
+                                </a>
                         </div>
                 </div>
         </div>
 </div>
 {% endfor %}
-{% else %}
-{% endif %}
 
 {% endblock %}

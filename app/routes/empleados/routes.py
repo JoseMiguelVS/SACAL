@@ -86,7 +86,7 @@ def empleado_detalles(id):
     with get_db_connection() as con:
         with con.cursor(cursor_factory=RealDictCursor) as cur:
             # Asegúrate de usar parámetros para evitar inyección SQL
-            cur.execute('SELECT * FROM empleados WHERE id_empleado = %s', (id,))  #generar vista para roles
+            cur.execute('SELECT * FROM detalles_empleados WHERE id_empleado = %s', (id,))  #generar vista para roles
             empleado = cur.fetchone()  # Recupera solo un registro
     if empleado is None:
         flash('El empleado no existe o ha sido eliminado.')

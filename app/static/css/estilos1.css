@@ -1,0 +1,326 @@
+@import url("https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap");
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Raleway", sans-serif;
+  font-size: 20px;
+  /* font-optical-sizing: auto;
+  font-style: normal; */
+}
+
+body {
+  background-color: #f0f0f0;
+}
+
+.header {
+  background-color: #14447c;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 85px;
+  padding: 5px 10%;
+}
+
+.header .logo {
+  cursor: pointer;
+}
+
+.header .logo img {
+  height: 70px;
+  width: auto;
+  transition: all 0.3s ease;
+}
+
+.header .logo img:hover {
+  transform: scale(1.2);
+}
+
+.header .nav-links {
+  list-style: none;
+}
+
+.header .nav-links li {
+  display: inline-block;
+  padding: 0 20px;
+}
+
+.header .nav-links li:hover {
+  transform: scale(1.1);
+}
+
+.header .nav-links a {
+  text-decoration: none;
+  color: #fff;
+  transition: all 0.3s ease;
+  padding: 10px;
+  display: block;
+}
+
+.header .nav-links li a:hover {
+  color: #eb5d10;
+}
+
+.header .btn button {
+  font-weight: 700;
+  color: #f3a474;
+  padding: 9px 25px;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease 0s;
+}
+
+.header .btn button:hover {
+  background-color: #eb5d10;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.nav-links>li {
+  float: left;
+}
+
+.nav-links li ul {
+  display: none;
+  position: absolute;
+  background-color: #14447c;
+  padding: 10px 0;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+  transform: scale(0);
+}
+
+.nav-links li:hover>ul {
+  transform: scale(1);
+  display: block;
+}
+
+.nav-links li ul li {
+  position: relative;
+}
+
+.herramientas {
+  border: #f0f0f0 solid 1px;
+  border-radius: 5px;
+}
+
+.tools {
+  z-index: 999999;
+}
+
+/* ---------------------------------------------------------------------------------------------------------------------------------------- */
+
+.form-container {
+  display: flex;
+  width: inherit;
+  margin-bottom: 5px;
+  height: 80%;
+  justify-content: center;
+  /* Centra horizontalmente */
+  align-items: center;
+  /* Centra verticalmente */
+}
+
+.espacio_form {
+  margin: 15px;
+  display: flex;
+  justify-content: center;
+  /* Centra horizontalmente */
+  align-items: center;
+  /* Centra verticalmente */
+  width: inherit;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------------------------ */
+.tables {
+  align-items: center;
+  padding: 1%;
+}
+
+table {
+  width: 100%;
+  background-color: white;
+  border-radius: 10px;
+}
+
+th,
+td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #e7e7e7;
+  color: rgb(8, 8, 8);
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* td {
+  position: relative;
+} */
+
+td:last-child,
+td:nth-last-child(2) {
+  text-align: center;
+}
+
+/* -------------------------------- */
+.tables_participantes {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.tables_participantes table {
+  width: 100%;
+  /* Solo el ancho necesario */
+  border-collapse: collapse;
+  /* Texto más pequeño */
+}
+
+.tables_participantes td,
+.tables_participantes th {
+  font-size: 13px;
+  padding: 4px 5px;
+  max-width: 100px;
+  white-space: nowrap;
+  text-align: center;
+  border: 1px solid #ccc;
+}
+
+.tables_participantes select,
+.tables_participantes input[type="text"],
+.tables_participantes input[type="date"] {
+  font-size: 12px;
+  max-width: 100px;
+  /* Limita el ancho de los inputs/selects */
+}
+
+.tables_participantes input[type="checkbox"] {
+  align-items: center;
+  accent-color: #f3a474;
+  cursor: pointer;
+  /* Checkbox más pequeño */
+}
+
+/* ------------------------------------------------------------------------------------------------- */
+footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  background-color: #14447c;
+  justify-content: center;
+  height: 8%;
+  text-align: center;
+}
+
+footer {
+  align-items: center;
+  color: white;
+  margin: 0;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+}
+
+/* ----------------------------------------------------------------------------------------------------------------------------------------------------- */
+.botones {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #7d1b1b;
+  /* color danger */
+  background-color: transparent;
+  border: 1px solid #7d1b1b;
+  border-radius: 0.375rem;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out;
+}
+
+.botones:hover {
+  color: #fff;
+  background-color: #7d1b1b;
+  border-color: #7d1b1b;
+}
+
+.botones-cancelar,
+.botones-delete {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #c00404;
+  /* color danger */
+  background-color: transparent;
+  border: 1px solid #c00404;
+  border-radius: 0.375rem;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out;
+}
+
+.botones-cancelar:hover,
+.botones-delete:hover {
+  color: #fff;
+  background-color: #c00404;
+  border-color: #c00404;
+}
+
+.botones-guardar,
+.botones-editar,
+.botones-ver {
+  /* display: inline-flex; */
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #060683;
+  /* color danger */
+  background-color: transparent;
+  border: 1px solid #060683;
+  border-radius: 0.375rem;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out;
+}
+
+.botones-guardar:hover,
+.botones-editar:hover,
+.botones-ver:hover {
+  color: #fff;
+  background-color: #060683;
+  border-color: #060683;
+}
+
+.btn-act {
+  text-decoration: none;
+  color: #e27b7b;
+  text-align: center;
+}

@@ -1,14 +1,22 @@
 {% extends './layout.html' %}
 {% block body %}
-<h2>Participantes</h2>
-<br>
 
-<!-- Alertas -->
+<!-- TÍTULO -->
+<h2 class="text-center">Participantes</h2>
+
+<!-- AGREGAR NUEVO -->
+<div class="form-container">
+    <a class="botones" href="{{ url_for('participantes.participante_agregar') }}">
+        <i class="fa fa-plus" style="font-size: 18px;"></i> Nuevo
+    </a>
+</div>
+
+<!-- ALERTAS -->
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 {% for message in messages %}
-<div class="alert alert-{% if " Error" in message %}danger{% elif "Advertencia" in message %}warning{% else %}success{%
-    endif %} alert-dismissible fade show" role="alert">
+<div class="fade show alert alert-{% if " Error" in message %}danger{% elif "Advertencia" in message %}warning{% else
+    %}success{% endif %} alert-dismissible fade show" role="alert">
     <strong>{{ message }}</strong>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
@@ -16,58 +24,67 @@
 {% endif %}
 {% endwith %}
 
-<!-- Agregar e ir a sesiones -->
-<div>
-    <div class="form-container">
-        <!-- -------------------------------------- ------------------------------------- -->
-        <a class="botones" href="{{url_for('participantes.participante_agregar')}}"><i class="fa fa-plus"
-                style="font-size: 18px;"></i></a>
-    </div>
-    <div class="form-container">
-        <!-- -------------------------------------- ------------------------------------- -->
-        <a class="botones" href="{{url_for('sesiones.sesiones_buscar')}}">sesiones</a>
+<!-- CONTENEDOR FLEX PRINCIPAL -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+    <!-- BOTÓN ATRÁS IZQUIERDA -->
+    <a href="{{ url_for('index') }}" class="botones">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <!-- FORMULARIO CENTRADO -->
+    <div class="mx-auto" style="width: 60%;">
+        <form method="get" action="{{ url_for('participantes.participantes_buscar') }}"
+            class="d-flex align-items-center justify-content-center gap-2 flex-wrap">
+            <!-- SELECT CURSO -->
+            <div class="espacio_form">
+                <select name="nombre_curso" id="nombre_curso" class="form-select">
+                    <option value="">-Seleccione el curso-</option>
+                    {% if cursos %}
+                    {% for curso in cursos %}
+                    {% if curso.2 == True %}
+                    <option value="{{ curso.1 }}" {% if request.args.get('nombre_curso')==curso.1 %}selected{% endif %}>
+                        {{ curso.1 }}
+                    </option>
+                    {% endif %}
+                    {% endfor %}
+                    {% else %}
+                    <option>Aún no hay registros</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <!-- SELECT SESIÓN -->
+            <div class="espacio_form">
+                <select name="sesion" id="sesion" class="form-select">
+                    <option value="">-Seleccione la sesión-</option>
+                    {% if sesiones %}
+                    {% for sesion in sesiones %}
+                    {% if sesion.4 == True %}
+                    <option value="{{ sesion.1 }}" {% if request.args.get('sesion')==sesion.1 %}selected{% endif %}>
+                        {{ sesion.7 }} | {{ sesion.1 }}
+                    </option>
+                    {% endif %}
+                    {% endfor %}
+                    {% else %}
+                    <option>Aún no hay registros</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <!-- BOTÓN ACEPTAR -->
+            <button type="submit" class="btn btn-primary">Aceptar</button>
+        </form>
     </div>
 </div>
 
-<div>
-    <form method="get" action="{{ url_for('participantes.participantes_buscar') }}" class="d-flex">
-        <!-- Buscar por sesión/curso -->
-        <div class="espacio_form">
-            <select name="nombre_curso" id="nombre_curso">
-                <option value="">-Seleccione el curso-</option>
-                {% if cursos %}
-                {% for curso in cursos %}
-                <option value="{{ curso.1 }}" {% if request.args.get('nombre_curso')==curso.1 %}selected{% endif %}>
-                    {{ curso.1 }}
-                </option>
-                {% endfor %}
-                {% else %}
-                <option>Aún no hay registros</option>
-                {% endif %}
-            </select>
-        </div>
-
-        <div class="espacio_form">
-            <select name="sesion" id="sesion">
-                <option value="">-Seleccione la sesion-</option>
-                {% if sesiones %}
-                {% for sesion in sesiones %}
-                <option value="{{ sesion.1 }}" {% if request.args.get('sesion')==sesion.1 %}selected{% endif %}>
-                    {{ sesion.7 }} | {{ sesion.1 }} </option>
-                {% endfor %}
-                {% else %}
-                <option>Aún no hay registros</option>
-                {% endif %}
-            </select>
-            <button type="submit">Aceptar</button>
-        </div>
-
-    </form>
+<!-- MÁS HERRAMIENTAS -->
+<div class="form-container">
+    <a class="botones" href="{{ url_for('sesiones.sesiones_buscar') }}">Sesiones</a>
 </div>
 
-<!-- Tabla de resultados -->
+<!-- TABLA DE PARTICIPANTES -->
 <div class="tables_participantes">
-    <h2>Informacion de participantes</h2>
     <table>
         <thead>
             <tr>
@@ -75,16 +92,16 @@
                 <th>Nombre</th>
                 <th>Apellidos</th>
                 <th>Paquete</th>
-                <th>Pago validado</th>
+                <th>Pago <br>validado</th>
                 <th>Fecha del pago</th>
                 <th>Factura</th>
                 <th>Forma pago</th>
                 <th>Promotor</th>
-                <th>Confirmacion de grupo de WhatsApp</th>
-                <th>Materiales enviados</th>
-                <th>Grabaciones enviadas</th>
-                <th>Evaluacion recibida</th>
-                <th>Obervaciones</th>
+                <th>WhatsApp</th>
+                <th>Materiales</th>
+                <th>Grabaciones</th>
+                <th>Evaluación <br>recibida</th>
+                <th>Observaciones</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -97,43 +114,36 @@
                 <td><input type="text" name="nombre_participante" value="{{ p.nombre_participante }}"></td>
                 <td><input type="text" name="apellidos_participante" value="{{ p.apellidos_participante }}"></td>
                 <td>
-                    <select name="nombre_paquete" id="nombre_paquete" aria-label="Default select example">
-                        <option value="" disabled {% if not p.nombre_paquete %}selected{% endif %}>Paquete</option>
+                    <select name="nombre_paquete" id="nombre_paquete">
+                        <option value="true" selected>Paquete</option>
                         {% if paquetes %}
                         {% for paquete in paquetes %}
-                        <option value="{{ paquete.0 }}" {% if paquete.0|string==p.nombre_paquete|string %} selected {%
-                            endif %}>
-                            {{ paquete.1 }}
-                        </option>
+                        <option value="{{ paquete.0 }}" {% if paquete.1|string==p.nombre_paquete|string %}selected{%
+                            endif %}>{{ paquete.1 }}</option>
                         {% endfor %}
                         {% else %}
                         <option>Aún no hay registros</option>
                         {% endif %}
                     </select>
                 </td>
-
-
                 <td>{{ p.validacion_pago }}</td>
                 <td><input type="date" name="fecha_pago" value="{{ p.fecha_pago }}"></td>
                 <td><input type="checkbox" name="factura_pago" {% if p.factura_pago %}checked{% endif %}></td>
-
                 <td>
-                    <select name="cuenta_destino" id="cuenta_destino" aria-label="Default select example">
-                        <option value="" disabled {% if not p.cuenta_destino %} selected {% endif %}>Cuenta destino
+                    <select name="cuenta_destino" id="cuenta_destino">
+                        <option value="" disabled {% if not p.cuenta_destino %}selected{% endif %}>Cuenta destino
                         </option>
                         {% if cuentas %}
                         {% for cuenta in cuentas %}
-                        <option value="{{ cuenta.0 }}" {% if cuenta.0|string==p.cuenta_destino %} selected {% endif %}>
-                            {{ cuenta.1 }}
-                        </option>
+                        <option value="{{ cuenta.0 }}" {% if cuenta.1|string==p.cuenta_destino|string %}selected{% endif
+                            %}>{{ cuenta.1 }}</option>
                         {% endfor %}
                         {% else %}
                         <option>Aún no hay registros</option>
                         {% endif %}
                     </select>
                 </td>
-
-                <td> {{ p.nombre_empleado }}</td>
+                <td>{{ p.nombre_empleado }}</td>
                 <td><input type="checkbox" name="confirmacion_grupo" {% if p.confirmacion_grupo %}checked{% endif %}>
                 </td>
                 <td><input type="checkbox" name="materiales" {% if p.materiales %}checked{% endif %}></td>
@@ -146,11 +156,10 @@
             {% endfor %}
             {% else %}
             <tr>
-                <td align="center" colspan="4">No existen participantes</td>
+                <td align="center" colspan="15">No existen participantes</td>
             </tr>
             {% endif %}
         </tbody>
-
     </table>
 </div>
 

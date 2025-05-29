@@ -41,6 +41,7 @@ def cursos_nuevo():
         codigo_curso = request.form['codigo_curso']
         duracion_curso = request.form['duracion_curso']
         tema_curso = request.form['id_tema']
+        es_nacional = request.form['es_nacional']
         estado = True
         fecha_creacion= datetime.now()
         fecha_modificacion = datetime.now()
@@ -56,8 +57,8 @@ def cursos_nuevo():
             flash('Error: el curso ya existe. Intente con otro')
             return redirect(url_for('cursos.curso_agregar'))
         else:
-            sql = 'INSERT INTO cursos (nombre_curso,codigo_curso, tema_curso, duracion_curso, estado, fecha_creacion, fecha_modificacion) VALUES (%s, %s, %s, %s, %s, %s, %s)'
-            valores = (nombre_curso,codigo_curso, tema_curso, duracion_curso, estado, fecha_creacion, fecha_modificacion)
+            sql = 'INSERT INTO cursos (nombre_curso,codigo_curso, tema_curso, duracion_curso,es_nacional , estado, fecha_creacion, fecha_modificacion) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
+            valores = (nombre_curso,codigo_curso, tema_curso, duracion_curso,es_nacional , estado, fecha_creacion, fecha_modificacion)
             cur.execute(sql, valores)
             con.commit()
             cur.close()
@@ -100,13 +101,14 @@ def curso_actualizar(id):
         nombre_curso = request.form['nombre_curso']
         codigo_curso = request.form['codigo_curso']
         tema_curso = request.form['id_tema']
+        es_nacional = request.form['es_nacional']
         duracion_curso = request.form['duracion_curso']
         fecha_modificacion= datetime.now()
         
         con = get_db_connection()
         cur = con.cursor()
-        sql="UPDATE cursos SET nombre_curso = %s, codigo_curso = %s, tema_curso = %s, duracion_curso = %s, fecha_modificacion = %s WHERE id_curso = %s"
-        valores=(nombre_curso, codigo_curso, tema_curso, duracion_curso, fecha_modificacion, id)
+        sql="UPDATE cursos SET nombre_curso = %s, codigo_curso = %s, tema_curso = %s, duracion_curso = %s, es_nacional = %s, fecha_modificacion = %s WHERE id_curso = %s"
+        valores=(nombre_curso, codigo_curso, tema_curso, duracion_curso, es_nacional, fecha_modificacion, id)
         cur.execute(sql, valores)
         con.commit()
         cur.close()

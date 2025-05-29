@@ -53,6 +53,7 @@ def sesiones_agregar():
 @login_required
 def sesion_nuevo():
     if request.method == 'POST':
+        # Campos base
         fecha = request.form['fecha']
         horario_inicio = request.form['horario_inicio']
         horario_fin = request.form['horario_fin']
@@ -61,14 +62,14 @@ def sesion_nuevo():
         semana = request.form['id_semana']
         estado = True
 
-        # Listas dinámicas
+        # Campos dinámicos
         cursos = request.form.getlist('cursos[]')
         ponentes = request.form.getlist('ponentes[]')
 
         con = get_db_connection()
         cur = con.cursor(cursor_factory=RealDictCursor)
 
-        # Insertar sesión base (sin curso ni ponente específicos)
+        # Insertar sesión principal
         sql_sesion = '''
             INSERT INTO sesiones_curso 
             (fecha, horario_inicio, horario_fin, categoria, mes, semana, estado)
@@ -79,7 +80,7 @@ def sesion_nuevo():
         cur.execute(sql_sesion, valores_sesion)
         sesion_id = cur.fetchone()['id_sesion']
 
-        # Insertar cada curso + ponente relacionados a esa sesión
+        # Insertar cursos y ponentes
         sql_relacion = '''
             INSERT INTO cursos_sesion (sesion_id, curso_id, ponente_id)
             VALUES (%s, %s, %s)
@@ -96,8 +97,9 @@ def sesion_nuevo():
 
     return redirect(url_for('sesiones.sesiones_agregar'))
 
+
 #------------------------------------EDITAR SESION-------------------------------
-@sesiones.route('/participantes/editar/<string:id>')
+@sesiones.route('/participantes/sesiones/editar/<string:id>')
 @login_required
 def sesion_editar(id):
     con = get_db_connection()
@@ -119,37 +121,39 @@ def sesion_editar(id):
 @login_required
 def sesion_actualizar(id):
     if request.method == "POST":
-        nombre_curso = request.form['id_curso']
+        # Campos generales
         fecha = request.form['fecha']
         horario_inicio = request.form['horario_inicio']
         horario_fin = request.form['horario_fin']
-        ponente = request.form['id_ponente']
         categoria = request.form['id_categoria']
         mes = request.form['id_mes']
         semana = request.form['id_semana']
 
+        # Listas de cursos y ponentes
+        cursos = request.form.getlist('cursos[]')
+        ponentes = request.form.getlist('ponentes[]')
+
         con = get_db_connection()
         cur = con.cursor()
 
-        # Actualiza los datos generales de la sesión
+        # Actualiza sesión
         sql_update_sesion = """
             UPDATE sesiones_curso 
             SET fecha = %s, horario_inicio = %s, horario_fin = %s, categoria = %s, mes = %s, semana = %s 
             WHERE id_sesion = %s
         """
-        valores_sesion = (fecha, horario_inicio, horario_fin, categoria, mes, semana, id)
-        cur.execute(sql_update_sesion, valores_sesion)
+        cur.execute(sql_update_sesion, (fecha, horario_inicio, horario_fin, categoria, mes, semana, id))
 
-        # Elimina las asociaciones anteriores de cursos/ponentes para esa sesión
+        # Elimina cursos/ponentes anteriores
         cur.execute("DELETE FROM cursos_sesion WHERE sesion_id = %s", (id,))
 
-        # Inserta la nueva asociación curso/ponente
+        # Inserta nuevas combinaciones
         sql_insert_cs = """
             INSERT INTO cursos_sesion (sesion_id, curso_id, ponente_id)
             VALUES (%s, %s, %s)
         """
-        valores_cs = (id, nombre_curso, ponente)
-        cur.execute(sql_insert_cs, valores_cs)
+        for curso, ponente in zip(cursos, ponentes):
+            cur.execute(sql_insert_cs, (id, curso, ponente))
 
         con.commit()
         cur.close()
@@ -158,6 +162,7 @@ def sesion_actualizar(id):
         flash("Sesión actualizada correctamente")
 
     return redirect(url_for("sesiones.sesiones_buscar"))
+
 
 
 #-----------------------------------CANCELAR SESION---------------------------------
@@ -178,7 +183,7 @@ def sesion_cancelar(id):
     return redirect(url_for('sesiones.sesiones_buscar'))
 
 #--------------------------------------PAPELERA DE SESIONES--------------------------
-@sesiones.route("/participantes/papelera/sesiones")
+@sesiones.route("/participantes/sesiones/papelera")
 @login_required
 def sesiones_papelera():
     search_query = request.args.get('buscar','', type = str).strip()

@@ -9,6 +9,7 @@ from routes.cursos.routes import cursos
 from routes.participantes.routes import participantes
 from routes.sesiones.routes import sesiones
 from routes.constancias.routes import constancias
+from routes.temas.routes import temas
 
 from flask import Flask, render_template, url_for, redirect, request, flash
 from flask import Flask
@@ -64,6 +65,7 @@ app.register_blueprint(paquetes)
 app.register_blueprint(cursos)
 app.register_blueprint(participantes)
 app.register_blueprint(sesiones)
+app.register_blueprint(temas)
 app.register_blueprint(constancias)
 
 # Rutas principales

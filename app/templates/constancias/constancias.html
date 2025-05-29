@@ -1,4 +1,5 @@
 {% extends './layout.html' %}
+
 {% block body %}
 <h2>Datos de constancias</h2>
 <br>
@@ -16,9 +17,9 @@
 {% endif %}
 {% endwith %}
 
+<!-- Filtros de búsqueda -->
 <div>
     <form method="get" action="{{ url_for('constancias.constancias_buscar') }}" class="d-flex">
-        <!-- Buscar por sesión/curso -->
         <div class="espacio_form">
             <select name="nombre_categoria" id="nombre_categoria">
                 <option value="">-Seleccione la categoria-</option>
@@ -37,11 +38,12 @@
 
         <div class="espacio_form">
             <select name="sesion" id="sesion">
-                <option value="">-Seleccione la sesion-</option>
+                <option value="">-Seleccione la sesión-</option>
                 {% if sesiones %}
                 {% for sesion in sesiones %}
                 <option value="{{ sesion.1 }}" {% if request.args.get('sesion')==sesion.1 %}selected{% endif %}>
-                    {{ sesion.7 }} | {{ sesion.1 }} </option>
+                    {{ sesion.7 }} | {{ sesion.1 }}
+                </option>
                 {% endfor %}
                 {% else %}
                 <option>Aún no hay registros</option>
@@ -49,7 +51,6 @@
             </select>
             <button type="submit">Aceptar</button>
         </div>
-
     </form>
 </div>
 
@@ -58,41 +59,40 @@
     <table>
         <thead>
             <tr>
-                <th>Ver mas</th>
-                <th>Generar constancia</th>
+                <th>Ver más</th>
+                <th>Generar<br>constancia</th>
                 <th>Editar</th>
-                <th>Clave Participante</th>
-                <th>Nombre Participante</th>
+                <th>Clave<br>Participante</th>
+                <th>Nombre<br>Participante</th>
                 <th>Curso</th>
-                <th>Pago validado</th>
-                <th>Constancia generada</th>
-                <th>Folio de constancia</th>
-                <th>Constancia enviada</th>
-                <th>Fecha de envio</th>
+                <th>Pago<br>validado</th>
+                <th>Constancia<br>generada</th>
+                <th>Folio de<br>constancia</th>
+                <th>Constancia<br>enviada</th>
+                <th>Fecha de<br>envío</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             {% if constancias %}
             {% for p in constancias %}
-            {% if p.constancia_enviada == False %}
+            {% if not p.constancia_enviada %}
             <tr data-id="{{ p.id_participante }}">
                 <td>
-                    <a class="botones-ver"
-                        href="{{url_for('constancias.constancias_detalles',id = p.id_participante)}}">
+                    <a class=""
+                        href="{{ url_for('constancias.constancias_detalles', id=p.id_participante) }}">
                         <li class="fa fa-eye" style="font-size: 18px;"></li>
                     </a>
                 </td>
                 <td>
-                    <a class="botones-ver"
+                    <a class=""
                         onclick="generarConstancia('{{ p.id_participante }}', '{{ p.nombre_curso }}', '{{ p.fecha }}', '{{ p.curso_id }}')">
                         <li class="fas fa-download" style="font-size: 18px;"></li>
                     </a>
-
                 </td>
                 <td>
-                    <a class="botones-editar"
-                        href="{{ url_for('constancias.constancias_editar', id = p.id_participante, curso = p.nombre_curso, fecha = p.fecha) }}">
+                    <a class=""
+                        href="{{ url_for('constancias.constancias_editar', id=p.id_participante, curso=p.nombre_curso, fecha=p.fecha) }}">
                         <li class="fa fa-edit" style="font-size: 18px;"></li>
                     </a>
                 </td>
@@ -100,29 +100,30 @@
                 <td>{{ p.nombre_participante }} {{ p.apellidos_participante }}</td>
                 <td>{{ p.nombre_curso }}</td>
                 <td>{{ p.validacion_pago }}</td>
-                <td><input type="checkbox" {% if p.constancia_generada %}checked{% endif %}>
-                    <form class="d-flex" method="post"
-                        action="{{ url_for('constancias.modificar_constancia') }}?id={{ p.id_participante }}&id_curso={{ p.curso_id }}">
-                        <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
-                <td><input type="text" name="folio_constancia" value="{{p.folio_constancia}}"></td>
-                <td> <input type="checkbox" name="constancia_enviada" {% if p.constancia_enviada %}checked{% endif %}>
-                </td>
-                <td><input type="date" name="fecha_envio" value="{{ p.fecha_envio|default('', true) }}"></td>
-                <td><button type="submit">Guardar</button></td>
-                </form>
+                <td><input type="checkbox" {% if p.constancia_generada %}checked{% endif %} disabled></td>
 
-                {% endif %}
-                {% endfor %}
-                {% else %}
+                <form class="d-flex" method="post"
+                    action="{{ url_for('constancias.modificar_constancia') }}?id={{ p.id_participante }}&id_curso={{ p.curso_id }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <td><input type="text" name="folio_constancia" value="{{ p.folio_constancia }}"></td>
+                    <td><input type="checkbox" name="constancia_enviada" {% if p.constancia_enviada %}checked{% endif
+                            %}></td>
+                    <td><input type="date" name="fecha_envio" value="{{ p.fecha_envio | default('', true) }}"></td>
+                    <td><button type="submit">Guardar</button></td>
+                </form>
+            </tr>
+            {% endif %}
+            {% endfor %}
+            {% else %}
             <tr>
-                <td align="center" colspan="4">No existen participantes</td>
+                <td align="center" colspan="12">No existen participantes</td>
             </tr>
             {% endif %}
         </tbody>
-
     </table>
 </div>
 
+<!-- Botón para ver constancias generadas -->
 <div>
     <br>
     <a href="{{ url_for('constancias.constancias_hechas') }}"
@@ -131,19 +132,14 @@
     </a>
 </div>
 
-
+<!-- Script para generación de constancia -->
 <script>
     function generarConstancia(id, curso, fecha, id_curso) {
         const url = `/constancias/constancia?id=${id}&curso=${encodeURIComponent(curso)}&fecha=${fecha}&id_curso=${id_curso}`;
-
-        // Abrir descarga en nueva pestaña
         window.open(url, '_blank');
-
-        // Esperar unos segundos y luego recargar la página actual
         setTimeout(() => {
             location.reload();
-        }, 2000); // 2 segundos, puedes ajustarlo si hace falta más tiempo para la generación
+        }, 2000);
     }
 </script>
-
 {% endblock %}

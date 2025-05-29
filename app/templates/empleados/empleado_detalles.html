@@ -1,34 +1,44 @@
 {% extends './layout.html' %}
 
 {% block body %}
-<h2>Detalles de Empleado</h2>
-<p class="fc">Fecha creación: {{ empleado.fecha_creacion }}</p>
-<p class="fc">Fecha modificación: {{ empleado.fecha_modificacion }}</p>
-<br />
-<!-- ----------------------------------------------------------------------------------------------- -->
-<table>
-  <thead>
-    <tr>
-      <th>Nombre(s)</th>
-      <th>Apellido Paterno</th>
-      <th>Apellido Materno</th>
-      <th>Nombre usuario</th>
-      <th>Correo Electrónico</th>
-      <th>Rol</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>{{ empleado.nombre_empleado }}</td>
-      <td>{{ empleado.apellido_paterno }}</td>
-      <td>{{ empleado.apellido_materno }}</td>
-      <td>{{ empleado.nombre_usuario }}</td>
-      <td>{{ empleado.correo_empleado }}</td>
-      <td>{{ empleado.rol }}</td>
-    </tr>
-  </tbody>
-</table>
-<div>
-  <a class="botones" href="{{ url_for('empleados.empleadosBuscar') }}">Cancelar</a>
+<h2 class="text-center mb-4">Detalles de Empleado</h2>
+<!-- BOTÓN CANCELAR -->
+<div class="">
+  <a class="botones" href="{{ url_for('empleados.empleadosBuscar') }}">
+    <i class="fas fa-arrow-left"></i>
+  </a>
 </div>
+
+<!-- FECHAS -->
+<div class="mb-3 text-center text-muted">
+  <p><strong>Fecha de creación:</strong> {{ empleado.fecha_creacion }}</p>
+  <p><strong>Última modificación:</strong> {{ empleado.fecha_modificacion }}</p>
+</div>
+
+<!-- TABLA DE DETALLES -->
+<div class="table-responsive">
+  <table class="table table-bordered text-center align-middle">
+    <thead class="">
+      <tr>
+        <th>Nombre(s)</th>
+        <th>Apellido Paterno</th>
+        <th>Apellido Materno</th>
+        <th>Usuario</th>
+        <th>Correo Electrónico</th>
+        <th>Rol</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{ empleado.nombre_empleado }}</td>
+        <td>{{ empleado.apellido_pat }}</td>
+        <td>{{ empleado.apellido_mat }}</td>
+        <td>{{ empleado.nombre_usuario }}</td>
+        <td>{{ empleado.correo_empleado }}</td>
+        <td>{{ empleado.nombre_rol }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 {% endblock %}

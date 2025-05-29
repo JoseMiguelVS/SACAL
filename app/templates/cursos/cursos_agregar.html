@@ -22,18 +22,23 @@
         <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
         <div>
             <div class="espacio_form">
-                <!-- <label for="nombre_usuario">Nombre de usuario</label> -->
+                <label for="nombre_usuario">Codigo</label>
                 <input type="text" id="codigo_curso" placeholder="Codigo" name="codigo_curso" required>
             </div>
             <div class="espacio_form">
-                <!-- <label for="nombre_usuario">Nombre de usuario</label> -->
+                <label for="nombre_usuario">Nombre de curso</label>
                 <input type="text" id="nombre_curso" placeholder="Nombre Curso" name="nombre_curso" required>
             </div>
-   
+
+            <div class="espacio_form">
+                <label for="nombre_usuario">Es nacional?</label>
+                <input type="checkbox" name="es_nacional" id="es_nacional">
+            </div>
+
             <!-- ----------------------------------------Tema-------------------------------------------------------- -->
             <div class="espacio_form">
                 <select name="id_tema" id="id_tema" aria-label="Default select example">
-                    <option value="true" selected>-Seleccione el tema-</option>
+                    <option value="true" selected>Tema</option>
                     {% if temas %}
                     {% for tema in temas %}
                     <option value="{{tema.0}}">{{tema.1}}</option>

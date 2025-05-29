@@ -1,17 +1,21 @@
 from datetime import datetime
 import io
 import os
-os.makedirs('static/constancias', exist_ok=True)
+os.makedirs('static/constancias', exist_ok=True) 
 from reportlab.pdfbase import pdfmetrics
+from reportlab.lib.colors import HexColor
 
 from reportlab.pdfbase.ttfonts import TTFont
 
 pdfmetrics.registerFont(TTFont('Montserrat-Regular', 'static/fonts/Montserrat-Regular.ttf'))
 pdfmetrics.registerFont(TTFont('Montserrat-Bold', 'static/fonts/Montserrat-Bold.ttf'))
+pdfmetrics.registerFont(TTFont('Montserrat-Black', 'static/fonts/Montserrat-Black.ttf'))
+pdfmetrics.registerFont(TTFont('Metropolis-Black', 'static/fonts/Metropolis-Black.ttf'))
+pdfmetrics.registerFont(TTFont('Metropolis-Bold', 'static/fonts/Metropolis-Bold.ttf'))
 
 #----------------------------------------------------------------------------------------------------------------------------------
 
-def draw_texto_centrado_multilinea(c, texto, y_inicial, font_name="Helvetica", font_size=12, max_width=700, line_spacing=5):
+def draw_texto_centrado_multilinea(c, texto, y_inicial, font_name="Helvetica", font_size=12, max_width=800, line_spacing=5):
     """
     Dibuja texto centrado horizontalmente en una hoja en orientación horizontal (landscape),
     usando height como base para el ancho visible.
@@ -60,43 +64,67 @@ def generar_constancia(participante, qr_path):
     apellidos = participante['apellidos_participante']
     curso = participante['nombre_curso']
     nombre_tipo = participante['nombre_tipo']
-    categoria = participante['nombre_categoria']
+    es_nacional = participante['es_nacional']
     fecha = participante['fecha']
     dia = fecha.day if isinstance(fecha, datetime) else int(str(fecha)[8:10])
     nombre_mes = participante['nombre_mes']
-    horario_inicio = participante['horario_inicio']
-    horario_fin = participante['horario_fin']
+    duracion_curso = participante['duracion_curso']
     clave = participante['clave_participante']
     current_year = datetime.now().year
 
-#--------------------------------------------- Calcular duración-----------------------------------------------------
-    formato = "%H:%M:%S"
-    try:
-        inicio = datetime.strptime(str(horario_inicio), formato)
-        fin = datetime.strptime(str(horario_fin), formato)
-        duracion_horas = (fin - inicio).seconds // 3600
-    except Exception:
-        duracion_horas = 0
+#---------------------------------------------------------------------------------------------
 
-    texto_duracion = f"CON UNA DURACIÓN DE {duracion_horas} HORA(S),"
-    realizado = "REALIZADO ONLINE EN VIVO,"
-    texto_fecha = f"EL {dia} DE {nombre_mes.upper()} DE {current_year}."
-    nombre_completo = f'{nombre.upper()} {apellidos.upper()}'
-    curso_com = f"\"{curso.upper()}\""
-
-    def draw_centrado(texto, y, font="Helvetica", size=12):
+    if nombre_tipo == 'Especializacion':
+        texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
+        realizado = "REALIZADO ONLINE EN VIVO,"
+        texto_fecha = f"{nombre_mes.upper()} DE {current_year}."
+        nombre_completo = f'{nombre.upper()} {apellidos.upper()}'
+        espe = f"ESPECIALIZACIÓN:"
+        curso_com = f"\"{curso.upper()}\""
+        def draw_centrado(texto, y, font="Helvetica", size=12):
             c.setFont(font, size)
             text_width = c.stringWidth(texto, font, size)
             x = (height - text_width) / 2
             c.drawString(x, y, texto)
 
-    # Impresión con centrado manual
-    draw_centrado(nombre_completo, 290, font="Helvetica-Bold", size=18)
-    curso_com = f"\"{curso.upper()}\""
-    draw_texto_centrado_multilinea( c, texto=curso_com, y_inicial=220, font_name="Montserrat-Bold", font_size=25, max_width=700)# más permisivo
-    draw_centrado(texto_duracion, 180, font="Montserrat-Bold", size=10)
-    draw_centrado(realizado, 165, font="Montserrat-Bold", size=10)
-    draw_centrado(texto_fecha, 150, font="Montserrat-Bold", size=10)
+        # Impresión con centrado manual
+        
+        draw_centrado(nombre_completo, 290, font="Montserrat-Bold", size=18)
+        c.setFillColor(HexColor("#003366")) 
+        draw_texto_centrado_multilinea( c, texto=espe, y_inicial=230, font_name="Metropolis-Black", font_size=25, max_width=500)# más permisivo
+        draw_texto_centrado_multilinea( c, texto=curso_com, y_inicial=210, font_name="Metropolis-Black", font_size=20, max_width=500)# más permisivo
+        c.setFillColorRGB(0, 0, 0)
+        draw_centrado(texto_duracion, 165, font="Montserrat-Bold", size=10)
+        draw_centrado(realizado, 150, font="Montserrat-Bold", size=10)
+        draw_centrado(texto_fecha, 135, font="Montserrat-Bold", size=10)
+    else:
+        nacional = f"POR SU PARTICIACION EN EL CURSO NACIONAL"
+        internacional = f"POR SU PARTICIACION EN EL CURSO INTERNACIONAL"
+        texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
+        realizado = "REALIZADO ONLINE EN VIVO,"
+        texto_fecha = f"EL {dia} DE {nombre_mes.upper()} DE {current_year}."
+        nombre_completo = f'{nombre.upper()} {apellidos.upper()}'
+        curso_com = f"\"{curso.upper()}\""
+
+        #---------------------------------------------------------------------------------------------------
+
+        def draw_centrado(texto, y, font="Helvetica", size=12):
+                c.setFont(font, size)
+                text_width = c.stringWidth(texto, font, size)
+                x = (height - text_width) / 2
+                c.drawString(x, y, texto)
+
+        # Impresión con centrado manual
+        if es_nacional == True:
+            draw_centrado(nacional, 260, font="Montserrat-Bold", size=14)
+        else:
+            draw_centrado(internacional, 260, font="Montserrat-Bold", size=14)
+
+        draw_centrado(nombre_completo, 290, font="Montserrat-Bold", size=18)
+        draw_texto_centrado_multilinea( c, texto=curso_com, y_inicial=230, font_name="Metropolis-Black", font_size=25, max_width=500)# más permisivo
+        draw_centrado(texto_duracion, 180, font="Montserrat-Bold", size=10)
+        draw_centrado(realizado, 165, font="Montserrat-Bold", size=10)
+        draw_centrado(texto_fecha, 150, font="Montserrat-Bold", size=10)
 
     # Insertar QR en parte inferior izquierda
     if qr_path:
@@ -106,16 +134,14 @@ def generar_constancia(participante, qr_path):
     packet.seek(0)
 
     new_pdf = PdfReader(packet)
-    if categoria == 'especializacion':
-        plantilla_path = "static/pdf/espacializacion.pdf"
+    if nombre_tipo == 'Especializacion':
+        plantilla_path = "static/pdf/especializacion.pdf"
     elif nombre_tipo == 'psicologia':
         plantilla_path = "static/pdf/psicologia.pdf"
     elif nombre_tipo == 'empresarial':  
         plantilla_path = "static/pdf/empresarial.pdf"
-    elif nombre_tipo == 'publico en general':
-        plantilla_path = "static/pdf/publico.pdf"
     else:
-        plantilla_path = "static/pdf/default.pdf"  # <- puedes poner un PDF genérico
+        plantilla_path = "static/pdf/publico.pdf"
 
     existing_pdf = PdfReader(open(plantilla_path, "rb"))
 

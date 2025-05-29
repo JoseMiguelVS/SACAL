@@ -2,7 +2,7 @@
 
 {% block title %} {{titulo}} {% endblock %}
 {% block body %}
-
+<h2 class="text-center">Registrar nuevo participante</h2>
 <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
 {% with messages = get_flashed_messages() %}
 {% if messages %}
@@ -16,86 +16,97 @@
 {% endif %}
 {% endwith %}
 <!-- ----------------------------------------------------------------------------------------------- -->
-<h1>Registrar nuevo participantes</h1>
+
 <div class="form-container">
-    <form class="formulario" method="POST" action="{{url_for('participantes.participante_nuevo')}}"
-        enctype="multipart/form-data">
-        <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
-        <input type="hidden" name="nombre_empleado" value="{{ current_user.id_empleado }}">
-        <div>
-            <div class="espacio_form">
-                <!-- <label for="nombre_usuario">Nombre de usuario</label> -->
-                <input type="text" id="clave_participante" placeholder="Clave" name="clave_participante" required>
-            </div>
-
-            <div class="espacio_form">
-                <!-- <label for="nombre_usuario">Nombre de usuario</label> -->
-                <input type="text" id="nombre_participante" placeholder="Nombre del participante"
-                    name="nombre_participante" required>
-            </div>
-
-            <div class="espacio_form">
-                <!-- <label for="nombre_usuario">Nombre de usuario</label> -->
-                <input type="text" id="apellidos_participante" placeholder="Apellidos del participante"
-                    name="apellidos_participante" required>
-            </div>
-
-            <div class="espacio_form">
-                <!-- <label for="nombre_usuario">Nombre de usuario</label> -->
-                <input type="text" id="num_telefono" placeholder="Numero de telefono" name="num_telefono" required>
-            </div>
-
-            <!-- ----------------------------------------CUENTA-------------------------------------------------------- -->
-            <div class="espacio_form">
-                <select name="id_sesion" id="id_sesion" aria-label="Default select example">
-                    <option value="true" selected>Cuenta destino</option>
-                    {% if cuentas %}
-                    {% for cuenta in cuentas %}
-                    <option value="{{cuenta.0}}">{{cuenta.1}}</option>
-                    {% endfor %}
-                    {% else %}
-                    <option>Aún no hay registros</option>
-                    {% endif %}
-                </select>
-            </div>
-
-            <!-- ----------------------------------------Sesion-------------------------------------------------------- -->
-            <div class="espacio_form">
-                <select name="id_sesion" id="id_sesion" aria-label="Default select example">
-                    <option value="true" selected>Sesion</option>
-                    {% if sesiones %}
-                    {% for sesion in sesiones %}
-                    <option value="{{sesion.0}}">{{sesion.1}} || {{ sesion.7 }}</option>
-                    {% endfor %}
-                    {% else %}
-                    <option>Aún no hay registros</option>
-                    {% endif %}
-                </select>
-            </div>
-
-            <!-- ----------------------------------------PAQUETE-------------------------------------------------------- -->
-            <div class="espacio_form">
-                <select name="id_paquete" id="id_paquete" aria-label="Default select example">
-                    <option value="true" selected>Paquetes</option>
-                    {% if paquetes %}
-                    {% for paquete in paquetes %}
-                    <option value="{{paquete.0}}">{{paquete.1}}</option>
-                    {% endfor %}
-                    {% else %}
-                    <option>Aún no hay registros</option>
-                    {% endif %}
-                </select>
-            </div>
-
-            <div class="espacio_form">
-                <button class="botones" type="submit">Guardar</button>
-            </div>
-            <div class="espacio_form">
-                <a class="botones" href="{{url_for('participantes.participantes_buscar')}}">Cancelar</a>
-            </div>
+    <form class="formulario" method="POST" action="{{ url_for('participantes.participante_nuevo') }}"
+          enctype="multipart/form-data">
+      
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="nombre_empleado" value="{{ current_user.id_empleado }}">
+  
+      <div>
+  
+        <!-- Clave -->
+        <div class="espacio_form mb-3">
+          <input type="text" id="clave_participante" name="clave_participante"
+                 class="form-control" placeholder="Clave" required>
         </div>
+  
+        <!-- Nombre -->
+        <div class="espacio_form mb-3">
+          <input type="text" id="nombre_participante" name="nombre_participante"
+                 class="form-control" placeholder="Nombre del participante" required>
+        </div>
+  
+        <!-- Apellidos -->
+        <div class="espacio_form mb-3">
+          <input type="text" id="apellidos_participante" name="apellidos_participante"
+                 class="form-control" placeholder="Apellidos del participante" required>
+        </div>
+  
+        <!-- Teléfono -->
+        <div class="espacio_form mb-3">
+          <input type="text" id="num_telefono" name="num_telefono"
+                 class="form-control" placeholder="Número de teléfono" required>
+        </div>
+  
+        <!-- Cuenta destino -->
+        <div class="espacio_form mb-3">
+          <select name="id_cuenta" id="id_cuenta" class="form-select" aria-label="Cuenta destino">
+            <option value="" selected>Cuenta destino</option>
+            {% if cuentas %}
+              {% for cuenta in cuentas %}
+                  <option value="{{ cuenta.0 }}">{{ cuenta.1 }}</option>
+              {% endfor %}
+            {% else %}
+              <option>Aún no hay registros</option>
+            {% endif %}
+          </select>
+        </div>
+  
+        <!-- Sesión -->
+        <div class="espacio_form mb-3">
+          <select name="id_sesion" id="id_sesion" class="form-select" aria-label="Sesión">
+            <option value="" selected>Sesión</option>
+            {% if sesiones %}
+              {% for sesion in sesiones %}
+                {% if sesion.4 == True %}
+                  <option value="{{ sesion.0 }}">{{ sesion.1 }} || {{ sesion.7 }}</option>
+                {% endif %}
+              {% endfor %}
+            {% else %}
+              <option>Aún no hay registros</option>
+            {% endif %}
+          </select>
+        </div>
+  
+        <!-- Paquete -->
+        <div class="espacio_form mb-3">
+          <select name="id_paquete" id="id_paquete" class="form-select" aria-label="Paquetes">
+            <option value="" selected>Paquetes</option>
+            {% if paquetes %}
+              {% for paquete in paquetes %}
+                {% if paquete.4 == True %}
+                  <option value="{{ paquete.0 }}">{{ paquete.1 }}</option>
+                {% endif %}
+              {% endfor %}
+            {% else %}
+              <option>Aún no hay registros</option>
+            {% endif %}
+          </select>
+        </div>
+  
+        <!-- Botones -->
+        <div class="espacio_form mb-3">
+          <button class="botones-guardar" type="submit">Guardar</button>
+        </div>
+        <div class="espacio_form mb-3">
+          <a class="botones-cancelar" href="{{ url_for('participantes.participantes_buscar') }}">Cancelar</a>
+        </div>
+      </div>
     </form>
-</div>
+  </div>
+  
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {

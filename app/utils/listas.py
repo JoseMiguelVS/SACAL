@@ -51,3 +51,6 @@ def lista_tiposCer():
 
 def lista_ponente():
     return listar_tabla('ponentes', 'id_ponentes')
+
+def lista_tiposCur():
+    return listar_tabla('tipo_cursos', 'id_tipo')

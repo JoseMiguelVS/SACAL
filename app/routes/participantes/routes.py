@@ -29,7 +29,7 @@ def participantes_buscar():
     paginado = paginador3(
         sql_count, sql_lim,
         [nombre_curso, nombre_curso, sesion, sesion],
-        1, 5
+        1, 50
     )
 
     return render_template('participantes/participantes.html',

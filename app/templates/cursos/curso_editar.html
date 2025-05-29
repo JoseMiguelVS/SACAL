@@ -1,4 +1,4 @@
-<!-- {% extends './layout.html' %}
+{% extends './layout.html' %}
 {% block body %}
 
 <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
@@ -19,28 +19,33 @@
   <form class="formulario" method="POST" action="{{url_for('cursos.curso_actualizar',id=curso[0])}}">
     <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
     <div>
-        <div class="espacio_form">
-          <input type="text" id="codigo_curso" placeholder="Codigo curso" name="codigo_curso"
-            value="{{curso[7]}}">
-        </div>
-
       <div class="espacio_form">
-        <input type="text" id="nombre_curso" placeholder="Nombre Curso" name="nombre_curso"
-          value="{{curso[1]}}">
+        <label for="">Codigo del curso</label>
+        <input type="text" id="codigo_curso" placeholder="Codigo curso" name="codigo_curso" value="{{curso[6]}}">
       </div>
 
       <div class="espacio_form">
-        <input type="text" id="duracion_curso" placeholder="Duracion Curso" name="duracion_curso"
-          value="{{curso[6]}}">
+        <label for="">Nombre del curso</label>
+        <input type="text" id="nombre_curso" placeholder="Nombre Curso" name="nombre_curso" value="{{curso[1]}}">
+      </div>
+
+      <div class="espacio_form">
+        <label for="">Duracion del curso</label>
+        <input type="text" id="duracion_curso" placeholder="Duracion Curso" name="duracion_curso" value="{{curso[5]}}">
+      </div>
+
+      <div class="espacio_form">
+        <label for="">Es nacional?</label>
+        <input type="checkbox" name="es_nacional" id="es_nacional" {% if curso[8] %} checked {% endif %}>
       </div>
 
       <!-- ------------------------------------desplegable-------------------------------------------------------------- -->
       <div class="espacio-form">
         <select name="id_tema" id="id_tema" class="form-select" aria-label="Default select example">
-          <option value="true" selected>------Seleccione el tema--------</option>
+          <option value="true" selected>Tema</option>
           {% if temas %}
           {% for tema in temas %}
-          <option value="{{tema.0}}" {% if tema.0 == curso[8] %} selected {% endif %}>{{tema.1}}</option>
+          <option value="{{tema.0}}" {% if tema.0==curso[7] %} selected {% endif %}>{{tema.1}}</option>
           {% endfor %}
           {% else %}
           <option>Aún no hay registros</option>
@@ -56,8 +61,8 @@
           Guardar
         </button>
       </div>
-      
+
     </div>
   </form>
 </div>
-{% endblock %} -->
+{% endblock %}
