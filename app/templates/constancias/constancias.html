@@ -41,9 +41,11 @@
                 <option value="">-Seleccione la sesión-</option>
                 {% if sesiones %}
                 {% for sesion in sesiones %}
+                {% if sesion.4 == True %}
                 <option value="{{ sesion.1 }}" {% if request.args.get('sesion')==sesion.1 %}selected{% endif %}>
-                    {{ sesion.7 }} | {{ sesion.1 }}
+                    {{ sesion.1 }} | {{ sesion.2 }} - {{ sesion.3 }}
                 </option>
+                {% endif %}
                 {% endfor %}
                 {% else %}
                 <option>Aún no hay registros</option>
@@ -56,21 +58,20 @@
 
 <!-- Tabla de resultados -->
 <div class="tables_participantes">
-    <table>
+    <table class="table table-bordered">
         <thead>
             <tr>
-                <th>Ver más</th>
-                <th>Generar<br>constancia</th>
-                <th>Editar</th>
-                <th>Clave<br>Participante</th>
-                <th>Nombre<br>Participante</th>
-                <th>Curso</th>
-                <th>Pago<br>validado</th>
-                <th>Constancia<br>generada</th>
-                <th>Folio de<br>constancia</th>
-                <th>Constancia<br>enviada</th>
-                <th>Fecha de<br>envío</th>
-                <th>Acciones</th>
+                <th class="text-nowrap">Ver más</th>
+                <th class="text-nowrap">Generar constancia</th>
+                <th class="text-nowrap">Editar</th>
+                <th class="text-nowrap">Clave Participante</th>
+                <th class="text-nowrap">Nombre Participante</th>
+                <th class="text-nowrap">Curso</th>
+                <th class="text-nowrap">Pago validado</th>
+                <th class="text-nowrap">Constancia generada</th>
+                <th class="text-nowrap">Constancia enviada</th>
+                <th class="text-nowrap">Fecha de envío</th>
+                <th class="text-nowrap">Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -79,16 +80,15 @@
             {% if not p.constancia_enviada %}
             <tr data-id="{{ p.id_participante }}">
                 <td>
-                    <a class=""
-                        href="{{ url_for('constancias.constancias_detalles', id=p.id_participante) }}">
+                    <a class="" href="{{ url_for('constancias.constancias_detalles', id=p.id_participante) }}">
                         <li class="fa fa-eye" style="font-size: 18px;"></li>
                     </a>
                 </td>
                 <td>
-                    <a class=""
-                        onclick="generarConstancia('{{ p.id_participante }}', '{{ p.nombre_curso }}', '{{ p.fecha }}', '{{ p.curso_id }}')">
+                    <button class="botones" data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrop-{{ p.id_participante }}">
                         <li class="fas fa-download" style="font-size: 18px;"></li>
-                    </a>
+                    </button>
                 </td>
                 <td>
                     <a class=""
@@ -96,20 +96,21 @@
                         <li class="fa fa-edit" style="font-size: 18px;"></li>
                     </a>
                 </td>
-                <td>{{ p.clave_participante }}</td>
-                <td>{{ p.nombre_participante }} {{ p.apellidos_participante }}</td>
-                <td>{{ p.nombre_curso }}</td>
-                <td>{{ p.validacion_pago }}</td>
-                <td><input type="checkbox" {% if p.constancia_generada %}checked{% endif %} disabled></td>
+                <td class="text-nowrap">{{ p.clave_participante }}</td>
+                <td class="text-nowrap">{{ p.nombre_participante }} <br> {{ p.apellidos_participante }}</td>
+                <td class="truncate-text">{{ p.nombre_curso }}</td>
+                <td class="text-nowrap">{{ p.validacion_pago }}</td>
+                <td class="text-nowrap"><input type="checkbox" {% if p.constancia_generada %}checked{% endif %}
+                        disabled></td>
 
                 <form class="d-flex" method="post"
                     action="{{ url_for('constancias.modificar_constancia') }}?id={{ p.id_participante }}&id_curso={{ p.curso_id }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <td><input type="text" name="folio_constancia" value="{{ p.folio_constancia }}"></td>
-                    <td><input type="checkbox" name="constancia_enviada" {% if p.constancia_enviada %}checked{% endif
-                            %}></td>
-                    <td><input type="date" name="fecha_envio" value="{{ p.fecha_envio | default('', true) }}"></td>
-                    <td><button type="submit">Guardar</button></td>
+                    <td class="text-nowrap"><input type="checkbox" name="constancia_enviada" {% if p.constancia_enviada
+                            %}checked{% endif %}></td>
+                    <td class="text-nowrap"><input type="date" name="fecha_envio"
+                            value="{{ p.fecha_envio | default('', true) }}"></td>
+                    <td class="text-nowrap"><button type="submit">Guardar</button></td>
                 </form>
             </tr>
             {% endif %}
@@ -132,14 +133,61 @@
     </a>
 </div>
 
+<!-- Modal de folio de constancias -->
+{% if constancias %}
+{% for p in constancias %}
+<form
+    action="{{ url_for('constancias.folio_constancia') }}?id={{ p.id_participante }}&curso={{ p.nombre_curso }}&fecha={{ p.fecha }}"
+    method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="modal fade" id="staticBackdrop-{{ p.id_participante }}" data-bs-backdrop="static"
+        data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Agregar folio</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" name="folio_constancia" placeholder="Folio de la constancia" class="form-control"
+                        required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary"
+                        onclick="enviarFolioYGenerar('{{ p.id_participante }}', '{{ p.nombre_curso }}', '{{ p.fecha }}')">Guardar
+                        y generar</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
 <!-- Script para generación de constancia -->
 <script>
-    function generarConstancia(id, curso, fecha, id_curso) {
-        const url = `/constancias/constancia?id=${id}&curso=${encodeURIComponent(curso)}&fecha=${fecha}&id_curso=${id_curso}`;
-        window.open(url, '_blank');
-        setTimeout(() => {
-            location.reload();
-        }, 2000);
+    function enviarFolioYGenerar(id, curso, fecha) {
+        const form = new FormData();
+        const folio = document.querySelector(`#staticBackdrop-${id} input[name='folio_constancia']`).value;
+        form.append("folio_constancia", folio);
+
+        fetch(`/constancias/folio/?id=${id}&curso=${encodeURIComponent(curso)}&fecha=${fecha}`, {
+            method: "POST",
+            body: form,
+            headers: {
+                "X-CSRFToken": "{{ csrf_token() }}"
+            }
+        }).then(res => {
+            if (res.redirected) {
+                window.open(res.url, '_blank');
+                setTimeout(() => location.reload(), 2000);
+            }
+        });
     }
 </script>
+{% endfor %}
+{% endif %}
+
 {% endblock %}

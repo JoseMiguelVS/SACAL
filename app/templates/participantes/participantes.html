@@ -62,7 +62,7 @@
                     {% for sesion in sesiones %}
                     {% if sesion.4 == True %}
                     <option value="{{ sesion.1 }}" {% if request.args.get('sesion')==sesion.1 %}selected{% endif %}>
-                        {{ sesion.7 }} | {{ sesion.1 }}
+                        {{ sesion.1 }} | {{ sesion.2 }} -{{ sesion.3 }}
                     </option>
                     {% endif %}
                     {% endfor %}

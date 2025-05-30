@@ -175,41 +175,55 @@ td:nth-last-child(2) {
 }
 
 /* -------------------------------- */
+
+.truncate-text {
+  max-width: 160px;
+  /* ajusta según lo que necesites */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
 .tables_participantes {
   overflow-x: auto;
   max-width: 100%;
 }
 
 .tables_participantes table {
+  table-layout: auto;
   width: 100%;
-  /* Solo el ancho necesario */
   border-collapse: collapse;
-  /* Texto más pequeño */
+  white-space: nowrap;
 }
 
-.tables_participantes td,
-.tables_participantes th {
+.tables_participantes th,
+.tables_participantes td {
   font-size: 13px;
   padding: 4px 5px;
-  max-width: 100px;
   white-space: nowrap;
   text-align: center;
   border: 1px solid #ccc;
+  vertical-align: middle;
 }
 
-.tables_participantes select,
+/* Input y select dentro de la tabla */
 .tables_participantes input[type="text"],
-.tables_participantes input[type="date"] {
+.tables_participantes input[type="date"],
+.tables_participantes select {
   font-size: 12px;
-  max-width: 100px;
-  /* Limita el ancho de los inputs/selects */
+  width: 100%;
+  max-width: 140px;
+  /* Más espacio para inputs tipo date */
+  box-sizing: border-box;
 }
 
+/* Checkbox estilizado */
 .tables_participantes input[type="checkbox"] {
-  align-items: center;
+  width: 18px;
+  height: 18px;
   accent-color: #f3a474;
   cursor: pointer;
-  /* Checkbox más pequeño */
 }
 
 /* ------------------------------------------------------------------------------------------------- */

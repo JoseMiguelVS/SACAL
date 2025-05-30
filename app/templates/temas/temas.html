@@ -115,7 +115,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-tittle" id="staticBackdropLabel">Editar tema</h5>
-                <button type="button" class="bnt-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <form method="POST" class="formulario" action="{{ url_for('temas.tema_editar', id = tema.id_tema) }}">
@@ -125,7 +125,7 @@
                         <option value="true">Sector</option>
                         {% if tipos %}
                         {% for tipo in tipos %}
-                        <option value="{{tipo.0}}" {% if tipo.0==tema.tipo_id %} selected {% endif %}>{{tipo.1}}
+                        <option value="{{tipo.0}}" {% if tipo.1==tema.nombre_tipo %} selected {% endif %}>{{tipo.1}}
                         </option>
                         {% endfor %}
                         {% else %}

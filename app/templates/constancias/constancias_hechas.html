@@ -16,9 +16,13 @@
 {% endif %}
 {% endwith %}
 
+<!-- BOTÓN ATRÁS IZQUIERDA -->
+<a href="{{ url_for('constancias.constancias_buscar') }}" class="botones">
+    <i class="fas fa-arrow-left"></i>
+</a>
 
 <div>
-    <form method="get" action="{{ url_for('constancias.constancias_buscar') }}" class="d-flex">
+    <form method="get" action="{{ url_for('constancias.constancias_hechas') }}" class="d-flex">
         <!-- Buscar por sesión/curso -->
         <div class="espacio_form">
             <select name="nombre_categoria" id="nombre_categoria">
@@ -41,8 +45,10 @@
                 <option value="">-Seleccione la sesion-</option>
                 {% if sesiones %}
                 {% for sesion in sesiones %}
+                {% if sesion.4 == True %}
                 <option value="{{ sesion.1 }}" {% if request.args.get('sesion')==sesion.1 %}selected{% endif %}>
-                    {{ sesion.7 }} | {{ sesion.1 }} </option>
+                    {{ sesion.1 }} | {{ sesion.2 }}-{{ sesion.3 }} </option>
+                {% endif %}
                 {% endfor %}
                 {% else %}
                 <option>Aún no hay registros</option>
@@ -56,21 +62,20 @@
 
 <!-- Tabla de resultados -->
 <div class="tables_participantes">
-    <table>
+    <table class="table table-bordered">
         <thead>
             <tr>
-                <th>Ver mas</th>
-                <th>Generar constancia</th>
-                <th>Editar</th>
-                <th>Clave Participante</th>
-                <th>Nombre Participante</th>
-                <th>Curso</th>
-                <th>Pago validado</th>
-                <th>Constancia generada</th>
-                <th>Folio de constancia</th>
-                <th>Constancia enviada</th>
-                <th>Fecha de envio</th>
-                <th>Acciones</th>
+                <th class="text-nowrap">Ver mas</th>
+                <th class="text-nowrap">Genera constancia</th>
+                <th class="text-nowrap">Editar</th>
+                <th class="text-nowrap">Clave Participante</th>
+                <th class="text-nowrap">Nombre Participante</th>
+                <th class="text-nowrap">Curso</th>
+                <th class="text-nowrap">Pago validado</th>
+                <th class="text-nowrap">Constancia generada</th>
+                <th class="text-nowrap">Folio de constancia</th>
+                <th class="text-nowrap">Constancia enviada</th>
+                <th class="text-nowrap">Fecha de envio</th>
             </tr>
         </thead>
         <tbody>
@@ -97,20 +102,16 @@
                         <li class="fa fa-edit" style="font-size: 18px;"></li>
                     </a>
                 </td>
-                <td>{{ p.clave_participante }}</td>
-                <td>{{ p.nombre_participante }} {{ p.apellidos_participante }}</td>
-                <td>{{ p.nombre_curso }}</td>
-                <td>{{ p.validacion_pago }}</td>
+                <td class="text-nowrap">{{ p.clave_participante }}</td>
+                <td class="text-nowrap">{{ p.nombre_participante }} <br> {{ p.apellidos_participante }}</td>
+                <td class="truncate-text">{{ p.nombre_curso }}</td>
+                <td class="text-nowrap">{{ p.validacion_pago }}</td>
                 <td><input type="checkbox" {% if p.constancia_generada %}checked{% endif %}>
-                    <form class="d-flex" method="post"
-                        action="{{ url_for('constancias.modificar_constancia') }}?id={{ p.id_participante }}&id_curso={{ p.curso_id }}">
-                        <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
-                <td><input type="text" name="folio_constancia" value="{{p.folio_constancia}}"></td>
-                <td> <input type="checkbox" name="constancia_enviada" {% if p.constancia_enviada %}checked{% endif %}>
+                <td>{{p.folio_constancia}}</td>
+                <td class="text-nowrap"> <input type="checkbox" name="constancia_enviada" {% if p.constancia_enviada
+                        %}checked{% endif %}>
                 </td>
-                <td><input type="date" name="fecha_envio" value="{{ p.fecha_envio|default('', true) }}"></td>
-                <td><button type="submit">Guardar</button></td>
-                </form>
+                <td class="text-nowrap">{{ p.fecha_envio}}</td>
 
                 {% endif %}
                 {% endfor %}
@@ -123,15 +124,6 @@
 
     </table>
 </div>
-
-<div>
-    <br>
-    <a href="{{ url_for('constancias.constancias_hechas') }}"
-        class="btn btn-outline-danger d-inline-flex align-items-center">
-        <li class="fa fa-folder" style="font-size: 18px;"></li>
-    </a>
-</div>
-
 
 <script>
     function generarConstancia(id, curso, fecha, id_curso) {

@@ -86,12 +86,15 @@ def participante_nuevo():
         participante_id = cur.fetchone()['id_participante']
 
         # 3. Insertar asistencia
-        sql2 = 'INSERT INTO asistencias (participante, sesion) VALUES (%s, %s)'
+        sql2 = 'INSERT INTO asistencias (participante, sesion) VALUES (%s, %s) RETURNING id_asistencia'
         valores2 = (participante_id, sesion)
         cur.execute(sql2, valores2)
 
-        sql3 = "INSERT INTO constancias (participante, constancia_generada, constancia_enviada) VALUES (%s, %s, %s)"
-        valores3 = (participante_id, constancia_generada, constancia_enviada)
+        # 3.5 Obtener el id de asistencia
+        asistencia_id = cur.fetchone()['id_asistencia']
+
+        sql3 = "INSERT INTO constancias (participante, constancia_generada, constancia_enviada, asistencia) VALUES (%s, %s, %s, %s)"
+        valores3 = (participante_id, constancia_generada, constancia_enviada, asistencia_id)
         cur.execute(sql3, valores3)
 
         # 4. Guardar cambios y cerrar conexión

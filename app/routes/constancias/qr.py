@@ -14,6 +14,7 @@ def generar_qr(participante):
     horario_fin = participante['horario_fin']
     clave = participante['clave_participante']
     nombre_participante = participante['nombre_participante']
+    folio_constancia = participante['folio_constancia']
     current_year = datetime.now().year
 
     # Extraer día
@@ -34,6 +35,8 @@ def generar_qr(participante):
 
     # Contenido QR con formato del reverso
     contenido_qr = f"""
+INFORMACION DE CONSTANCIA:
+    Folio: {folio_constancia}
 INFORMACION DE PARTICIPANTE:
     FOLIO: {clave}
     NOMBRE DEL PARTICIPANTE: {nombre_participante.upper()}

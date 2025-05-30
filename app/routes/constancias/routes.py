@@ -63,11 +63,40 @@ def constancias_detalles(id):
      
 #----------------------------------------------------------GENERADOR DE CONSTANCIAS-------------------------------------------------------------
 
-@constancias.route("/constancias/constancia")
+@constancias.route('/constancias/folio/', methods=["POST"])
+@login_required
+def folio_constancia():
+    folio = request.form.get("folio_constancia")
+    id = request.args.get("id")
+    curso = request.args.get("curso")
+    fecha = request.args.get("fecha")  # formato ISO: 'YYYY-MM-DD'
+
+    if not id or not curso or not fecha or not folio:
+        flash('Datos incompletos', 'Error')
+        return redirect(url_for('constancias.constancias_buscar'))
+
+    with get_db_connection() as con:
+        with con.cursor() as cur:
+            cur.execute("""
+                UPDATE constancias
+                SET folio_constancia = %s
+                WHERE participante = %s
+            """, (folio, id))
+            con.commit()
+
+    # Redirigir a la generación automática de constancia
+    return redirect(url_for(
+    'constancias.constancias_generar',
+    id=id,
+    curso=curso,
+    fecha=fecha
+))
+
+
+@constancias.route("/constancias/folio/generar")
 @login_required
 def constancias_generar():
     id = request.args.get("id")
-    id_curso = request.args.get("id_curso")
     curso = request.args.get("curso")
     fecha = request.args.get("fecha")  # formato ISO: 'YYYY-MM-DD'
 
@@ -95,8 +124,8 @@ def constancias_generar():
             cur.execute("""
                 UPDATE constancias
                 SET constancia_generada = TRUE
-                WHERE participante = %s AND curso = %s
-            """, (id, id_curso))
+                WHERE participante = %s
+            """, (id))
         con.commit()
 
     return send_file(pdf_path, as_attachment=True)
@@ -170,10 +199,10 @@ def constancias_actualizar(id):
 @login_required
 def modificar_constancia():
     id_participante = request.args.get("id")
-    id_curso = request.args.get("id_curso")
+    constancia_enviada = True
     datos = request.form  # ⚠️ Usamos form en lugar de get_json porque no será fetch
 
-    if not id_participante or not id_curso:
+    if not id_participante:
         flash("Faltan parámetros", "Error")
         return redirect(url_for("constancias.constancias_buscar"))
 
@@ -182,17 +211,14 @@ def modificar_constancia():
 
     sql = '''
         UPDATE constancias SET
-            folio_constancia = %s,
             constancia_enviada = %s,
             fecha_envio = %s
-        WHERE participante = %s AND curso = %s
+        WHERE participante = %s 
     '''
     valores = (
-        datos.get('folio_constancia'),
-        datos.get('constancia_enviada') == 'on',
+        constancia_enviada,
         datos.get('fecha_envio'),
         id_participante,
-        id_curso
     )
 
     try:
