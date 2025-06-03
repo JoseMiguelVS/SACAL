@@ -8,9 +8,9 @@
 {% if messages %}
 {% for message in messages %}
 <div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
-    {% endif %} alert-dismissible fade show" role="alert">
-    <strong>{{message}}</strong>
-    <button type="button" class="" data-bs-dismiss="alert" aria-label="Close"></button>
+  {% endif %} alert-dismissible fade show" role="alert">
+  <strong>{{message}}</strong>
+  <button type="button" class="" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% endfor %}
 {% endif %}
@@ -18,132 +18,139 @@
 <!-- ----------------------------------------------------------------------------------------------- -->
 
 <div class="form-container">
-    <form class="formulario" method="POST" action="{{ url_for('participantes.participante_nuevo') }}"
-          enctype="multipart/form-data">
-      
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <input type="hidden" name="nombre_empleado" value="{{ current_user.id_empleado }}">
-  
-      <div>
-  
-        <!-- Clave -->
-        <div class="espacio_form mb-3">
-          <input type="text" id="clave_participante" name="clave_participante"
-                 class="form-control" placeholder="Clave" required>
-        </div>
-  
-        <!-- Nombre -->
-        <div class="espacio_form mb-3">
-          <input type="text" id="nombre_participante" name="nombre_participante"
-                 class="form-control" placeholder="Nombre del participante" required>
-        </div>
-  
-        <!-- Apellidos -->
-        <div class="espacio_form mb-3">
-          <input type="text" id="apellidos_participante" name="apellidos_participante"
-                 class="form-control" placeholder="Apellidos del participante" required>
-        </div>
-  
-        <!-- Teléfono -->
-        <div class="espacio_form mb-3">
-          <input type="text" id="num_telefono" name="num_telefono"
-                 class="form-control" placeholder="Número de teléfono" required>
-        </div>
-  
-        <!-- Cuenta destino -->
-        <div class="espacio_form mb-3">
-          <select name="id_cuenta" id="id_cuenta" class="form-select" aria-label="Cuenta destino">
-            <option value="" selected>Cuenta destino</option>
-            {% if cuentas %}
-              {% for cuenta in cuentas %}
-                  <option value="{{ cuenta.0 }}">{{ cuenta.1 }}</option>
-              {% endfor %}
-            {% else %}
-              <option>Aún no hay registros</option>
-            {% endif %}
-          </select>
-        </div>
-  
-        <!-- Sesión -->
-        <div class="espacio_form mb-3">
-          <select name="id_sesion" id="id_sesion" class="form-select" aria-label="Sesión">
-            <option value="" selected>Sesión</option>
-            {% if sesiones %}
-              {% for sesion in sesiones %}
-                {% if sesion.4 == True %}
-                  <option value="{{ sesion.0 }}">{{ sesion.1 }} || {{ sesion.7 }}</option>
-                {% endif %}
-              {% endfor %}
-            {% else %}
-              <option>Aún no hay registros</option>
-            {% endif %}
-          </select>
-        </div>
-  
-        <!-- Paquete -->
-        <div class="espacio_form mb-3">
-          <select name="id_paquete" id="id_paquete" class="form-select" aria-label="Paquetes">
-            <option value="" selected>Paquetes</option>
-            {% if paquetes %}
-              {% for paquete in paquetes %}
-                {% if paquete.4 == True %}
-                  <option value="{{ paquete.0 }}">{{ paquete.1 }}</option>
-                {% endif %}
-              {% endfor %}
-            {% else %}
-              <option>Aún no hay registros</option>
-            {% endif %}
-          </select>
-        </div>
-  
-        <!-- Botones -->
-        <div class="espacio_form mb-3">
-          <button class="botones-guardar" type="submit">Guardar</button>
-        </div>
-        <div class="espacio_form mb-3">
-          <a class="botones-cancelar" href="{{ url_for('participantes.participantes_buscar') }}">Cancelar</a>
-        </div>
+  <form class="formulario" method="POST" action="{{ url_for('participantes.participante_nuevo') }}"
+    enctype="multipart/form-data">
+
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="nombre_empleado" value="{{ current_user.id_empleado }}">
+
+    <div>
+
+      <!-- Clave -->
+      <div class="espacio_form mb-3">
+        <input type="text" id="clave_participante" name="clave_participante" class="form-control" placeholder="Clave"
+          required>
       </div>
-    </form>
-  </div>
-  
+
+      <!-- Nombre -->
+      <div class="espacio_form mb-3">
+        <input type="text" id="nombre_participante" name="nombre_participante" class="form-control"
+          placeholder="Nombre del participante" required>
+      </div>
+
+      <!-- Apellidos -->
+      <div class="espacio_form mb-3">
+        <input type="text" id="apellidos_participante" name="apellidos_participante" class="form-control"
+          placeholder="Apellidos del participante" required>
+      </div>
+
+      <!-- Teléfono -->
+      <div class="espacio_form mb-3">
+        <input type="text" id="num_telefono" name="num_telefono" class="form-control" placeholder="Número de teléfono"
+          required>
+      </div>
+
+      <!-- Cuenta destino -->
+      <div class="espacio_form mb-3">
+        <select name="id_cuenta" id="id_cuenta" class="form-select" aria-label="Cuenta destino">
+          <option value="" selected>Cuenta destino</option>
+          {% if cuentas %}
+          {% for cuenta in cuentas %}
+          <option value="{{ cuenta.0 }}">{{ cuenta.1 }}</option>
+          {% endfor %}
+          {% else %}
+          <option>Aún no hay registros</option>
+          {% endif %}
+        </select>
+      </div>
+
+      <!-- Sesión -->
+      <div class="espacio_form mb-3">
+        <select name="id_sesion" id="id_sesion" class="form-select" aria-label="Sesión">
+          <option value="" selected>Sesión</option>
+          {% if sesiones %}
+          {% for sesion in sesiones %}
+          {% if sesion.4 == True %}
+          <option value="{{ sesion.0 }}">{{ sesion.1 }} || {{ sesion.7 }}</option>
+          {% endif %}
+          {% endfor %}
+          {% else %}
+          <option>Aún no hay registros</option>
+          {% endif %}
+        </select>
+      </div>
+
+      <!-- Paquete -->
+      <div class="espacio_form mb-3">
+        <select name="id_paquete" id="id_paquete" class="form-select" aria-label="Paquetes">
+          <option value="" selected>Paquetes</option>
+
+          {% if paquetes and sesiones %}
+          {% set categorias_validas = sesiones | selectattr('4') | map(attribute='9') | list %}
+          {% set mostrados = [] %}
+
+          {% for paquete in paquetes %}
+          {% if paquete[4] and paquete[3] in categorias_validas and paquete[0] not in mostrados %}
+          <option value="{{ paquete[0] }}">{{ paquete[1] }}</option>
+          {% set _ = mostrados.append(paquete[0]) %}
+          {% endif %}
+          {% endfor %}
+          {% else %}
+          <option disabled>No hay paquetes disponibles</option>
+          {% endif %}
+        </select>
+      </div>
+
+
+
+      <!-- Botones -->
+      <div class="espacio_form mb-3">
+        <button class="botones-guardar" type="submit">Guardar</button>
+      </div>
+      <div class="espacio_form mb-3">
+        <a class="botones-cancelar" href="{{ url_for('participantes.participantes_buscar') }}">Cancelar</a>
+      </div>
+    </div>
+  </form>
+</div>
+
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const categoriaSelect = document.getElementById('id_categoria');
-        const cursoPrincipal = document.getElementById('id_curso');
-        const cursosEspeciales = [];
+  document.addEventListener('DOMContentLoaded', function () {
+    const categoriaSelect = document.getElementById('id_categoria');
+    const cursoPrincipal = document.getElementById('id_curso');
+    const cursosEspeciales = [];
 
-        // Recolectar los selects de cursos del 1 al 9
-        for (let i = 1; i <= 9; i++) {
-            cursosEspeciales.push(document.getElementById(`id_curso${i}`));
-        }
+    // Recolectar los selects de cursos del 1 al 9
+    for (let i = 1; i <= 9; i++) {
+      cursosEspeciales.push(document.getElementById(`id_curso${i}`));
+    }
 
-        function actualizarVisibilidad() {
-            const selectedText = categoriaSelect.options[categoriaSelect.selectedIndex].textContent.trim();
+    function actualizarVisibilidad() {
+      const selectedText = categoriaSelect.options[categoriaSelect.selectedIndex].textContent.trim();
 
-            if (selectedText === 'Especializaciones') {
-                cursoPrincipal.disabled = true;
-                cursoPrincipal.parentElement.style.display = 'none';
+      if (selectedText === 'Especializaciones') {
+        cursoPrincipal.disabled = true;
+        cursoPrincipal.parentElement.style.display = 'none';
 
-                cursosEspeciales.forEach(select => {
-                    select.disabled = false;
-                    select.parentElement.style.display = 'block';
-                });
-            } else {
-                cursoPrincipal.disabled = false;
-                cursoPrincipal.parentElement.style.display = 'block';
+        cursosEspeciales.forEach(select => {
+          select.disabled = false;
+          select.parentElement.style.display = 'block';
+        });
+      } else {
+        cursoPrincipal.disabled = false;
+        cursoPrincipal.parentElement.style.display = 'block';
 
-                cursosEspeciales.forEach(select => {
-                    select.disabled = true;
-                    select.parentElement.style.display = 'none';
-                });
-            }
-        }
+        cursosEspeciales.forEach(select => {
+          select.disabled = true;
+          select.parentElement.style.display = 'none';
+        });
+      }
+    }
 
-        categoriaSelect.addEventListener('change', actualizarVisibilidad);
-        actualizarVisibilidad(); // Ejecutar al inicio por si ya hay selección
-    });
+    categoriaSelect.addEventListener('change', actualizarVisibilidad);
+    actualizarVisibilidad(); // Ejecutar al inicio por si ya hay selección
+  });
 </script>
 
 

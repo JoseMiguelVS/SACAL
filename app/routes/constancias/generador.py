@@ -101,6 +101,26 @@ def generar_constancia(participante, qr_path):
         draw_centrado(c, texto_duracion, 165, font="Montserrat-Bold", size=10)
         draw_centrado(c, realizado, 150, font="Montserrat-Bold", size=10)
         draw_centrado(c, texto_fecha, 135, font="Montserrat-Bold", size=10)
+
+    if nombre_tipo == 'Mini Especializacion':
+        texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
+        realizado = "REALIZADO ONLINE EN VIVO,"
+        texto_fecha = f"{nombre_mes.upper()} DE {current_year}."
+        espe = "MINI ESPECIALIZACIÓN:"
+
+        # Pintar
+        draw_centrado(c, nombre_completo, 290, font="Montserrat-Bold", size=18)
+        centro_nombre = draw_centrado(c, nombre_completo, 290, font="Montserrat-Bold", size=18, return_center=True)
+
+        c.setFillColor(HexColor("#003366"))
+        draw_texto_centrado_multilinea(c, texto=espe, y_inicial=230, font_name="Metropolis-Black", font_size=25, max_width=500, x_centro=centro_nombre)
+        draw_texto_centrado_multilinea(c, texto=curso_com, y_inicial=210, font_name="Metropolis-Black", font_size=20, max_width=500, x_centro=centro_nombre)
+        c.setFillColorRGB(0, 0, 0)
+
+        draw_centrado(c, texto_duracion, 165, font="Montserrat-Bold", size=10)
+        draw_centrado(c, realizado, 150, font="Montserrat-Bold", size=10)
+        draw_centrado(c, texto_fecha, 135, font="Montserrat-Bold", size=10)
+
     else:
         texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
         realizado = "REALIZADO ONLINE EN VIVO,"
@@ -135,6 +155,7 @@ def generar_constancia(participante, qr_path):
     new_pdf = PdfReader(packet)
     plantilla_path = {
         'especializacion': "static/pdf/especializacion.pdf",
+        'mini especializacion': "static/pdf/especializacion.pdf",
         'psicologia': "static/pdf/psicologia.pdf",
         'empresarial': "static/pdf/empresarial.pdf"
     }.get(nombre_tipo.lower(), "static/pdf/publico.pdf")
@@ -146,7 +167,7 @@ def generar_constancia(participante, qr_path):
     output = PdfWriter()
     output.add_page(page)
 
-    if nombre_tipo == 'Especializacion':
+    if nombre_tipo == 'Especializacion' and 'Mini Especializacion':
         constancia_path = f'static/constancias/{clave}-E.pdf'
     else:
         constancia_path = f'static/constancias/{clave}.pdf'

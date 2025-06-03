@@ -45,42 +45,74 @@ def paquete_agregar():
     return render_template('paquetes/paquetes_agregar.html', titulo = titulo, categorias = lista_categorias())
 
 
-@paquetes.route("/paquetes/agregar/nuevo", methods = ('GET', 'POST'))
+@paquetes.route("/paquetes/agregar/nuevo", methods=('GET', 'POST'))
 @login_required
 def paquete_nuevo():
     if request.method == 'POST':
         nombre_paquete = request.form['nombre_paquete']
+
         if allowed_paquename(nombre_paquete):
-            nombre_paquete = request.form['nombre_paquete']
             precio_paquete = request.form['precio_paquete']
             categoria_paquete = request.form['id_categoria']
             estado = True
-            fecha_creacion= datetime.now()
+            fecha_creacion = datetime.now()
             fecha_modificacion = datetime.now()
-            
-            con = get_db_connection()
-            cur = con.cursor(cursor_factory=RealDictCursor)
-            sql_validar = 'SELECT COUNT(*) FROM paquetes WHERE nombre_paquete = %s;'
-            cur.execute(sql_validar, (nombre_paquete,))
-            existe = cur.fetchone()['count']
-            if existe:
-                cur.close()
-                con.close()
-                flash('Error: El nombre seleccionado ya esta registrado. Intente con uno diferente')
-                return redirect(url_for('paquete.paquete_agregar'))
-            else:
-                sql = 'INSERT INTO paquetes (nombre_paquete, precio_paquete, categoria_paquete, estado, fecha_creacion, fecha_modificacion) VALUES (%s, %s, %s, %s, %s, %s)'
+
+            # Verificamos si el usuario marcó la casilla de regalos
+            regalo = 'regalo' in request.form
+
+            # Solo tomamos los valores si regalo está marcado
+            num_cursos = int(request.form['num_cursos']) if regalo and request.form['num_cursos'] else 0
+            diploma_flash = 'diploma_flash' in request.form if regalo else False
+            solo_global = 'solo_global' in request.form if regalo else False
+
+            try:
+                con = get_db_connection()
+                cur = con.cursor(cursor_factory=RealDictCursor)
+
+                # Insertar paquete y recuperar su ID
+                sql = '''
+                    INSERT INTO paquetes (nombre_paquete, precio_paquete, categoria_paquete, estado, fecha_creacion, fecha_modificacion)
+                    VALUES (%s, %s, %s, %s, %s, %s) RETURNING id_paquete
+                '''
                 valores = (nombre_paquete, precio_paquete, categoria_paquete, estado, fecha_creacion, fecha_modificacion)
                 cur.execute(sql, valores)
+                paquete_id = cur.fetchone()['id_paquete']
+
+                # Insertar regalo y recuperar su ID
+                sql2 = '''
+                    INSERT INTO regalos (num_cursos, diploma_flash, solo_global)
+                    VALUES (%s, %s, %s) RETURNING id_regalo
+                '''
+                valores2 = (num_cursos, diploma_flash, solo_global)
+                cur.execute(sql2, valores2)
+                regalos_id = cur.fetchone()['id_regalo']
+
+                # Insertar privilegio (relación)
+                sql3 = 'INSERT INTO privilegios (paquete_id, regalos_id) VALUES (%s, %s)'
+                valores3 = (paquete_id, regalos_id)
+                cur.execute(sql3, valores3)
+
                 con.commit()
-                cur.close()
-                con.close()
                 flash('Paquete agregado correctamente')
                 return redirect(url_for('paquete.paquetes_buscar'))
+
+            except Exception as e:
+                print("Error al insertar paquete:", e)
+                con.rollback()
+                flash('Error al registrar el paquete')
+                return redirect(url_for('paquete.paquete_agregar'))
+
+            finally:
+                cur.close()
+                con.close()
+
         else:
-            flash('Error')
+            flash('Nombre de paquete no válido')
             return redirect(url_for('paquete.paquete_agregar'))
+
     return redirect(url_for('paquete.paquete_agregar'))
+
 
 #---------------------------------------DETALLES DE PAQUETE------------------------------
 @paquetes.route('/paquetes/detalles/<int:id>')
@@ -100,34 +132,59 @@ def paquete_detalles(id):
 @paquetes.route('/paquetes/editar/<string:id>')
 @login_required
 def paquete_editar(id):
-    con = get_db_connection()
-    cur = con.cursor()
-    cur.execute('SELECT * FROM paquetes WHERE id_paquete = {0}'.format(id))
-    paquete = cur.fetchall()
-    con.commit()
-    cur.close()
-    con.close()
-    return render_template('/paquetes/paquetes_editar.html', paquete = paquete[0], categorias = lista_categorias())
+    try:
+        con = get_db_connection()
+        cur = con.cursor(cursor_factory=RealDictCursor)
+        cur.execute('SELECT * FROM paquetes WHERE id_paquete = %s', (id,))
+        paquete = cur.fetchone()
+        cur.close()
+        con.close()
 
-@paquetes.route('/paquetes/editar/<string:id>', methods = ['POST'])
+        if not paquete:
+            flash('Paquete no encontrado', 'danger')
+            return redirect(url_for('paquete.paquetes_buscar'))
+
+        return render_template('/paquetes/paquetes_editar.html', paquete=paquete, categorias=lista_categorias())
+
+    except Exception as e:
+        print(f"Error al cargar paquete: {e}")
+        flash('Error al cargar el paquete', 'danger')
+        return redirect(url_for('paquete.paquetes_buscar'))
+
+
+@paquetes.route('/paquetes/editar/<string:id>', methods=['POST'])
 @login_required
 def paquete_actualizar(id):
     if request.method == 'POST':
-        nombre_paquete = request.form['nombre_paquete']
-        precio_paquete = request.form['precio_paquete']
-        categoria_paquete = request.form['id_categoria']
-        fecha_modificacion = datetime.now()
+        try:
+            nombre_paquete = request.form['nombre_paquete']
+            precio_paquete = request.form['precio_paquete']
+            categoria_paquete = request.form['id_categoria']
+            fecha_modificacion = datetime.now()
 
-        con = get_db_connection()
-        cur = con.cursor()
-        sql = 'UPDATE paquetes SET nombre_paquete = %s, precio_paquete = %s, categoria_paquete = %s, fecha_modificacion = %s WHERE id_paquete = %s;'
-        valores = (nombre_paquete, precio_paquete, categoria_paquete, fecha_modificacion, id)
-        cur.execute(sql, valores)
-        con.commit()
-        cur.close()
-        con.close()
-        flash('Paquete actualizado correctamente')
+            con = get_db_connection()
+            cur = con.cursor()
+            sql = '''
+                UPDATE paquetes
+                SET nombre_paquete = %s,
+                    precio_paquete = %s,
+                    categoria_paquete = %s,
+                    fecha_modificacion = %s
+                WHERE id_paquete = %s
+            '''
+            valores = (nombre_paquete, precio_paquete, categoria_paquete, fecha_modificacion, id)
+            cur.execute(sql, valores)
+            con.commit()
+            cur.close()
+            con.close()
+            flash('Paquete actualizado correctamente', 'success')
+        except Exception as e:
+            print(f"Error al actualizar paquete: {e}")
+            flash('Error al actualizar el paquete', 'danger')
+            return redirect(url_for('paquete.paquete_editar', id=id))
+
     return redirect(url_for('paquete.paquetes_buscar'))
+
 
 #-------------------------------ELIMINAR PAQUETES----------------------------
 @paquetes.route('/paquetes/eliminar/<string:id>')

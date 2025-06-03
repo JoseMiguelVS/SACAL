@@ -68,7 +68,8 @@
         {% if page > 1 %}
         <li class="page-item">
             <a class="page-link bg-warning"
-                href="{{url_for('temas.temas_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}" aria-label="Previous">
+                href="{{url_for('temas.temas_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                aria-label="Previous">
                 <span aria-hidden="true">&laquo;</span>
             </a>
         </li>
@@ -98,7 +99,8 @@
             {% endif %}
             <li class="page-item">
                 <a class="page-link bg-warning"
-                    href="{{url_for('temas.temas_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}" aria-label="Next">
+                    href="{{url_for('temas.temas_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                    aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>

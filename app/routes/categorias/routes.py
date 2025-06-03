@@ -37,46 +37,36 @@ def categorias_buscar():
 
 
 #------------------------------AGREGAR CATEGORIA--------------------------------
-@categorias.route('/categorias/agregar')
-@login_required
-def categoria_agregar():
-    titulo ='Agregar categoria'
-    return render_template('categorias/categorias_agregar.html', titulo = titulo)
-
-@categorias.route('/categorias/agregar/nuevo', methods = ('GET', 'POST'))
+@categorias.route('/categorias/nuevo', methods = ('GET', 'POST'))
 @login_required
 def categoria_nuevo():
     if request.method == 'POST':
         nombre_categoria = request.form['nombre_categoria']
-        if allowed_catname(nombre_categoria):
-            nombre_categoria = request.form['nombre_categoria']
-            estado = True
-            fecha_creacion= datetime.now()
-            fecha_modificacion = datetime.now()
+        estado = True
+        fecha_creacion= datetime.now()
+        fecha_modificacion = datetime.now()
 
-            con = get_db_connection()
-            cur = con.cursor(cursor_factory = RealDictCursor)
-            sql_validar = "SELECT COUNT(*) FROM categorias WHERE nombre_categoria = %s"
-            cur.execute(sql_validar, (nombre_categoria,))
-            existe = cur.fetchone()['count']
-            if existe:
-                cur.close()
-                con.close()
-                flash('Error: la categoria ya se encuentra registrada')
-                return redirect(url_for('categorias.categorias_buscar'))
-            else:
-                sql = 'INSERT INTO categorias(nombre_categoria, estado, fecha_creacion, fecha_modificacion) VALUES (%s,%s,%s,%s);'
-                valores = (nombre_categoria, estado, fecha_creacion, fecha_modificacion)
-                cur.execute(sql,valores)
-                con.commit()
-                cur.close()
-                con.close()
-                flash('Categoria agregada correctamente')
-                return redirect(url_for('categorias.categorias_buscar'))
+        con = get_db_connection()
+        cur = con.cursor(cursor_factory = RealDictCursor)
+        sql_validar = "SELECT COUNT(*) FROM categorias WHERE nombre_categoria = %s"
+        cur.execute(sql_validar, (nombre_categoria,))
+        existe = cur.fetchone()['count']
+        if existe:
+            cur.close()
+            con.close()
+            flash('Error: la categoria ya se encuentra registrada')
+            return redirect(url_for('categorias.categorias_buscar'))
         else:
-            flash ('Error')
-            return redirect(url_for('categortias.categorias_agregar'))
-    return redirect(url_for('categorias.categoria_agregar'))
+            sql = 'INSERT INTO categorias(nombre_categoria, estado, fecha_creacion, fecha_modificacion) VALUES (%s,%s,%s,%s);'
+            valores = (nombre_categoria, estado, fecha_creacion, fecha_modificacion)
+            cur.execute(sql,valores)
+            con.commit()
+            cur.close()
+            con.close()
+            flash('Categoria agregada correctamente')
+            return redirect(url_for('categorias.categorias_buscar'))
+        
+    return redirect(url_for('categorias.categorias_buscar'))
 
 #------------------------------------DETALLES DE CATEGORIAS------------------------
 @categorias.route('/categorias/detalles/<int:id>')

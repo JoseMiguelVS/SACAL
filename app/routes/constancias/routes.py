@@ -5,7 +5,7 @@ from psycopg2.extras import RealDictCursor
 
 from ..constancias.generador import generar_constancia
 from ..constancias.qr import generar_qr
-from utils.listas import lista_categorias, lista_cuentas, lista_cursos, lista_paquetes, lista_ponente, lista_sesiones
+from utils.listas import lista_categorias, lista_cuentas, lista_cursos, lista_paquetes, lista_ponente, lista_privilegios, lista_sesiones
 
 from ..utils.utils import get_db_connection, paginador3
 
@@ -39,6 +39,7 @@ def constancias_buscar():
                            sesiones = lista_sesiones(),
                            paquetes = lista_paquetes(),
                            cuentas = lista_cuentas(),
+                           privilegios = lista_privilegios(),
                            constancias=paginado[0],
                            page=paginado[1],
                            per_page=paginado[2],
@@ -125,7 +126,7 @@ def constancias_generar():
                 UPDATE constancias
                 SET constancia_generada = TRUE
                 WHERE participante = %s
-            """, (id))
+            """, (id,))
         con.commit()
 
     return send_file(pdf_path, as_attachment=True)

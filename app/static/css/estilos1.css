@@ -226,6 +226,13 @@ td:nth-last-child(2) {
   cursor: pointer;
 }
 
+.tables_participantes input[type="checkbox"]:disabled {
+  width: 18px;
+  height: 18px;
+  accent-color: #f3a474;
+  cursor: pointer;
+}
+
 /* ------------------------------------------------------------------------------------------------- */
 footer {
   position: fixed;

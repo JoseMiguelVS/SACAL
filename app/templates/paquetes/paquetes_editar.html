@@ -1,56 +1,50 @@
 {% extends './layout.html' %}
 {% block body %}
 
-<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
-{% with messages = get_flashed_messages() %}
+<!-- Mensajes de alerta -->
+{% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
-{% for message in messages %}
-<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
-    {% endif %} alert-dismissible fade show" role="alert">
-    <strong>{{message}}</strong>
+{% for category, message in messages %}
+<div class="alert alert-{{ 'danger' if category == 'danger' else category }} alert-dismissible fade show" role="alert">
+    <strong>{{ message }}</strong>
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% endfor %}
 {% endif %}
 {% endwith %}
-<!-- -------------------------------------------------------------------------- -->
 
+<!-- Formulario de edición -->
 <div class="form-container">
-    <form class="formulario" method="POST" action="{{url_for('paquete.paquete_actualizar',id=paquete[0])}}">
-        <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+    <form class="formulario" method="POST" action="{{ url_for('paquete.paquete_actualizar', id=paquete.id_paquete) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div>
             <div class="espacio_form">
                 <input type="text" id="nombre_paquete" placeholder="Nombre Paquete" name="nombre_paquete"
-                    value="{{ paquete[1] }}">
+                    value="{{ paquete.nombre_paquete }}" required>
             </div>
             <div class="espacio_form">
-                <input type="number" id="precio_paquete" placeholder="Precio" name="precio_paquete" value="{{ paquete[2] }}">
+                <input type="number" id="precio_paquete" placeholder="Precio" name="precio_paquete"
+                    value="{{ paquete.precio_paquete }}" required>
             </div>
 
-            <!-- ------------------------------------desplegable-------------------------------------------------------------- -->
             <div class="espacio-form">
-                <select name="id_categoria" id="id_categoria" class="form-select" aria-label="Default select example">
-                    <option value="true" selected>--Seleccione la categoria--</option>
-                    {% if categorias %}
+                <select name="id_categoria" id="id_categoria" class="form-select" aria-label="Seleccione categoría">
+                    <option value="true">--Seleccione la categoría--</option>
                     {% for categoria in categorias %}
-                    <option value="{{categoria.0}}" {% if categoria.0 == paquete[3] %} selected {% endif %}>{{categoria.1}}</option>
+                    <option value="{{ categoria.0 }}" {% if categoria.0==paquete.categoria_paquete %} selected {% endif
+                        %}>
+                        {{ categoria.1 }}
+                    </option>
                     {% endfor %}
-                    {% else %}
-                    <option>Aún no hay registros</option>
-                    {% endif %}
                 </select>
             </div>
 
             <div class="espacio-form text-center">
-                <a class="botones" href="{{url_for('paquete.paquetes_buscar')}}">
-                    Cancelar
-                </a>
-                <button class="botones" type="submit">
-                    Guardar
-                </button>
+                <a class="botones" href="{{ url_for('paquete.paquetes_buscar') }}">Cancelar</a>
+                <button class="botones" type="submit">Guardar</button>
             </div>
-
         </div>
     </form>
 </div>
+
 {% endblock %}

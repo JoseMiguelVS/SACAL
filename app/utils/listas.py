@@ -54,3 +54,6 @@ def lista_ponente():
 
 def lista_tiposCur():
     return listar_tabla('tipo_cursos', 'id_tipo')
+
+def lista_privilegios():
+    return listar_tabla('paquetes_privilegios', 'id_paquete')

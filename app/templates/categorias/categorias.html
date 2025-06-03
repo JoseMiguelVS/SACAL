@@ -16,11 +16,12 @@
 {% endwith %}
 
 <div>
-    <div class="form-container">
-        <!-- --------------------------------------NUEVO USUARIO ------------------------------------- -->
-        <a class="botones" href="{{url_for('categorias.categoria_agregar')}}"><i class="fa fa-plus"
-            style="font-size: 18px;"></i></a>
-            <!-- -------------------------------------BUSCADOR------------------------------------------ -->
+        <div class="form-container">
+                <button class="botones" data-bs-toggle="modal" data-bs-target="#modalAgregarCategoria">
+                        <i class="fa fa-plus"></i>Nuevo
+                </button>
+
+                <!-- -------------------------------------BUSCADOR------------------------------------------ -->
                 <form method="get" action="{{ url_for('categorias.categorias_buscar') }}" class="d-flex">
                         <input class="form-control" type="text" name="buscar" value="{{ search_query }}"
                                 placeholder="Buscar..." required>
@@ -34,7 +35,6 @@
         <table>
                 <thead>
                         <tr>
-                                <th>Ver</th>
                                 <th>Nombre Categoria</th>
                                 <th>Editar</th>
                                 <th>Eliminar</th>
@@ -45,22 +45,16 @@
                         {% for categoria in categorias %}
                         {% if categoria.estado == true %}
                         <tr>
-                                <td>
-                                        <a class="botones-ver"
-                                                href="{{url_for('categorias.categoria_detalles',id = categoria.id_categoria)}}">
-                                                <li class="fa fa-eye" style="font-size: 18px;"></li>
-                                        </a>
-                                </td>
                                 <td>{{ categoria.nombre_categoria }}</td>
                                 <td>
-                                        <a class="botones-editar"
-                                                href="{{ url_for('categorias.categoria_editar', id = categoria.id_categoria) }}">
+                                        <button type="button" class="botones-editar" data-bs-toggle="modal"
+                                                data-bs-target="#modalEditar-{{categoria.id_categoria}}">
                                                 <li class="fa fa-edit" style="font-size: 18px;"></li>
-                                        </a>
+                                        </button>
                                 </td>
                                 <td>
                                         <button class="botones-delete" type="button" data-bs-toggle="modal"
-                                                data-bs-target="#staticBackdrop-{{categoria.id_categoria}}">
+                                                data-bs-target="#modalEliminar-{{categoria.id_categoria}}">
                                                 <li class="fa fa-trash" style="font-size: 18px;"></li>
                                         </button>
                                 </td>
@@ -87,7 +81,8 @@
                         </a>
                 </li>
                 {% if page != 1 and page != 2 %}
-                <li class="page-item"><a class="page-link bg-warning" href="{{url_for('categorias.categorias_buscar')}}">1</a></li>
+                <li class="page-item"><a class="page-link bg-warning"
+                                href="{{url_for('categorias.categorias_buscar')}}">1</a></li>
                 {% if page != 3 %}
                 <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
                 {% endif %}
@@ -131,11 +126,11 @@
         </a>
 </div>
 
-<!-- --------------------------------------------------MODAL--------------------------------------------------- -->
+<!-- ------------------------------------------MODAL--------------------------------------------------- -->
 {% if categorias %}
 {% for categoria in categorias %}
-<div class="modal fade" id="staticBackdrop-{{categoria.id_categoria}}" data-bs-backdrop="static" data-bs-keyboard="false"
-        tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="modalEliminar-{{categoria.id_categoria}}" data-bs-backdrop="static"
+        data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
                 <div class="modal-content">
                         <div class="modal-header">
@@ -156,6 +151,56 @@
                 </div>
         </div>
 </div>
+
+<!-- -----------------------------------------AGREGAR--------------------------------------------- -->
+<div class="modal fade" id="modalAgregarCategoria" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="modalAgregarTemaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+                <form action="{{url_for('categorias.categoria_nuevo')}}" method="post" class="formulario modal-content">
+                        <h5 class="modal-title" id="modalAgregarCategoriaLabel">Agregar Categoria</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        <div class="modal-body">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="mb-3">
+                                        <label for="categoria" class="form-label">Categoria</label>
+                                        <input type="text" class="form-control" name="nombre_categoria"
+                                                id="nombre_categoria" required maxlength="15">
+                                </div>
+                        </div>
+                        <div class="modal-footer">
+                                <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="botones">Guardar</button>
+                        </div>
+                </form>
+        </div>
+</div>
+
+<!-- -----------------------------------------EDITAR-------------------------------------------- -->
+<div class="modal fade" id="modalEditar-{{categoria.id_categoria}}" data-bs-backdrop="static"
+        data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+                <div class="modal-content">
+                        <div class="modal-header">
+                                <h5 class="modal-tittle" id="staticBackdropLabel">Editar Categoria</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                                <form action="{{ url_for('categorias.categoria_editar', id = categoria.id_categoria) }}"
+                                        method="post" class="formulario">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="text" name="categoria" id="categoria"
+                                                value="{{ categoria.nombre_categoria }}">
+                        </div>
+                        <div class="modal-footer">
+                                <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="botones">Guardar</button>
+                        </div>
+                        </form>
+                </div>
+        </div>
+</div>
+
 {% endfor %}
 {% else %}
 {% endif %}
