@@ -59,13 +59,9 @@
                                         </a>
                                 </td>
                                 <td>{{paquete.nombre_paquete}}</td>
-                                <td>{{paquete.precio_paquete}}</td>
+                                <td>${{paquete.precio_paquete}}</td>
                                 <td>{{paquete.nombre_categoria}}</td>
                                 <td>
-                                        <!-- <a class="botones-editar"
-                                                href="{{ url_for('paquete.paquete_editar', id = paquete.id_paquete) }}">
-                                                <li class="fa fa-edit" style="font-size: 18px;"></li>
-                                        </a> -->
                                         <button type="button" class="botones-editar" data-bs-toggle="modal"
                                                 data-bs-target="#modalEditar-{{paquete.id_paquete}}">
                                                 <li class="fa fa-edit" style="font-size: 18px;"></li>
@@ -189,20 +185,30 @@
                                                         class="form-label">Nombre</label>
                                                 <input type="text" class="form-control"
                                                         id="nombre-{{paquete.id_paquete}}" name="nombre"
-                                                        value="{{paquete.nombre}}" required>
-                                        </div>
-                                        <div class="mb-3">
-                                                <label for="descripcion-{{paquete.id_paquete}}"
-                                                        class="form-label">Descripción</label>
-                                                <textarea class="form-control" id="descripcion-{{paquete.id_paquete}}"
-                                                        name="descripcion" required>{{paquete.descripcion}}</textarea>
+                                                        value="{{paquete.nombre_paquete}}" required>
                                         </div>
                                         <div class="mb-3">
                                                 <label for="precio-{{paquete.id_paquete}}"
                                                         class="form-label">Precio</label>
                                                 <input type="number" class="form-control"
                                                         id="precio-{{paquete.id_paquete}}" name="precio"
-                                                        value="{{paquete.precio}}" required>
+                                                        value="{{paquete.precio_paquete}}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                                <select name="id_categoria" id="id_categoria" class="form-select mb-2">
+                                                        <option value="" disabled>Categoria</option>
+                                                        {% if categorias %}
+                                                        {% for categoria in categorias %}
+                                                        <option value="{{ categoria.0 }}" {% if
+                                                                categoria.0==paquete.nombre_categoria %} selected {%
+                                                                endif %}>
+                                                                {{ categoria.1 }}
+                                                        </option>
+                                                        {% endfor %}
+                                                        {% else %}
+                                                        <option disabled>Aun no hay registros</option>
+                                                        {% endif %}
+                                                </select>
                                         </div>
 
                                         <div class="form-check mb-3">
@@ -345,8 +351,7 @@
                                 </div>
                         </div>
                         <div class="modal-footer">
-                                <button type="button" class="botones"
-                                        data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
                                 <button type="submit" class="botones">Guardar</button>
                         </div>
                 </form>
