@@ -1,21 +1,15 @@
 {% extends './layout.html' %}
 {% block body %}
-<h2>Empleados</h2>
-<br>
-
-<!-- BOTÓN ATRÁS -->
-<a href="{{ url_for('index') }}" class="botones"><i class="fas fa-arrow-left"></i></a>
+<h2 class="text-center">Empleados</h2>
 
 <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
-<!-- ----------------------------- MENSAJES FLASH ----------------------------- -->
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 {% for message in messages %}
-<div class="alert 
-        {% if 'Error' in message %}alert-danger 
-        {% elif 'Advertencia' in message %}alert-warning 
-        {% else %}alert-success{% endif %} 
-        alert-dismissible fade show" role="alert">
+<div class="alert alert-dismissible fade show alert-fixed
+          {% if 'Error' in message %}alert-danger
+          {% elif 'Advertencia' in message %}alert-warning
+          {% else %}alert-success{% endif %}" role="alert">
         <strong>{{ message }}</strong>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
@@ -25,9 +19,8 @@
 
 <!-- ----------------------------- FORMULARIO Y BUSCADOR ----------------------------- -->
 <div class="form-container d-flex align-items-center mb-3">
-        <a class="botones mr-5" href="{{ url_for('empleados.empleado_agregar') }}">
-                <i class="fa fa-plus" style="font-size: 18px;"></i>Nuevo
-        </a>
+        <button type="button" class="botones" data-bs-toggle="modal" data-bs-target="#modalAgregarEmpleado"><i
+                        class="fa fa-plus" style="font-size: 18px;"></i>Nuevo</button>
 
         <form method="get" action="{{ url_for('empleados.empleadosBuscar') }}" class="d-flex">
                 <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
@@ -65,10 +58,15 @@
                                 <td>{{ empleado.apellido_pat }} {{ empleado.apellido_mat }}</td>
                                 <td>{{ empleado.correo_empleado }}</td>
                                 <td>
-                                        <a class="botones-editar"
+                                        <!-- <a class="botones-editar"
                                                 href="{{ url_for('empleados.empleado_editar', id=empleado.id_empleado) }}">
                                                 <i class="fa fa-edit" style="font-size: 18px;"></i>
-                                        </a>
+                                        </a> -->
+
+                                        <button type="button" class="botones-editar" data-bs-toggle="modal"
+                                                data-bs-target="#modalEditar-{{empleado.id_empleado}}">
+                                                <li class="fa fa-edit" style="font-size: 18px;"></li>
+                                        </button>
                                 </td>
                                 <td>
                                         <button class="botones-delete" type="button" data-bs-toggle="modal"
@@ -144,7 +142,8 @@
         </a>
 </div>
 
-<!-- ----------------------------- MODALES DE CONFIRMACIÓN ----------------------------- -->
+<!-- ----------------------------------- MODAL DE ELIMINACION ----------------------------- -->
+{% if empleados %}
 {% for empleado in empleados %}
 <div class="modal fade" id="staticBackdrop-{{ empleado.id_empleado }}" data-bs-backdrop="static"
         data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -156,7 +155,7 @@
                                         aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                                ¿Deseas eliminar a <strong>{{ empleado.nombre_usuario }} {{ empleado.apellido_pat
+                                ¿Deseas eliminar a <strong>{{ empleado.nombre_empleado }} {{ empleado.apellido_pat
                                         }}</strong>?
                         </div>
                         <div class="modal-footer">
@@ -170,6 +169,111 @@
                 </div>
         </div>
 </div>
+
+<!-- --------------------------------------------------EDITAR---------------------------------------------- -->
+<!-- MODAL EDITAR EMPLEADO -->
+<div class="modal fade" id="modalEditar-{{ empleado.id_empleado }}" data-bs-backdrop="static" data-bs-keyboard="false"
+        tabindex="-1" aria-labelledby="modalEditarLabel-{{ empleado.id_empleado }}" aria-hidden="true">
+        <div class="modal-dialog">
+                <form action="{{ url_for('empleados.empleado_actualizar', id=empleado.id_empleado) }}" method="post"
+                        class="modal-content">
+                        <div class="modal-header">
+                                <h5 class="modal-title" id="modalEditarLabel-{{ empleado.id_empleado }}">Editar Empleado
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                                <label for="usuario">Usuario</label>
+                                <input type="text" name="nombre_usuario" class="form-control mb-2"
+                                        value="{{ empleado.nombre_usuario }}" placeholder="Nombre Usuario" required>
+                                <label for="nombre">Nombre(s)</label>
+                                <input type="text" name="nombre_empleado" class="form-control mb-2"
+                                        value="{{ empleado.nombre_empleado }}" placeholder="Nombre Completo" required>
+                                <label for="apellido paterno">Apellido paterno</label>
+                                <input type="text" name="apellido_pat" class="form-control mb-2"
+                                        value="{{ empleado.apellido_pat }}" placeholder="Apellido Paterno" required>
+                                <label for="apellido materno">Apellido Materno</label>
+                                <input type="text" name="apellido_mat" class="form-control mb-2"
+                                        value="{{ empleado.apellido_mat }}" placeholder="Apellido Materno" required>
+                                <label for="email">Correo Electrónico</label>
+                                <input type="email" name="correo_empleado" class="form-control mb-2"
+                                        value="{{ empleado.correo_empleado }}" placeholder="Correo Electrónico"
+                                        required>
+
+                                <select name="id_rol" class="form-select mb-2" required>
+                                        <option value="" disabled>Cargo</option>
+                                        {% if roles %}
+                                        {% for rol in roles %}
+                                        <option value="{{ rol.0 }}" {% if rol.0==empleado.id_rol %}selected{% endif %}>
+                                                {{ rol.1 }}</option>
+                                        {% endfor %}
+                                        {% else %}
+                                        <option disabled>Aún no hay registros</option>
+                                        {% endif %}
+                                </select>
+                        </div>
+                        <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-primary">Guardar</button>
+                        </div>
+                </form>
+        </div>
+</div>
+
 {% endfor %}
+{% else %}
+{% endif %}
+
+<!-- MODAL AGREGAR EMPLEADO -->
+<div class="modal fade" id="modalAgregarEmpleado" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="modalAgregarEmpleadoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+                <form action="{{ url_for('empleados.empleado_nuevo') }}" method="post" class="modal-content">
+                        <div class="modal-header">
+                                <h5 class="modal-title" id="modalAgregarEmpleadoLabel">Agregar Empleado</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                                <input type="text" name="nombre_usuario" class="form-control mb-2"
+                                        placeholder="Nombre Usuario" required>
+                                <input type="text" name="nombre_empleado" class="form-control mb-2"
+                                        placeholder="Nombre Completo" required>
+                                <input type="text" name="apellido_pat" class="form-control mb-2"
+                                        placeholder="Apellido Paterno" required>
+                                <input type="text" name="apellido_mat" class="form-control mb-2"
+                                        placeholder="Apellido Materno" required>
+                                <input type="email" name="correo_empleado" class="form-control mb-2"
+                                        placeholder="Correo Electrónico" required>
+
+                                <select name="id_rol" class="form-select mb-2" required>
+                                        <option value="" disabled selected>Seleccione un Cargo</option>
+                                        {% if roles %}
+                                        {% for rol in roles %}
+                                        <option value="{{ rol.0 }}">{{ rol.1 }}</option>
+                                        {% endfor %}
+                                        {% else %}
+                                        <option disabled>Aún no hay registros</option>
+                                        {% endif %}
+                                </select>
+
+                                <input type="password" name="contrasenia_empleado" class="form-control mb-2"
+                                        placeholder="Contraseña" required>
+                        </div>
+                        <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="btn btn-primary">Guardar</button>
+                        </div>
+                </form>
+        </div>
+</div>
+
 
 {% endblock %}

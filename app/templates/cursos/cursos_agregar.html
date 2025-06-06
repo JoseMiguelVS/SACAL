@@ -16,7 +16,7 @@
 {% endif %}
 {% endwith %}
 <!-- ----------------------------------------------------------------------------------------------- -->
-<h1>Registrar nuevo curso</h1>
+<h1>Registrar nuevo curso</h1> 
 <div class="form-container">
     <form class="formulario" method="POST" action="{{url_for('cursos.cursos_nuevo')}}" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{csrf_token()}}">

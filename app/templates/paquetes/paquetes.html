@@ -6,9 +6,11 @@
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 {% for message in messages %}
-<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
-        {% endif %} alert-dismissible fade show" role="alert">
-        <strong>{{message}}</strong>
+<div class="alert alert-dismissible fade show alert-fixed
+          {% if 'Error' in message %}alert-danger
+          {% elif 'Advertencia' in message %}alert-warning
+          {% else %}alert-success{% endif %}" role="alert">
+        <strong>{{ message }}</strong>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% endfor %}
@@ -16,11 +18,14 @@
 {% endwith %}
 
 <div>
-    <div class="form-container">
-        <!-- --------------------------------------NUEVO USUARIO ------------------------------------- -->
-        <a class="botones" href="{{url_for('paquete.paquete_agregar')}}"><i class="fa fa-plus"
-            style="font-size: 18px;"></i></a>
-            <!-- -------------------------------------BUSCADOR------------------------------------------ -->
+        <div class="form-container">
+                <!-- --------------------------------------NUEVO USUARIO ------------------------------------- -->
+                <!-- <a class="botones" href="{{url_for('paquete.paquete_agregar')}}"><i class="fa fa-plus"
+                                style="font-size: 18px;"></i></a> -->
+                <button type="button" class="botones" data-bs-toggle="modal" data-bs-target="#modalAgregarPaquete">
+                        <i class="fa fa-plus" style="font-size: 18px;"></i> Nuevo
+                </button>
+                <!-- -------------------------------------BUSCADOR------------------------------------------ -->
                 <form method="get" action="{{ url_for('paquete.paquetes_buscar') }}" class="d-flex">
                         <input class="form-control" type="text" name="buscar" value="{{ search_query }}"
                                 placeholder="Buscar..." required>
@@ -57,10 +62,14 @@
                                 <td>{{paquete.precio_paquete}}</td>
                                 <td>{{paquete.nombre_categoria}}</td>
                                 <td>
-                                        <a class="botones-editar"
+                                        <!-- <a class="botones-editar"
                                                 href="{{ url_for('paquete.paquete_editar', id = paquete.id_paquete) }}">
                                                 <li class="fa fa-edit" style="font-size: 18px;"></li>
-                                        </a>
+                                        </a> -->
+                                        <button type="button" class="botones-editar" data-bs-toggle="modal"
+                                                data-bs-target="#modalEditar-{{paquete.id_paquete}}">
+                                                <li class="fa fa-edit" style="font-size: 18px;"></li>
+                                        </button>
                                 </td>
                                 <td>
                                         <button class="botones-delete" type="button" data-bs-toggle="modal"
@@ -135,7 +144,7 @@
         </a>
 </div>
 
-<!-- --------------------------------------------------MODAL--------------------------------------------------- -->
+<!-- -------------------------------------------------- MODAL ELIMINAR --------------------------------------------------- -->
 {% if paquetes %}
 {% for paquete in paquetes %}
 <div class="modal fade" id="staticBackdrop-{{paquete.id_paquete}}" data-bs-backdrop="static" data-bs-keyboard="false"
@@ -160,8 +169,213 @@
                 </div>
         </div>
 </div>
+
+<!-------------------------------------------------------- MODAL EDITAR -------------------------------------------------------->
+<!-- Modal de edición -->
+<div class="modal fade" id="modalEditar-{{paquete.id_paquete}}" tabindex="-1"
+        aria-labelledby="modalLabel-{{paquete.id_paquete}}" aria-hidden="true">
+        <div class="modal-dialog">
+                <div class="modal-content">
+                        <form method="POST" action="{{ url_for('paquete.paquete_actualizar', id=paquete.id_paquete) }}">
+                                <div class="modal-header">
+                                        <h5 class="modal-title" id="modalLabel-{{paquete.id_paquete}}">Editar Paquete
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Cerrar"></button>
+                                </div>
+                                <div class="modal-body">
+                                        <div class="mb-3">
+                                                <label for="nombre-{{paquete.id_paquete}}"
+                                                        class="form-label">Nombre</label>
+                                                <input type="text" class="form-control"
+                                                        id="nombre-{{paquete.id_paquete}}" name="nombre"
+                                                        value="{{paquete.nombre}}" required>
+                                        </div>
+                                        <div class="mb-3">
+                                                <label for="descripcion-{{paquete.id_paquete}}"
+                                                        class="form-label">Descripción</label>
+                                                <textarea class="form-control" id="descripcion-{{paquete.id_paquete}}"
+                                                        name="descripcion" required>{{paquete.descripcion}}</textarea>
+                                        </div>
+                                        <div class="mb-3">
+                                                <label for="precio-{{paquete.id_paquete}}"
+                                                        class="form-label">Precio</label>
+                                                <input type="number" class="form-control"
+                                                        id="precio-{{paquete.id_paquete}}" name="precio"
+                                                        value="{{paquete.precio}}" required>
+                                        </div>
+
+                                        <div class="form-check mb-3">
+                                                <input class="form-check-input" type="checkbox" value="1"
+                                                        id="regalo-{{paquete.id_paquete}}" name="regalo" {% if
+                                                        paquete.regalo %}checked{% endif %}>
+                                                <label class="form-check-label"
+                                                        for="regalo-{{paquete.id_paquete}}">¿Incluye regalo?</label>
+                                        </div>
+
+                                        <div id="regalo_campos-{{paquete.id_paquete}}" style="display: none;">
+                                                <div class="mb-3">
+                                                        <label for="num_cursos-{{paquete.id_paquete}}"
+                                                                class="form-label">Número de Cursos</label>
+                                                        <input type="number" class="form-control"
+                                                                id="num_cursos-{{paquete.id_paquete}}" name="num_cursos"
+                                                                value="{{paquete.num_cursos or ''}}">
+                                                </div>
+                                                <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" value="1"
+                                                                id="diploma_flash-{{paquete.id_paquete}}"
+                                                                name="diploma_flash" {% if paquete.diploma_flash
+                                                                %}checked{% endif %}>
+                                                        <label class="form-check-label"
+                                                                for="diploma_flash-{{paquete.id_paquete}}">Diploma
+                                                                Flash</label>
+                                                </div>
+                                                <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" value="1"
+                                                                id="solo_global-{{paquete.id_paquete}}"
+                                                                name="solo_global" {% if paquete.solo_global %}checked{%
+                                                                endif %}>
+                                                        <label class="form-check-label"
+                                                                for="solo_global-{{paquete.id_paquete}}">Solo
+                                                                Global</label>
+                                                </div>
+                                        </div>
+                                </div>
+                                <div class="modal-footer">
+                                        <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" class="botones">Guardar</button>
+                                </div>
+                        </form>
+                </div>
+        </div>
+</div>
+
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+                const regaloCheckbox = document.getElementById('regalo-{{paquete.id_paquete}}');
+                const camposRegalo = document.getElementById('regalo_campos-{{paquete.id_paquete}}');
+                const numCursos = document.getElementById('num_cursos-{{paquete.id_paquete}}');
+                const diplomaFlash = document.getElementById('diploma_flash-{{paquete.id_paquete}}');
+                const soloGlobal = document.getElementById('solo_global-{{paquete.id_paquete}}');
+
+                function toggleCamposRegalo() {
+                        if (regaloCheckbox.checked) {
+                                camposRegalo.style.display = 'block';
+                        } else {
+                                camposRegalo.style.display = 'none';
+                                if (numCursos) numCursos.value = '';
+                                if (diplomaFlash) diplomaFlash.checked = false;
+                                if (soloGlobal) soloGlobal.checked = false;
+                        }
+                }
+
+                toggleCamposRegalo();
+                regaloCheckbox.addEventListener('change', toggleCamposRegalo);
+        });
+</script>
+
 {% endfor %}
 {% else %}
 {% endif %}
+
+<!-- --------------------------------------------------MODAL DE AGREGAR-------------------------------------------------- -->
+<div class="modal" id="modalAgregarPaquete" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="modalAgregarEmpleadoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+                <form action="{{url_for('paquete.paquete_nuevo')}}" method="post" class="modal-content">
+                        <div class="modal-header">
+                                <h5 class="modal-title" id="modalAgregarPaquetelabel">Agregar Paquete</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body">
+                                <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+
+                                <div class="input-group">
+                                        <input type="text" class="input-field" id="nombre_paquete" name="nombre_paquete"
+                                                placeholder="" required>
+                                        <label for="nombre" class="input-label">Paquete</label>
+                                </div>
+
+                                <div class="input-group">
+                                        <input class="input-field" type="number" id="precio_paquete" placeholder=""
+                                                name="precio_paquete" required>
+                                        <label for="nombre" class="input-label">Precio del paquete</label>
+                                </div>
+
+                                <div class="input-group">
+                                        <select name="id_categoria" id="id_categoria"
+                                                aria-label="Default select example" class="form-select">
+                                                <option value="true" selected>-Seleccione la Categoria-
+                                                </option>
+                                                {% if categorias %}
+                                                {% for categoria in categorias %}
+                                                <option value="{{categoria.0}}">{{categoria.1}}</option>
+                                                {% endfor %}
+                                                {% else %}
+                                                <option>Aún no hay registros</option>
+                                                {% endif %}
+                                        </select>
+                                        <label for="id_categoria" class="input-label">Categoria</label>
+                                </div>
+
+                                <div class="checkbox-group">
+                                        <input type="checkbox" name="regalo" id="regalo">
+                                        <label for="solo_global">¿Tiene privilegios?</label>
+                                </div>
+
+                                <!-- Agrupa los campos relacionados a regalos -->
+                                <div id="regalo_campos" style="display: none;">
+                                        <div class="input-group">
+                                                <input class="input-field" type="number" name="num_cursos"
+                                                        id="num_cursos" placeholder="">
+                                                <label for="Cursos" class="input-label">¿Cuántos cursos de regalo
+                                                        son?</label>
+                                        </div>
+
+                                        <div class="checkbox-group">
+                                                <input type="checkbox" name="diploma_flash" id="diploma_flash">
+                                                <label for="diploma_flash">¿Tiene diploma flash?</label>
+                                        </div>
+
+                                        <div class="checkbox-group">
+                                                <input type="checkbox" name="solo_global" id="solo_global">
+                                                <label for="global">¿Solo tiene global?</label>
+                                        </div>
+                                </div>
+                        </div>
+                        <div class="modal-footer">
+                                <button type="button" class="botones"
+                                        data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="botones">Guardar</button>
+                        </div>
+                </form>
+        </div>
+</div>
+
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+                const regaloCheckbox = document.getElementById('regalo');
+                const camposRegalo = document.getElementById('regalo_campos');
+
+                function toggleCamposRegalo() {
+                        if (regaloCheckbox.checked) {
+                                camposRegalo.style.display = 'block';
+                        } else {
+                                camposRegalo.style.display = 'none';
+                                // También puedes limpiar los valores si se desea
+                                document.getElementById('num_cursos').value = '';
+                                document.getElementById('diploma_flash').checked = false;
+                                document.getElementById('solo_global').checked = false;
+                        }
+                }
+
+                // Inicializar visibilidad al cargar
+                toggleCamposRegalo();
+
+                // Escuchar cambios en el checkbox
+                regaloCheckbox.addEventListener('change', toggleCamposRegalo);
+        });
+</script>
 
 {% endblock %}

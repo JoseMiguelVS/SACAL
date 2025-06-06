@@ -19,11 +19,11 @@ def constancias_buscar():
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas_constancias
                    WHERE (%s = '' OR nombre_categoria::text = %s)
-                     AND (%s = '' OR fecha ILIKE %s)'''
+                     AND (%s = '' OR fecha ILIKE %s) AND constancia_enviada = False'''
 
     sql_lim = '''SELECT * FROM asistencias_detalladas_constancias
                  WHERE (%s = '' OR nombre_categoria::text = %s)
-                   AND (%s = '' OR fecha ILIKE %s)
+                   AND (%s = '' OR fecha ILIKE %s) AND constancia_enviada = False
                  ORDER BY nombre_participante DESC
                  LIMIT %s OFFSET %s'''
 
@@ -244,11 +244,11 @@ def constancias_hechas():
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas_constancias
                    WHERE (%s = '' OR nombre_categoria::text = %s)
-                     AND (%s = '' OR fecha ILIKE %s)'''
+                     AND (%s = '' OR fecha ILIKE %s) AND constancia_enviada = true'''
 
     sql_lim = '''SELECT * FROM asistencias_detalladas_constancias
                  WHERE (%s = '' OR nombre_categoria::text = %s)
-                   AND (%s = '' OR fecha ILIKE %s)
+                   AND (%s = '' OR fecha ILIKE %s) AND constancia_enviada = true
                  ORDER BY nombre_participante DESC
                  LIMIT %s OFFSET %s'''
 

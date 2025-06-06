@@ -19,6 +19,7 @@ def cursos_buscar():
     sql_lim = 'SELECT * FROM detalles_curso WHERE estado = true AND (nombre_curso ILIKE %s OR codigo_curso ILIKE %s) ORDER BY id_curso DESC LIMIT %s OFFSET %s;'
     paginado = paginador1(sql_count,sql_lim, search_query, 1, 5)
     return render_template('cursos/cursos.html',
+                           temas = lista_temas(),
                            cursos=paginado[0],
                            page=paginado[1],
                            per_page=paginado[2],

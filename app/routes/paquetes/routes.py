@@ -30,6 +30,7 @@ def paquetes_buscar():
     paginado = paginador2(sql_count, sql_lim, params_count, params_lim, 1 , 5)
 
     return render_template('paquetes/paquetes.html',
+                           categorias = lista_categorias(),
                            paquetes=paginado[0],
                            page=paginado[1],
                            per_page=paginado[2],

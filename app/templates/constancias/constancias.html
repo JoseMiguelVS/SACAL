@@ -125,7 +125,7 @@
                     </td>
                 </form>
             </tr>
-            {% elif not (p.nombre_categoria == 'Especializacion' and p.solo_global and p.constancia_enviada) %}
+            {% elif not (p.nombre_categoria == 'Especializacion' and p.solo_global and p.constancia_enviada == True) %}
             <!-- Mostrar normalmente -->
             <tr data-id="{{ p.id_participante }}">
                 <td>

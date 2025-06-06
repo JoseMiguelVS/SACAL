@@ -16,11 +16,13 @@
 {% endwith %}
 
 <div>
-    <div class="form-container">
-        <!-- --------------------------------------NUEVO CURSO ------------------------------------- -->
-        <a class="botones" href="{{url_for('cursos.curso_agregar')}}"><i class="fa fa-plus"
-            style="font-size: 18px;"></i></a>
-            <!-- -------------------------------------BUSCADOR------------------------------------------ -->
+        <div class="form-container">
+                <!-- --------------------------------------NUEVO CURSO ------------------------------------- -->
+
+                <button type="button" class="botones" data-bs-toggle="modal" data-bs-target="#modalAgregarCurso">
+                        <i class="fa fa-plus" style="font-size: 18px;"></i>Nuevo
+                </button>
+                <!-- -------------------------------------BUSCADOR------------------------------------------ -->
                 <form method="get" action="{{ url_for('cursos.cursos_buscar') }}" class="d-flex">
                         <input class="form-control" type="text" name="buscar" value="{{ search_query }}"
                                 placeholder="Buscar..." required>
@@ -31,7 +33,7 @@
 
 <div class="form-container">
         <a class="botones" href="{{ url_for('temas.temas_buscar') }}">Temas</a>
-    </div>
+</div>
 
 <!-- ------------------------------TABLE -------------------------------- -->
 <div class="tables">
@@ -63,10 +65,14 @@
                                 <td>{{curso.nombre_tipo}}</td>
                                 <td>{{curso.duracion_curso}}</td>
                                 <td>
-                                        <a class="botones-editar"
+                                        <!-- <a class="botones-editar"
                                                 href="{{ url_for('cursos.curso_editar', id = curso.id_curso) }}">
                                                 <li class="fa fa-edit" style="font-size: 18px;"></li>
-                                        </a>
+                                        </a> -->
+                                        <button type="button" class="botones" data-bs-toggle="modal"
+                                                data-bs-target="#modalEditar-{{curso.id_curso}}">
+                                                <li class="fa fa-edit" style="font-size: 18px;"></li>
+                                        </button>
                                 </td>
                                 <td>
                                         <button class="botones-delete" type="button" data-bs-toggle="modal"
@@ -97,7 +103,8 @@
                         </a>
                 </li>
                 {% if page != 1 and page != 2 %}
-                <li class="page-item"><a class="page-link bg-warning" href="{{url_for('cursos.cursos_buscar')}}">1</a></li>
+                <li class="page-item"><a class="page-link bg-warning" href="{{url_for('cursos.cursos_buscar')}}">1</a>
+                </li>
                 {% if page != 3 %}
                 <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
                 {% endif %}
@@ -166,8 +173,108 @@
                 </div>
         </div>
 </div>
+
+<div class="modal fade" id="modalEditar-{{ curso.id_curso }}" data-bs-backdrop="static" data-bs-keyboard="false"
+        tabindex="-1" aria-labelledby="modalEditarLabel-{{ curso.id_curso }}" aria-hidden="true">
+        <div class="modal-dialog">
+                <form action="{{url_for('cursos.cursos_actualizar')}}" enctype="multipart/form-data" method="post"
+                        class="modal-content">
+                        <div class="modal-header">
+                                <h5 class="modal-tittle" id="modalEditarLabel-{{ curso.id_curso }}">Editar curso</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body">
+                                <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+
+                                <label for="">Codigo del curso</label>
+                                <input type="text" id="codigo_curso" placeholder="Codigo curso" name="codigo_curso"
+                                        value="{{curso.codigo_curso}}">
+
+                                <label for="">Nombre del curso</label>
+                                <input type="text" id="nombre_curso" placeholder="Nombre Curso" name="nombre_curso"
+                                        value="{{curso.nombre_curso}}">
+
+                                <label for="">Duracion del curso</label>
+                                <input type="text" id="duracion_curso" placeholder="Duracion Curso"
+                                        name="duracion_curso" value="{{curso.duracion_curso}}">
+
+                                <label for="">Es nacional?</label>
+                                <input type="checkbox" name="es_nacional" id="es_nacional" {% if curso.es_nacional %}
+                                        checked {% endif %}>
+
+                                <!-- ------------------------------------desplegable-------------------------------------------------------------- -->
+                                <select name="id_tema" id="id_tema" class="form-select"
+                                        aria-label="Default select example">
+                                        <option value="true" selected>Tema</option>
+                                        {% if temas %}
+                                        {% for tema in temas %}
+                                        <option value="{{tema.0}}" {% if tema.0==curso.nombre_tema %} selected {% endif
+                                                %}>
+                                                {{tema.1}}</option>
+                                        {% endfor %}
+                                        {% else %}
+                                        <option>Aún no hay registros</option>
+                                        {% endif %}
+                                </select>
+                        </div>
+                        <div class="modal-footer">
+                                <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="botones">Guardar</button>
+                        </div>
+                </form>
+        </div>
+</div>
+
 {% endfor %}
 {% else %}
 {% endif %}
 
-{% endblock %} 
+<div class="modal fade" id="modalAgregarCurso" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="modalAgregarCursoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+                <form action="{{url_for('cursos.cursos_nuevo')}}" enctype="multipart/form-data" method="post"
+                        class="modal-content">
+                        <div class="modal-header">
+                                <h5 class="modal-tittle" id="modalAgregarCursoLabel">Agregar Curso</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body">
+                                <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+
+                                <label for="nombre_usuario">Codigo</label>
+                                <input type="text" id="codigo_curso" placeholder="Codigo" name="codigo_curso" required>
+
+                                <label for="nombre_usuario">Nombre de curso</label>
+                                <input type="text" id="nombre_curso" placeholder="Nombre Curso" name="nombre_curso"
+                                        required>
+
+                                <label for="nombre_usuario">Es nacional?</label>
+                                <input type="checkbox" name="es_nacional" id="es_nacional">
+
+                                <!-- ----------------------------------------Tema-------------------------------------------------------- -->
+                                <select name="id_tema" id="id_tema" aria-label="Default select example">
+                                        <option value="true" selected>Tema</option>
+                                        {% if temas %}
+                                        {% for tema in temas %}
+                                        <option value="{{tema.0}}">{{tema.1}}</option>
+                                        {% endfor %}
+                                        {% else %}
+                                        <option>Aún no hay registros</option>
+                                        {% endif %}
+                                </select>
+
+                                <!-- <label for="nombre_empleado">Nombre completo</label> -->
+                                <input type="text" id="duracion_curso" placeholder="Duracion Curso"
+                                        name="duracion_curso" required>
+                        </div>
+                        <div class="modal-footer">
+                                <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
+                                <button type="submit" class="botones">Guardar</button>
+                        </div>
+                </form>
+        </div>
+</div>
+
+{% endblock %}

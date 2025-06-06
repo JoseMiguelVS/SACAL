@@ -21,10 +21,12 @@
     <form class="formulario" method="POST" action="{{url_for('paquete.paquete_nuevo')}}" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
         <div>
-            <div class="espacio_form">
-                <!-- <label for="nombre_usuario">Nombre de usuario</label> -->
-                <input type="text" id="nombre_paquete" placeholder="Nombre Paquete" name="nombre_paquete" required>
+            <div class="input-group">
+                <input type="text" id="nombre" class="input-field" id=" nombre_paquete" name="nombre_paquete"
+                    placeholder="" required>
+                <label for="nombre" class="input-label">Paquete</label>
             </div>
+
             <div class="espacio_form">
                 <!-- <label for="nombre_empleado">Nombre completo</label> -->
                 <input type="number" id="precio_paquete" placeholder="Precio Paquete" name="precio_paquete" required>
