@@ -62,7 +62,7 @@
                                 </td>
                                 <td>{{curso.nombre_curso}}</td>
                                 <td>{{curso.codigo_curso}}</td>
-                                <td>{{curso.nombre_tipo}}</td>
+                                <td>{{curso.nombre_tema}}</td>
                                 <td>{{curso.duracion_curso}}</td>
                                 <td>
                                         <!-- <a class="botones-editar"
@@ -177,8 +177,8 @@
 <div class="modal fade" id="modalEditar-{{ curso.id_curso }}" data-bs-backdrop="static" data-bs-keyboard="false"
         tabindex="-1" aria-labelledby="modalEditarLabel-{{ curso.id_curso }}" aria-hidden="true">
         <div class="modal-dialog">
-                <form action="{{url_for('cursos.cursos_actualizar')}}" enctype="multipart/form-data" method="post"
-                        class="modal-content">
+                <form action="{{url_for('cursos.curso_actualizar', id = curso.id_curso)}}" enctype="multipart/form-data"
+                        method="post" class="modal-content">
                         <div class="modal-header">
                                 <h5 class="modal-tittle" id="modalEditarLabel-{{ curso.id_curso }}">Editar curso</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
@@ -206,10 +206,10 @@
                                 <!-- ------------------------------------desplegable-------------------------------------------------------------- -->
                                 <select name="id_tema" id="id_tema" class="form-select"
                                         aria-label="Default select example">
-                                        <option value="true" selected>Tema</option>
+                                        <option value="true">Tema</option>
                                         {% if temas %}
                                         {% for tema in temas %}
-                                        <option value="{{tema.0}}" {% if tema.0==curso.nombre_tema %} selected {% endif
+                                        <option value="{{tema.0}}" {% if tema.1==curso.nombre_tipo %} selected {% endif
                                                 %}>
                                                 {{tema.1}}</option>
                                         {% endfor %}
@@ -243,14 +243,14 @@
                         <div class="modal-body">
                                 <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
 
-                                <label for="nombre_usuario">Codigo</label>
+                                <label for="Codigo">Codigo</label>
                                 <input type="text" id="codigo_curso" placeholder="Codigo" name="codigo_curso" required>
 
-                                <label for="nombre_usuario">Nombre de curso</label>
+                                <label for="Curso">Nombre de curso</label>
                                 <input type="text" id="nombre_curso" placeholder="Nombre Curso" name="nombre_curso"
                                         required>
 
-                                <label for="nombre_usuario">Es nacional?</label>
+                                <label for="Nacional">Es nacional?</label>
                                 <input type="checkbox" name="es_nacional" id="es_nacional">
 
                                 <!-- ----------------------------------------Tema-------------------------------------------------------- -->
@@ -265,7 +265,7 @@
                                         {% endif %}
                                 </select>
 
-                                <!-- <label for="nombre_empleado">Nombre completo</label> -->
+                                <label for="nombre_empleado">Duracion del Curso(horas)</label>
                                 <input type="text" id="duracion_curso" placeholder="Duracion Curso"
                                         name="duracion_curso" required>
                         </div>

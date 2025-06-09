@@ -80,8 +80,6 @@ def generar_constancia(participante, qr_path):
     nombre_completo = f'{nombre.upper()} {apellidos.upper()}'
     curso_com = f"\"{curso.upper()}\""
 
-    centro_nombre = draw_centrado(c, nombre_completo, 300, font="Montserrat-Bold", size=18, return_center=True)
-
     match nombre_tipo.lower():
         case 'especializacion':
             texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
@@ -89,6 +87,7 @@ def generar_constancia(participante, qr_path):
             texto_fecha = f"{nombre_mes.upper()} DE {current_year}."
             espe = "ESPECIALIZACIÓN:"
 
+            centro_nombre = draw_centrado(c, nombre_completo, 300, font="Montserrat-Bold", size=18, return_center=True)
             c.setFillColor(HexColor("#003366"))
             draw_texto_centrado_multilinea(c, espe, 230, "Metropolis-Black", 25, 500, x_centro=centro_nombre)
             draw_texto_centrado_multilinea(c, curso_com, 210, "Metropolis-Black", 20, 500, x_centro=centro_nombre)
@@ -107,6 +106,7 @@ def generar_constancia(participante, qr_path):
             texto_fecha = f"{nombre_mes.upper()} DE {current_year}."
             espe = "MINI ESPECIALIZACIÓN:"
 
+            centro_nombre = draw_centrado(c, nombre_completo, 300, font="Montserrat-Bold", size=18, return_center=True)
             c.setFillColor(HexColor("#003366"))
             draw_texto_centrado_multilinea(c, espe, 230, "Metropolis-Black", 25, 500, x_centro=centro_nombre)
             draw_texto_centrado_multilinea(c, curso_com, 210, "Metropolis-Black", 20, 500, x_centro=centro_nombre)
@@ -120,21 +120,23 @@ def generar_constancia(participante, qr_path):
                 c.drawImage(qr_path, x=50, y=25, width=90, height=90)
 
         case 'publico en general':
-            texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
-            realizado = "REALIZADO ONLINE EN VIVO,"
-            texto_fecha = f"EL {dia} DE {nombre_mes.upper()} DE {current_year}."
 
             if duracion_curso == '8':
                 participacion = "POR SU PARTICIPACIÓN EN EL CURSO-TALLER NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO-TALLER INTERNACIONAL"
             else:
                 participacion = "POR SU PARTICIPACIÓN EN EL CURSO NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO INTERNACIONAL"
 
-            draw_centrado(c, participacion, 260, "Montserrat-Bold", 14)
-            draw_texto_centrado_multilinea(c, curso_com, 230, "Metropolis-Black", 25, 500, x_centro=centro_nombre)
+            texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
+            realizado = "REALIZADO ONLINE EN VIVO,"
+            texto_fecha = f"EL {dia} DE {nombre_mes.upper()} DE {current_year}."
 
-            draw_centrado(c, texto_duracion, 180, "Montserrat-Bold", 10)
-            draw_centrado(c, realizado, 165, "Montserrat-Bold", 10)
-            draw_centrado(c, texto_fecha, 150, "Montserrat-Bold", 10)
+            centro_nombre = draw_centrado(c, nombre_completo, 270, font="Montserrat-Bold", size=18, return_center=True)
+            draw_centrado(c, participacion, 230, "Montserrat-Bold", 14)
+            draw_texto_centrado_multilinea(c, curso_com, 200, "Metropolis-Black", 25, 500, x_centro=centro_nombre)
+
+            draw_centrado(c, texto_duracion, 150, "Montserrat-Bold", 10)
+            draw_centrado(c, realizado, 135, "Montserrat-Bold", 10)
+            draw_centrado(c, texto_fecha, 120, "Montserrat-Bold", 10)   
 
             if qr_path:
                 c.drawImage(qr_path, x=250, y=25, width=90, height=90)
@@ -149,6 +151,7 @@ def generar_constancia(participante, qr_path):
             else:
                 participacion = "POR SU PARTICIPACIÓN EN EL CURSO NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO INTERNACIONAL"
 
+            centro_nombre = draw_centrado(c, nombre_completo, 300, font="Montserrat-Bold", size=18, return_center=True)
             draw_centrado(c, participacion, 260, "Montserrat-Bold", 14)
             draw_texto_centrado_multilinea(c, curso_com, 230, "Metropolis-Black", 25, 500, x_centro=centro_nombre)
 
@@ -160,24 +163,26 @@ def generar_constancia(participante, qr_path):
                 c.drawImage(qr_path, x=250, y=25, width=90, height=90)
 
         case 'psicologia':
-            texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
-            realizado = "REALIZADO ONLINE EN VIVO,"
-            texto_fecha = f"EL {dia} DE {nombre_mes.upper()} DE {current_year}."
 
             if duracion_curso == '8':
                 participacion = "POR SU PARTICIPACIÓN EN EL CURSO-TALLER NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO-TALLER INTERNACIONAL"
             else:
                 participacion = "POR SU PARTICIPACIÓN EN EL CURSO NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO INTERNACIONAL"
 
-            draw_centrado(c, participacion, 260, "Montserrat-Bold", 14)
-            draw_texto_centrado_multilinea(c, curso_com, 230, "Metropolis-Black", 25, 500, x_centro=centro_nombre)
+            texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
+            realizado = "REALIZADO ONLINE EN VIVO,"
+            texto_fecha = f"EL {dia} DE {nombre_mes.upper()} DE {current_year}."
 
-            draw_centrado(c, texto_duracion, 180, "Montserrat-Bold", 10)
-            draw_centrado(c, realizado, 165, "Montserrat-Bold", 10)
-            draw_centrado(c, texto_fecha, 150, "Montserrat-Bold", 10)
+            centro_nombre = draw_centrado(c, nombre_completo, 270, font="Montserrat-Bold", size=18, return_center=True)
+            draw_centrado(c, participacion, 230, "Montserrat-Bold", 14)
+            draw_texto_centrado_multilinea(c, curso_com, 200, "Metropolis-Black", 25, 500, x_centro=centro_nombre)
+
+            draw_centrado(c, texto_duracion, 150, "Montserrat-Bold", 10)
+            draw_centrado(c, realizado, 135, "Montserrat-Bold", 10)
+            draw_centrado(c, texto_fecha, 120, "Montserrat-Bold", 10)
 
             if qr_path:
-                c.drawImage(qr_path, x=50, y=25, width=90, height=90)
+                c.drawImage(qr_path, x=50, y=25, width=150, height=150)
 
     c.save()
     packet.seek(0)

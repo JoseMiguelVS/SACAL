@@ -34,23 +34,26 @@ def curso_agregar():
     titulo = 'Agregar curso'
     return render_template('cursos/cursos_agregar.html', titulo = titulo, temas = lista_temas())
 
-@cursos.route("/cursos/agregar/nuevo",methods = ('GET', 'POST'))
+@cursos.route("/cursos/agregar/nuevo", methods=('GET', 'POST'))
 @login_required
 def cursos_nuevo():
     if request.method == 'POST':
-        nombre_curso = request.form['nombre_curso']
         codigo_curso = request.form['codigo_curso']
-        duracion_curso = request.form['duracion_curso']
+        nombre_curso = request.form['nombre_curso']
         tema_curso = request.form['id_tema']
-        es_nacional = request.form['es_nacional']
+        duracion_curso = request.form['duracion_curso']
+
+        # Validación para 'es_nacional': si no viene, asignar None
+        es_nacional = request.form.get('es_nacional') or None
+
         estado = True
-        fecha_creacion= datetime.now()
+        fecha_creacion = datetime.now()
         fecha_modificacion = datetime.now()
-            
+
         con = get_db_connection()
         cur = con.cursor(cursor_factory=RealDictCursor)
         sql_validar = 'SELECT COUNT(*) FROM cursos WHERE nombre_curso = %s'
-        cur.execute(sql_validar,(nombre_curso,))
+        cur.execute(sql_validar, (nombre_curso,))
         existe = cur.fetchone()['count']
         if existe:
             cur.close()
@@ -58,8 +61,10 @@ def cursos_nuevo():
             flash('Error: el curso ya existe. Intente con otro')
             return redirect(url_for('cursos.curso_agregar'))
         else:
-            sql = 'INSERT INTO cursos (nombre_curso,codigo_curso, tema_curso, duracion_curso,es_nacional , estado, fecha_creacion, fecha_modificacion) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
-            valores = (nombre_curso,codigo_curso, tema_curso, duracion_curso,es_nacional , estado, fecha_creacion, fecha_modificacion)
+            sql = '''INSERT INTO cursos 
+                     (nombre_curso, codigo_curso, tema_curso, duracion_curso, es_nacional, estado, fecha_creacion, fecha_modificacion) 
+                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'''
+            valores = (nombre_curso, codigo_curso, tema_curso, duracion_curso, es_nacional, estado, fecha_creacion, fecha_modificacion)
             cur.execute(sql, valores)
             con.commit()
             cur.close()
@@ -95,14 +100,14 @@ def curso_editar(id):
     con.close()
     return render_template('cursos/curso_editar.html',curso = curso[0], temas = lista_temas() )
 
-@cursos.route('/cursos/editar/<string:id>',methods=['POST'])
+@cursos.route('/cursos/editar/<string:id>', methods=['POST', 'GET'])
 @login_required
 def curso_actualizar(id):
     if request.method == 'POST':
         nombre_curso = request.form['nombre_curso']
         codigo_curso = request.form['codigo_curso']
         tema_curso = request.form['id_tema']
-        es_nacional = request.form['es_nacional']
+        es_nacional = request.form.get('es_nacional') or None
         duracion_curso = request.form['duracion_curso']
         fecha_modificacion= datetime.now()
         

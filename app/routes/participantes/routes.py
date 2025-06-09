@@ -3,7 +3,7 @@ from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
 
-from utils.listas import lista_cuentas, lista_cursos, lista_paquetes, lista_sesiones
+from utils.listas import lista_cuentas, lista_cursos, lista_meses, lista_paquetes, lista_sesiones, lista_semanas
 
 from ..utils.utils import get_db_connection, paginador3
 
@@ -33,7 +33,9 @@ def participantes_buscar():
     )
 
     return render_template('participantes/participantes.html',
-                           cursos=lista_cursos(),
+                           mes = lista_meses(),
+                           cursos = lista_cursos(),
+                           semanas = lista_semanas(),
                            sesiones = lista_sesiones(),
                            paquetes = lista_paquetes(),
                            cuentas = lista_cuentas(),

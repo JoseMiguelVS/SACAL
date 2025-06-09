@@ -155,7 +155,8 @@
                                         aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                                ¿Deseas eliminar el empleado <strong>{{ empleado.nombre_empleado }} {{ empleado.apellido_pat
+                                ¿Deseas eliminar el empleado <strong>{{ empleado.nombre_empleado }} {{
+                                        empleado.apellido_pat
                                         }}</strong>?
                         </div>
                         <div class="modal-footer">
@@ -275,5 +276,14 @@
         </div>
 </div>
 
+<script>
+        const socket = io();
+
+        socket.on('empleado_actualizado', function (data) {
+                console.log("Cambios detectados en empleados:", data);
+                // Aquí puedes actualizar solo la tabla vía AJAX si quieres
+                location.reload(); // refresca toda la página
+        });
+</script>
 
 {% endblock %}

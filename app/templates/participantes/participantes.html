@@ -36,7 +36,17 @@
     <div class="mx-auto" style="width: 60%;">
         <form method="get" action="{{ url_for('participantes.participantes_buscar') }}"
             class="d-flex align-items-center justify-content-center gap-2 flex-wrap">
-            <!-- SELECT CURSO -->
+
+            <div class="espacio_form">
+                <select name="mes" id="mes" class="form-select">
+                    <option value="">Mes</option>
+                    {% if meses %}
+                    {% for m in meses %}
+                    <option value="{{ mes.0 }}">{{ m.2 }}</option>
+                </select>
+            </div>
+
+            <!-- SELECT CURSO
             <div class="espacio_form">
                 <select name="nombre_curso" id="nombre_curso" class="form-select">
                     <option value="">-Seleccione el curso-</option>
@@ -54,7 +64,7 @@
                 </select>
             </div>
 
-            <!-- SELECT SESIÓN -->
+            SELECT SESIÓN
             <div class="espacio_form">
                 <select name="sesion" id="sesion" class="form-select">
                     <option value="">-Seleccione la sesión-</option>
@@ -70,7 +80,7 @@
                     <option>Aún no hay registros</option>
                     {% endif %}
                 </select>
-            </div>
+            </div> -->
 
             <!-- BOTÓN ACEPTAR -->
             <button type="submit" class="btn btn-primary">Aceptar</button>

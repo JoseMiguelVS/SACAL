@@ -95,7 +95,7 @@ def folio_constancia():
 
 
 @constancias.route("/constancias/folio/generar")
-@login_required
+@login_required 
 def constancias_generar():
     id = request.args.get("id")
     curso = request.args.get("curso")

@@ -9,26 +9,24 @@
 <table>
   <thead>
     <tr>
-        <th>Nombre curso</th>
-        <th>Codigo</th>
-        <th>Tema</th>
-        <th>Tipo</th>
-        <th>Duracion</th>
+      <th>Nombre curso</th>
+      <th>Codigo</th>
+      <th>Tema</th>
+      <th>Sector</th>
+      <th>Duracion</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-        <td>{{curso.nombre_curso}}</td>
-        <td>{{curso.codigo_curso}}</td>
-        <td>{{curso.nombre_tema}}</td>
-        <td>{{curso.nombre_tipo}}</td>
-        <td>{{curso.duracion_curso}}</td>
+      <td>{{curso.nombre_curso}}</td>
+      <td>{{curso.codigo_curso}}</td>
+      <td>{{curso.nombre_tema}}</td>
+      <td>{{curso.nombre_tipo}}</td>
+      <td>{{curso.duracion_curso}}</td>
     </tr>
   </tbody>
 </table>
 <div>
-  <a
-    class="botones"
-    href="{{ url_for('cursos.cursos_buscar') }}">Cancelar</a>
+  <a class="botones" href="{{ url_for('cursos.cursos_buscar') }}">Cancelar</a>
 </div>
 {% endblock %}
