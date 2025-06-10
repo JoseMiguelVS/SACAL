@@ -1,6 +1,9 @@
 {% extends './layout.html' %}
 {% block body %}
-
+<!-- BOTÓN ATRÁS IZQUIERDA -->
+<a href="{{ url_for('index') }}" class="botones">
+    <i class="fas fa-arrow-left"></i>
+</a>
 <!-- TÍTULO -->
 <h2 class="text-center">Participantes</h2>
 
@@ -30,11 +33,6 @@
 
 <!-- CONTENEDOR FLEX PRINCIPAL -->
 <div class="d-flex justify-content-between align-items-center mb-3">
-
-    <!-- BOTÓN ATRÁS IZQUIERDA -->
-    <a href="{{ url_for('index') }}" class="botones">
-        <i class="fas fa-arrow-left"></i>
-    </a>
 
     <!-- FORMULARIO CENTRADO -->
     <div class="mx-auto" style="width: 60%;">
@@ -180,8 +178,13 @@
             {% set partes = request.args.get('fecha').split(',') %}
             {% if partes|length == 4 %}
             Fecha: {{ partes[1] }}<br>
-            Hora de inicio: {{ partes[2] }}<br>
+            Hora de inicio: {{ partes[2] }}<br> 
             Hora de fin: {{ partes[3] }}
+            {% if sesiones %}
+            {% if partes[1] == fecha and partes[2] == horario_inicio and partes[3] == horario_fin %}
+            Curso: {{ sesiones.7 }}
+            {% endif %}
+            {% endif %}
             {% endif %}
             {% endif %}
         </div>
@@ -288,29 +291,6 @@
                 <p>Sesion: {{ partesSesiones[1] }}, {{ partesSesiones[2] }}, {{ partesSesiones[3] }}</p>
                 {% endif %}
                 {% endif %}
-
-
-                <!-- {% set fecha_raw = request.args.get('fecha', '') %}
-                {% set fecha = '' %}
-                {% set hora_inicio = '' %}
-                {% set hora_fin = '' %}
-
-                {% if fecha_raw %}
-                {% set partes = fecha_raw.split(',') %}
-                {% if partes | length == 3 %}
-                {% set fecha = partes[0] %}
-                {% set hora_inicio = partes[1] %}
-                {% set hora_fin = partes[2] %}
-
-                {% set id_sesion = 'No hay sesion' %}
-                {% for sesion in sesiones %}
-                {% if sesion[1] == fecha and sesion[2] == hora_inicio and sesion[3] == hora_fin %}
-                {% set id_sesion = sesion[0] %}
-                {% endif %}
-                {% endfor %}
-                <input type="hidden" name="id_sesion" id="id_sesion" value="{{ id_sesion }}">
-                {% endif %}
-                {% endif %} -->
 
                 <div class="row g-3">
                     <!-- Clave -->

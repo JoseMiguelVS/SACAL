@@ -23,10 +23,6 @@ def participantes_buscar():
         if len(partes) == 3:
             fecha, hora_inicio, hora_fin = partes
 
-    # Ahora puedes usar 'fecha', 'hora_inicio' y 'hora_fin'
-    # Si quieres agregar filtros por hora también:
-    print(f"Fecha: {fecha}, Hora inicio: {hora_inicio}, Hora fin: {hora_fin}")
-
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
                    WHERE (%s = '' OR meses ILIKE %s)
                      AND (%s = '' OR semanas ILIKE %s)
