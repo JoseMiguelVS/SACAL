@@ -13,27 +13,39 @@ participantes = Blueprint('participantes', __name__)
 @participantes.route("/participantes")
 @login_required
 def participantes_buscar():
-    nombre_curso = request.args.get('nombre_curso', '', type=str)
-    sesion = request.args.get('sesion', '', type=str)
+    mes = request.args.get('mes', '', type=str)
+    semana = request.args.get('semana', '', type=str)
+    fecha_raw = request.args.get('fecha', '', type=str)
+
+    fecha = hora_inicio = hora_fin = ''
+    if fecha_raw:
+        partes = fecha_raw.split(',')
+        if len(partes) == 3:
+            fecha, hora_inicio, hora_fin = partes
+
+    # Ahora puedes usar 'fecha', 'hora_inicio' y 'hora_fin'
+    # Si quieres agregar filtros por hora también:
+    print(f"Fecha: {fecha}, Hora inicio: {hora_inicio}, Hora fin: {hora_fin}")
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
-                   WHERE (%s = '' OR cursos::text = %s)
+                   WHERE (%s = '' OR meses ILIKE %s)
+                     AND (%s = '' OR semanas ILIKE %s)
                      AND (%s = '' OR fecha ILIKE %s)'''
 
     sql_lim = '''SELECT * FROM asistencias_detalladas
-                 WHERE (%s = '' OR cursos::text = %s)
+                 WHERE (%s = '' OR meses ILIKE %s)
+                   AND (%s = '' OR semanas ILIKE %s)
                    AND (%s = '' OR fecha ILIKE %s)
                  ORDER BY nombre_participante DESC
                  LIMIT %s OFFSET %s'''
-
     paginado = paginador3(
         sql_count, sql_lim,
-        [nombre_curso, nombre_curso, sesion, sesion],
+        [mes, mes, semana, semana, fecha, fecha],
         1, 50
     )
 
     return render_template('participantes/participantes.html',
-                           mes = lista_meses(),
+                           meses = lista_meses(),
                            cursos = lista_cursos(),
                            semanas = lista_semanas(),
                            sesiones = lista_sesiones(),
