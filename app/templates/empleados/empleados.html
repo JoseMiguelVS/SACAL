@@ -19,7 +19,7 @@
 
 <!-- ----------------------------- FORMULARIO Y BUSCADOR ----------------------------- -->
 <div class="form-container d-flex align-items-center mb-3">
-        <button type="button" class="botones" data-bs-toggle="modal" data-bs-target="#modalAgregarEmpleado"><i
+        <button type="button" class="botones m-2" data-bs-toggle="modal" data-bs-target="#modalAgregarEmpleado"><i
                         class="fa fa-plus" style="font-size: 18px;"></i>Nuevo</button>
 
         <form method="get" action="{{ url_for('empleados.empleadosBuscar') }}" class="d-flex">
@@ -30,8 +30,8 @@
 </div>
 
 <!-- ----------------------------- TABLA DE EMPLEADOS ----------------------------- -->
-<div class="tables table-responsive table-striped table-hover ">
-        <table class="table table-bordered">
+<div class="table-responsive table-sm">
+        <table class="table-hover ">
                 <thead>
                         <tr>
                                 <th>Ver</th>

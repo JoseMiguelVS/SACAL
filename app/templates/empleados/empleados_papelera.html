@@ -1,154 +1,147 @@
 {% extends './layout.html' %}
 {% block body %}
-<h2 class="mb-4 text-center">Papelera de Empleados</h2>
+<div class="main">
+        <a href="{{ url_for('empleados.empleadosBuscar') }}" class="botones">
+                <i class="fas fa-arrow-left"></i>
+        </a>
+        <h2 class="mb-4 text-center">Papelera de Empleados</h2>
+</div>
+<!-- ALERTAS FLASH -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert 
+{% if 'Error' in message %}alert-danger
+{% elif 'Advertencia' in message %}alert-warning
+{% else %}alert-success{% endif %} 
+alert-dismissible fade show" role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+<!-- BUSCADOR -->
+<div class="form-container">
+        <form method="get" action="{{ url_for('empleados.empleados_papelera') }}" class="d-flex" role="search"
+                style="width: 300px;">
+                <input class="form-control me-2" type="search" name="buscar" value="{{ search_query }}"
+                        placeholder="Buscar..." aria-label="Buscar" required>
+                <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+        </form>
+</div>
+<!-- TABLA -->
+<div>
+        <table class="table-responsive tables">
+                <thead>
+                        <tr>
+                                <th>Nombre usuario</th>
+                                <th>Nombre empleado</th>
+                                <th>Correo electrónico</th>
+                                <th>Restaurar</th>
+                        </tr>
+                </thead>
+                <tbody>
+                        {% if empleados %}
+                        {% for empleado in empleados %}
+                        {% if not empleado.estado %}
+                        <tr>
+                                <td>{{ empleado.nombre_usuario }}</td>
+                                <td>{{ empleado.nombre_empleado }}</td>
+                                <td>{{ empleado.correo_empleado }}</td>
+                                <td>
+                                        <button class="btn btn-sm btn-outline-success" type="button"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#restaurarModal-{{ empleado.id_empleado }}">
+                                                <i class="fas fa-sync-alt"></i>
+                                        </button>
+                                </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                                <td colspan="4" class="text-center">No existen empleados en la papelera</td>
+                        </tr>
+                        {% endif %}
+                </tbody>
+        </table>
+</div>
 
-<div class="container mt-4">
-        <!-- ALERTAS FLASH -->
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        {% for message in messages %}
-        <div class="alert 
-        {% if 'Error' in message %}alert-danger
-        {% elif 'Advertencia' in message %}alert-warning
-        {% else %}alert-success{% endif %} 
-        alert-dismissible fade show" role="alert">
-                <strong>{{ message }}</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-        </div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
+<!-- PAGINACIÓN -->
+<nav aria-label="Paginación" class="mt-4">
+        <ul class="pagination justify-content-center">
+                {% if page > 1 %}
+                <li class="page-item">
+                        <a class="page-link bg-warning"
+                                href="{{ url_for('empleados.empleados_papelera') }}?page={{ page - 1 }}&per_page={{ per_page }}"
+                                aria-label="Anterior">&laquo;</a>
+                </li>
+                {% if page > 2 %}
+                <li class="page-item"><a class="page-link bg-warning"
+                                href="{{ url_for('empleados.empleados_papelera') }}?page=1&per_page={{ per_page }}">1</a>
+                </li>
+                {% if page > 3 %}
+                <li class="page-item disabled"><span class="page-link bg-warning">...</span></li>
+                {% endif %}
+                {% endif %}
+                <li class="page-item"><a class="page-link bg-warning"
+                                href="{{ url_for('empleados.empleados_papelera') }}?page={{ page - 1 }}&per_page={{ per_page }}">{{
+                                page - 1 }}</a></li>
+                {% endif %}
 
-        <!-- BUSCADOR -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
-                <a href="{{ url_for('empleados.empleadosBuscar') }}" class="botones">
-                        <i class="fas fa-arrow-left"></i>
-                </a>
-                <div class="mx-auto" style="width: 50%;">
-                        <form method="get" action="{{ url_for('empleados.empleados_papelera') }}" class="d-flex"
-                                role="search" style="width: 300px;">
-                                <input class="form-control me-2" type="search" name="buscar" value="{{ search_query }}"
-                                        placeholder="Buscar..." aria-label="Buscar" required>
-                                <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
-                        </form>
-                </div>
-        </div>
+                <li class="page-item active"><span class="page-link bg-warning">{{ page }}</span></li>
 
-        <!-- TABLA -->
-        <div class="table-responsive">
-                <table class="table align-middle text-center">
-                        <thead class="">
-                                <tr>
-                                        <th>Nombre usuario</th>
-                                        <th>Nombre empleado</th>
-                                        <th>Correo electrónico</th>
-                                        <th>Restaurar</th>
-                                </tr>
-                        </thead>
-                        <tbody>
-                                {% if empleados %}
-                                {% for empleado in empleados %}
-                                {% if not empleado.estado %}
-                                <tr>
-                                        <td>{{ empleado.nombre_usuario }}</td>
-                                        <td>{{ empleado.nombre_empleado }}</td>
-                                        <td>{{ empleado.correo_empleado }}</td>
-                                        <td>
-                                                <button class="btn btn-sm btn-outline-success" type="button"
-                                                        data-bs-toggle="modal"
-                                                        data-bs-target="#restaurarModal-{{ empleado.id_empleado }}">
-                                                        <i class="fas fa-sync-alt"></i>
-                                                </button>
-                                        </td>
-                                </tr>
+                {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
+                                href="{{ url_for('empleados.empleados_papelera') }}?page={{ page + 1 }}&per_page={{ per_page }}">{{
+                                page + 1 }}</a></li>
+                        {% if page < total_pages - 1 %} {% if page < total_pages - 2 %} <li class="page-item disabled">
+                                <span class="page-link bg-warning">...</span></li>
                                 {% endif %}
-                                {% endfor %}
-                                {% else %}
-                                <tr>
-                                        <td colspan="4" class="text-center">No existen empleados en la papelera</td>
-                                </tr>
+                                <li class="page-item"><a class="page-link bg-warning"
+                                                href="{{ url_for('empleados.empleados_papelera') }}?page={{ total_pages }}&per_page={{ per_page }}">{{
+                                                total_pages }}</a></li>
                                 {% endif %}
-                        </tbody>
-                </table>
-        </div>
+                                <li class="page-item">
+                                        <a class="page-link bg-warning"
+                                                href="{{ url_for('empleados.empleados_papelera') }}?page={{ page + 1 }}&per_page={{ per_page }}"
+                                                aria-label="Siguiente">&raquo;</a>
+                                </li>
+                                {% endif %}
+        </ul>
+</nav>
 
-        <!-- PAGINACIÓN -->
-        <nav aria-label="Paginación" class="mt-4">
-                <ul class="pagination justify-content-center">
-                        {% if page > 1 %}
-                        <li class="page-item">
-                                <a class="page-link bg-warning"
-                                        href="{{ url_for('empleados.empleados_papelera') }}?page={{ page - 1 }}&per_page={{ per_page }}"
-                                        aria-label="Anterior">&laquo;</a>
-                        </li>
-                        {% if page > 2 %}
-                        <li class="page-item"><a class="page-link bg-warning"
-                                        href="{{ url_for('empleados.empleados_papelera') }}?page=1&per_page={{ per_page }}">1</a>
-                        </li>
-                        {% if page > 3 %}
-                        <li class="page-item disabled"><span class="page-link bg-warning">...</span></li>
-                        {% endif %}
-                        {% endif %}
-                        <li class="page-item"><a class="page-link bg-warning"
-                                        href="{{ url_for('empleados.empleados_papelera') }}?page={{ page - 1 }}&per_page={{ per_page }}">{{
-                                        page - 1 }}</a></li>
-                        {% endif %}
-
-                        <li class="page-item active"><span class="page-link bg-warning">{{ page }}</span></li>
-
-                        {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
-                                        href="{{ url_for('empleados.empleados_papelera') }}?page={{ page + 1 }}&per_page={{ per_page }}">{{
-                                        page + 1 }}</a></li>
-                                {% if page < total_pages - 1 %} {% if page < total_pages - 2 %} <li
-                                        class="page-item disabled">
-                                        <span class="page-link bg-warning">...</span></li>
-                                        {% endif %}
-                                        <li class="page-item"><a class="page-link bg-warning"
-                                                        href="{{ url_for('empleados.empleados_papelera') }}?page={{ total_pages }}&per_page={{ per_page }}">{{
-                                                        total_pages }}</a></li>
-                                        {% endif %}
-                                        <li class="page-item">
-                                                <a class="page-link bg-warning"
-                                                        href="{{ url_for('empleados.empleados_papelera') }}?page={{ page + 1 }}&per_page={{ per_page }}"
-                                                        aria-label="Siguiente">&raquo;</a>
-                                        </li>
-                                        {% endif %}
-                </ul>
-        </nav>
-
-        <!-- MODALES DE CONFIRMACIÓN PARA RESTAURAR -->
-        {% for empleado in empleados %}
-        {% if not empleado.estado %}
-        <div class="modal fade" id="restaurarModal-{{ empleado.id_empleado }}" tabindex="-1"
-                aria-labelledby="restaurarModalLabel-{{ empleado.id_empleado }}" aria-hidden="true"
-                data-bs-backdrop="static" data-bs-keyboard="false">
-                <div class="modal-dialog">
-                        <div class="modal-content">
-                                <div class="modal-header">
-                                        <h5 class="modal-title" id="restaurarModalLabel-{{ empleado.id_empleado }}">
-                                                Confirmar
-                                                restauración</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Cerrar"></button>
-                                </div>
-                                <div class="modal-body">
-                                        ¿Deseas restaurar al empleado <strong>{{ empleado.nombre_usuario }} - {{
-                                                empleado.nombre_empleado }}</strong>?
-                                </div>
-                                <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                                data-bs-dismiss="modal">Cancelar</button>
-                                        <a href="{{ url_for('empleados.empleados_restaurar', id=empleado.id_empleado) }}"
-                                                class="btn btn-warning">
-                                                <i class="fas fa-sync-alt"></i> Restaurar
-                                        </a>
-                                </div>
+<!-- MODALES DE CONFIRMACIÓN PARA RESTAURAR -->
+{% for empleado in empleados %}
+{% if not empleado.estado %}
+<div class="modal fade" id="restaurarModal-{{ empleado.id_empleado }}" tabindex="-1"
+        aria-labelledby="restaurarModalLabel-{{ empleado.id_empleado }}" aria-hidden="true" data-bs-backdrop="static"
+        data-bs-keyboard="false">
+        <div class="modal-dialog">
+                <div class="modal-content">
+                        <div class="modal-header">
+                                <h5 class="modal-title" id="restaurarModalLabel-{{ empleado.id_empleado }}">
+                                        Confirmar
+                                        restauración</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body">
+                                ¿Deseas restaurar al empleado <strong>{{ empleado.nombre_usuario }} - {{
+                                        empleado.nombre_empleado }}</strong>?
+                        </div>
+                        <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Cancelar</button>
+                                <a href="{{ url_for('empleados.empleados_restaurar', id=empleado.id_empleado) }}"
+                                        class="btn btn-warning">
+                                        <i class="fas fa-sync-alt"></i> Restaurar
+                                </a>
                         </div>
                 </div>
         </div>
-        {% endif %}
-        {% endfor %}
-
 </div>
+{% endif %}
+{% endfor %}
 
 {% endblock %}
