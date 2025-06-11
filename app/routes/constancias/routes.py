@@ -5,46 +5,58 @@ from psycopg2.extras import RealDictCursor
 
 from ..constancias.generador import generar_constancia
 from ..constancias.qr import generar_qr
-from utils.listas import lista_categorias, lista_cuentas, lista_cursos, lista_paquetes, lista_ponente, lista_privilegios, lista_sesiones
+from utils.listas import lista_categorias, lista_cuentas, lista_cursos, lista_meses, lista_paquetes, lista_ponente, lista_privilegios, lista_semanas, lista_sesiones
 
 from ..utils.utils import get_db_connection, paginador3
 
 constancias = Blueprint('constancias', __name__)
 
-@constancias.route("/constancias")
+@constancias.route("/constancias") 
 @login_required
 def constancias_buscar():
-    nombre_categoria = request.args.get('nombre_categoria', '', type=str)
-    sesion = request.args.get('sesion', '', type=str)
+    nombre_mes = request.args.get('mes', '', type=str)
+    semana = request.args.get('semana', '', type=str)
+    fecha = request.args.get('fecha', '', type=str)  # Usar directamente el valor completo
 
-    sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas_constancias
-                   WHERE (%s = '' OR nombre_categoria::text = %s)
-                     AND (%s = '' OR fecha ILIKE %s) AND constancia_enviada = False'''
+    sql_count = '''
+        SELECT COUNT(*) FROM asistencias_detalladas_constancias
+        WHERE (%s = '' OR nombre_mes ILIKE %s)
+          AND (%s = '' OR semana ILIKE %s)
+          AND (%s = '' OR fecha ILIKE %s) 
+          AND constancia_enviada = False
+    '''
 
-    sql_lim = '''SELECT * FROM asistencias_detalladas_constancias
-                 WHERE (%s = '' OR nombre_categoria::text = %s)
-                   AND (%s = '' OR fecha ILIKE %s) AND constancia_enviada = False
-                 ORDER BY nombre_participante DESC
-                 LIMIT %s OFFSET %s'''
+    sql_lim = '''
+        SELECT * FROM asistencias_detalladas_constancias
+        WHERE (%s = '' OR nombre_mes ILIKE %s)
+          AND (%s = '' OR semana ILIKE %s)
+          AND (%s = '' OR fecha ILIKE %s) 
+          AND constancia_enviada = False
+        ORDER BY nombre_participante DESC
+        LIMIT %s OFFSET %s
+    '''
 
     paginado = paginador3(
         sql_count, sql_lim,
-        [nombre_categoria, nombre_categoria, sesion, sesion],
-        1, 20
+        [nombre_mes, nombre_mes, semana, semana, fecha, fecha],
+        1, 50
     )
 
     return render_template('constancias/constancias.html',
-                           categorias = lista_categorias(),
+                           categorias=lista_categorias(),
                            cursos=lista_cursos(),
-                           sesiones = lista_sesiones(),
-                           paquetes = lista_paquetes(),
-                           cuentas = lista_cuentas(),
-                           privilegios = lista_privilegios(),
+                           sesiones=lista_sesiones(),
+                           paquetes=lista_paquetes(),
+                           cuentas=lista_cuentas(),
+                           privilegios=lista_privilegios(),
+                           meses=lista_meses(),
+                           semanas=lista_semanas(),
                            constancias=paginado[0],
                            page=paginado[1],
                            per_page=paginado[2],
                            total_items=paginado[3],
                            total_pages=paginado[4])
+
 
 #------------------------------------------------------DETALLES-----------------------------------------------------
 

@@ -20,9 +20,9 @@ pdfmetrics.registerFont(TTFont('Metropolis-Bold', 'static/fonts/Metropolis-Bold.
 # -------------------------------------------
 def draw_centrado(c, texto, y, font="Helvetica", size=12, return_center=False):
     c.setFont(font, size)
-    page_height = c._pagesize[1]
+    page_width = c._pagesize[0]  # Ancho de la página, no altura
     text_width = c.stringWidth(texto, font, size)
-    x = (page_height - text_width) / 2
+    x = (page_width - text_width) / 2
     c.drawString(x, y, texto)
     if return_center:
         return x + text_width / 2
@@ -33,6 +33,7 @@ def draw_texto_centrado_multilinea(c, texto, y_inicial, font_name="Helvetica", f
     Dibuja texto centrado horizontalmente. Si se pasa x_centro, alinea usando ese centro en lugar del centro de la hoja.
     """
     c.setFont(font_name, font_size)
+    page_width = c._pagesize[0]  # Ancho, no altura
 
     palabras = texto.strip().split()
     lineas = []
@@ -55,7 +56,7 @@ def draw_texto_centrado_multilinea(c, texto, y_inicial, font_name="Helvetica", f
         if x_centro:
             x = x_centro - (text_width / 2)
         else:
-            x = (page_height - text_width) / 2
+            x = (page_width - text_width) / 2
         c.drawString(x, y, linea)
         y -= font_size + line_spacing
 

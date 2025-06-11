@@ -64,48 +64,13 @@
                 </select>
             </div>
 
-            <!-- SELECT CURSO
-            <div class="espacio_form">
-                <select name="nombre_curso" id="nombre_curso" class="form-select">
-                    <option value="">-Seleccione el curso-</option>
-                    {% if cursos %}
-                    {% for curso in cursos %}
-                    {% if curso.2 == True %}
-                    <option value="{{ curso.1 }}" {% if request.args.get('nombre_curso')==curso.1 %}selected{% endif %}>
-                        {{ curso.1 }}
-                    </option>
-                    {% endif %}
-                    {% endfor %}
-                    {% else %}
-                    <option>Aún no hay registros</option>
-                    {% endif %}
-                </select>
-            </div>
-
-            SELECT SESIÓN
-            <div class="espacio_form">
-                <select name="sesion" id="sesion" class="form-select">
-                    <option value="">-Seleccione la sesión-</option>
-                    {% if sesiones %}
-                    {% for sesion in sesiones %}
-                    {% if sesion.4 == True %}
-                    <option value="{{ sesion.1 }}" {% if request.args.get('sesion')==sesion.1 %}selected{% endif %}>
-                        {{ sesion.1 }} | {{ sesion.2 }} -{{ sesion.3 }}
-                    </option>
-                    {% endif %}
-                    {% endfor %}
-                    {% else %}
-                    <option>Aún no hay registros</option>
-                    {% endif %}
-                </select>
-            </div> -->
-
             <!-- BOTÓN ACEPTAR -->
             <button type="submit" class="btn btn-primary">Aceptar</button>
             <a href="{{ url_for('participantes.participantes_buscar') }}" class="botones">Limpiar filtros</a>
 
         </form>
     </div>
+    
 </div>
 
 <!-- MÁS HERRAMIENTAS -->
