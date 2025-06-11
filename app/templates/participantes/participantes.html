@@ -70,7 +70,7 @@
 
         </form>
     </div>
-    
+
 </div>
 
 <!-- MÁS HERRAMIENTAS -->
@@ -81,7 +81,7 @@
 <!-- TABLA DE PARTICIPANTES -->
 
 <div class="tables_participantes">
-    <div class="tables">
+    <div class="tables ">
         <thead>
             <tr>
                 <th>
@@ -153,7 +153,7 @@
         {% endif %}
     </div>
 
-    <table>
+    <table class="mb-5">
         <thead>
             <tr>
                 <th>Clave</th>
@@ -327,6 +327,52 @@
         </form>
     </div>
 </div>
+
+<!-- -------------------------------------------------PAGINADOR----------------------------------------------- -->
+<nav class="paginati" aria-label="Page navigation" class="justify-content-center">
+    <ul class="pagination justify-content-center" style="margin:20px 0">
+            {% if page > 1 %}
+            <li class="page-item">
+                    <a class="page-link bg-warning"
+                            href="{{url_for('participantes.participantes_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                            aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                    </a>
+            </li>
+            {% if page != 1 and page != 2 %}
+            <li class="page-item"><a class="page-link bg-warning" href="{{url_for('participantes.participantes_buscar')}}">1</a></li>
+            {% if page != 3 %}
+            <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
+            {% endif %}
+            {% endif %}
+            <li class="page-item"><a class="page-link bg-warning"
+                            href="{{url_for('participantes.participantes_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+            </li>
+            {% endif %}
+
+            <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
+
+            {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
+                            href="{{url_for('participantes.participantes_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+                    </li>
+                    {% if page != total_pages and page != total_pages-1 %}
+                    {% if page != total_pages-2 %}
+                    <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
+                    {% endif %}
+                    <li class="page-item"><a class="page-link bg-warning"
+                                    href="{{url_for('participantes.participantes_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                    </li>
+                    {% endif %}
+                    <li class="page-item">
+                            <a class="page-link bg-warning"
+                                    href="{{url_for('participantes.participantes_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                                    aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                            </a>
+                    </li>
+                    {% endif %}
+    </ul>
+</nav>
 
 
 <script>
