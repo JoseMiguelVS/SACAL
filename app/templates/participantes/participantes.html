@@ -9,9 +9,6 @@
 
 <!-- AGREGAR NUEVO -->
 <div class="form-container">
-    <!-- <a class="botones" href="{{ url_for('participantes.participante_agregar') }}">
-        <i class="fa fa-plus" style="font-size: 18px;"></i> Nuevo
-    </a> -->
     <button type="button" class="botones" data-bs-toggle="modal" data-bs-target="#modalAgregarParticipante"><i
             class="fa fa-plus" style="font-size: 18px;"></i>Nuevo</button>
 </div>
@@ -178,7 +175,7 @@
             {% set partes = request.args.get('fecha').split(',') %}
             {% if partes|length == 4 %}
             Fecha: {{ partes[1] }}<br>
-            Hora de inicio: {{ partes[2] }}<br> 
+            Hora de inicio: {{ partes[2] }}<br>
             Hora de fin: {{ partes[3] }}
             {% if sesiones %}
             {% if partes[1] == fecha and partes[2] == horario_inicio and partes[3] == horario_fin %}
