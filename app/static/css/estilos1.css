@@ -12,9 +12,14 @@
 }
 
 body {
-  background-color: #f0f0f0;
+  padding-bottom: 100px; /* espacio suficiente para que el contenido no quede bajo el footer */
+  min-height: 100vh;
+  overflow-y: auto; /* fuerza scroll si es necesario */
 }
 
+html {
+  scroll-behavior: smooth; /* Desplazamiento suave */
+}
 /* Estilos del encabezado */
 .header {
   background-color: #14447c;
@@ -240,17 +245,12 @@ td:nth-last-child(2) {
 
 /* Estilos del pie de página (footer) */
 footer {
-  position: fixed;
-  bottom: 0;
   width: 100%;
-  display: flex;
-  align-items: center;
   background-color: #14447c;
-  justify-content: center;
-  height: 8%;
-  text-align: center;
   color: white;
-  margin: 0;
+  text-align: center;
+  padding: 15px 10px;
+  z-index: 999;
 }
 
 /* Estilos de botones generales */
