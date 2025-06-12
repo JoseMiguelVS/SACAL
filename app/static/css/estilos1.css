@@ -255,6 +255,7 @@ footer {
 
 /* Estilos de botones generales */
 .botones,
+.botones-papelera,
 .botones-cancelar,
 .botones-delete,
 .botones-guardar,
@@ -287,6 +288,7 @@ footer {
   border-color: #7d1b1b;
 }
 
+.botones-papelera,
 .botones-cancelar,
 .botones-delete {
   color: #c00404;

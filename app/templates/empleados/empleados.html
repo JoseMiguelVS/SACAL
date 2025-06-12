@@ -29,7 +29,7 @@
                         </div>
                 </form>
         </section>
-
+ 
         <section class="table-responsive table-sm">
                 <table class="table table-hover">
                         <thead>
@@ -143,8 +143,9 @@
                 </ul>
         </nav>
 
+        <!-- ---------------------------------------------------papelera--------------------------------------------------- -->
         <aside class="mt-3">
-                <a href="{{ url_for('empleados.empleados_papelera') }}" class="btn btn-outline-danger">
+                <a href="{{ url_for('empleados.empleados_papelera') }}" class="btn botones-papelera">
                         <i class="fa fa-folder" style="font-size: 18px"></i> Papelera
                 </a>
         </aside>
@@ -283,38 +284,38 @@
                                                 <label for="new_nombre_usuario" class="form-label">Nombre de
                                                         Usuario</label>
                                                 <input type="text" name="nombre_usuario" class="form-control"
-                                                        id="new_nombre_usuario" placeholder="Nombre Usuario" required />
+                                                        id="nnombre_usuario" placeholder="Nombre Usuario" required />
                                         </div>
                                         <div class="mb-2">
                                                 <label for="new_nombre_empleado" class="form-label">Nombre(s) del
                                                         Empleado</label>
                                                 <input type="text" name="nombre_empleado" class="form-control"
-                                                        id="new_nombre_empleado" placeholder="Nombre Completo"
+                                                        id="nombre_empleado" placeholder="Nombre Completo"
                                                         required />
                                         </div>
                                         <div class="mb-2">
                                                 <label for="new_apellido_pat" class="form-label">Apellido
                                                         Paterno</label>
                                                 <input type="text" name="apellido_pat" class="form-control"
-                                                        id="new_apellido_pat" placeholder="Apellido Paterno" required />
+                                                        id="apellido_pat" placeholder="Apellido Paterno" required />
                                         </div>
                                         <div class="mb-2">
                                                 <label for="new_apellido_mat" class="form-label">Apellido
                                                         Materno</label>
                                                 <input type="text" name="apellido_mat" class="form-control"
-                                                        id="new_apellido_mat" placeholder="Apellido Materno" required />
+                                                        id="apellido_mat" placeholder="Apellido Materno" required />
                                         </div>
                                         <div class="mb-2">
                                                 <label for="new_correo_empleado" class="form-label">Correo
                                                         Electrónico</label>
                                                 <input type="email" name="correo_empleado" class="form-control"
-                                                        id="new_correo_empleado" placeholder="Correo Electrónico"
+                                                        id="correo_empleado" placeholder="Correo Electrónico"
                                                         required />
                                         </div>
 
                                         <div class="mb-2">
                                                 <label for="new_id_rol" class="form-label">Cargo</label>
-                                                <select name="id_rol" class="form-select" id="new_id_rol" required>
+                                                <select name="id_rol" class="form-select" id="id_rol" required>
                                                         <option value="" disabled selected>Seleccione un Cargo</option>
                                                         {% if roles %} {% for rol in roles %}
                                                         <option value="{{ rol.0 }}">{{ rol.1 }}</option>
@@ -325,10 +326,10 @@
                                         </div>
 
                                         <div class="mb-2">
-                                                <label for="new_contrasenia_empleado"
+                                                <label for="contrasenia_empleado"
                                                         class="form-label">Contraseña</label>
                                                 <input type="password" name="contrasenia_empleado" class="form-control"
-                                                        id="new_contrasenia_empleado" placeholder="Contraseña"
+                                                        id="contrasenia_empleado" placeholder="Contraseña"
                                                         required />
                                         </div>
                                 </div>

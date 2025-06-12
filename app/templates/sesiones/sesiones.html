@@ -1,162 +1,262 @@
-{% extends './layout.html' %}
-{% block body %}
-<h2>Sesion</h2>
-<br>
-<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-{% for message in messages %}
-<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
-    {% endif %} alert-dismissible fade show" role="alert">
-    <strong>{{message}}</strong>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-{% endfor %}
-{% endif %}
-{% endwith %}
+{% extends './layout.html' %} {% block body %}
+<main class="container my-4">
+    <h2 class="text-center mb-4">Sesion</h2>
 
-<div>
-    <div class="form-container">
-        <!-- --------------------------------------NUEVA SESION ------------------------------------- -->
-        <a class="botones" href="{{url_for('sesiones.sesiones_agregar')}}"><i class="fa fa-plus"
-                style="font-size: 18px;"></i></a>
-        <!-- -------------------------------------BUSCADOR------------------------------------------ -->
-        <form method="get" action="{{ url_for('sesiones.sesiones_buscar') }}" class="d-flex">
-            <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
-                required>
-            <button type="submit"><i class="fas fa-search"></i></button>
-        </form>
+    <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+    {% with messages = get_flashed_messages() %} {% if messages %} {% for
+    message in messages %}
+    <div class="alert alert-dismissible fade show alert-fixed {% if 'Error' in message %}alert-danger{% elif 'Advertencia' in message %}alert-warning{% else %}alert-success{% endif %}"
+        role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-</div>
+    {% endfor %} {% endif %} {% endwith %}
 
-<!-- ------------------------------TABLE -------------------------------- -->
-<div class="tables">
-    <table>
-        <thead>
-            <tr>
-                <th>Curso</th>
-                <th>Fecha</th>
-                <th>Hora inicio</th>
-                <th>Hora fin</th>
-                <th>Mes</th>
-                <th>Semana</th>
-                <th>Editar</th>
-                <th>Eliminar</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if sesiones %}
-            {% for sesion in sesiones %}
-            {% if sesion.estado == True %}
-            <tr>
-                <td>{{sesion.cursos}}</td>
-                <td>{{sesion.fecha}}</td>
-                <td>{{sesion.horario_inicio}}</td>
-                <td>{{sesion.horario_fin}}</td>
-                <td>{{sesion.nombre_mes}}</td>
-                <td>{{sesion.semana}}</td>
-                <td>
-                    <a class="botones-editar" href="{{ url_for('sesiones.sesion_editar', id = sesion.id_sesion) }}">
-                        <li class="fa fa-edit" style="font-size: 18px;"></li>
-                    </a>
-                </td>
-                <td>
-                    <button class="botones-delete" type="button" data-bs-toggle="modal"
-                        data-bs-target="#staticBackdrop-{{sesion.id_sesion}}">
-                        <li class="fa fa-trash" style="font-size: 18px;"></li>
-                    </button>
-                </td>
+    <section class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <!-- --------------------------------------NUEVA SESION ------------------------------------- -->
+        <button type="button" class="botones m-2" data-bs-toggle="modal" data-bs-target="#modalAgregarSesion"
+            aria-label="Agregar Nueva Sesion">
+            <i class="fa fa-plus" style="font-size: 18px"></i> Nuevo</button>
+        <!-- -------------------------------------BUSCADOR------------------------------------------ -->
+        <form method="get" action="{{ url_for('sesiones.sesiones_buscar') }}"
+            class="d-flex flex-grow-1 justify-content-end">
+            <div class="input-group" style="max-width: 300px">
+                <input class="form-control" type="text" name="buscar" value="{{ search_query }}"
+                    placeholder="Buscar por fecha" required>
+                <button class="botones ms-2" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <!-- ------------------------------TABLE -------------------------------- -->
+    <section class="table-responsive table-sm">
+        <table class="tabla table-hover">
+            <thead>
+                <tr>
+                    <th>Curso</th>
+                    <th>Fecha</th>
+                    <th>Hora inicio</th>
+                    <th>Hora fin</th>
+                    <th>Mes</th>
+                    <th>Semana</th>
+                    <th>Editar</th>
+                    <th>Eliminar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if sesiones %} {% for sesion in sesiones %} {% if sesion.estado == True %}
+                <tr>
+                    <td>{{sesion.cursos}}</td>
+                    <td>{{sesion.fecha}}</td>
+                    <td>{{sesion.horario_inicio}}</td>
+                    <td>{{sesion.horario_fin}}</td>
+                    <td>{{sesion.nombre_mes}}</td>
+                    <td>{{sesion.semana}}</td>
+                    <td>
+                        <a class="botones-editar" href="{{ url_for('sesiones.sesion_editar', id = sesion.id_sesion) }}">
+                            <li class="fa fa-edit" style="font-size: 18px;"></li>
+                        </a>
+                    </td>
+                    <td>
+                        <button class="botones-delete" type="button" data-bs-toggle="modal"
+                            data-bs-target="#staticBackdrop-{{sesion.id_sesion}}">
+                            <li class="fa fa-trash" style="font-size: 18px;"></li>
+                        </button>
+                    </td>
+                    {% endif %}
+                    {% endfor %}
+                    {% else %}
+                <tr>
+                    <td align="center" colspan="8">No existen sesiones</td>
+                </tr>
                 {% endif %}
-                {% endfor %}
-                {% else %}
-            <tr>
-                <td align="center" colspan="8">No existen sesiones</td>
-            </tr>
-            {% endif %}
-            </tr>
-        </tbody>
-    </table>
-</div>
-<!-- -------------------------------------------------PAGINADOR----------------------------------------------- -->
-<nav class="paginati" aria-label="Page navigation" class="justify-content-center">
-    <ul class="pagination justify-content-center" style="margin:20px 0">
-        {% if page > 1 %}
-        <li class="page-item">
-            <a class="page-link bg-warning"
-                href="{{url_for('sesiones.sesiones_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
-                aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-            </a>
-        </li>
-        {% if page != 1 and page != 2 %}
-        <li class="page-item"><a class="page-link bg-warning" href="{{url_for('sesiones.sesiones_buscar')}}">1</a></li>
-        {% if page != 3 %}
-        <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
-        {% endif %}
-        {% endif %}
-        <li class="page-item"><a class="page-link bg-warning"
-                href="{{url_for('sesiones.sesiones_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
-        </li>
-        {% endif %}
-
-        <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
-
-        {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
-                href="{{url_for('sesiones.sesiones_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
-            </li>
-            {% if page != total_pages and page != total_pages-1 %}
-            {% if page != total_pages-2 %}
-            <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
-            {% endif %}
-            <li class="page-item"><a class="page-link bg-warning"
-                    href="{{url_for('sesiones.sesiones_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
-            </li>
-            {% endif %}
+                </tr>
+            </tbody>
+        </table>
+    </section>
+    <!-- -------------------------------------------------PAGINADOR----------------------------------------------- -->
+    <nav class="pagination-container mt-4" aria-label="navegacion de paginas de sesiones">
+        <ul class="pagination justify-content-center">
+            {% if page > 1 %}
             <li class="page-item">
                 <a class="page-link bg-warning"
-                    href="{{url_for('sesiones.sesiones_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
-                    aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
+                    href="{{url_for('sesiones.sesiones_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                    aria-label="Anterior">
+                    &laquo;
                 </a>
             </li>
+            {% if page != 1 and page != 2 %}
+            <li class="page-item"><a class="page-link bg-warning" href="{{url_for('sesiones.sesiones_buscar')}}">1</a>
+            </li>
+            {% if page != 3 %}
+            <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
             {% endif %}
-    </ul>
-</nav>
+            {% endif %}
+            <li class="page-item"><a class="page-link bg-warning"
+                    href="{{url_for('sesiones.sesiones_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+            </li>
+            {% endif %}
 
-<!-- -----------------------------------------------PAPELERA--------------------------------------------------- -->
+            <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
 
-<div>
-    <br>
-    <a href="{{ url_for('sesiones.sesiones_papelera') }}"
-        class="btn btn-outline-danger d-inline-flex align-items-center">
-        <li class="fa fa-folder" style="font-size: 18px;"></li>
-    </a>
-</div>
+            {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
+                    href="{{url_for('sesiones.sesiones_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+                </li>
+                {% if page != total_pages and page != total_pages-1 %}
+                {% if page != total_pages-2 %}
+                <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
+                {% endif %}
+                <li class="page-item"><a class="page-link bg-warning"
+                        href="{{url_for('sesiones.sesiones_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                </li>
+                {% endif %}
+                <li class="page-item">
+                    <a class="page-link bg-warning"
+                        href="{{url_for('sesiones.sesiones_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                        aria-label="Siguiente">
+                        &raquo;
+                    </a>
+                </li>
+                {% endif %}
+        </ul>
+    </nav>
 
-<!-- --------------------------------------------------MODAL--------------------------------------------------- -->
-{% if sesiones %}
-{% for sesion in sesiones %}
-<div class="modal fade" id="staticBackdrop-{{sesion.id_sesion}}" data-bs-backdrop="static" data-bs-keyboard="false"
-    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">Confirmar acción</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                ¿Deseas cancelar la sesion del dia <strong>{{ sesion.fecha }}</strong>?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <a class="btn btn-danger" href="{{ url_for('sesiones.sesion_cancelar', id = sesion.id_sesion) }}"
-                    class="btn-delete"><i class="fas fa-trash-alt"></i>Aceptar</a>
+    <!-- -----------------------------------------------PAPELERA--------------------------------------------------- -->
+
+    <aside class="mt-3">
+        <a href="{{ url_for('sesiones.sesiones_papelera') }}" class="btn botones-papelera">
+            <li class="fa fa-folder" style="font-size: 18px;"></li> Papelera
+        </a>
+    </aside>
+
+    <!-- --------------------------------------------------MODAL--------------------------------------------------- -->
+    {% if sesiones %} {% for sesion in sesiones %}
+    <div class="modal fade" id="staticBackdrop-{{sesion.id_sesion}}" data-bs-backdrop="static" data-bs-keyboard="false"
+        tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Confirmar acción</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Deseas cancelar la sesion del dia <strong>{{ sesion.fecha }}</strong>?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <a class="btn btn-danger" href="{{ url_for('sesiones.sesion_cancelar', id = sesion.id_sesion) }}"
+                        class="btn-delete"><i class="fas fa-trash-alt"></i>Aceptar</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
-{% endfor %}
-{% else %}
-{% endif %}
+    {% endfor %} {% else %} {% endif %}
 
+    <div class="modal fade" id="modalAgregarSesion" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="modalAgregarSesionLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form action="{{ url_for('sesiones.sesion_nuevo') }}" method="post" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalAgregarSesionLabel">Agregar sesion</h5>
+                    <button type="button" class="bnt-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <!-- Fecha -->
+                    <div class="mb-2">
+                        <label class="form-label" for="new_fecha">Fecha del curso:</label>
+                        <input class="form-control" type="date" id="fecha" name="fecha" required>
+                    </div>
+
+                    <!-- Horario de inicio -->
+                    <div class="mb-2">
+                        <label class="form-label" for="new_horario_inicio">Hora de inicio:</label>
+                        <input class="form-control" type="time" id="horario_inicio" name="horario_inicio" required>
+                    </div>
+
+                    <!-- Horario de fin -->
+                    <div class="mb-2">
+                        <label class="form-label" for="new_horario_fin">Hora de fin:</label>
+                        <input class="form-control" type="time" id="horario_fin" name="horario_fin" required>
+                    </div>
+
+                    <!-- Categoría -->
+                    <div class="mb-2">
+                        <label class="form-label" for="new_id_categoria">Categoría:</label>
+                        <select class="form-control" name="id_categoria" id="id_categoria" required>
+                            <option value="" selected disabled>Categoria</option>
+                            {% if categorias %}
+                            {% for categoria in categorias %}
+                            <option value="{{ categoria.0 }}">{{ categoria.1 }}</option>
+                            {% endfor %}
+                            {% else %}
+                            <option>Aún no hay registros</option>
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <!-- Mes -->
+                    <div class="mb-2">
+                        <label class="form-label" for="new_id_mes">Mes:</label>
+                        <select class="form-control" name="id_mes" id="id_mes" required>
+                            <option value="" selected disabled>Mes</option>
+                            {% if meses %}
+                            {% for mes in meses %}
+                            <option value="{{ mes.0 }}">{{ mes.1 }}</option>
+                            {% endfor %}
+                            {% else %}
+                            <option>Aún no hay registros</option>
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <!-- Semana -->
+                    <div class="mb-2">
+                        <label for="new_semana" class="form-label">Semana:</label>
+                        <select class="form-control" name="id_semana" id="id_semana" required>
+                            <option value="" selected disabled>Semana</option>
+                            {% if semanas %}
+                            {% for semana in semanas %}
+                            <option value="{{ semana.0 }}">{{ semana.1 }}</option>
+                            {% endfor %}
+                            {% else %}
+                            <option>Aún no hay registros</option>
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <!-- Cursos y Ponentes -->
+                    <div id="cursos-container">
+                        <label for="new_cursos" class="form-label">Cursos:</label>
+                        <select name="cursos[]" class="form-select mb-2" required>
+                            <option value="">Curso</option>
+                            {% for curso in cursos %}
+                            <option value="{{ curso.0 }}">{{ curso.1 }}</option>
+                            {% endfor %}
+                        </select>
+
+                        <label for="new_ponente" class="form-label">Ponente:</label>
+                        <select name="ponentes[]" class="form-select mb-2" required>
+                            <option value="">Ponente</option>
+                            {% for ponente in ponentes %}
+                            <option value="{{ ponente.0 }}">{{ ponente.1 }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</main>
 {% endblock %}
