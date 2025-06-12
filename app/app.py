@@ -17,14 +17,11 @@ from routes.sesiones.routes import sesiones
 from routes.constancias.routes import constancias
 from routes.temas.routes import temas
 
-from extensions import socketio  # 👈 Importa desde extensions.py
-
 # ...
 app = Flask(__name__)
 csrf = CSRFProtect(app) 
 app.secret_key = 'secret'
 
-socketio.init_app(app) 
 
 # Login
 login_manager = LoginManager(app)
@@ -87,4 +84,4 @@ if __name__ == '__main__':
     csrf.init_app(app)
     app.register_error_handler(404, pagina_no_encontrada)
     app.register_error_handler(401, acceso_no_autorizado)
-    socketio.run(app, debug=True, port=5000)  # 👈 Usa socketio.run en lugar de app.run
+    app.run(debug=True, port=5000)

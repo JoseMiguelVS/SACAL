@@ -4,7 +4,6 @@ from datetime import datetime
 from psycopg2.extras import RealDictCursor
 from werkzeug.security import generate_password_hash
 # app/routes/empleados/routes.py
-from extensions import socketio  # 👈 Ya no importas desde app, sino desde extensions
 
 from utils.listas import lista_rol
 
@@ -72,7 +71,6 @@ def empleado_nuevo():
                 con.commit()
                 cur.close()
                 con.close()
-                socketio.emit('empleado_actualizado', {'accion': 'agregado', 'usuario': nombre_usuario})
                 flash('Empleado agregado correctamente')
                 return redirect(url_for('empleados.empleadosBuscar'))
             
@@ -130,7 +128,6 @@ def empleado_actualizar(id):
         con.commit()
         cur.close()
         con.close()
-        socketio.emit('empleado_actualizado', {'accion': 'editado', 'id': id})
         flash("Empleado actualizado correctamente")
     return redirect(url_for('empleados.empleadosBuscar'))
 
@@ -149,7 +146,6 @@ def empleado_eliminar(id):
     con.commit()
     cur.close()
     con.close()
-    socketio.emit('empleado_actualizado', {'accion': 'eliminado', 'id': id})
     flash("Empleado eliminado correctamente")
     return redirect(url_for('empleados.empleadosBuscar'))
 # -----------------------------------------------------------PAPELERA DE EMPLEADO--------------------------------------------------------------------
@@ -199,6 +195,5 @@ def empleados_restaurar(id):
     con.commit()
     cur.close()
     con.close()
-    socketio.emit('empleado_actualizado', {'accion': 'restaurado', 'id': id})
     flash("Empleado restaurado correctamente")
     return redirect(url_for('empleados.empleadosBuscar'))
