@@ -55,9 +55,13 @@
                     <td>{{sesion.nombre_mes}}</td>
                     <td>{{sesion.semana}}</td>
                     <td>
-                        <a class="botones-editar" href="{{ url_for('sesiones.sesion_editar', id = sesion.id_sesion) }}">
+                        <!-- <a class="botones-editar" href="{{ url_for('sesiones.sesion_editar', id = sesion.id_sesion) }}">
                             <li class="fa fa-edit" style="font-size: 18px;"></li>
-                        </a>
+                        </a> -->
+                        <button type="button" class="botones-editar" data-bs-toggle="modal"
+                            data-bs-target="#modalEditar-{{ sesion.id_sesion }}"
+                            aria-label="Editar sesion {{ sesion.fecha }}">
+                            <i class="fa fa-edit" style="font-size: 18px;"></i></button>
                     </td>
                     <td>
                         <button class="botones-delete" type="button" data-bs-toggle="modal"
@@ -152,6 +156,126 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="modalEditar-{{ sesion.id_sesion }}" data-bs-backdrop="static" data-bs-keyboard="false"
+        tabindex="-1" aria-labelledby="modalEditarLabel-{{ sesion.id_sesion }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <form action="{{ url_for('sesiones.sesion_actualizar', id=sesion.id_sesion) }}" method="post"
+                class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarLabel-{{ sesion.id_sesion }}">Editar sesion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <!-- Fecha y horario -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="fecha" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" name="fecha" id="fecha" value="{{ sesiones[6] }}"
+                                required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="horario_inicio" class="form-label">Hora de inicio</label>
+                            <input type="time" class="form-control" name="horario_inicio" id="horario_inicio"
+                                value="{{ sesiones[1] }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="horario_fin" class="form-label">Hora de fin</label>
+                            <input type="time" class="form-control" name="horario_fin" id="horario_fin"
+                                value="{{ sesiones[4] }}" required>
+                        </div>
+                    </div>
+
+                    <!-- Categoría -->
+                    <div class="mb-3">
+                        <label for="id_categoria" class="form-label">Categoría</label>
+                        <select name="id_categoria" class="form-select" required>
+                            <option value="">Categoría</option>
+                            {% for categoria in categorias %}
+                            <option value="{{ categoria[0] }}" {% if categoria[0]==sesiones[7] %}selected{% endif %}>{{
+                                categoria[1] }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Mes y Semana -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="id_mes" class="form-label">Mes</label>
+                            <select name="id_mes" class="form-select" required>
+                                <option value="">Mes-</option>
+                                {% for mes in meses %}
+                                <option value="{{ mes[0] }}" {% if mes[0]==sesiones[2] %}selected{% endif %}>{{ mes[1]
+                                    }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_semana" class="form-label">Semana</label>
+                            <select name="id_semana" class="form-select" required>
+                                <option value="">-Seleccione la semana-</option>
+                                {% for semana in semanas %}
+                                <option value="{{ semana[0] }}" {% if semana[0]==sesiones[3] %}selected{% endif %}>{{
+                                    semana[1] }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Cursos y Ponentes -->
+                    <div id="curso-container">
+                        {% for curso_ponente in cursos_sesion %}
+                        <div class="row align-items-end mb-3">
+                            <div class="col-md-5">
+                                <label class="form-label">Curso</label>
+                                <select name="cursos[]" class="form-select" required>
+                                    <option value="">-Seleccione el curso-</option>
+                                    {% for curso in cursos %}
+                                    <option value="{{ curso[0] }}" {% if curso[0]==curso_ponente.curso_id %}selected{%
+                                        endif %}>{{
+                                        curso[1] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label">Ponente</label>
+                                <select name="ponentes[]" class="form-select" required>
+                                    <option value="">-Seleccione el ponente-</option>
+                                    {% for ponente in ponentes %}
+                                    <option value="{{ ponente[0] }}" {% if ponente[0]==curso_ponente.ponente_id
+                                        %}selected{% endif %}>{{
+                                        ponente[1] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-2 d-grid">
+                                <button type="button" class="btn btn-danger mt-4"
+                                    onclick="this.closest('.row').remove()">Eliminar</button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Botón para agregar más -->
+                    <div class="mb-4 text-center">
+                        <button type="button" class="btn btn-outline-primary" onclick="agregarCursoPonente()">+ Agregar
+                            curso y
+                            ponente</button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn botones" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn botones">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
     {% endfor %} {% else %} {% endif %}
 
     <div class="modal fade" id="modalAgregarSesion" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
@@ -160,7 +284,7 @@
             <form action="{{ url_for('sesiones.sesion_nuevo') }}" method="post" class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalAgregarSesionLabel">Agregar sesion</h5>
-                    <button type="button" class="bnt-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
 
@@ -259,4 +383,37 @@
     </div>
 
 </main>
+
+<script>
+    function agregarCursoPonente() {
+        const container = document.getElementById("curso-container");
+        const row = document.createElement("div");
+        row.classList.add("row", "align-items-end", "mb-3");
+
+        row.innerHTML = `
+            <div class="col-md-5">
+                <label class="form-label">Curso</label>
+                <select name="cursos[]" class="form-select" required>
+                    <option value="">-Seleccione el curso-</option>
+                    {% for curso in cursos %}
+                    <option value="{{ curso[0] }}">{{ curso[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label">Ponente</label>
+                <select name="ponentes[]" class="form-select" required>
+                    <option value="">-Seleccione el ponente-</option>
+                    {% for ponente in ponentes %}
+                    <option value="{{ ponente[0] }}">{{ ponente[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="button" class="btn btn-danger mt-4" onclick="this.closest('.row').remove()">Eliminar</button>
+            </div>
+        `;
+        container.appendChild(row);
+    }
+</script>
 {% endblock %}

@@ -29,6 +29,11 @@ def sesiones_buscar():
     paginado = paginador2(sql_count, sql_lim, params_count, params_lim, 1, 5)
 
     return render_template('sesiones/sesiones.html',
+                           cursos = lista_cursos(), 
+                           semanas = lista_semanas(), 
+                           meses = lista_meses(), 
+                           categorias = lista_categorias(),
+                           ponentes = lista_ponente(),
                            sesiones=paginado[0],
                            page=paginado[1],
                            per_page=paginado[2],
@@ -162,8 +167,6 @@ def sesion_actualizar(id):
         flash("Sesión actualizada correctamente")
 
     return redirect(url_for("sesiones.sesiones_buscar"))
-
-
 
 #-----------------------------------CANCELAR SESION---------------------------------
 @sesiones.route("/participantes/sesiones/cancelar/<string:id>")
