@@ -1,373 +1,321 @@
-{% extends './layout.html' %}
-{% block body %}
-<!-- BOTÓN ATRÁS IZQUIERDA -->
-<a href="{{ url_for('index') }}" class="botones">
-    <i class="fas fa-arrow-left"></i>
-</a>
-<!-- TÍTULO -->
-<h2 class="text-center">Participantes</h2>
+{% extends './layout.html' %} {% block body %}
+<main class="w-100 d-flex flex-column align-items-center justify-content-center" style="margin: -1px; padding: 0;">
 
-<!-- AGREGAR NUEVO -->
-<div class="form-container">
-    <button type="button" class="botones" data-bs-toggle="modal" data-bs-target="#modalAgregarParticipante"><i
-            class="fa fa-plus" style="font-size: 18px;"></i>Nuevo</button>
-</div>
+    <!-- TÍTULO -->
+    <h2 class="text-center mb-4">Participantes</h2>
 
-<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-{% for message in messages %}
-<div class="alert alert-dismissible fade show alert-fixed
-          {% if 'Error' in message %}alert-danger
-          {% elif 'Advertencia' in message %}alert-warning
-          {% else %}alert-success{% endif %}" role="alert">
-    <strong>{{ message }}</strong>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-{% endfor %}
-{% endif %}
-{% endwith %}
+    <!-- NUEVO + BUSCADOR -->
+    <section class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <!-- Botón "Nuevo" alineado a la izquierda -->
+        <button type="button" class="botones m-2" data-bs-toggle="modal" data-bs-target="#modalAgregarParticipante">
+            <i class="fa fa-plus"></i> Nuevo
+        </button>
 
-<!-- CONTENEDOR FLEX PRINCIPAL -->
-<div class="d-flex justify-content-between align-items-center mb-3">
-
-    <!-- FORMULARIO CENTRADO -->
-    <div class="mx-auto" style="width: 60%;">
+        <!-- Buscador por clave a la derecha -->
         <form method="get" action="{{ url_for('participantes.participantes_buscar') }}"
-            class="d-flex align-items-center justify-content-center gap-2 flex-wrap">
-
-            <div class="espacio_form">
-                <select name="mes" id="mes" class="form-select">
-                    <option value="">Mes</option>
-                    {% if meses %}
-                    {% for mes in meses %}
-                    <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>{{ mes.1 }}
-                    </option>
-                    {% endfor %}
-                    {% else %}
-                    <option value="">Aun no hay registros</option>
-                    {% endif %}
-                </select>
-            </div>
-
-            <div class="espacio_form">
-                <select name="semana" id="semana" class="form-select">
-                    <option value="">Semana</option>
-                    {% if semanas %}
-                    {% for semana in semanas %}
-                    <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>{{
-                        semana.1 }}</option>
-                    {% endfor %}
-                    {% else %}
-                    <option value="">Aun no hay registros</option>
-                    {% endif %}
-                </select>
-            </div>
-
-            <!-- BOTÓN ACEPTAR -->
-            <button type="submit" class="btn btn-primary">Aceptar</button>
-            <a href="{{ url_for('participantes.participantes_buscar') }}" class="botones">Limpiar filtros</a>
-
+            class="d-flex flex-grow-1 justify-content-end">
+            <!-- Conservamos filtros activos -->
+            <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
+                aria-label="Buscar participante por clave o nombre" required />
+            <button type="submit" class="btn btn-primary ms-2" aria-label="Buscar">
+                <i class="fas fa-search"></i>
+            </button>
         </form>
+    </section>
+
+    <!-- FILTROS CENTRADOS ABAJO -->
+    <section class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
+        <!-- Formulario: Mes y Semana -->
+        <form method="get" action="{{ url_for('participantes.participantes_buscar') }}"
+            class="d-flex flex-wrap align-items-center gap-2">
+            <select name="mes" class="form-select-sm">
+                <option value="">Mes</option>
+                {% for mes in meses %}
+                <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>{{ mes.1 }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <select name="semana" class="form-select-sm">
+                <option value="">-Semana-</option>
+                {% for semana in semanas %}
+                <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>{{
+                    semana.1 }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="btn btn-sm btn-outline-primary">Filtrar</button>
+        </form>
+
+        <!-- Formulario: Sesión -->
+        <form method="get" action="{{ url_for('participantes.participantes_buscar') }}"
+            class="d-flex flex-wrap align-items-center gap-2">
+            <!-- Mantener filtros -->
+            <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
+            <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
+
+            <select name="fecha" class="form-select-sm">
+                <option value="">Sesión</option>
+                {% set mes_seleccionado = request.args.get('mes', '') %}
+                {% set semana_seleccionada = request.args.get('semana', '') %}
+                {% set fecha_actual = request.args.get('fecha', '') %}
+                {% for sesion in sesiones %}
+                {% if sesion.6 == mes_seleccionado and sesion.5 == semana_seleccionada %}
+                {% set valor = sesion.0 ~ ',' ~ sesion.1 ~ ',' ~ sesion.2 ~ ',' ~ sesion.3 %}
+                <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
+                    {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.2 }} || {{ sesion.3 }}
+                </option>
+                {% endif %}
+                {% endfor %}
+            </select>
+
+            <button type="submit" class="btn btn-sm btn-success">Aceptar</button>
+            <a href="{{ url_for('participantes.participantes_buscar') }}" class="btn btn-sm btn-secondary">Limpiar</a>
+        </form>
+    </section>
+
+
+    <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+    {% with messages = get_flashed_messages() %} {% if messages %} {% for
+    message in messages %}
+    <div class="alert alert-dismissible fade show alert-fixed {% if 'Error' in message %}alert-danger{% elif 'Advertencia' in message %}alert-warning{% else %}alert-success{% endif %}"
+        role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
+    {% endfor %} {% endif %} {% endwith %}
 
-</div>
-
-<!-- TABLA DE PARTICIPANTES -->
-
-<div class="tables_participantes">
-    <div class="tables ">
-        <thead>
-            <tr>
-                <th>
-                    <form method="get" action="{{ url_for('participantes.participantes_buscar') }}"
-                        class="d-flex align-items-center justify-content-center gap-2 flex-wrap">
-
-                        <!-- Mantener el mes y la semana seleccionados -->
-                        <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
-                        <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
-
-                        <!-- SELECT de sesiones filtradas por mes y semana -->
-                        <div class="espacio_form">
-                            <select name="fecha" id="fecha" class="form-select">
-                                <option value="">Sesión</option>
-                                {% set mes_seleccionado = request.args.get('mes', '') %}
-                                {% set semana_seleccionada = request.args.get('semana', '') %}
-                                {% set fecha_actual = request.args.get('fecha', '') %}
-
-                                {% if sesiones %}
-                                {% for sesion in sesiones %}
-                                {% if sesion.6 == mes_seleccionado and sesion.5 == semana_seleccionada %}
-                                {% set valor = sesion.0 ~ ',' ~ sesion.1 ~ ',' ~ sesion.2 ~ ',' ~ sesion.3 %}
-                                {% set valorSesion = sesion.0 %}
-
-                                <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
-                                    {{ sesion.0}} . {{ sesion.1 }} || {{ sesion.2 }} || {{ sesion.3 }}
-                                </option>
-
-                                {% endif %}
+    <!-- TABLA DE PARTICIPANTES -->
+    <section class="tables_participantes table">
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle text-nowrap">
+                <thead class="table-light small">
+                    <tr>
+                        <th>Clave</th>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>Paquete</th>
+                        <th>Pago <br>validado</th>
+                        <th>Fecha del pago</th>
+                        <th>Factura</th>
+                        <th>Forma pago</th>
+                        <th>Promotor</th>
+                        <th>WhatsApp</th>
+                        <th>Materiales</th>
+                        <th>Grabaciones</th>
+                        <th>Evaluación <br>recibida</th>
+                        <th>Observaciones</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="small">
+                    {% if participantes %}
+                    {% for p in participantes %}
+                    {% if p.estado == True %}
+                    <tr data-id="{{ p.id_participante }}">
+                        <td><input type="text" name="clave_participante" value="{{ p.clave_participante }}"></td>
+                        <td><input type="text" name="nombre_participante" value="{{ p.nombre_participante }}"></td>
+                        <td><input type="text" name="apellidos_participante" value="{{ p.apellidos_participante }}">
+                        </td>
+                        <td>
+                            <select name="nombre_paquete" id="nombre_paquete">
+                                <option value="true" selected>Paquete</option>
+                                {% if paquetes %}
+                                {% for paquete in paquetes %}
+                                <option value="{{ paquete.0 }}" {% if paquete.1|string==p.nombre_paquete|string
+                                    %}selected{% endif %}>{{ paquete.1 }}</option>
                                 {% endfor %}
                                 {% else %}
+                                <option>Aún no hay registros</option>
+                                {% endif %}
+                            </select>
+                        </td>
+                        <td>{{ p.validacion_pago }}</td>
+                        <td><input type="date" name="fecha_pago" value="{{ p.fecha_pago }}"></td>
+                        <td><input type="checkbox" name="factura_pago" {% if p.factura_pago %}checked{% endif %}></td>
+                        <td>
+                            <select name="cuenta_destino" id="cuenta_destino">
+                                <option value="" disabled {% if not p.cuenta_destino %}selected{% endif %}>Cuenta
+                                    destino
+                                </option>
+                                {% if cuentas %}
+                                {% for cuenta in cuentas %}
+                                <option value="{{ cuenta.0 }}" {% if cuenta.1|string==p.cuenta_destino|string
+                                    %}selected{% endif %}>{{ cuenta.1 }}</option>
+                                {% endfor %}
+                                {% else %}
+                                <option>Aún no hay registros</option>
+                                {% endif %}
+                            </select>
+                        </td>
+                        <td>{{ p.nombre_empleado }}</td>
+                        <td><input type="checkbox" name="confirmacion_grupo" {% if p.confirmacion_grupo %}checked{%
+                                endif %}>
+                        </td>
+                        <td><input type="checkbox" name="materiales" {% if p.materiales %}checked{% endif %}></td>
+                        <td><input type="checkbox" name="grabaciones" {% if p.grabaciones %}checked{% endif %}></td>
+                        <td><input type="checkbox" name="evaluacion_dc3" {% if p.evaluacion_dc3 %}checked{% endif %}>
+                        </td>
+                        <td><input type="text" name="observaciones" value="{{ p.observaciones }}"></td>
+                        <td><button onclick="guardarCambios(this)">Guardar</button></td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td align="center" colspan="15">No existen participantes</td>
+                    </tr>
+                    {% endif %}
 
-                                <option value="">Aún no hay registros</option>
+                </tbody>
+            </table>
+        </div>
+    </section>
 
+    <div class="modal fade" id="modalAgregarParticipante" data-bs-backdrop="static" data-bs-keyboard="false"
+        tabindex="-1" aria-labelledby="modalAgregarParticipanteLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <form action="{{ url_for('participantes.participante_nuevo') }}" method="post" class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalAgregarParticipanteLabel">Agregar Participante</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="nombre_empleado" value="{{ current_user.id_empleado }}">
+
+                    {% if request.args.get('fecha') %}
+                    {% set partesSesiones = request.args.get('fecha').split(',') %}
+                    {% if partesSesiones|length == 4 %}
+                    <input type="hidden" name="id_sesion" id="id_sesion" value="{{ partesSesiones[0] }}">
+                    <p>Sesion: {{ partesSesiones[1] }}, {{ partesSesiones[2] }}, {{ partesSesiones[3] }}</p>
+                    {% endif %}
+                    {% endif %}
+
+                    <div class="row g-3">
+                        <!-- Clave -->
+                        <div class="col-md-6">
+                            <label for="clave_participante" class="form-label">Clave</label>
+                            <input type="text" id="clave_participante" name="clave_participante" class="form-control"
+                                placeholder="Clave" required>
+                        </div>
+
+                        <!-- Teléfono -->
+                        <div class="col-md-6">
+                            <label for="num_telefono" class="form-label">Número de teléfono</label>
+                            <input type="text" id="num_telefono" name="num_telefono" class="form-control"
+                                placeholder="Teléfono" required>
+                        </div>
+
+                        <!-- Nombre -->
+                        <div class="col-md-6">
+                            <label for="nombre_participante" class="form-label">Nombre</label>
+                            <input type="text" id="nombre_participante" name="nombre_participante" class="form-control"
+                                placeholder="Nombre" required>
+                        </div>
+
+                        <!-- Apellidos -->
+                        <div class="col-md-6">
+                            <label for="apellidos_participante" class="form-label">Apellidos</label>
+                            <input type="text" id="apellidos_participante" name="apellidos_participante"
+                                class="form-control" placeholder="Apellidos" required>
+                        </div>
+
+                        <!-- Cuenta destino -->
+                        <div class="col-md-6">
+                            <label for="id_cuenta" class="form-label">Cuenta destino</label>
+                            <select name="id_cuenta" id="id_cuenta" class="form-select" required>
+                                <option value="" selected disabled>Selecciona una cuenta</option>
+                                {% if cuentas %}
+                                {% for cuenta in cuentas %}
+                                <option value="{{ cuenta.0 }}">{{ cuenta.1 }}</option>
+                                {% endfor %}
+                                {% else %}
+                                <option disabled>Aún no hay registros</option>
                                 {% endif %}
                             </select>
                         </div>
 
-                        <button type="submit" class="btn btn-primary">Aceptar</button>
-                        <a href="{{ url_for('participantes.participantes_buscar') }}" class="botones">Limpiar
-                            filtros</a>
-                    </form>
-                </th>
-            </tr>
-        </thead>
-    </div>
-
-    <div class="">
-        {% if request.args.get('mes') or request.args.get('semana') or request.args.get('fecha') %}
-        <div class="alert alert-info mt-3">
-            <strong>Filtros activos:</strong><br>
-            {% if request.args.get('mes') %}Mes: {{ request.args.get('mes') }}<br>{% endif %}
-            {% if request.args.get('semana') %}Semana: {{ request.args.get('semana') }}<br>{% endif %}
-
-            {% if request.args.get('fecha') %}
-            {% set partes = request.args.get('fecha').split(',') %}
-            {% if partes|length == 4 %}
-            Fecha: {{ partes[1] }}<br>
-            Hora de inicio: {{ partes[2] }}<br>
-            Hora de fin: {{ partes[3] }}
-            {% if sesiones %}
-            {% if partes[1] == fecha and partes[2] == horario_inicio and partes[3] == horario_fin %}
-            Curso: {{ sesiones.7 }}
-            {% endif %}
-            {% endif %}
-            {% endif %}
-            {% endif %}
-        </div>
-        {% endif %}
-    </div>
-
-    <table class="mb-5">
-        <thead>
-            <tr>
-                <th>Clave</th>
-                <th>Nombre</th>
-                <th>Apellidos</th>
-                <th>Paquete</th>
-                <th>Pago <br>validado</th>
-                <th>Fecha del pago</th>
-                <th>Factura</th>
-                <th>Forma pago</th>
-                <th>Promotor</th>
-                <th>WhatsApp</th>
-                <th>Materiales</th>
-                <th>Grabaciones</th>
-                <th>Evaluación <br>recibida</th>
-                <th>Observaciones</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if participantes %}
-            {% for p in participantes %}
-            {% if p.estado == True %}
-            <tr data-id="{{ p.id_participante }}">
-                <td><input type="text" name="clave_participante" value="{{ p.clave_participante }}"></td>
-                <td><input type="text" name="nombre_participante" value="{{ p.nombre_participante }}"></td>
-                <td><input type="text" name="apellidos_participante" value="{{ p.apellidos_participante }}"></td>
-                <td>
-                    <select name="nombre_paquete" id="nombre_paquete">
-                        <option value="true" selected>Paquete</option>
-                        {% if paquetes %}
-                        {% for paquete in paquetes %}
-                        <option value="{{ paquete.0 }}" {% if paquete.1|string==p.nombre_paquete|string %}selected{%
-                            endif %}>{{ paquete.1 }}</option>
-                        {% endfor %}
-                        {% else %}
-                        <option>Aún no hay registros</option>
-                        {% endif %}
-                    </select>
-                </td>
-                <td>{{ p.validacion_pago }}</td>
-                <td><input type="date" name="fecha_pago" value="{{ p.fecha_pago }}"></td>
-                <td><input type="checkbox" name="factura_pago" {% if p.factura_pago %}checked{% endif %}></td>
-                <td>
-                    <select name="cuenta_destino" id="cuenta_destino">
-                        <option value="" disabled {% if not p.cuenta_destino %}selected{% endif %}>Cuenta destino
-                        </option>
-                        {% if cuentas %}
-                        {% for cuenta in cuentas %}
-                        <option value="{{ cuenta.0 }}" {% if cuenta.1|string==p.cuenta_destino|string %}selected{% endif
-                            %}>{{ cuenta.1 }}</option>
-                        {% endfor %}
-                        {% else %}
-                        <option>Aún no hay registros</option>
-                        {% endif %}
-                    </select>
-                </td>
-                <td>{{ p.nombre_empleado }}</td>
-                <td><input type="checkbox" name="confirmacion_grupo" {% if p.confirmacion_grupo %}checked{% endif %}>
-                </td>
-                <td><input type="checkbox" name="materiales" {% if p.materiales %}checked{% endif %}></td>
-                <td><input type="checkbox" name="grabaciones" {% if p.grabaciones %}checked{% endif %}></td>
-                <td><input type="checkbox" name="evaluacion_dc3" {% if p.evaluacion_dc3 %}checked{% endif %}></td>
-                <td><input type="text" name="observaciones" value="{{ p.observaciones }}"></td>
-                <td><button onclick="guardarCambios(this)">Guardar</button></td>
-            </tr>
-            {% endif %}
-            {% endfor %}
-            {% else %}
-            <tr>
-                <td align="center" colspan="15">No existen participantes</td>
-            </tr>
-            {% endif %}
-        </tbody>
-    </table>
-</div>
-
-<div class="modal fade" id="modalAgregarParticipante" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="modalAgregarParticipanteLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <form action="{{ url_for('participantes.participante_nuevo') }}" method="post" class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="modalAgregarParticipanteLabel">Agregar Participante</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Cerrar"></button>
-            </div>
-
-            <div class="modal-body">
-
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="nombre_empleado" value="{{ current_user.id_empleado }}">
-
-                {% if request.args.get('fecha') %}
-                {% set partesSesiones = request.args.get('fecha').split(',') %}
-                {% if partesSesiones|length == 4 %}
-                <input type="hidden" name="id_sesion" id="id_sesion" value="{{ partesSesiones[0] }}">
-                <p>Sesion: {{ partesSesiones[1] }}, {{ partesSesiones[2] }}, {{ partesSesiones[3] }}</p>
-                {% endif %}
-                {% endif %}
-
-                <div class="row g-3">
-                    <!-- Clave -->
-                    <div class="col-md-6">
-                        <label for="clave_participante" class="form-label">Clave</label>
-                        <input type="text" id="clave_participante" name="clave_participante" class="form-control"
-                            placeholder="Clave" required>
-                    </div>
-
-                    <!-- Teléfono -->
-                    <div class="col-md-6">
-                        <label for="num_telefono" class="form-label">Número de teléfono</label>
-                        <input type="text" id="num_telefono" name="num_telefono" class="form-control"
-                            placeholder="Teléfono" required>
-                    </div>
-
-                    <!-- Nombre -->
-                    <div class="col-md-6">
-                        <label for="nombre_participante" class="form-label">Nombre</label>
-                        <input type="text" id="nombre_participante" name="nombre_participante" class="form-control"
-                            placeholder="Nombre" required>
-                    </div>
-
-                    <!-- Apellidos -->
-                    <div class="col-md-6">
-                        <label for="apellidos_participante" class="form-label">Apellidos</label>
-                        <input type="text" id="apellidos_participante" name="apellidos_participante"
-                            class="form-control" placeholder="Apellidos" required>
-                    </div>
-
-                    <!-- Cuenta destino -->
-                    <div class="col-md-6">
-                        <label for="id_cuenta" class="form-label">Cuenta destino</label>
-                        <select name="id_cuenta" id="id_cuenta" class="form-select" required>
-                            <option value="" selected disabled>Selecciona una cuenta</option>
-                            {% if cuentas %}
-                            {% for cuenta in cuentas %}
-                            <option value="{{ cuenta.0 }}">{{ cuenta.1 }}</option>
-                            {% endfor %}
-                            {% else %}
-                            <option disabled>Aún no hay registros</option>
-                            {% endif %}
-                        </select>
-                    </div>
-
-                    <!-- Paquete -->
-                    <div class="col-md-6">
-                        <label for="id_paquete" class="form-label">Paquete</label>
-                        <select name="id_paquete" id="id_paquete" class="form-select" required>
-                            <option value="" selected disabled>Selecciona un paquete</option>
-                            {% if paquetes and sesiones %}
-                            {% set categorias_validas = sesiones | selectattr('4') | map(attribute='9') | list %}
-                            {% set mostrados = [] %}
-                            {% for paquete in paquetes %}
-                            {% if paquete[4] and paquete[3] in categorias_validas and paquete[0] not in mostrados %}
-                            <option value="{{ paquete[0] }}">{{ paquete[1] }}</option>
-                            {% set _ = mostrados.append(paquete[0]) %}
-                            {% endif %}
-                            {% endfor %}
-                            {% else %}
-                            <option disabled>No hay paquetes disponibles</option>
-                            {% endif %}
-                        </select>
+                        <!-- Paquete -->
+                        <div class="col-md-6">
+                            <label for="id_paquete" class="form-label">Paquete</label>
+                            <select name="id_paquete" id="id_paquete" class="form-select" required>
+                                <option value="" selected disabled>Selecciona un paquete</option>
+                                {% if paquetes and sesiones %}
+                                {% set categorias_validas = sesiones | selectattr('4') | map(attribute='9') | list %}
+                                {% set mostrados = [] %}
+                                {% for paquete in paquetes %}
+                                {% if paquete[4] and paquete[3] in categorias_validas and paquete[0] not in mostrados %}
+                                <option value="{{ paquete[0] }}">{{ paquete[1] }}</option>
+                                {% set _ = mostrados.append(paquete[0]) %}
+                                {% endif %}
+                                {% endfor %}
+                                {% else %}
+                                <option disabled>No hay paquetes disponibles</option>
+                                {% endif %}
+                            </select>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-success">Agregar</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            </div>
-        </form>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Agregar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-<!-- -------------------------------------------------PAGINADOR----------------------------------------------- -->
-<nav class="paginati" aria-label="Page navigation" class="justify-content-center">
-    <ul class="pagination justify-content-center" style="margin:20px 0">
+    <!-- -------------------------------------------------PAGINADOR----------------------------------------------- -->
+    <nav class="pagination-container mt-4" aria-label="Page navigation" class="justify-content-center">
+        <ul class="pagination justify-content-center" style="margin:20px 0">
             {% if page > 1 %}
             <li class="page-item">
-                    <a class="page-link bg-warning"
-                            href="{{url_for('participantes.participantes_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
-                            aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                    </a>
+                <a class="page-link bg-warning"
+                    href="{{url_for('participantes.participantes_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                    aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
             </li>
             {% if page != 1 and page != 2 %}
-            <li class="page-item"><a class="page-link bg-warning" href="{{url_for('participantes.participantes_buscar')}}">1</a></li>
+            <li class="page-item"><a class="page-link bg-warning"
+                    href="{{url_for('participantes.participantes_buscar')}}">1</a></li>
             {% if page != 3 %}
             <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
             {% endif %}
             {% endif %}
             <li class="page-item"><a class="page-link bg-warning"
-                            href="{{url_for('participantes.participantes_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+                    href="{{url_for('participantes.participantes_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
             </li>
             {% endif %}
 
             <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
 
             {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
-                            href="{{url_for('participantes.participantes_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
-                    </li>
-                    {% if page != total_pages and page != total_pages-1 %}
-                    {% if page != total_pages-2 %}
-                    <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
-                    {% endif %}
-                    <li class="page-item"><a class="page-link bg-warning"
-                                    href="{{url_for('participantes.participantes_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
-                    </li>
-                    {% endif %}
-                    <li class="page-item">
-                            <a class="page-link bg-warning"
-                                    href="{{url_for('participantes.participantes_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
-                                    aria-label="Next">
-                                    <span aria-hidden="true">&raquo;</span>
-                            </a>
-                    </li>
-                    {% endif %}
-    </ul>
-</nav>
+                    href="{{url_for('participantes.participantes_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+                </li>
+                {% if page != total_pages and page != total_pages-1 %}
+                {% if page != total_pages-2 %}
+                <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
+                {% endif %}
+                <li class="page-item"><a class="page-link bg-warning"
+                        href="{{url_for('participantes.participantes_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                </li>
+                {% endif %}
+                <li class="page-item">
+                    <a class="page-link bg-warning"
+                        href="{{url_for('participantes.participantes_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                        aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+        </ul>
+    </nav>
+</main>
 
 
 <script>

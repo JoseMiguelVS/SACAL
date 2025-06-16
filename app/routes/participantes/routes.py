@@ -13,45 +13,61 @@ participantes = Blueprint('participantes', __name__)
 @participantes.route("/participantes")
 @login_required
 def participantes_buscar():
+    search_query = request.args.get('buscar', '', type=str)
     mes = request.args.get('mes', '', type=str)
     semana = request.args.get('semana', '', type=str)
     fecha_raw = request.args.get('fecha', '', type=str)
 
-    fecha = hora_inicio = hora_fin = ''
+    fecha = ''
+    horarios = ''
     if fecha_raw:
         partes = fecha_raw.split(',')
-        if len(partes) == 3:
-            fecha, hora_inicio, hora_fin = partes
+        if len(partes) == 4:
+            fecha = partes[1]
+            horarios = f"{partes[2]} - {partes[3]}"
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
-                   WHERE (%s = '' OR meses ILIKE %s)
-                     AND (%s = '' OR semanas ILIKE %s)
-                     AND (%s = '' OR fecha ILIKE %s)'''
+                WHERE (%s = '' OR meses ILIKE %s)
+                    AND (%s = '' OR semanas ILIKE %s)
+                    AND (%s = '' OR fecha ILIKE %s)
+                    AND (%s = '' OR horarios ILIKE %s)
+                    AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)'''  # 👈 Filtro único
 
     sql_lim = '''SELECT * FROM asistencias_detalladas
-                 WHERE (%s = '' OR meses ILIKE %s)
-                   AND (%s = '' OR semanas ILIKE %s)
-                   AND (%s = '' OR fecha ILIKE %s)
-                 ORDER BY nombre_participante DESC
-                 LIMIT %s OFFSET %s'''
+                WHERE (%s = '' OR meses ILIKE %s)
+                AND (%s = '' OR semanas ILIKE %s)
+                AND (%s = '' OR fecha ILIKE %s)
+                AND (%s = '' OR horarios ILIKE %s)
+                AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)
+                ORDER BY nombre_participante DESC
+                LIMIT %s OFFSET %s'''
+
     paginado = paginador3(
         sql_count, sql_lim,
-        [mes, mes, semana, semana, fecha, fecha],
+        [
+            mes, mes,
+            semana, semana,
+            fecha, fecha,
+            horarios, horarios,
+            search_query, search_query, search_query  # nombre y clave usan el mismo valor
+        ],
         1, 50
     )
 
+
     return render_template('participantes/participantes.html',
-                           meses = lista_meses(),
-                           cursos = lista_cursos(),
-                           semanas = lista_semanas(),
-                           sesiones = lista_sesiones(),
-                           paquetes = lista_paquetes(),
-                           cuentas = lista_cuentas(),
+                           meses=lista_meses(),
+                           cursos=lista_cursos(),
+                           semanas=lista_semanas(),
+                           sesiones=lista_sesiones(),
+                           paquetes=lista_paquetes(),
+                           cuentas=lista_cuentas(),
                            participantes=paginado[0],
                            page=paginado[1],
                            per_page=paginado[2],
                            total_items=paginado[3],
                            total_pages=paginado[4])
+
 #-----------------------------------------------------------------------------------------
 
 @participantes.route("/participantes/agregar")

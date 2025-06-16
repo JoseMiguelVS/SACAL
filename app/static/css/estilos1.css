@@ -407,6 +407,12 @@ footer {
   display: none; /* Oculto por defecto, se muestra en pantallas pequeñas */
 }
 
+@media screen and (max-width: 1400px) {
+  * {
+    font-size: 15px;
+  }
+}
+
 @media screen and (max-width: 1000px) {
   /* Combinado para evitar repetición */
   .nav-links,
