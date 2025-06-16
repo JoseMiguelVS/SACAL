@@ -35,10 +35,10 @@ def participantes_buscar():
 
     sql_lim = '''SELECT * FROM asistencias_detalladas
                 WHERE (%s = '' OR meses ILIKE %s)
-                AND (%s = '' OR semanas ILIKE %s)
-                AND (%s = '' OR fecha ILIKE %s)
-                AND (%s = '' OR horarios ILIKE %s)
-                AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)
+                    AND (%s = '' OR semanas ILIKE %s)
+                    AND (%s = '' OR fecha ILIKE %s)
+                    AND (%s = '' OR horarios ILIKE %s)
+                    AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)
                 ORDER BY nombre_participante DESC
                 LIMIT %s OFFSET %s'''
 
