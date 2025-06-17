@@ -22,18 +22,23 @@ def constancias_buscar():
     fecha = ''
     horario_inicio = ''
     horario_fin = ''
+    # inicio = ''
+    # fin = ''
+    
     if fecha_raw:
         partes = fecha_raw.split(',')
         if len(partes) == 4:
             fecha = partes[1]
             horario_inicio = f"{partes[2]}"
             horario_fin = f"{partes[3]}"
+            # inicio = datetime.strptime(horario_inicio, '%H:%M:%S').time()
+            # fin = datetime.strptime(horario_fin, '%H:%M:%S').time()
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas_constancias
-                WHERE (%s = '' OR nombre_meses ILIKE %s)
-                    AND (%s = '' OR semanas ILIKE %s)
+                WHERE (%s = '' OR nombre_mes ILIKE %s)
+                    AND (%s = '' OR semana ILIKE %s)
                     AND (%s = '' OR fecha ILIKE %s)
-                    AND (%s = '' OR horario_inicio ILIKE %s AND horario_fin ILIKE %s)
+                    AND (%s = '' OR horario_inicio::text ILIKE %s AND horario_fin::text ILIKE %s)
                     AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)
                 AND constancia_enviada = False '''
 
@@ -41,7 +46,7 @@ def constancias_buscar():
             WHERE (%s = '' OR nombre_mes ILIKE %s)
                 AND (%s = '' OR semana ILIKE %s)
                 AND (%s = '' OR fecha ILIKE %s) 
-                AND (%s = '' OR horario_inicio ILIKE %s AND horario_fin ILIKE %s)
+                AND (%s = '' OR horario_inicio::text ILIKE %s AND horario_fin::text ILIKE %s)
                 AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)
                 AND constancia_enviada = False
             ORDER BY nombre_participante DESC
@@ -53,8 +58,9 @@ def constancias_buscar():
             nombre_mes, nombre_mes, 
             semana, semana, 
             fecha, fecha,
-            horario_inicio, horario_inicio,
-            horario_fin, horario_fin,
+            horario_inicio, 
+            horario_inicio,
+            horario_fin,
             search_query, search_query, search_query  # nombre y clave usan el mismo valor
         ],
         1, 50
@@ -269,23 +275,56 @@ def modificar_constancia():
 @constancias.route("/constancias/hechas&enviadas")
 @login_required
 def constancias_hechas():
-    nombre_categoria = request.args.get('nombre_categoria', '', type=str)
-    sesion = request.args.get('sesion', '', type=str)
+    search_query = request.args.get('buscar', '', type=str)
+    nombre_mes = request.args.get('mes', '', type=str)
+    semana = request.args.get('semana', '', type=str)
+    fecha_raw = request.args.get('fecha', '', type=str)  # Usar directamente el valor completo
+
+    fecha = ''
+    horario_inicio = ''
+    horario_fin = ''
+    # inicio = ''
+    # fin = ''
+    
+    if fecha_raw:
+        partes = fecha_raw.split(',')
+        if len(partes) == 4:
+            fecha = partes[1]
+            horario_inicio = f"{partes[2]}"
+            horario_fin = f"{partes[3]}"
+            # inicio = datetime.strptime(horario_inicio, '%H:%M:%S').time()
+            # fin = datetime.strptime(horario_fin, '%H:%M:%S').time()
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas_constancias
-                   WHERE (%s = '' OR nombre_categoria::text = %s)
-                     AND (%s = '' OR fecha ILIKE %s) AND constancia_enviada = true'''
+                WHERE (%s = '' OR nombre_mes ILIKE %s)
+                    AND (%s = '' OR semana ILIKE %s)
+                    AND (%s = '' OR fecha ILIKE %s)
+                    AND (%s = '' OR horario_inicio::text ILIKE %s AND horario_fin::text ILIKE %s)
+                    AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)
+                AND constancia_enviada = True '''
 
     sql_lim = '''SELECT * FROM asistencias_detalladas_constancias
-                 WHERE (%s = '' OR nombre_categoria::text = %s)
-                   AND (%s = '' OR fecha ILIKE %s) AND constancia_enviada = true
-                 ORDER BY nombre_participante DESC
-                 LIMIT %s OFFSET %s'''
+            WHERE (%s = '' OR nombre_mes ILIKE %s)
+                AND (%s = '' OR semana ILIKE %s)
+                AND (%s = '' OR fecha ILIKE %s) 
+                AND (%s = '' OR horario_inicio::text ILIKE %s AND horario_fin::text ILIKE %s)
+                AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)
+                AND constancia_enviada = True
+            ORDER BY nombre_participante DESC
+            LIMIT %s OFFSET %s'''
 
     paginado = paginador3(
         sql_count, sql_lim,
-        [nombre_categoria, nombre_categoria, sesion, sesion],
-        1, 20
+        [
+            nombre_mes, nombre_mes, 
+            semana, semana, 
+            fecha, fecha,
+            horario_inicio, 
+            horario_inicio,
+            horario_fin,
+            search_query, search_query, search_query  # nombre y clave usan el mismo valor
+        ],
+        1, 50
     )
 
     return render_template('constancias/constancias_hechas.html',
