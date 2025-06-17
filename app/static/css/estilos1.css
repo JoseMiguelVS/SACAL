@@ -12,14 +12,18 @@
 }
 
 body {
-  padding-bottom: 100px; /* espacio suficiente para que el contenido no quede bajo el footer */
+  padding-bottom: 100px;
+  /* espacio suficiente para que el contenido no quede bajo el footer */
   min-height: 100vh;
-  overflow-y: auto; /* fuerza scroll si es necesario */
+  overflow-y: auto;
+  /* fuerza scroll si es necesario */
 }
 
 html {
-  scroll-behavior: smooth; /* Desplazamiento suave */
+  scroll-behavior: smooth;
+  /* Desplazamiento suave */
 }
+
 /* Estilos del encabezado */
 .header {
   background-color: #14447c;
@@ -62,7 +66,8 @@ html {
 
 .header .nav-links a {
   text-decoration: none;
-  font-weight: 700; /* Asumiendo que 700 era un font-weight */
+  font-weight: 700;
+  /* Asumiendo que 700 era un font-weight */
   color: #fff;
   transition: all 0.3s ease;
   padding: 10px;
@@ -84,6 +89,7 @@ html {
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease 0s;
+  text-decoration: none;
 }
 
 .header .btn button:hover,
@@ -94,7 +100,7 @@ html {
 }
 
 /* Menú desplegable de escritorio (Herramientas) */
-.nav-links > li {
+.nav-links>li {
   float: left;
 }
 
@@ -108,19 +114,22 @@ html {
   transform: scale(0);
   left: 0;
   top: 100%;
-  min-width: 150px; /* Ajusta según sea necesario */
+  min-width: 150px;
+  /* Ajusta según sea necesario */
   z-index: 1000;
 }
 
-.nav-links li:hover > ul {
+.nav-links li:hover>ul {
   transform: scale(1);
   display: block;
 }
 
 .nav-links li ul li {
   position: relative;
-  display: block; /* Los elementos del dropdown se apilan verticalmente */
-  padding: 5px 20px; /* Relleno para los elementos del dropdown */
+  display: block;
+  /* Los elementos del dropdown se apilan verticalmente */
+  padding: 5px 20px;
+  /* Relleno para los elementos del dropdown */
 }
 
 .herramientas {
@@ -138,15 +147,19 @@ html {
   width: inherit;
   margin-bottom: 5px;
   height: 80%;
-  justify-content: center; /* Centra horizontalmente */
-  align-items: center; /* Centra verticalmente */
+  justify-content: center;
+  /* Centra horizontalmente */
+  align-items: center;
+  /* Centra verticalmente */
 }
 
 .espacio_form {
   margin: 15px;
   display: flex;
-  justify-content: center; /* Centra horizontalmente */
-  align-items: center; /* Centra verticalmente */
+  justify-content: center;
+  /* Centra horizontalmente */
+  align-items: center;
+  /* Centra verticalmente */
   width: inherit;
 }
 
@@ -188,7 +201,8 @@ td:nth-last-child(2) {
 
 /* Texto truncado en tabla */
 .truncate-text {
-  max-width: 160px; /* ajusta según lo que necesites */
+  max-width: 160px;
+  /* ajusta según lo que necesites */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -224,7 +238,8 @@ td:nth-last-child(2) {
 .tables_participantes select {
   font-size: 12px;
   width: 100%;
-  max-width: 140px; /* Más espacio para inputs tipo date */
+  max-width: 140px;
+  /* Más espacio para inputs tipo date */
   box-sizing: border-box;
 }
 
@@ -255,26 +270,30 @@ footer {
 
 /* Estilos de botones generales */
 .botones,
+.botones-restaurar,
 .botones-papelera,
 .botones-cancelar,
-.botones-delete,
+.botones-eliminar,
 .botones-guardar,
 .botones-editar,
 .botones-ver {
-  display: inline-flex; /* Usar inline-flex para todos los botones */
+  display: inline-flex;
+  /* Usar inline-flex para todos los botones */
   align-items: center;
   padding: 0.375rem 0.75rem;
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
-  border: 1px solid; /* Definir el borde base aquí */
+  border: 1px solid;
+  /* Definir el borde base aquí */
   border-radius: 0.375rem;
   text-align: center;
   text-decoration: none;
   cursor: pointer;
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
     border-color 0.15s ease-in-out;
-  background-color: transparent; /* Fondo transparente por defecto */
+  background-color: transparent;
+  /* Fondo transparente por defecto */
 }
 
 .botones {
@@ -288,15 +307,36 @@ footer {
   border-color: #7d1b1b;
 }
 
-.botones-papelera,
+.botones-papelera {
+  color: #6e6e6e;
+  border-color: #6e6e6e;
+}
+
+.botones-restaurar {
+  color: #198754;
+  border-color: #198754;
+}
+
 .botones-cancelar,
-.botones-delete {
+.botones-eliminar {
   color: #c00404;
   border-color: #c00404;
 }
 
+.botones-papelera:hover {
+  color: #fff;
+  background-color: #6e6e6e;
+  border-color: #6e6e6e;
+}
+
+.botones-restaurar:hover {
+  color: #fff;
+  background-color: #198754;
+  border-color: #198754;
+}
+
 .botones-cancelar:hover,
-.botones-delete:hover {
+.botones-eliminar:hover {
   color: #fff;
   background-color: #c00404;
   border-color: #c00404;
@@ -360,8 +400,8 @@ footer {
   outline: none;
 }
 
-.input-field:focus + .input-label,
-.input-field:not(:placeholder-shown) + .input-label {
+.input-field:focus+.input-label,
+.input-field:not(:placeholder-shown)+.input-label {
   top: -0.5rem;
   left: 0.5rem;
   font-size: 0.75rem;
@@ -369,8 +409,8 @@ footer {
 }
 
 /* Mover label cuando hay selección (no es el primer option) */
-.form-select:focus + .input-label,
-.form-select:not([value=""]) + .input-label {
+.form-select:focus+.input-label,
+.form-select:not([value=""])+.input-label {
   top: -0.5rem;
   left: 0.5rem;
   font-size: 0.75rem;
@@ -389,7 +429,8 @@ footer {
   width: 18px;
   height: 18px;
   margin-right: 0.5rem;
-  accent-color: #007bff; /* Azul Bootstrap */
+  accent-color: #007bff;
+  /* Azul Bootstrap */
   cursor: pointer;
 }
 
@@ -404,7 +445,8 @@ footer {
 
 /* Menú móvil (Responsive) */
 .menu {
-  display: none; /* Oculto por defecto, se muestra en pantallas pequeñas */
+  display: none;
+  /* Oculto por defecto, se muestra en pantallas pequeñas */
 }
 
 @media screen and (max-width: 1400px) {
@@ -414,14 +456,19 @@ footer {
 }
 
 @media screen and (max-width: 1000px) {
+
   /* Combinado para evitar repetición */
   .nav-links,
   .btn {
-    display: none; /* Oculta el menú de escritorio y el botón en pantallas pequeñas */
+    display: none;
+    /* Oculta el menú de escritorio y el botón en pantallas pequeñas */
   }
+
   .menu {
-    display: inherit; /* Muestra el botón de menú móvil */
+    display: inherit;
+    /* Muestra el botón de menú móvil */
   }
+
   /* Ajuste de tamaño de fuente para pantallas más pequeñas */
   * {
     font-size: 15px;
@@ -429,18 +476,21 @@ footer {
 }
 
 .header a {
-  text-decoration: none; /* Regla general para enlaces en el header */
+  text-decoration: none;
+  /* Regla general para enlaces en el header */
 }
 
 .header .overlay {
   height: 100%;
-  width: 0; /* Oculto por defecto */
+  width: 0;
+  /* Oculto por defecto */
   position: fixed;
   z-index: 1;
   left: 0;
   top: 0;
   background-color: #eb5d10;
-  overflow-x: hidden; /* Cambiado a hidden para evitar scroll horizontal innecesario */
+  overflow-x: hidden;
+  /* Cambiado a hidden para evitar scroll horizontal innecesario */
   transition: all 0.3s ease 0s;
 }
 
@@ -450,8 +500,10 @@ footer {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  list-style: none; /* Elimina el estilo de lista para los elementos principales */
-  padding: 0; /* Asegura que no haya padding extra que cause desbordamiento */
+  list-style: none;
+  /* Elimina el estilo de lista para los elementos principales */
+  padding: 0;
+  /* Asegura que no haya padding extra que cause desbordamiento */
 }
 
 .header .overlay a {
@@ -460,50 +512,67 @@ footer {
   display: block;
   transition: all 0.3s ease 0s;
   color: aliceblue;
-  width: 100%; /* Asegura que los enlaces ocupen el ancho completo para el clic */
-  text-align: center; /* Centra el texto de los enlaces */
+  width: 100%;
+  /* Asegura que los enlaces ocupen el ancho completo para el clic */
+  text-align: center;
+  /* Centra el texto de los enlaces */
 }
 
 /* Estilos para el ul anidado en el menú móvil (submenú) */
 .header .overlay .overlay-content li ul {
-  position: static; /* Elimina el posicionamiento absoluto */
-  display: none; /* OCULTA EL SUBMENÚ POR DEFECTO EN EL MÓVIL */
-  background-color: transparent; /* Sin fondo para la lista anidada en el móvil */
+  position: static;
+  /* Elimina el posicionamiento absoluto */
+  display: none;
+  /* OCULTA EL SUBMENÚ POR DEFECTO EN EL MÓVIL */
+  background-color: transparent;
+  /* Sin fondo para la lista anidada en el móvil */
   padding: 0;
   border-radius: 0;
-  transform: none; /* No se necesita transformación */
-  text-align: center; /* Centra los elementos */
-  width: 100%; /* Ocupa todo el ancho */
-  max-height: 0; /* Para la animación de desplegar/plegar */
-  overflow: hidden; /* Para que la animación de max-height funcione */
-  transition: max-height 0.3s ease-out; /* Transición suave para el desplegable */
+  transform: none;
+  /* No se necesita transformación */
+  text-align: center;
+  /* Centra los elementos */
+  width: 100%;
+  /* Ocupa todo el ancho */
+  max-height: 0;
+  /* Para la animación de desplegar/plegar */
+  overflow: hidden;
+  /* Para que la animación de max-height funcione */
+  transition: max-height 0.3s ease-out;
+  /* Transición suave para el desplegable */
 }
 
 /* Muestra el submenú cuando el LI padre tiene la clase 'active' */
-.header .overlay .overlay-content li.active > ul {
+.header .overlay .overlay-content li.active>ul {
   display: block;
-  max-height: 500px; /* Un valor lo suficientemente grande para que se muestre todo el contenido */
+  max-height: 500px;
+  /* Un valor lo suficientemente grande para que se muestre todo el contenido */
 }
 
 .header .overlay .overlay-content li ul li {
-  display: block; /* Asegura que los elementos se apilen verticalmente */
-  padding: 5px 0; /* Relleno para los elementos anidados, un poco menos que el principal */
+  display: block;
+  /* Asegura que los elementos se apilen verticalmente */
+  padding: 5px 0;
+  /* Relleno para los elementos anidados, un poco menos que el principal */
 }
 
 .header .overlay .overlay-content li ul li a {
-  font-size: 24px; /* Ajusta el tamaño de fuente para los enlaces anidados */
+  font-size: 24px;
+  /* Ajusta el tamaño de fuente para los enlaces anidados */
   padding: 5px 0;
   color: #fff;
 }
 
 .header .overlay .overlay-content li ul li a:hover {
-  color: #14447c; /* Color de hover para los enlaces anidados */
+  color: #14447c;
+  /* Color de hover para los enlaces anidados */
 }
 
 /* Corrección de selector y hover */
 .header .overlay a:hover,
 .header .overlay a:focus {
-  color: #14447c; /* Cambiado a un color que contraste mejor con el naranja */
+  color: #14447c;
+  /* Cambiado a un color que contraste mejor con el naranja */
 }
 
 .header .overlay .close {
@@ -511,7 +580,8 @@ footer {
   top: 20px;
   right: 45px;
   font-size: 65px;
-  color: #fff; /* Asegura que la 'X' sea visible */
+  color: #fff;
+  /* Asegura que la 'X' sea visible */
 }
 
 /* Media query para pantallas pequeñas (altura) */
@@ -533,20 +603,24 @@ footer {
   }
 
   .header .overlay {
-    overflow-y: auto; /* Permite scroll vertical si hay muchas opciones */
+    overflow-y: auto;
+    /* Permite scroll vertical si hay muchas opciones */
   }
 
   .header .overlay a {
-    font-size: 24px; /* Reduce tamaño de enlaces principales */
+    font-size: 24px;
+    /* Reduce tamaño de enlaces principales */
     padding: 10px;
   }
 
   .header .overlay .overlay-content li ul li a {
-    font-size: 18px; /* Reduce tamaño de submenú */
+    font-size: 18px;
+    /* Reduce tamaño de submenú */
   }
 
   .header .overlay .overlay-content {
-    padding: 20px 10px; /* Agrega un poco de padding */
+    padding: 20px 10px;
+    /* Agrega un poco de padding */
   }
 
   .header .overlay .close {

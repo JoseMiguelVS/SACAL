@@ -1,46 +1,42 @@
-{% extends './layout.html' %}
-
-{% block body %}
-<h2 class="text-center mb-4">Sesiones Canceladas</h2>
-<div class="container mt-4">
+{% extends './layout.html' %} {% block body %}
+<main class="container my-4">
+    <h2 class="text-center mb-4">Sesiones Canceladas</h2>
 
     <!-- Alertas -->
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    {% for message in messages %}
-    <div class="alert alert-{% if " Error" in message %}danger{% elif "Advertencia" in message %}warning{% else
-        %}success{% endif %} alert-dismissible fade show" role="alert">
+    {% with messages = get_flashed_messages() %} {% if messages %} {% for
+    message in messages %}
+    <div class="alert alert-dismissible fade show alert-fixed {% if 'Error' in message %}alert-danger{% elif 'Advertencia' in message %}alert-warning{% else %}alert-success{% endif %}"
+        role="alert">
         <strong>{{ message }}</strong>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
+    {% endfor %} {% endif %} {% endwith %}
 
     <!-- Buscador -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <!-- Botón a la izquierda -->
-        <a href="{{ url_for('sesiones.sesiones_buscar') }}" class="botones">
-            <i class="fas fa-arrow-left"></i>
-        </a>
+    <!-- Botón a la izquierda -->
+    <a href="{{ url_for('sesiones.sesiones_buscar') }}" class="botones">
+        <i class="fas fa-arrow-left"></i>
+    </a>
 
-        <!-- Contenedor centrado para el formulario -->
-        <div class="mx-auto" style="width: 50%;">
-            <form method="get" action="{{ url_for('sesiones.sesiones_papelera') }}" class="d-flex">
-                <input class="form-control me-2" type="text" name="buscar" value="{{ search_query }}"
-                    placeholder="Buscar..." required>
-                <button class="btn btn-outline-primary" type="submit">
+    <!-- Contenedor centrado para el formulario -->
+    <section class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <form method="get" action="{{ url_for('sesiones.sesiones_papelera') }}"
+            class="d-flex flex-grow-1 justify-content-end">
+            <div class="input-group" style="max-width: 300px;">
+                <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
+                    required>
+                <button class="botones-ver ms-2" type="submit">
                     <i class="fas fa-search"></i>
-                </button>
-            </form>
-        </div>
-    </div>
+            </div>
+            </button>
+        </form>
 
+    </section>
 
     <!-- Tabla -->
-    <div class="table-responsive">
-        <table class="table align-middle text-center">
-            <thead class="">
+    <section class="table-responsive table-sm">
+        <table class="table table-hover">
+            <thead>
                 <tr>
                     <th>Curso</th>
                     <th>Fecha</th>
@@ -56,14 +52,14 @@
                 {% for sesion in sesiones %}
                 {% if not sesion.estado %}
                 <tr>
-                    <td>{{ sesion.nombre_curso }}</td>
+                    <td>{{ sesion.cursos }}</td>
                     <td>{{ sesion.fecha }}</td>
                     <td>{{ sesion.horario_inicio }}</td>
                     <td>{{ sesion.horario_fin }}</td>
                     <td>{{ sesion.nombre_mes }}</td>
                     <td>{{ sesion.semana }}</td>
                     <td>
-                        <button class="btn btn-sm btn-outline-success" type="button" data-bs-toggle="modal"
+                        <button class="botones-restaurar" type="button" data-bs-toggle="modal"
                             data-bs-target="#staticBackdrop-{{ sesion.id_sesion }}">
                             <i class="fas fa-sync-alt"></i>
                         </button>
@@ -78,10 +74,10 @@
                 {% endif %}
             </tbody>
         </table>
-    </div>
+    </section>
 
     <!-- Paginación -->
-    <nav class="mt-4">
+    <nav class="pagination-container mt-4" aria-label="Navegación de páginas de Sesiones">
         <ul class="pagination justify-content-center">
             {% if page > 1 %}
             <li class="page-item">
@@ -121,13 +117,12 @@
     </nav>
 
     <!-- Modals -->
-    {% if sesiones %}
-    {% for sesion in sesiones %}
+    {% if sesiones %} {% for sesion in sesiones %}
     <div class="modal fade" id="staticBackdrop-{{ sesion.id_sesion }}" data-bs-backdrop="static"
         data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header bg-warning text-dark">
+                <div class="modal-header">
                     <h5 class="modal-title" id="staticBackdropLabel">Confirmar restauración</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
@@ -136,14 +131,13 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <a class="btn btn-success" href="{{ url_for('sesiones.sesion_restaurar', id=sesion.id_sesion) }}">
+                    <a class="botones-restaurar" href="{{ url_for('sesiones.sesion_restaurar', id=sesion.id_sesion) }}">
                         <i class="fas fa-sync-alt"></i> Restaurar
                     </a>
                 </div>
             </div>
         </div>
     </div>
-    {% endfor %}
-    {% endif %}
-</div>
+    {% endfor %} {% endif %}
+</main>
 {% endblock %}

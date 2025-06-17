@@ -1,188 +1,185 @@
-{% extends '/layout.html' %}
-{% block body %}
-<h2 class="text-center">Temas</h2>
-<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-{% for message in messages %}
-<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
-    {% endif %} alert-dismissible fade show" role="alert">
-    <strong>{{message}}</strong>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-{% endfor %}
-{% endif %}
-{% endwith %}
+{% extends '/layout.html' %} {% block body %}
+<main class="container my-4">
+    <h2 class="text-center mb-4">Temas de Cursos</h2>
 
-<div>
-    <div class="form-container">
+    <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+    {% with messages = get_flashed_messages() %} {% if messages %} {% for
+    message in messages %}
+    <div class="alert alert-dismissible fade show alert-fixed {% if 'Error' in message %}alert-danger{% elif 'Advertencia' in message %}alert-warning{% else %}alert-success{% endif %}"
+        role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
+
+    <section class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
         <!-- Botón para abrir modal de nuevo tema -->
-        <button class="botones" data-bs-toggle="modal" data-bs-target="#modalAgregarTema">
-            <i class="fa fa-plus"></i>Nuevo
+        <button class="botones" data-bs-toggle="modal" data-bs-target="#modalAgregarTema"
+            aria-label="Agregar Nuevo Tema">
+            <i class="fa fa-plus" style="font-size: 18px;"></i>Nuevo
         </button>
 
-        <form method="get" action="{{ url_for('temas.temas_buscar') }}" class="d-flex">
-            <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
-                required>
-            <button type="submit"><i class="fas fa-search"></i></button>
+        <form method="get" action="{{ url_for('temas.temas_buscar') }}" class="d-flex flex-grow-1 justify-content-end">
+            <div class="input-group" style="max-width: 300px;">
+                <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
+                    required>
+                <button class="botones ms-2" type="submit"><i class="fas fa-search"></i></button>
+            </div>
         </form>
-    </div>
-</div>
+    </section>
 
-<div class="tables">
-    <table>
-        <thead>
-            <tr>
-                <th>Tema</th>
-                <th>Sector</th>
-                <th>Editar</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if temas %}
-            {% for tema in temas %}
-            <tr>
-                <td>{{ tema.nombre_tema }}</td>
-                <td>{{ tema.nombre_tipo }}</td>
-                <td>
-                    <button class="botones-editar" type="button" data-bs-toggle="modal"
-                        data-bs-target="#staticBackdrop-{{tema.id_tema}}">
-                        <li class="fa fa-edit"></li>
-                    </button>
-                </td>
-                {% endfor %}
-                {% else %}
-            <tr>
-                <td align="center" colspan="8">No existen temas</td>
-            </tr>
-            {% endif %}
-            </tr>
-        </tbody>
-    </table>
-</div>
+    <section class="table-responsive table-sm">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Tema</th>
+                    <th>Sector</th>
+                    <th>Editar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if temas %}
+                {% for tema in temas %}
+                <tr>
+                    <td>{{ tema.nombre_tema }}</td>
+                    <td>{{ tema.nombre_tipo }}</td>
+                    <td>
+                        <button class="botones-editar" type="button" data-bs-toggle="modal"
+                            data-bs-target="#staticBackdrop-{{tema.id_tema}}">
+                            <li class="fa fa-edit"></li>
+                        </button>
+                    </td>
+                    {% endfor %}
+                    {% else %}
+                <tr>
+                    <td align="center" colspan="8">No existen temas</td>
+                </tr>
+                {% endif %}
+                </tr>
+            </tbody>
+        </table>
+    </section>
 
-<nav class="paginati" aria-label="Page navigation" class="justify-content-center">
-    <ul class="pagination justify-content-center" style="margin:20px 0">
-        {% if page > 1 %}
-        <li class="page-item">
-            <a class="page-link bg-warning"
-                href="{{url_for('temas.temas_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
-                aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-            </a>
-        </li>
-        {% if page != 1 and page != 2 %}
-        <li class="page-item"><a class="page-link bg-warning" href="{{url_for('temas.temas_buscar')}}">1</a></li>
-        {% if page != 3 %}
-        <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
-        {% endif %}
-        {% endif %}
-        <li class="page-item"><a class="page-link bg-warning"
-                href="{{url_for('temas.temas_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
-        </li>
-        {% endif %}
-
-        <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
-
-        {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
-                href="{{url_for('temas.temas_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
-            </li>
-            {% if page != total_pages and page != total_pages-1 %}
-            {% if page != total_pages-2 %}
-            <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
-            {% endif %}
-            <li class="page-item"><a class="page-link bg-warning"
-                    href="{{url_for('temas.temas_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
-            </li>
-            {% endif %}
+    <nav class="pagination-container mt-4" aria-label="Page navigation">
+        <ul class="pagination justify-content-center" style="margin:20px 0">
+            {% if page > 1 %}
             <li class="page-item">
                 <a class="page-link bg-warning"
-                    href="{{url_for('temas.temas_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
-                    aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
+                    href="{{url_for('temas.temas_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                    aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
+            {% if page != 1 and page != 2 %}
+            <li class="page-item"><a class="page-link bg-warning" href="{{url_for('temas.temas_buscar')}}">1</a></li>
+            {% if page != 3 %}
+            <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
             {% endif %}
-    </ul>
-</nav>
+            {% endif %}
+            <li class="page-item"><a class="page-link bg-warning"
+                    href="{{url_for('temas.temas_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+            </li>
+            {% endif %}
 
-<!-- ----------------------------------------------------MODAL----------------------------- -->
-{% if temas %}
-{% for tema in temas %}
-<div class="modal fade" id="staticBackdrop-{{tema.id_tema}}" data-bs-backdrop="static" data-bs-keyboard="false"
-    tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-tittle" id="staticBackdropLabel">Editar tema</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form method="POST" class="formulario" action="{{ url_for('temas.tema_editar', id = tema.id_tema) }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <input type="text" name="nombre_tema" id="nombre_tema" value="{{ tema.nombre_tema }}">
-                    <select name="id_tipo" id="id_tipo" class="form-select" aria-label="Default select example">
-                        <option value="true">Sector</option>
-                        {% if tipos %}
-                        {% for tipo in tipos %}
-                        <option value="{{tipo.0}}" {% if tipo.1==tema.nombre_tipo %} selected {% endif %}>{{tipo.1}}
-                        </option>
-                        {% endfor %}
-                        {% else %}
-                        <option value="">Aun no hay registros</option>
-                        {% endif %}
-                    </select>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
-                <button class="botones" type="submit">Guardar</button>
-                </form>
+            <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
+
+            {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
+                    href="{{url_for('temas.temas_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+                </li>
+                {% if page != total_pages and page != total_pages-1 %}
+                {% if page != total_pages-2 %}
+                <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
+                {% endif %}
+                <li class="page-item"><a class="page-link bg-warning"
+                        href="{{url_for('temas.temas_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                </li>
+                {% endif %}
+                <li class="page-item">
+                    <a class="page-link bg-warning"
+                        href="{{url_for('temas.temas_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                        aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+        </ul>
+    </nav>
+
+    <!-- ----------------------------------------------------MODAL----------------------------- -->
+    {% if temas %} {% for tema in temas %}
+    <div class="modal fade" id="staticBackdrop-{{tema.id_tema}}" data-bs-backdrop="static" data-bs-keyboard="false"
+        tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-tittle" id="staticBackdropLabel">Editar tema</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" class="formulario"
+                        action="{{ url_for('temas.tema_editar', id = tema.id_tema) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="text" name="nombre_tema" id="nombre_tema" value="{{ tema.nombre_tema }}">
+                        <select name="id_tipo" id="id_tipo" class="form-select" aria-label="Default select example">
+                            <option value="true">Sector</option>
+                            {% if tipos %}
+                            {% for tipo in tipos %}
+                            <option value="{{tipo.0}}" {% if tipo.1==tema.nombre_tipo %} selected {% endif %}>{{tipo.1}}
+                            </option>
+                            {% endfor %}
+                            {% else %}
+                            <option value="">Aun no hay registros</option>
+                            {% endif %}
+                        </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="botones" type="submit">Guardar</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- #----------------------------------------------------------------------------------------- -->
-<!-- MODAL AGREGAR TEMA -->
-<div class="modal fade" id="modalAgregarTema" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="modalAgregarTemaLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form method="POST" action="{{ url_for('temas.tema_nuevo') }}" class="modal-content formulario">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalAgregarTemaLabel">Agregar Tema</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <div class="mb-3">
-                    <label for="nombre_tema" class="form-label">Nombre del Tema</label>
-                    <input type="text" class="form-control" name="nombre_tema" required>
+    <!-- #----------------------------------------------------------------------------------------- -->
+    <!-- MODAL AGREGAR TEMA -->
+    <div class="modal fade" id="modalAgregarTema" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="modalAgregarTemaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="POST" action="{{ url_for('temas.tema_nuevo') }}" class="modal-content formulario">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalAgregarTemaLabel">Agregar Tema</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
-                <div class="mb-3">
-                    <label for="tipo_id" class="form-label">Sector</label>
-                    <select name="tipo_id" class="form-select" required>
-                        <option value="" disabled selected>Seleccione un sector</option>
-                        {% if tipos %}
-                        {% for tipo in tipos %}
-                        <option value="{{ tipo.0 }}">{{ tipo.1 }}</option>
-                        {% endfor %}
-                        {% else %}
-                        <option value="">Aun no hay registros</option>
-                        {% endif %}
-                    </select>
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="nombre_tema" class="form-label">Nombre del Tema</label>
+                        <input type="text" class="form-control" name="nombre_tema" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="tipo_id" class="form-label">Sector</label>
+                        <select name="tipo_id" class="form-select" required>
+                            <option value="" disabled selected>Seleccione un sector</option>
+                            {% if tipos %}
+                            {% for tipo in tipos %}
+                            <option value="{{ tipo.0 }}">{{ tipo.1 }}</option>
+                            {% endfor %}
+                            {% else %}
+                            <option value="">Aun no hay registros</option>
+                            {% endif %}
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="botones">Guardar</button>
-            </div>
-        </form>
+                <div class="modal-footer">
+                    <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="botones">Guardar</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
-{% endfor %}
-{% else %}
-{% endif %}
+    {% endfor %} {% else %} {% endif %}
 
-
+</main>
 
 {% endblock %}

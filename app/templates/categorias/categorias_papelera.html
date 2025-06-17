@@ -1,135 +1,130 @@
 {% extends './layout.html' %}
 {% block body %}
-<h2>Papelera de categorias</h2>
-<br>
-<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-{% for message in messages %}
-<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
-    {% endif %} alert-dismissible fade show" role="alert">
-    <strong>{{message}}</strong>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-{% endfor %}
-{% endif %}
-{% endwith %}
-
-<div>
-    <div class="form-container">
-        <!-- -------------------------------------BUSCADOR------------------------------------------ -->
-        <form method="get" action="{{ url_for('categorias.categorias_papelera') }}" class="d-flex">
-            <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
-                required>
-            <button type="submit"><i class="fas fa-search"></i></button>
-        </form>
+<main class="container my-4">
+    <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+    {% with messages = get_flashed_messages() %} {% if messages %} {% for
+    message in messages %}
+    <div class="alert alert-dismissible fade show alert-fixed {% if 'Error' in message %}alert-danger{% elif 'Advertencia' in message %}alert-warning{% else %}alert-success{% endif %}"
+        role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-</div>
+    {% endfor %} {% endif %} {% endwith %}
 
-<!-- ------------------------------TABLE -------------------------------- -->
-<div class="tables">
-    <table>
-        <thead>
-            <tr>
-                <th>Ver</th>
-                <th>Nombre categoriath>
-                <th>Restaurar</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if categorias %}
-            {% for categoria in categorias %}
-            {% if categoria.estado == false %}
-            <tr>
-                <td>{{categoria.nombre_categoria}}</td>
-                <td>
-                    <button class="botones" type="button" data-bs-toggle="modal"
-                        data-bs-target="#staticBackdrop-{{categoria.id_categoria}}"><i class="fas fa-sync-alt"
-                            style="font-size: 18px;"></i>
-                    </button>
-                </td>
+    <section class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <form method="get" action="{{ url_for('categorias.categorias_papelera') }}"
+            class="d-flex flex-grow-1 justify-content-end">
+            <div class="input-group" style="max-width: 300px;">
+                <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
+                    required>
+                <button type="submit"><i class="fas fa-search"></i></button>
+            </div>
+        </form>
+    </section>
+    <!-- ------------------------------TABLE -------------------------------- -->
+    <section class="table-responsive table-sm">
+        <table class="table table-hover">
+            <thead class="text-center">
+                <tr>
+                    <th>Nombre categoria</th>
+                    <th>Restaurar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if categorias %}
+                {% for categoria in categorias %}
+                {% if categoria.estado == false %}
+                <tr>
+                    <td>{{categoria.nombre_categoria}}</td>
+                    <td>
+                        <button class="botones" type="button" data-bs-toggle="modal"
+                            data-bs-target="#staticBackdrop-{{categoria.id_categoria}}"><i class="fas fa-sync-alt"
+                                style="font-size: 18px;"></i>
+                        </button>
+                    </td>
+                    {% endif %}
+                    {% endfor %}
+                    {% else %}
+                <tr>
+                    <td align="center" colspan="8">No existen categorias eliminados</td>
+                </tr>
                 {% endif %}
-                {% endfor %}
-                {% else %}
-            <tr>
-                <td align="center" colspan="8">No existen categorias eliminados</td>
-            </tr>
-            {% endif %}
-            </tr>
-        </tbody>
-    </table>
-</div>
-<!-- -------------------------------------------------PAGINADOR----------------------------------------------- -->
-<nav class="paginati" aria-label="Page navigation" class="justify-content-center">
-    <ul class="pagination justify-content-center" style="margin:20px 0">
-        {% if page > 1 %}
-        <li class="page-item">
-            <a class="page-link bg-warning"
-                href="{{url_for('categorias_papelera')}}?page={{ page - 1 }}&per_page={{ per_page }}"
-                aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-            </a>
-        </li>
-        {% if page != 1 and page != 2 %}
-        <li class="page-item"><a class="page-link bg-warning" href="{{url_for('categorias_papelera')}}">1</a></li>
-        {% if page != 3 %}
-        <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
-        {% endif %}
-        {% endif %}
-        <li class="page-item"><a class="page-link bg-warning"
-                href="{{url_for('categorias_papelera')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
-        </li>
-        {% endif %}
-
-        <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
-
-        {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
-                href="{{url_for('categorias_papelera')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
-            </li>
-            {% if page != total_pages and page != total_pages-1 %}
-            {% if page != total_pages-2 %}
-            <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
-            {% endif %}
-            <li class="page-item"><a class="page-link bg-warning"
-                    href="{{url_for('categorias_papelera')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
-            </li>
-            {% endif %}
+                </tr>
+            </tbody>
+        </table>
+    </section>
+    <!-- -------------------------------------------------PAGINADOR----------------------------------------------- -->
+    <nav class="paginati" aria-label="Page navigation" class="justify-content-center">
+        <ul class="pagination justify-content-center" style="margin:20px 0">
+            {% if page > 1 %}
             <li class="page-item">
                 <a class="page-link bg-warning"
-                    href="{{url_for('categorias_papelera')}}?page={{ page + 1 }}&per_page={{ per_page }}"
-                    aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
+                    href="{{url_for('categorias_papelera')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                    aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
+            {% if page != 1 and page != 2 %}
+            <li class="page-item"><a class="page-link bg-warning" href="{{url_for('categorias_papelera')}}">1</a></li>
+            {% if page != 3 %}
+            <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
             {% endif %}
-    </ul>
-</nav>
+            {% endif %}
+            <li class="page-item"><a class="page-link bg-warning"
+                    href="{{url_for('categorias_papelera')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+            </li>
+            {% endif %}
 
-<!-- --------------------------------------------------MODAL--------------------------------------------------- -->
-{% if categorias %}
-{% for categoria in categorias %}
-<div class="modal fade" id="staticBackdrop-{{categoria.id_categoria}}" data-bs-backdrop="static"
-    data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="staticBackdropLabel">Confirmar acción</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                ¿Deseas Restaurar a <strong>{{ categoria.nombre_categoria }}</strong>?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <a class="btn btn-danger"
-                    href="{{ url_for('categorias.categoria_restaurar', id = categoria.id_categoria) }}"
-                    class="btn-delete"><i class="fas fa-trash-alt"></i>Restaurar</a>
+            <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
+
+            {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
+                    href="{{url_for('categorias_papelera')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+                </li>
+                {% if page != total_pages and page != total_pages-1 %}
+                {% if page != total_pages-2 %}
+                <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
+                {% endif %}
+                <li class="page-item"><a class="page-link bg-warning"
+                        href="{{url_for('categorias_papelera')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                </li>
+                {% endif %}
+                <li class="page-item">
+                    <a class="page-link bg-warning"
+                        href="{{url_for('categorias_papelera')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                        aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+        </ul>
+    </nav>
+
+    <!-- --------------------------------------------------MODAL--------------------------------------------------- -->
+    {% if categorias %}
+    {% for categoria in categorias %}
+    <div class="modal fade" id="staticBackdrop-{{categoria.id_categoria}}" data-bs-backdrop="static"
+        data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Confirmar acción</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ¿Deseas Restaurar a <strong>{{ categoria.nombre_categoria }}</strong>?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <a class="btn btn-danger"
+                        href="{{ url_for('categorias.categoria_restaurar', id = categoria.id_categoria) }}"
+                        class="btn-delete"><i class="fas fa-trash-alt"></i>Restaurar</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
-{% endfor %}
-{% else %}
-{% endif %}
+    {% endfor %}
+    {% else %}
+    {% endif %}
+</main>
 
 {% endblock %}

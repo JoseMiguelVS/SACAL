@@ -23,7 +23,7 @@
                                 <input class="form-control" type="text" name="buscar" value="{{ search_query }}"
                                         placeholder="Buscar..." aria-label="Buscar empleado por nombre o correo"
                                         required />
-                                <button type="submit" class="btn btn-primary ms-2" aria-label="Buscar">
+                                <button type="submit" class="botones-ver ms-2" aria-label="Buscar">
                                         <i class="fas fa-search"></i>
                                 </button>
                         </div>
@@ -65,7 +65,7 @@
                                                 </button>
                                         </td>
                                         <td>
-                                                <button class="botones-delete" type="button" data-bs-toggle="modal"
+                                                <button class="botones-eliminar" type="button" data-bs-toggle="modal"
                                                         data-bs-target="#staticBackdrop-{{ empleado.id_empleado }}"
                                                         aria-label="Eliminar empleado {{ empleado.nombre_empleado }}">
                                                         <i class="fa fa-trash" style="font-size: 18px"></i>
@@ -145,7 +145,7 @@
 
         <!-- ---------------------------------------------------papelera--------------------------------------------------- -->
         <aside class="mt-3">
-                <a href="{{ url_for('empleados.empleados_papelera') }}" class="btn botones-papelera">
+                <a href="{{ url_for('empleados.empleados_papelera') }}" class="botones-papelera">
                         <i class="fa fa-folder" style="font-size: 18px"></i> Papelera
                 </a>
         </aside>
@@ -168,10 +168,10 @@
                                         <strong>{{ empleado.nombre_empleado }} {{ empleado.apellido_pat }}</strong>?
                                 </div>
                                 <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        <button type="button" class="botones-ver" data-bs-dismiss="modal">
                                                 Cancelar
                                         </button>
-                                        <a class="btn btn-danger"
+                                        <a class="botones-eliminar"
                                                 href="{{ url_for('empleados.empleado_eliminar', id=empleado.id_empleado) }}"
                                                 aria-label="Eliminar empleado {{ empleado.nombre_empleado }}">
                                                 <i class="fas fa-trash-alt"></i> Eliminar
@@ -256,10 +256,10 @@
                                         </div>
                                 </div>
                                 <div class="modal-footer">
-                                        <button type="button" class="btn botones" data-bs-dismiss="modal">
+                                        <button type="button" class="botones-cancelar" data-bs-dismiss="modal">
                                                 Cancelar
                                         </button>
-                                        <button type="submit" class="btn botones">Guardar</button>
+                                        <button type="submit" class="botones-guardar">Guardar</button>
                                 </div>
                         </form>
                 </div>
@@ -331,10 +331,10 @@
                                         </div>
                                 </div>
                                 <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        <button type="button" class="botones-cancelar" data-bs-dismiss="modal">
                                                 Cancelar
                                         </button>
-                                        <button type="submit" class="btn btn-primary">Guardar</button>
+                                        <button type="submit" class="botones-guardar">Guardar</button>
                                 </div>
                         </form>
                 </div>
