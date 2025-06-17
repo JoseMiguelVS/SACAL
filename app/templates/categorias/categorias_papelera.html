@@ -1,5 +1,4 @@
-{% extends './layout.html' %}
-{% block body %}
+{% extends './layout.html' %} {% block body %}
 <main class="container my-4">
     <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
     {% with messages = get_flashed_messages() %} {% if messages %} {% for
@@ -17,10 +16,11 @@
             <div class="input-group" style="max-width: 300px;">
                 <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
                     required>
-                <button type="submit"><i class="fas fa-search"></i></button>
+                <button class="botones-ver ms-2" type="submit"><i class="fas fa-search"></i></button>
             </div>
         </form>
     </section>
+
     <!-- ------------------------------TABLE -------------------------------- -->
     <section class="table-responsive table-sm">
         <table class="table table-hover">
@@ -37,7 +37,7 @@
                 <tr>
                     <td>{{categoria.nombre_categoria}}</td>
                     <td>
-                        <button class="botones" type="button" data-bs-toggle="modal"
+                        <button class="botones-restaurar" type="button" data-bs-toggle="modal"
                             data-bs-target="#staticBackdrop-{{categoria.id_categoria}}"><i class="fas fa-sync-alt"
                                 style="font-size: 18px;"></i>
                         </button>
@@ -100,8 +100,7 @@
     </nav>
 
     <!-- --------------------------------------------------MODAL--------------------------------------------------- -->
-    {% if categorias %}
-    {% for categoria in categorias %}
+    {% if categorias %} {% for categoria in categorias %}
     <div class="modal fade" id="staticBackdrop-{{categoria.id_categoria}}" data-bs-backdrop="static"
         data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -115,16 +114,15 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <a class="btn btn-danger"
-                        href="{{ url_for('categorias.categoria_restaurar', id = categoria.id_categoria) }}"
-                        class="btn-delete"><i class="fas fa-trash-alt"></i>Restaurar</a>
+                    <a class="botones-restaurar"
+                        href="{{ url_for('categorias.categoria_restaurar', id = categoria.id_categoria) }}">
+                        <i class="fas fa-sync-alt"></i> Restaurar
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-    {% endfor %}
-    {% else %}
-    {% endif %}
+    {% endfor %} {% else %} {% endif %}
 </main>
 
 {% endblock %}

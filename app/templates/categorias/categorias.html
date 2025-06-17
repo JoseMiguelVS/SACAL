@@ -23,7 +23,7 @@
                         <div class="input-group" style="max-width: 300px;">
                                 <input class="form-control" type="text" name="buscar" value="{{ search_query }}"
                                         placeholder="Buscar..." required>
-                                <button class="botones ms-2" type="submit"><i class="fas fa-search"></i></button>
+                                <button class="botones-ver ms-2" type="submit"><i class="fas fa-search"></i></button>
                         </div>
                 </form>
         </section>
@@ -51,7 +51,7 @@
                                                 </button>
                                         </td>
                                         <td>
-                                                <button class="botones-delete" type="button" data-bs-toggle="modal"
+                                                <button class="botones-eliminar" type="button" data-bs-toggle="modal"
                                                         data-bs-target="#modalEliminar-{{categoria.id_categoria}}">
                                                         <li class="fa fa-trash" style="font-size: 18px;"></li>
                                                 </button>
@@ -67,6 +67,7 @@
                         </tbody>
                 </table>
         </div>
+
         <!-- -------------------------------------------------PAGINADOR----------------------------------------------- -->
         <nav class="pagination-container mt-4" aria-label="Navegacion de paginas de categorias">
                 <ul class="pagination justify-content-center" style="margin:20px 0">
@@ -166,7 +167,7 @@
                                 </div>
                                 <div class="modal-footer">
                                         <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
-                                        <button type="submit" class="botones">Guardar</button>
+                                        <button type="submit" class="botones-guardar">Guardar</button>
                                 </div>
                         </form>
                 </div>
@@ -191,7 +192,7 @@
                                 </div>
                                 <div class="modal-footer">
                                         <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
-                                        <button type="submit" class="botones">Guardar</button>
+                                        <button type="submit" class="botones-guardar">Guardar</button>
                                 </div>
                                 </form>
                         </div>

@@ -22,7 +22,7 @@
                         <div class="input-group" style="max-width: 300px;">
                                 <input class="form-control" type="text" name="buscar" value="{{ search_query }}"
                                         placeholder="Buscar..." required>
-                                <button type="submit"><i class="fas fa-search"></i></button>
+                                <button class="botones-ver ms-2" type="submit"><i class="fas fa-search"></i></button>
                         </div>
                 </form>
         </section>
@@ -61,13 +61,13 @@
                                                 href="{{ url_for('cursos.curso_editar', id = curso.id_curso) }}">
                                                 <li class="fa fa-edit" style="font-size: 18px;"></li>
                                         </a> -->
-                                                <button type="button" class="botones" data-bs-toggle="modal"
+                                                <button type="button" class="botones-editar" data-bs-toggle="modal"
                                                         data-bs-target="#modalEditar-{{curso.id_curso}}">
                                                         <li class="fa fa-edit" style="font-size: 18px;"></li>
                                                 </button>
                                         </td>
                                         <td>
-                                                <button class="botones-delete" type="button" data-bs-toggle="modal"
+                                                <button class="botones-eliminar" type="button" data-bs-toggle="modal"
                                                         data-bs-target="#staticBackdrop-{{curso.id_curso}}">
                                                         <li class="fa fa-trash" style="font-size: 18px;"></li>
                                                 </button>
@@ -211,7 +211,7 @@
                                 </div>
                                 <div class="modal-footer">
                                         <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
-                                        <button type="submit" class="botones">Guardar</button>
+                                        <button type="submit" class="botones-guardar">Guardar</button>
                                 </div>
                         </form>
                 </div>
@@ -261,7 +261,7 @@
                                 </div>
                                 <div class="modal-footer">
                                         <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
-                                        <button type="submit" class="botones">Guardar</button>
+                                        <button type="submit" class="botones-guardar">Guardar</button>
                                 </div>
                         </form>
                 </div>

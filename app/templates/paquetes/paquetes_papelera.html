@@ -1,7 +1,7 @@
 {% extends './layout.html' %}
 {% block body %}
 <main class="container my-4">
-        <h2 class="text-center mb-4">Papelera de Paquete</h2>
+        <h2 class="text-center mb-4">Papelera de Paquetes</h2>
 
         <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
         {% with messages = get_flashed_messages() %} {% if messages %} {% for
@@ -26,6 +26,7 @@
                         </div>
                 </form>
         </section>
+
         <!-- ------------------------------TABLE -------------------------------- -->
         <section class="table-responsive table-sm">
                 <table class="table table-hover">
@@ -46,7 +47,7 @@
                                         <td>{{paquete.precio_paquete}}</td>
                                         <td>{{paquete.nombre_categoria}}</td>
                                         <td>
-                                                <button class="botones" type="button" data-bs-toggle="modal"
+                                                <button class="botones-resturar" type="button" data-bs-toggle="modal"
                                                         data-bs-target="#staticBackdrop-{{paquete.id_paquete}}"><i
                                                                 class="fas fa-sync-alt" style="font-size: 18px;"></i>
                                                 </button>
@@ -62,6 +63,7 @@
                         </tbody>
                 </table>
         </section>
+
         <!-- -------------------------------------------------PAGINADOR----------------------------------------------- -->
         <nav class="pagination-container mt-4" aria-label="Page navigation" class="justify-content-center">
                 <ul class="pagination justify-content-center" style="margin:20px 0">
@@ -126,9 +128,10 @@
                                 <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary"
                                                 data-bs-dismiss="modal">Cancelar</button>
-                                        <a class="btn btn-danger"
-                                                href="{{ url_for('paquete.paquete_restaurar', id = paquete.id_paquete) }}"
-                                                class="btn-delete"><i class="fas fa-trash-alt"></i>Restaurar</a>
+                                        <a class="botones-restaurar"
+                                                href="{{ url_for('paquete.paquete_restaurar', id = paquete.id_paquete) }}">
+                                                <i class="fas fa-sync-alt"></i> Restaurar
+                                        </a>
                                 </div>
                         </div>
                 </div>

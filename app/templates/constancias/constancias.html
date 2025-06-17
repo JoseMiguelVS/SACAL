@@ -104,7 +104,7 @@
                     <tr data-id="{{ p.id_participante }}">
                         <!-- Botón Detalles -->
                         <td>
-                            <a href="{{ url_for('constancias.constancias_detalles', id=p.id_participante) }}">
+                            <a class="botones-ver" href="{{ url_for('constancias.constancias_detalles', id=p.id_participante) }}">
                                 <li class="fa fa-eye" style="font-size: 18px;"></li>
                             </a>
                         </td>
@@ -117,7 +117,7 @@
                         </td>
                         <!-- Botón Editar -->
                         <td>
-                            <a
+                            <a class="botones-editar"
                                 href="{{ url_for('constancias.constancias_editar', id=p.id_participante, curso=p.nombre_curso, fecha=p.fecha) }}">
                                 <li class="fa fa-edit" style="font-size: 18px;"></li>
                             </a>
@@ -276,8 +276,8 @@
                             class="form-control" required>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-primary"
+                        <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="botones-guardar"
                             onclick="enviarFolioYGenerar('{{ p.id_participante }}', '{{ p.nombre_curso }}', '{{ p.fecha }}')">Guardar
                             y generar</button>
                     </div>

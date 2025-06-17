@@ -44,7 +44,7 @@
                                         <td>{{ponente.curp_ponente}}</td>
                                         <td>{{ponente.cedula_ponente}}</td>
                                         <td>
-                                                <button class="botones" type="button" data-bs-toggle="modal"
+                                                <button class="botones-restaurar" type="button" data-bs-toggle="modal"
                                                         data-bs-target="#staticBackdrop-{{ponente.id_ponentes}}"><i
                                                                 class="fas fa-sync-alt" style="font-size: 18px;"></i>
                                                 </button>
@@ -126,7 +126,7 @@
                                                 data-bs-dismiss="modal">Cancelar</button>
                                         <a class="btn btn-danger"
                                                 href="{{ url_for('ponentes.ponente_restaurar', id = ponente.id_ponentes) }}"
-                                                class="btn-delete"><i class="fas fa-trash-alt"></i>Restaurar</a>
+                                                class="botones-restaurar"><i class="fas fa-trash-alt"></i>Restaurar</a>
                                 </div>
                         </div>
                 </div>
