@@ -3,7 +3,7 @@ from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
 
-from utils.listas import lista_cuentas, lista_cursos, lista_meses, lista_paquetes, lista_sesiones, lista_semanas
+from utils.listas import lista_cuentas, lista_cursos, lista_equipos, lista_meses, lista_paquetes, lista_sesiones, lista_semanas
 
 from ..utils.utils import get_db_connection, paginador3
 
@@ -14,30 +14,33 @@ participantes = Blueprint('participantes', __name__)
 @login_required
 def participantes_buscar():
     search_query = request.args.get('buscar', '', type=str)
+    equipos = request.args.get('equipos', '', type=str)
     mes = request.args.get('mes', '', type=str)
     semana = request.args.get('semana', '', type=str)
     fecha_raw = request.args.get('fecha', '', type=str)
 
     fecha = ''
-    horarios = ''
+    cursos = ''
     if fecha_raw:
-        partes = fecha_raw.split(',')
-        if len(partes) == 4:
+        partes = fecha_raw.split('/')
+        if len(partes) == 3:
             fecha = partes[1]
-            horarios = f"{partes[2]} - {partes[3]}"
+            cursos = partes[2]
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
                 WHERE (%s = '' OR meses ILIKE %s)
+                    AND (%s = '' OR nombre_equipo ILIKE %s)
                     AND (%s = '' OR semanas ILIKE %s)
                     AND (%s = '' OR fecha ILIKE %s)
-                    AND (%s = '' OR horarios ILIKE %s)
-                    AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)'''  # 👈 Filtro único
+                    AND (%s = '' OR cursos ILIKE %s)
+                    AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)''' 
 
     sql_lim = '''SELECT * FROM asistencias_detalladas
                 WHERE (%s = '' OR meses ILIKE %s)
+                    AND (%s = '' OR nombre_equipo ILIKE %s)
                     AND (%s = '' OR semanas ILIKE %s)
                     AND (%s = '' OR fecha ILIKE %s)
-                    AND (%s = '' OR horarios ILIKE %s)
+                    AND (%s = '' OR cursos ILIKE %s)
                     AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)
                 ORDER BY nombre_participante DESC
                 LIMIT %s OFFSET %s'''
@@ -46,9 +49,10 @@ def participantes_buscar():
         sql_count, sql_lim,
         [
             mes, mes,
+            equipos, equipos,
             semana, semana,
             fecha, fecha,
-            horarios, horarios,
+            cursos, cursos,
             search_query, search_query, search_query  # nombre y clave usan el mismo valor
         ],
         1, 50
@@ -56,6 +60,7 @@ def participantes_buscar():
 
 
     return render_template('participantes/participantes.html',
+                           equipos=lista_equipos(),
                            meses=lista_meses(),
                            cursos=lista_cursos(),
                            semanas=lista_semanas(),
@@ -91,6 +96,7 @@ def participante_nuevo():
         cuenta_destino = request.form['id_cuenta']
         nombre_paquete = request.form['id_paquete']
         sesion = request.form['id_sesion']
+        equipos = request.form['equipo']
         estado = True
         constancia_generada = False
         constancia_enviada = False
@@ -101,11 +107,11 @@ def participante_nuevo():
         # 1. Insertar participante
         sql = '''
             INSERT INTO participantes 
-            (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino, equipos)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id_participante
         '''
-        valores = (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino )
+        valores = (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino, equipos )
         cur.execute(sql, valores)
 
         # 2. Obtener el ID recién creado

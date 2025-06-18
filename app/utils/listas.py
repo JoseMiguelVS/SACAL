@@ -57,3 +57,6 @@ def lista_tiposCur():
 
 def lista_privilegios():
     return listar_tabla('paquetes_privilegios', 'id_paquete')
+
+def lista_equipos():
+    return listar_tabla('equipos', 'id_equipo')

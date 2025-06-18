@@ -40,6 +40,7 @@
         <!-- Formulario: Mes y Semana -->
         <form method="get" action="{{ url_for('participantes.participantes_buscar') }}"
             class="d-flex flex-wrap align-items-center gap-2">
+
             <select name="mes" class="form-select-sm">
                 <option value="">Mes</option>
                 {% for mes in meses %}
@@ -59,23 +60,42 @@
             <button type="submit" class="btn btn-sm btn-outline-primary">Filtrar</button>
         </form>
 
+        <form action="{{ url_for('participantes.participantes_buscar') }}"
+            class="get d-flex flex-wrap align-items-center">
+            <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
+            <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
+
+            <select name="equipos" class="form-select-sm">
+                <option value="">Equipo</option>
+                {% for equipo in equipos %}
+                <option value="{{ equipo.1 }}" {% if request.args.get('equipos')==equipo.1 %}selected{% endif %}>{{
+                    equipo.1 }}
+                </option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-sm btn-success">Aceptar</button>
+        </form>
+
         <!-- Formulario: Sesión -->
         <form method="get" action="{{ url_for('participantes.participantes_buscar') }}"
             class="d-flex flex-wrap align-items-center gap-2">
             <!-- Mantener filtros -->
+            <input type="hidden" name="equipo" id="equipo" value="{{ request.args.get('equipo', '') }}">
             <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
             <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
 
             <select name="fecha" class="form-select-sm">
                 <option value="">Sesión</option>
+                {% set equipo_seleccionado = request.args.get('equipo', '') %}
                 {% set mes_seleccionado = request.args.get('mes', '') %}
                 {% set semana_seleccionada = request.args.get('semana', '') %}
                 {% set fecha_actual = request.args.get('fecha', '') %}
                 {% for sesion in sesiones %}
-                {% if sesion.6 == mes_seleccionado and sesion.5 == semana_seleccionada %}
-                {% set valor = sesion.0 ~ ',' ~ sesion.1 ~ ',' ~ sesion.2 ~ ',' ~ sesion.3 %}
+                {% if sesion.6 == mes_seleccionado and sesion.5 == semana_seleccionada or sesion.1 ==
+                equipo_seleccionado%}
+                {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.7 %}
                 <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
-                    {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.2 }} || {{ sesion.3 }}
+                    {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.7 }}
                 </option>
                 {% endif %}
                 {% endfor %}
@@ -195,6 +215,7 @@
                     <p>Sesion: {{ partesSesiones[1] }}, {{ partesSesiones[2] }}, {{ partesSesiones[3] }}</p>
                     {% endif %}
                     {% endif %}
+                    <input type="hidden" name="equipo" id="equipo" value="{{ request.args.get('equipo', '') }}">
 
                     <div class="row g-3">
                         <!-- Clave -->
