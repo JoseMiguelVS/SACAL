@@ -33,15 +33,18 @@
                 </button>
             </div>
         </form>
+        
     </section>
 
     <!-- FILTROS CENTRADOS ABAJO -->
     <section class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
+
         <!-- Formulario: Mes y Semana -->
         <form method="get" action="{{ url_for('participantes.participantes_buscar') }}"
-            class="d-flex flex-wrap align-items-center gap-2">
+            class="d-flex flex-wrap align-items-center gap-2" id="filtroForm">
 
-            <select name="mes" class="form-select-sm">
+            <!-- Filtro: Mes -->
+            <select name="mes" class="form-select-sm filtro-auto">
                 <option value="">Mes</option>
                 {% for mes in meses %}
                 <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>{{ mes.1 }}
@@ -49,50 +52,24 @@
                 {% endfor %}
             </select>
 
-            <select name="semana" class="form-select-sm">
-                <option value="">-Semana-</option>
+            <!-- Filtro: Semana -->
+            <select name="semana" class="form-select-sm filtro-auto">
+                <option value="">Semana</option>
                 {% for semana in semanas %}
                 <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>{{
                     semana.1 }}</option>
                 {% endfor %}
             </select>
 
-            <button type="submit" class="btn btn-sm btn-outline-primary">Filtrar</button>
-        </form>
-
-        <form action="{{ url_for('participantes.participantes_buscar') }}"
-            class="get d-flex flex-wrap align-items-center">
-            <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
-            <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
-
-            <select name="equipos" class="form-select-sm">
-                <option value="">Equipo</option>
-                {% for equipo in equipos %}
-                <option value="{{ equipo.1 }}" {% if request.args.get('equipos')==equipo.1 %}selected{% endif %}>{{
-                    equipo.1 }}
-                </option>
-                {% endfor %}
-            </select>
-            <button type="submit" class="btn btn-sm btn-success">Aceptar</button>
-        </form>
-
-        <!-- Formulario: Sesión -->
-        <form method="get" action="{{ url_for('participantes.participantes_buscar') }}"
-            class="d-flex flex-wrap align-items-center gap-2">
-            <!-- Mantener filtros -->
-            <input type="hidden" name="equipo" id="equipo" value="{{ request.args.get('equipo', '') }}">
-            <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
-            <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
-
-            <select name="fecha" class="form-select-sm">
+            <!-- Filtro: Sesión -->
+            <select name="fecha" class="form-select-sm filtro-auto">
                 <option value="">Sesión</option>
-                {% set equipo_seleccionado = request.args.get('equipo', '') %}
-                {% set mes_seleccionado = request.args.get('mes', '') %}
-                {% set semana_seleccionada = request.args.get('semana', '') %}
+                {% set equipo_sel = request.args.get('equipos', '') %}
+                {% set mes_sel = request.args.get('mes', '') %}
+                {% set semana_sel = request.args.get('semana', '') %}
                 {% set fecha_actual = request.args.get('fecha', '') %}
                 {% for sesion in sesiones %}
-                {% if sesion.6 == mes_seleccionado and sesion.5 == semana_seleccionada or sesion.1 ==
-                equipo_seleccionado%}
+                {% if sesion.6 == mes_sel and sesion.5 == semana_sel or sesion.1 == equipo_sel %}
                 {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.7 %}
                 <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
                     {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.7 }}
@@ -101,8 +78,18 @@
                 {% endfor %}
             </select>
 
-            <button type="submit" class="btn btn-sm btn-success">Aceptar</button>
-            <a href="{{ url_for('participantes.participantes_buscar') }}" class="btn btn-sm btn-secondary">Limpiar</a>
+            <!-- Filtro: Equipos -->
+            <select name="equipos" class="form-select-sm filtro-auto">
+                <option value="">Equipo</option>
+                {% for equipo in equipos %}
+                <option value="{{ equipo.1 }}" {% if request.args.get('equipos')==equipo.1 %}selected{% endif %}>
+                    {{ equipo.1 }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <!-- Limpiar filtros -->
+            <a href="{{ url_for('participantes.participantes_buscar') }}" class="botones">Limpiar</a>
         </form>
     </section>
 
@@ -134,12 +121,15 @@
                     {% for p in participantes %}
                     {% if p.estado == True %}
                     <tr data-id="{{ p.id_participante }}">
-                        <td><input type="text" name="clave_participante" value="{{ p.clave_participante }}"></td>
-                        <td><input type="text" name="nombre_participante" value="{{ p.nombre_participante }}"></td>
-                        <td><input type="text" name="apellidos_participante" value="{{ p.apellidos_participante }}">
+                        <td><input type="text" name="clave_participante" value="{{ p.clave_participante }}"
+                                onchange="guardarFila(this)"></td>
+                        <td><input type="text" name="nombre_participante" value="{{ p.nombre_participante }} "
+                                onchange="guardarFila(this)"></td>
+                        <td><input type="text" name="apellidos_participante" value="{{ p.apellidos_participante }}"
+                                onchange="guardarFila(this)">
                         </td>
                         <td>
-                            <select name="nombre_paquete" id="nombre_paquete">
+                            <select name="nombre_paquete" id="nombre_paquete" onchange="guardarFila(this)">
                                 <option value="true" selected>Paquete</option>
                                 {% if paquetes %}
                                 {% for paquete in paquetes %}
@@ -152,10 +142,12 @@
                             </select>
                         </td>
                         <td>{{ p.validacion_pago }}</td>
-                        <td><input type="date" name="fecha_pago" value="{{ p.fecha_pago }}"></td>
-                        <td><input type="checkbox" name="factura_pago" {% if p.factura_pago %}checked{% endif %}></td>
+                        <td><input type="date" name="fecha_pago" value="{{ p.fecha_pago }}"
+                                onchange="guardarFila(this)"></td>
+                        <td><input type="checkbox" name="factura_pago" onchange="guardarFila(this)" {% if p.factura_pago
+                                %}checked{% endif %}></td>
                         <td>
-                            <select name="cuenta_destino" id="cuenta_destino">
+                            <select name="cuenta_destino" id="cuenta_destino" onchange="guardarFila(this)">
                                 <option value="" disabled {% if not p.cuenta_destino %}selected{% endif %}>Cuenta
                                     destino
                                 </option>
@@ -170,15 +162,20 @@
                             </select>
                         </td>
                         <td>{{ p.nombre_empleado }}</td>
-                        <td><input type="checkbox" name="confirmacion_grupo" {% if p.confirmacion_grupo %}checked{%
-                                endif %}>
+                        <td><input type="checkbox" name="confirmacion_grupo" onchange="guardarFila(this)" {% if
+                                p.confirmacion_grupo %}checked{% endif %}>
                         </td>
-                        <td><input type="checkbox" name="materiales" {% if p.materiales %}checked{% endif %}></td>
-                        <td><input type="checkbox" name="grabaciones" {% if p.grabaciones %}checked{% endif %}></td>
-                        <td><input type="checkbox" name="evaluacion_dc3" {% if p.evaluacion_dc3 %}checked{% endif %}>
+                        <td><input type="checkbox" name="materiales" onchange="guardarFila(this)" {% if p.materiales
+                                %}checked{% endif %}></td>
+                        <td><input type="checkbox" name="grabaciones" onchange="guardarFila(this)" {% if p.grabaciones
+                                %}checked{% endif %}></td>
+                        <td><input type="checkbox" name="evaluacion_dc3" onchange="guardarFila(this)" {% if
+                                p.evaluacion_dc3 %}checked{% endif %}>
                         </td>
-                        <td><input type="text" name="observaciones" value="{{ p.observaciones }}"></td>
-                        <td><button onclick="guardarCambios(this)">Guardar</button></td>
+                        <td><input type="text" name="observaciones" onchange="guardarFila(this)"
+                                value="{{ p.observaciones }}"></td>
+                        <td>editar</td>
+                        <!-- <td><button onclick="guardarCambios(this)">Guardar</button></td> -->
                     </tr>
                     {% endif %}
                     {% endfor %}
@@ -208,14 +205,21 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="nombre_empleado" value="{{ current_user.id_empleado }}">
 
-                    {% if request.args.get('fecha') %}
-                    {% set partesSesiones = request.args.get('fecha').split(',') %}
-                    {% if partesSesiones|length == 4 %}
+                    {# Extraer partes de la fecha solo si existen #}
+                    {% set fecha_raw = request.args.get('fecha', '') %}
+                    {% set partesSesiones = fecha_raw.split('/') if fecha_raw else [] %}
+
+                    {% if partesSesiones|length == 3 %}
                     <input type="hidden" name="id_sesion" id="id_sesion" value="{{ partesSesiones[0] }}">
-                    <p>Sesion: {{ partesSesiones[1] }}, {{ partesSesiones[2] }}, {{ partesSesiones[3] }}</p>
+                    <p><strong>Sesión:</strong> {{ partesSesiones[1] }}, {{ partesSesiones[2] }}</p>
                     {% endif %}
-                    {% endif %}
-                    <input type="hidden" name="equipo" id="equipo" value="{{ request.args.get('equipo', '') }}">
+
+                    <input type="hidden" name="fecha" value="{{ fecha_raw }}">
+                    <input type="hidden" name="equipos" value="{{ request.args.get('equipos', '') }}">
+                    <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
+                    <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
+
+                    <p><strong>Equipo:</strong> {{ request.args.get('equipos', '') }}</p>
 
                     <div class="row g-3">
                         <!-- Clave -->
@@ -263,15 +267,17 @@
 
                         <!-- Paquete -->
                         <div class="col-md-6">
-                            <label for="id_paquete" class="form-label">Paquete</label>
-                            <select name="id_paquete" id="id_paquete" class="form-select" required>
+                            <label for="paquete" class="form-label">Paquete</label>
+                            <select name="paquete" id="paquete" class="form-select" required>
                                 <option value="" selected disabled>Selecciona un paquete</option>
                                 {% if paquetes and sesiones %}
                                 {% set categorias_validas = sesiones | selectattr('4') | map(attribute='9') | list %}
                                 {% set mostrados = [] %}
                                 {% for paquete in paquetes %}
                                 {% if paquete[4] and paquete[3] in categorias_validas and paquete[0] not in mostrados %}
-                                <option value="{{ paquete[0] }}">{{ paquete[1] }}</option>
+                                <option value="{{ paquete[0] }}, {{ paquete[2] }}">{{ paquete[1] }} Precio: ${{
+                                    paquete[2] }}
+                                </option>
                                 {% set _ = mostrados.append(paquete[0]) %}
                                 {% endif %}
                                 {% endfor %}
@@ -280,6 +286,7 @@
                                 {% endif %}
                             </select>
                         </div>
+
                     </div>
                 </div>
 
@@ -341,6 +348,53 @@
 
 
 <script>
+    function guardarFila(elemento) {
+        const fila = elemento.closest('tr');
+        const id = fila.dataset.id;
+        const datos = {};
+
+        fila.querySelectorAll('input, select').forEach(el => {
+            if (el.type === 'checkbox') {
+                datos[el.name] = el.checked;
+            } else {
+                datos[el.name] = el.value;
+            }
+        });
+
+        fetch(`/participantes/actualizar/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'  // Si estás usando CSRF con Flask-WTF
+            },
+            body: JSON.stringify(datos)
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data.alert);
+                // Aquí podrías mostrar una notificación visual si deseas
+            })
+            .catch(error => {
+                console.error('Error al guardar:', error);
+                alert('Error al guardar los cambios');
+            });
+    }
+</script>
+
+<script>
+    let debounceTimeout = null;
+
+    document.querySelectorAll('.filtro-auto').forEach(select => {
+        select.addEventListener('change', () => {
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(() => {
+                document.getElementById('filtroForm').submit();
+            }, 400); // Espera 400ms tras el último cambio
+        });
+    });
+</script>
+<!-- 
+<script>
     function guardarCambios(button) {
         const fila = button.closest("tr");
         const id = fila.getAttribute("data-id");
@@ -372,6 +426,6 @@
                 console.error(error);
             });
     }
-</script>
+</script> -->
 
 {% endblock %}

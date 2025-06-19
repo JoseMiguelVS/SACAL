@@ -94,12 +94,20 @@ def participante_nuevo():
         clave_participante = request.form['clave_participante']
         nombre_empleado = request.form['nombre_empleado']
         cuenta_destino = request.form['id_cuenta']
-        nombre_paquete = request.form['id_paquete']
+        paquete = request.form['paquete']
         sesion = request.form['id_sesion']
         equipos = request.form['equipo']
         estado = True
         constancia_generada = False
         constancia_enviada = False
+
+        nombre_paquete = ''
+        precio_paquete = ''
+        if paquete:
+            partes = paquete.split(',')
+            if len(paquete) == 2:
+                nombre_paquete == partes[1]
+                precio_paquete == partes[1]
 
         con = get_db_connection()
         cur = con.cursor(cursor_factory=RealDictCursor)
@@ -128,6 +136,10 @@ def participante_nuevo():
         sql3 = "INSERT INTO constancias (participante, constancia_generada, constancia_enviada, asistencia) VALUES (%s, %s, %s, %s)"
         valores3 = (participante_id, constancia_generada, constancia_enviada, asistencia_id)
         cur.execute(sql3, valores3)
+
+        sql4 = "INSERT INTO pagos (ingresos, participante) VALUES (%s, %s)"
+        valores4 = (precio_paquete, clave_participante )
+        cur.execute(sql4, valores4)
 
         # 4. Guardar cambios y cerrar conexión
         con.commit()
@@ -183,4 +195,4 @@ def actualizar_participante(id):
     cur.close()
     con.close()
 
-    return jsonify({'message': 'Participante actualizado correctamente'})
+    return jsonify({'alert': 'Participante actualizado correctamente'})
