@@ -147,7 +147,7 @@ def participante_nuevo():
         con.close()
 
         flash('Participante y asistencia registrados correctamente.')
-        return redirect(url_for('participantes.participantes_buscar'))  # o redirige a donde quieras
+        return redirect(url_for('participantes.participantes_buscar'))
     
 #---------------------------------------------------------------------------------------------------------------
 @participantes.route('/participantes/actualizar/<int:id>', methods=['POST'])
@@ -196,3 +196,20 @@ def actualizar_participante(id):
     con.close()
 
     return jsonify({'alert': 'Participante actualizado correctamente'})
+
+@participantes.route('/participantes/actualizar/sesion/<string:id>', methods=['POST'])
+@login_required
+def participante_actualizar(id):
+    if request.method == 'POST':
+        sesion = request.form['sesion']
+
+        con = get_db_connection()
+        cur = con.cursor()
+        sql = "UPDATE asistencias SET sesion = %s WHERE participante = %s"
+        valores = (sesion, id)
+        cur.execute(sql,valores)
+        con.commit()
+        cur.close()
+        con.close()
+        flash("Participante cambiado de sesion")
+    return redirect(url_for('participantes.participantes_buscar'))

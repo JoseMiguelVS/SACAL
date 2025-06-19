@@ -22,76 +22,91 @@
         </button>
 
         <!-- Buscador por clave a la derecha -->
-        <form method="get" action="{{ url_for('participantes.participantes_buscar') }}"
+        <form id="formBuscar" method="get" action="{{ url_for('participantes.participantes_buscar') }}"
             class="d-flex flex-grow-1 justify-content-end">
-            <!-- Conservamos filtros activos -->
             <div class="input-group" style="max-width: 300px;">
                 <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
-                    aria-label="Buscar participante por clave o nombre" required />
+                    aria-label="Buscar participante por clave o nombre" required
+                    onchange="document.getElementById('formBuscar').submit()" />
                 <button type="submit" class="botones-ver ms-2" aria-label="Buscar">
                     <i class="fas fa-search"></i>
                 </button>
             </div>
         </form>
-        
+
     </section>
 
     <!-- FILTROS CENTRADOS ABAJO -->
-    <section class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
-
-        <!-- Formulario: Mes y Semana -->
+    <section class="mb-4">
         <form method="get" action="{{ url_for('participantes.participantes_buscar') }}"
-            class="d-flex flex-wrap align-items-center gap-2" id="filtroForm">
+            class="row row-cols-auto g-3 justify-content-center align-items-end" id="filtroForm">
 
-            <!-- Filtro: Mes -->
-            <select name="mes" class="form-select-sm filtro-auto">
-                <option value="">Mes</option>
-                {% for mes in meses %}
-                <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>{{ mes.1 }}
-                </option>
-                {% endfor %}
-            </select>
+            <!-- Mes -->
+            <div class="col">
+                <label for="filtroMes" class="form-label mb-1">Mes</label>
+                <select id="filtroMes" name="mes" class="form-select form-select-sm filtro-auto">
+                    <option value="">Todos</option>
+                    {% for mes in meses %}
+                    <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>{{ mes.1 }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-            <!-- Filtro: Semana -->
-            <select name="semana" class="form-select-sm filtro-auto">
-                <option value="">Semana</option>
-                {% for semana in semanas %}
-                <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>{{
-                    semana.1 }}</option>
-                {% endfor %}
-            </select>
+            <!-- Semana -->
+            <div class="col">
+                <label for="filtroSemana" class="form-label mb-1">Semana</label>
+                <select id="filtroSemana" name="semana" class="form-select form-select-sm filtro-auto">
+                    <option value="">Todas</option>
+                    {% for semana in semanas %}
+                    <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>{{
+                        semana.1 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-            <!-- Filtro: Sesión -->
-            <select name="fecha" class="form-select-sm filtro-auto">
-                <option value="">Sesión</option>
-                {% set equipo_sel = request.args.get('equipos', '') %}
-                {% set mes_sel = request.args.get('mes', '') %}
-                {% set semana_sel = request.args.get('semana', '') %}
-                {% set fecha_actual = request.args.get('fecha', '') %}
-                {% for sesion in sesiones %}
-                {% if sesion.6 == mes_sel and sesion.5 == semana_sel or sesion.1 == equipo_sel %}
-                {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.7 %}
-                <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
-                    {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.7 }}
-                </option>
-                {% endif %}
-                {% endfor %}
-            </select>
+            <!-- Sesión -->
+            <div class="col">
+                <label for="filtroSesion" class="form-label mb-1">Sesión</label>
+                <select id="filtroSesion" name="fecha" class="form-select form-select-sm filtro-auto">
+                    <option value="">Todas</option>
+                    {% set equipo_sel = request.args.get('equipos', '') %}
+                    {% set mes_sel = request.args.get('mes', '') %}
+                    {% set semana_sel = request.args.get('semana', '') %}
+                    {% set fecha_actual = request.args.get('fecha', '') %}
+                    {% for sesion in sesiones %}
+                    {% if sesion.6 == mes_sel and sesion.5 == semana_sel or sesion.1 == equipo_sel %}
+                    {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.7 %}
+                    <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
+                        {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.7 }}
+                    </option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
 
-            <!-- Filtro: Equipos -->
-            <select name="equipos" class="form-select-sm filtro-auto">
-                <option value="">Equipo</option>
-                {% for equipo in equipos %}
-                <option value="{{ equipo.1 }}" {% if request.args.get('equipos')==equipo.1 %}selected{% endif %}>
-                    {{ equipo.1 }}
-                </option>
-                {% endfor %}
-            </select>
+            <!-- Equipo -->
+            <div class="col">
+                <label for="filtroEquipo" class="form-label mb-1">Equipo</label>
+                <select id="filtroEquipo" name="equipos" class="form-select form-select-sm filtro-auto">
+                    <option value="">Todos</option>
+                    {% for equipo in equipos %}
+                    <option value="{{ equipo.1 }}" {% if request.args.get('equipos')==equipo.1 %}selected{% endif %}>{{
+                        equipo.1 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
-            <!-- Limpiar filtros -->
-            <a href="{{ url_for('participantes.participantes_buscar') }}" class="botones">Limpiar</a>
+            <!-- Limpiar -->
+            <div class="col align-self-end">
+                <a href="{{ url_for('participantes.participantes_buscar') }}"
+                    class="btn btn-outline-secondary btn-sm">Limpiar</a>
+            </div>
+
         </form>
     </section>
+
+
 
     <!-- TABLA DE PARTICIPANTES -->
     <section class="tables_participantes table">
@@ -174,7 +189,13 @@
                         </td>
                         <td><input type="text" name="observaciones" onchange="guardarFila(this)"
                                 value="{{ p.observaciones }}"></td>
-                        <td>editar</td>
+                        <td>
+                            <button type="button" class="botones-editar" data-bs-toggle="modal"
+                                data-bs-target="#modalEditar-{{p.id_participante}}"
+                                aria-label="Editar participante {{ p.nombre_participante }}">
+                                <i class="fa fa-edit" style="font-size: 18px"></i>
+                            </button>
+                        </td>
                         <!-- <td><button onclick="guardarCambios(this)">Guardar</button></td> -->
                     </tr>
                     {% endif %}
@@ -344,8 +365,54 @@
                 {% endif %}
         </ul>
     </nav>
+
+    {% if participantes %} {% for p in participantes %}
+    <div class="modal fade" id="modalEditar-{{ p.id_participante }}" data-bs-backdrop="static"
+        data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalEditarLabel-{{ p.id_participante }}"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="post" action="{{ url_for('participantes.participante_actualizar', id = p.id_participante) }}"
+                class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="idEditarLabel-{{ p.id_participante }}">Editar Participante</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <div class="mb-2">
+                        <label for="sesion" class="form-label">Sesion</label>
+                        <select name="sesion" id="sesion-{{ p.id_participante }}" class="form-select" required>
+                            <option value="" disabled>Sesion</option>
+                            {% if sesiones %} {% for sesion in sesiones %}
+                            <option value="{{ sesion.0 }} " {% if sesion.7==p.cursos %} selected {% endif %}>{{ sesion.7
+                                }}</option>
+                            {% endfor %} {% else %}
+                            <option disabled>Aun no hay registros</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="botones-cancelar" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="botones-guardar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endfor %} {% endif %}
+
 </main>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const inputBuscar = document.querySelector("input[name='buscar']");
+        const form = document.getElementById("formBuscar");
+
+        inputBuscar.addEventListener("change", function () {
+            form.submit();
+        });
+    });
+</script>
 
 <script>
     function guardarFila(elemento) {
@@ -392,6 +459,8 @@
             }, 400); // Espera 400ms tras el último cambio
         });
     });
+
+
 </script>
 <!-- 
 <script>
