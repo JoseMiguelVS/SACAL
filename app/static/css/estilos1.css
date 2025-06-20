@@ -7,8 +7,27 @@
   padding: 0;
   font-family: "Raleway", sans-serif;
   font-size: 20px;
-  /* font-optical-sizing: auto; */
-  /* font-style: normal; */
+}
+
+.checkbox-pill input[type="checkbox"] {
+  display: none;
+}
+
+.checkbox-pill label {
+  display: inline-block;
+  padding: 8px 18px;
+  margin: 4px;
+  border: 2px solid #0d6efd;
+  border-radius: 30px;
+  background-color: white;
+  color: #0d6efd;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.checkbox-pill input[type="checkbox"]:checked+label {
+  background-color: #0d6efd;
+  color: white;
 }
 
 body {
@@ -22,6 +41,11 @@ body {
 html {
   scroll-behavior: smooth;
   /* Desplazamiento suave */
+}
+
+#filtro-auto {
+  z-index: 0;
+  /* O más alto, según sea necesario */
 }
 
 /* Estilos del encabezado */
@@ -440,8 +464,6 @@ footer {
   font-weight: 500;
   color: #333;
 }
-
-/* ... (tu CSS existente) ... */
 
 /* Menú móvil (Responsive) */
 .menu {

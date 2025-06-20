@@ -21,11 +21,16 @@ def participantes_buscar():
 
     fecha = ''
     cursos = ''
+    equipo = ''
     if fecha_raw:
         partes = fecha_raw.split('/')
         if len(partes) == 3:
             fecha = partes[1]
             cursos = partes[2]
+    if equipos:
+        partesEquipos = equipos.split(',')
+        if len(partesEquipos) == 2:
+            equipo = partesEquipos[1]
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
                 WHERE (%s = '' OR meses ILIKE %s)
@@ -49,7 +54,7 @@ def participantes_buscar():
         sql_count, sql_lim,
         [
             mes, mes,
-            equipos, equipos,
+            equipo, equipo,
             semana, semana,
             fecha, fecha,
             cursos, cursos,
@@ -57,7 +62,6 @@ def participantes_buscar():
         ],
         1, 50
     )
-
 
     return render_template('participantes/participantes.html',
                            equipos=lista_equipos(),
@@ -202,12 +206,21 @@ def actualizar_participante(id):
 def participante_actualizar(id):
     if request.method == 'POST':
         sesion = request.form['sesion']
+        grabacion = request.form['grabacion']
+
+        grabacion_new = ''
+        if grabacion == 'on':
+            grabacion_new = 'True'
 
         con = get_db_connection()
         cur = con.cursor()
         sql = "UPDATE asistencias SET sesion = %s WHERE participante = %s"
         valores = (sesion, id)
         cur.execute(sql,valores)
+
+        sql2 = "UPDATE participantes SET grabacion = %s WHERE id_participante = %s"
+        valores2 = (grabacion_new, id)
+        cur.execute(sql2,valores2)
         con.commit()
         cur.close()
         con.close()

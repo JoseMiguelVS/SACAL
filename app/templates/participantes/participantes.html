@@ -15,6 +15,7 @@
     {% endfor %} {% endif %} {% endwith %}
 
     <!-- NUEVO + BUSCADOR -->
+
     <section class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
         <!-- Botón "Nuevo" alineado a la izquierda -->
         <button type="button" class="botones m-2" data-bs-toggle="modal" data-bs-target="#modalAgregarParticipante">
@@ -37,76 +38,75 @@
     </section>
 
     <!-- FILTROS CENTRADOS ABAJO -->
-    <section class="mb-4">
+
+    <section class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
         <form method="get" action="{{ url_for('participantes.participantes_buscar') }}"
-            class="row row-cols-auto g-3 justify-content-center align-items-end" id="filtroForm">
+            class="d-flex flex-wrap align-items-center gap-2" id="filtroForm">
 
             <!-- Mes -->
-            <div class="col">
-                <label for="filtroMes" class="form-label mb-1">Mes</label>
-                <select id="filtroMes" name="mes" class="form-select form-select-sm filtro-auto">
-                    <option value="">Todos</option>
-                    {% for mes in meses %}
-                    <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>{{ mes.1 }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
+            <label for="filtroMes" class="form-label mb-1">Mes</label>
+            <select id="filtroMes" name="mes" class="form-select-sm filtro-auto">
+                <option value="">Todos</option>
+                {% for mes in meses %}
+                <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>{{ mes.1 }}
+                </option>
+                {% endfor %}
+            </select>
 
             <!-- Semana -->
-            <div class="col">
-                <label for="filtroSemana" class="form-label mb-1">Semana</label>
-                <select id="filtroSemana" name="semana" class="form-select form-select-sm filtro-auto">
-                    <option value="">Todas</option>
-                    {% for semana in semanas %}
-                    <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>{{
-                        semana.1 }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+            <label for="filtroSemana" class="form-label mb-1">Semana</label>
+            <select id="filtroSemana" name="semana" class="form-select-sm filtro-auto">
+                <option value="">Todas</option>
+                {% for semana in semanas %}
+                <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>{{
+                    semana.1 }}</option>
+                {% endfor %}
+            </select>
 
             <!-- Sesión -->
-            <div class="col">
-                <label for="filtroSesion" class="form-label mb-1">Sesión</label>
-                <select id="filtroSesion" name="fecha" class="form-select form-select-sm filtro-auto">
-                    <option value="">Todas</option>
-                    {% set equipo_sel = request.args.get('equipos', '') %}
-                    {% set mes_sel = request.args.get('mes', '') %}
-                    {% set semana_sel = request.args.get('semana', '') %}
-                    {% set fecha_actual = request.args.get('fecha', '') %}
-                    {% for sesion in sesiones %}
-                    {% if sesion.6 == mes_sel and sesion.5 == semana_sel or sesion.1 == equipo_sel %}
-                    {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.7 %}
-                    <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
-                        {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.7 }}
-                    </option>
-                    {% endif %}
-                    {% endfor %}
-                </select>
-            </div>
+            <label for="filtroSesion" class="form-label mb-1">Sesión</label>
+            <select id="filtroSesion" name="fecha" style="max-width: 400px; min-width: 400px"
+                class="form-select-sm filtro-auto">
+                <option value="">Todas</option>
+                {% set equipo_sel = request.args.get('equipos', '') %}
+                {% set mes_sel = request.args.get('mes', '') %}
+                {% set semana_sel = request.args.get('semana', '') %}
+                {% set fecha_actual = request.args.get('fecha', '') %}
+                {% for sesion in sesiones %}
+                {% if sesion.6 == mes_sel and sesion.5 == semana_sel or sesion.1 == equipo_sel %}
+                {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.7 %}
+                <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
+                    {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.7 }}
+                </option>
+                {% endif %}
+                {% endfor %}
+            </select>
 
             <!-- Equipo -->
-            <div class="col">
-                <label for="filtroEquipo" class="form-label mb-1">Equipo</label>
-                <select id="filtroEquipo" name="equipos" class="form-select form-select-sm filtro-auto">
-                    <option value="">Todos</option>
-                    {% for equipo in equipos %}
-                    <option value="{{ equipo.1 }}" {% if request.args.get('equipos')==equipo.1 %}selected{% endif %}>{{
-                        equipo.1 }}</option>
-                    {% endfor %}
-                </select>
+            <label for="filtroEquipo" class="form-label mb-1">Equipo</label>
+            <select id="filtroEquipo" name="equipos" class="form-select-sm filtro-auto">
+                <option value="">Todos</option>
+                {% for equipo in equipos %}
+                {% set valorEquipo = equipo.0 ~ ',' ~ equipo.1 %}
+                <option value="{{ valorEquipo }}" {% if request.args.get('equipos', '' ).split(',')[-1]==equipo.1
+                    %}selected{% endif %}>
+                    {{ equipo.1 }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <div class="form-check form-switch">
+                <input class="form-check-input" name="grabacion" type="checkbox" id="flexSwitchCheckDefault" {% if
+                    grabacion==p.grabacion %} selected {% endif %}>
+                <label class="form-check-label" for="flexSwitchCheckDefault">Cambiar a grabacion?</label>
             </div>
 
             <!-- Limpiar -->
-            <div class="col align-self-end">
-                <a href="{{ url_for('participantes.participantes_buscar') }}"
-                    class="btn btn-outline-secondary btn-sm">Limpiar</a>
-            </div>
+            <a href="{{ url_for('participantes.participantes_buscar') }}"
+                class="btn btn-outline-secondary btn-sm">Limpiar</a>
 
         </form>
     </section>
-
-
 
     <!-- TABLA DE PARTICIPANTES -->
     <section class="tables_participantes table">
@@ -215,10 +215,9 @@
         tabindex="-1" aria-labelledby="modalAgregarParticipanteLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <form action="{{ url_for('participantes.participante_nuevo') }}" method="post" class="modal-content">
-                <div class="modal-header bg-primary text-white">
+                <div class="modal-header">
                     <h5 class="modal-title" id="modalAgregarParticipanteLabel">Agregar Participante</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                        aria-label="Cerrar"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
 
                 <div class="modal-body">
@@ -234,13 +233,18 @@
                     <input type="hidden" name="id_sesion" id="id_sesion" value="{{ partesSesiones[0] }}">
                     <p><strong>Sesión:</strong> {{ partesSesiones[1] }}, {{ partesSesiones[2] }}</p>
                     {% endif %}
-
                     <input type="hidden" name="fecha" value="{{ fecha_raw }}">
-                    <input type="hidden" name="equipos" value="{{ request.args.get('equipos', '') }}">
+
+                    {% set partes_equipo = request.args.get('equipos', '').split(',') %}
+                    {% if partes_equipo | length == 2 %}
+                    <input type="hidden" name="equipos" id="equipos" value="{{ partes_equipo[0] }}">
+                    <p><strong>Equipo:</strong> {{ partes_equipo[1] }}</p>
+                    {% endif %}
+
+
                     <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
                     <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
 
-                    <p><strong>Equipo:</strong> {{ request.args.get('equipos', '') }}</p>
 
                     <div class="row g-3">
                         <!-- Clave -->
@@ -367,9 +371,8 @@
     </nav>
 
     {% if participantes %} {% for p in participantes %}
-    <div class="modal fade" id="modalEditar-{{ p.id_participante }}" data-bs-backdrop="static"
-        data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalEditarLabel-{{ p.id_participante }}"
-        aria-hidden="true">
+    <div class="modal fade" id="modalEditar-{{ p.id_participante }}" data-bs-backdrop="static" data-bs-keyboard="false"
+        tabindex="-1" aria-labelledby="modalEditarLabel-{{ p.id_participante }}" aria-hidden="true">
         <div class="modal-dialog">
             <form method="post" action="{{ url_for('participantes.participante_actualizar', id = p.id_participante) }}"
                 class="modal-content">
@@ -383,13 +386,21 @@
                         <label for="sesion" class="form-label">Sesion</label>
                         <select name="sesion" id="sesion-{{ p.id_participante }}" class="form-select" required>
                             <option value="" disabled>Sesion</option>
+                            {% set mes_sel = request.args.get('mes', '') %}
+                            {% set semana_sel = request.args.get('semana', '') %}
                             {% if sesiones %} {% for sesion in sesiones %}
-                            <option value="{{ sesion.0 }} " {% if sesion.7==p.cursos %} selected {% endif %}>{{ sesion.7
-                                }}</option>
-                            {% endfor %} {% else %}
+                            {% if mes_sel == sesion.6 and semana_sel == sesion.5 %}
+                            <option value="{{ sesion.0 }} " {% if sesion.7==p.cursos %} selected {% endif %}>
+                                {{ sesion.7 }}
+                            </option>
+                            {% endif %} {% endfor %} {% else %}
                             <option disabled>Aun no hay registros</option>
                             {% endif %}
                         </select>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" name="grabacion" type="checkbox" id="flexSwitchCheckDefault">
+                        <label class="form-check-label" for="flexSwitchCheckDefault">Cambiar a grabacion?</label>
                     </div>
                 </div>
                 <div class="modal-footer">

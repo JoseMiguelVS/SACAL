@@ -5,11 +5,13 @@ from psycopg2.extras import RealDictCursor
 
 from ..constancias.generador import generar_constancia
 from ..constancias.qr import generar_qr
-from utils.listas import lista_categorias, lista_cuentas, lista_cursos, lista_meses, lista_paquetes, lista_ponente, lista_privilegios, lista_semanas, lista_sesiones
+from utils.listas import lista_categorias, lista_cuentas, lista_cursos, lista_equipos, lista_meses, lista_paquetes, lista_ponente, lista_privilegios, lista_semanas, lista_sesiones
 
 from ..utils.utils import get_db_connection, paginador3
 
 constancias = Blueprint('constancias', __name__)
+
+#-----------------------------------------PRINCIPAL-------------------------------------------------
 
 @constancias.route("/constancias") 
 @login_required
@@ -20,33 +22,29 @@ def constancias_buscar():
     fecha_raw = request.args.get('fecha', '', type=str)  # Usar directamente el valor completo
 
     fecha = ''
-    horario_inicio = ''
-    horario_fin = ''
-    # inicio = ''
-    # fin = ''
-    
+    cursos = ''
+    inicio = ''
+    fin = ''
     if fecha_raw:
-        partes = fecha_raw.split(',')
+        partes = fecha_raw.split('/')
         if len(partes) == 4:
-            fecha = partes[1]
-            horario_inicio = f"{partes[2]}"
-            horario_fin = f"{partes[3]}"
-            # inicio = datetime.strptime(horario_inicio, '%H:%M:%S').time()
-            # fin = datetime.strptime(horario_fin, '%H:%M:%S').time()
+            fecha = partes[0]
+            inicio = partes[1]
+            fin = partes[2]
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas_constancias
                 WHERE (%s = '' OR nombre_mes ILIKE %s)
                     AND (%s = '' OR semana ILIKE %s)
                     AND (%s = '' OR fecha ILIKE %s)
-                    AND (%s = '' OR horario_inicio::text ILIKE %s AND horario_fin::text ILIKE %s)
+                    AND (%s = '' OR horario_inicio::text = %s AND horario_fin::text = %s)
                     AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)
                 AND constancia_enviada = False '''
 
     sql_lim = '''SELECT * FROM asistencias_detalladas_constancias
             WHERE (%s = '' OR nombre_mes ILIKE %s)
                 AND (%s = '' OR semana ILIKE %s)
-                AND (%s = '' OR fecha ILIKE %s) 
-                AND (%s = '' OR horario_inicio::text ILIKE %s AND horario_fin::text ILIKE %s)
+                AND (%s = '' OR fecha ILIKE %s)
+                AND (%s = '' OR horario_inicio::text = %s AND horario_fin::text = %s)
                 AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)
                 AND constancia_enviada = False
             ORDER BY nombre_participante DESC
@@ -58,15 +56,14 @@ def constancias_buscar():
             nombre_mes, nombre_mes, 
             semana, semana, 
             fecha, fecha,
-            horario_inicio, 
-            horario_inicio,
-            horario_fin,
+            inicio, inicio, fin,
             search_query, search_query, search_query  # nombre y clave usan el mismo valor
         ],
         1, 50
     )
 
     return render_template('constancias/constancias.html',
+                           equipos=lista_equipos(),
                            categorias=lista_categorias(),
                            cursos=lista_cursos(),
                            sesiones=lista_sesiones(),
@@ -80,7 +77,6 @@ def constancias_buscar():
                            per_page=paginado[2],
                            total_items=paginado[3],
                            total_pages=paginado[4])
-
 
 #------------------------------------------------------DETALLES-----------------------------------------------------
 
@@ -129,7 +125,7 @@ def folio_constancia():
     fecha=fecha
 ))
 
-
+# ------------------------------------FOLIO DEL PARTICIPANTE------------------------------------
 @constancias.route("/constancias/folio/generar")
 @login_required 
 def constancias_generar():
@@ -237,7 +233,7 @@ def constancias_actualizar(id):
 def modificar_constancia():
     id_participante = request.args.get("id")
     constancia_enviada = True
-    datos = request.form  # ⚠️ Usamos form en lugar de get_json porque no será fetch
+    datos = request.form
 
     if not id_participante:
         flash("Faltan parámetros", "Error")
@@ -283,8 +279,6 @@ def constancias_hechas():
     fecha = ''
     horario_inicio = ''
     horario_fin = ''
-    # inicio = ''
-    # fin = ''
     
     if fecha_raw:
         partes = fecha_raw.split(',')
@@ -292,8 +286,6 @@ def constancias_hechas():
             fecha = partes[1]
             horario_inicio = f"{partes[2]}"
             horario_fin = f"{partes[3]}"
-            # inicio = datetime.strptime(horario_inicio, '%H:%M:%S').time()
-            # fin = datetime.strptime(horario_fin, '%H:%M:%S').time()
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas_constancias
                 WHERE (%s = '' OR nombre_mes ILIKE %s)
@@ -328,11 +320,15 @@ def constancias_hechas():
     )
 
     return render_template('constancias/constancias_hechas.html',
-                           categorias = lista_categorias(),
+                           equipos=lista_equipos(),
+                           categorias=lista_categorias(),
                            cursos=lista_cursos(),
-                           sesiones = lista_sesiones(),
-                           paquetes = lista_paquetes(),
-                           cuentas = lista_cuentas(),
+                           sesiones=lista_sesiones(),
+                           paquetes=lista_paquetes(),
+                           cuentas=lista_cuentas(),
+                           privilegios=lista_privilegios(),
+                           meses=lista_meses(),
+                           semanas=lista_semanas(),
                            constancias=paginado[0],
                            page=paginado[1],
                            per_page=paginado[2],

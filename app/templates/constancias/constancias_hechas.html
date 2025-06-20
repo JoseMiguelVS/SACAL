@@ -1,4 +1,5 @@
 {% extends './layout.html' %} {% block body %}
+<a href="" class="botones"><i class="fa"></i></a>
 <main class="container my-4 ">
     <h2 class="text-center mb-4">Constancias enviadas</h2>
     <!-- Alertas -->
@@ -11,68 +12,63 @@
     </div>
     {% endfor %} {% endif %} {% endwith %}
 
-    <section class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-        <!-- Buscador por clave a la derecha -->
-        <form method="get" action="{{ url_for('constancias.constancias_hechas') }}"
-            class="d-flex flex-grow-1 justify-content-end">
-            <!-- Conservamos filtros activos -->
-            <div class="input-group" style="max-width: 300px;">
-                <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
-                    aria-label="Buscar participante por clave o nombre" required />
-                <button type="submit" class="btn btn-primary ms-2" aria-label="Buscar">
-                    <i class="fas fa-search"></i>
-                </button>
-            </div>
-        </form>
-    </section>
-
     <section class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
-        <!-- Formulario: Mes y Semana -->
         <form method="get" action="{{ url_for('constancias.constancias_hechas') }}"
-            class="d-flex flex-wrap align-items-center gap-2">
-            <select name="mes" class="form-select-sm">
-                <option value="">Mes</option>
+            class="d-flex flex-wrap align-items-center gap-2" id="filtroForm">
+
+            <!-- Mes -->
+            <label for="filtroMes" class="form-label mb-1">Mes</label>
+            <select id="filtroMes" name="mes" class="form-select-sm filtro-auto">
+                <option value="">Todos</option>
                 {% for mes in meses %}
                 <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>{{ mes.1 }}
                 </option>
                 {% endfor %}
             </select>
 
-            <select name="semana" class="form-select-sm">
-                <option value="">-Semana-</option>
+            <!-- Semana -->
+            <label for="filtroSemana" class="form-label mb-1">Semana</label>
+            <select id="filtroSemana" name="semana" class="form-select-sm filtro-auto">
+                <option value="">Todas</option>
                 {% for semana in semanas %}
                 <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>{{
                     semana.1 }}</option>
                 {% endfor %}
             </select>
 
-            <button type="submit" class="btn btn-sm btn-outline-primary">Filtrar</button>
-        </form>
-
-        <!-- Formulario: Sesión -->
-        <form method="get" action="{{ url_for('constancias.constancias_hechas') }}"
-            class="d-flex flex-wrap align-items-center gap-2">
-            <!-- Mantener filtros -->
-            <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
-            <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
-
-            <select name="fecha" class="form-select-sm">
-                <option value="">Sesión</option>
-                {% set mes_seleccionado = request.args.get('mes', '') %}
-                {% set semana_seleccionada = request.args.get('semana', '') %}
+            <!-- Sesión -->
+            <label for="filtroSesion" class="form-label mb-1">Sesión</label>
+            <select id="filtroSesion" name="fecha" style="max-width: 400px; min-width: 400px"
+                class="form-select-sm filtro-auto">
+                <option value="">Todas</option>
+                {% set equipo_sel = request.args.get('equipos', '') %}
+                {% set mes_sel = request.args.get('mes', '') %}
+                {% set semana_sel = request.args.get('semana', '') %}
                 {% set fecha_actual = request.args.get('fecha', '') %}
                 {% for sesion in sesiones %}
-                {% if sesion.6 == mes_seleccionado and sesion.5 == semana_seleccionada %}
-                {% set valor = sesion.0 ~ ',' ~ sesion.1 ~ ',' ~ sesion.2 ~ ',' ~ sesion.3 %}
+                {% if sesion.6 == mes_sel and sesion.5 == semana_sel or sesion.1 == equipo_sel %}
+                {% set valor = sesion.1 ~ '/' ~ sesion.2 ~ '/' ~ sesion.3 ~ '/' ~ sesion.7 %}
                 <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
-                    {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.2 }} || {{ sesion.3 }}
+                    {{ sesion.2 }} | {{ sesion.3 }} || {{ sesion.1 }} || {{ sesion.7 }}
                 </option>
                 {% endif %}
                 {% endfor %}
             </select>
 
-            <button type="submit" class="btn btn-sm btn-success">Aceptar</button>
-            <a href="{{ url_for('constancias.constancias_hechas') }}" class="btn btn-sm btn-secondary">Limpiar</a>
+            <!-- Equipo -->
+            <label for="filtroEquipo" class="form-label mb-1">Equipo</label>
+            <select id="filtroEquipo" name="equipos" class="form-select-sm filtro-auto">
+                <option value="">Todos</option>
+                {% for equipo in equipos %}
+                <option value="{{ equipo.1 }}" {% if request.args.get('equipos')==equipo.1 %}selected{% endif %}>{{
+                    equipo.1 }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Limpiar -->
+            <a href="{{ url_for('constancias.constancias_hechas') }}"
+                class="btn btn-outline-secondary btn-sm">Limpiar</a>
+
         </form>
     </section>
 
@@ -104,7 +100,8 @@
                     <tr data-id="{{ p.id_participante }}">
                         <!-- Botón Detalles -->
                         <td>
-                            <a href="{{ url_for('constancias.constancias_detalles', id=p.id_participante) }}">
+                            <a class="botones-ver"
+                                href="{{ url_for('constancias.constancias_detalles', id=p.id_participante) }}">
                                 <li class="fa fa-eye" style="font-size: 18px;"></li>
                             </a>
                         </td>
@@ -117,7 +114,7 @@
                         </td>
                         <!-- Botón Editar -->
                         <td>
-                            <a
+                            <a class="botones-editar"
                                 href="{{ url_for('constancias.constancias_editar', id=p.id_participante, curso=p.nombre_curso, fecha=p.fecha) }}">
                                 <li class="fa fa-edit" style="font-size: 18px;"></li>
                             </a>
@@ -269,8 +266,8 @@
                             class="form-control" required>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-primary"
+                        <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="botones-guardar"
                             onclick="enviarFolioYGenerar('{{ p.id_participante }}', '{{ p.nombre_curso }}', '{{ p.fecha }}')">Guardar
                             y generar</button>
                     </div>
@@ -302,6 +299,55 @@
     </script>
 
     {% endfor %} {% endif %}
+
+    <script>
+        let debounceTimeout = null;
+
+        document.querySelectorAll('.filtro-auto').forEach(select => {
+            select.addEventListener('change', () => {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(() => {
+                    document.getElementById('filtroForm').submit();
+                }, 400); // Espera 400ms tras el último cambio
+            });
+        });
+
+
+    </script>
+
+    <script>
+        function guardarFila(elemento) {
+            const fila = elemento.closest('tr');
+            const id = fila.dataset.id;
+            const datos = {};
+
+            fila.querySelectorAll('input, select').forEach(el => {
+                if (el.type === 'checkbox') {
+                    datos[el.name] = el.checked;
+                } else {
+                    datos[el.name] = el.value;
+                }
+            });
+
+            fetch(`/constancias/hechas&enviadas/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'  // Si estás usando CSRF con Flask-WTF
+                },
+                body: JSON.stringify(datos)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data.alert);
+                    // Aquí podrías mostrar una notificación visual si deseas
+                })
+                .catch(error => {
+                    console.error('Error al guardar:', error);
+                    alert('Error al guardar los cambios');
+                });
+        }
+    </script>
 
 </main>
 {% endblock %}
