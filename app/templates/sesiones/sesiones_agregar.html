@@ -1,127 +1,93 @@
-{% extends './layout.html' %}
+{% extends './layout.html' %} {% block body %}
+<main class="container my-5">
+    <h1 class="text-center mb-4">Registrar nueva sesión</h1>
 
-{% block title %} {{ titulo }} {% endblock %}
-
-{% block body %}
-
-<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-{% for message in messages %}
-<div class="alert alert-{% if " Error" in message %}danger{% elif "Advertencia" in message %}warning{% else %}success{%
-    endif %} alert-dismissible fade show" role="alert">
-    <strong>{{ message }}</strong>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-{% endfor %}
-{% endif %}
-{% endwith %}
-<!-- ----------------------------------------------------------------------------------------------- -->
-
-<h1>Registrar nueva sesión</h1>
-<br>
-
-<div class="form-container">
-    <form class="formulario" method="POST" action="{{ url_for('sesiones.sesion_nuevo') }}"
-        enctype="multipart/form-data">
+    <form method="POST" action="{{ url_for('sesiones.sesion_nuevo') }}" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-        <!-- Fecha -->
-        <div class="espacio_form">
-            <label for="fecha">Fecha del curso:</label>
-            <input type="date" id="fecha" name="fecha" required>
+        <div class="mb-3">
+            <label for="fecha" class="form-label">Fecha del curso:</label>
+            <input type="date" id="fecha" name="fecha" class="form-control" required>
         </div>
 
-        <!-- Horario de inicio -->
-        <div class="espacio_form">
-            <label for="horario_inicio">Hora de inicio:</label>
-            <input type="time" id="horario_inicio" name="horario_inicio" required>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="horario_inicio" class="form-label">Hora de inicio:</label>
+                <input type="time" id="horario_inicio" name="horario_inicio" class="form-control" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="horario_fin" class="form-label">Hora de fin:</label>
+                <input type="time" id="horario_fin" name="horario_fin" class="form-control" required>
+            </div>
         </div>
 
-        <!-- Horario de fin -->
-        <div class="espacio_form">
-            <label for="horario_fin">Hora de fin:</label>
-            <input type="time" id="horario_fin" name="horario_fin" required>
-        </div>
-
-        <!-- Categoría -->
-        <div class="espacio_form">
-            <label for="id_categoria">Categoría:</label>
-            <select name="id_categoria" id="id_categoria" required>
-                <option value="" selected disabled>Categoria</option>
-                {% if categorias %}
+        <div class="mb-3">
+            <label for="id_categoria" class="form-label">Categoría:</label>
+            <select name="id_categoria" id="id_categoria" class="form-select" required>
+                <option disabled selected>Categoria</option>
                 {% for categoria in categorias %}
                 <option value="{{ categoria.0 }}">{{ categoria.1 }}</option>
                 {% endfor %}
-                {% else %}
-                <option>Aún no hay registros</option>
-                {% endif %}
             </select>
         </div>
 
-        <!-- Mes -->
-        <div class="espacio_form">
-            <label for="id_mes">Mes:</label>
-            <select name="id_mes" id="id_mes" required>
-                <option value="" selected disabled>Mes</option>
-                {% if meses %}
-                {% for mes in meses %}
-                <option value="{{ mes.0 }}">{{ mes.1 }}</option>
-                {% endfor %}
-                {% else %}
-                <option>Aún no hay registros</option>
-                {% endif %}
-            </select>
-        </div>
-
-        <!-- Semana -->
-        <div class="espacio_form">
-            <select name="id_semana" id="id_semana" required>
-                <option value="" selected disabled>Semana</option>
-                {% if semanas %}
-                {% for semana in semanas %}
-                <option value="{{ semana.0 }}">{{ semana.1 }}</option>
-                {% endfor %}
-                {% else %}
-                <option>Aún no hay registros</option>
-                {% endif %}
-            </select>
-        </div>
-
-        <!-- Cursos y Ponentes -->
-        <div id="cursos-container">
-            <div class="curso-group espacio_form">
-                <select name="cursos[]" class="form-select mb-2" required>
-                    <option value="">Curso</option>
-                    {% for curso in cursos %}
-                    <option value="{{ curso.0 }}">{{ curso.1 }}</option>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="id_mes" class="form-label">Mes:</label>
+                <select name="id_mes" id="id_mes" class="form-select" required>
+                    <option disabled selected>Mes</option>
+                    {% for mes in meses %}
+                    <option value="{{ mes.0 }}">{{ mes.1 }}</option>
                     {% endfor %}
                 </select>
-
-                <select name="ponentes[]" class="form-select mb-2" required>
-                    <option value="">Ponente</option>
-                    {% for ponente in ponentes %}
-                    <option value="{{ ponente.0 }}">{{ ponente.1 }}</option>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="id_semana" class="form-label">Semana:</label>
+                <select name="id_semana" id="id_semana" class="form-select" required>
+                    <option disabled selected>Semana</option>
+                    {% for semana in semanas %}
+                    <option value="{{ semana.0 }}">{{ semana.1 }}</option>
                     {% endfor %}
                 </select>
             </div>
         </div>
 
-        <!-- Botón para agregar más cursos y ponentes -->
-        <div class="espacio_form">
-            <button type="button" id="agregar-curso" class="botones">Agregar otro curso</button>
+        <div id="cursos-container" class="mb-3">
+            <div class="row align-items-end mb-2 curso-group">
+                <div class="col-md-6 mb-2">
+                    <label class="form-label">Curso:</label>
+                    <select name="cursos[]" class="form-select" required>
+                        <option value="">Curso</option>
+                        {% for curso in cursos %}
+                        <option value="{{ curso.0 }}">{{ curso.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-2">
+                    <label class="form-label">Ponente:</label>
+                    <select name="ponentes[]" class="form-select" required>
+                        <option value="">Ponente</option>
+                        {% for ponente in ponentes %}
+                        <option value="{{ ponente.0 }}">{{ ponente.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
         </div>
 
-        <!-- Botones de acción -->
-        <div class="espacio_form">
-            <button class="botones" type="submit">Guardar</button>
-            <a class="botones" href="{{ url_for('sesiones.sesiones_buscar') }}">Cancelar</a>
+        <div class="mb-4">
+            <button type="button" id="agregar-curso" class="btn btn-outline-secondary btn-sm">Agregar otro
+                curso</button>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="botones-agregar">Guardar</button>
+            <a href="{{ url_for('sesiones.sesiones_buscar') }}" class="botones-cancelar">Cancelar</a>
         </div>
     </form>
-</div>
+</main>
 
 <!-- Script para clonar grupo de curso y ponente -->
-<!-- Script para mostrar/ocultar el campo de especialización -->
 <script>
     // Clonar cursos y ponentes
     document.getElementById('agregar-curso').addEventListener('click', function () {
@@ -135,6 +101,5 @@
         contenedor.appendChild(nuevoGrupo);
     });
 </script>
-
 
 {% endblock %}

@@ -1,42 +1,30 @@
-{% extends './layout.html' %}
+{% extends './layout.html' %} {% block body %}
 
-{% block title %} {{titulo}} {% endblock %}
-{% block body %}
+<main class="container my-5">
+    <h1 class="text-center mb-4">Registrar nuevo ponente</h1>
 
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-{% for message in messages %}
-<div class="alert alert-{% if " Error" in message %}danger{% elif "Advertencia" in message %}warning{% else %}success{%
-    endif %} alert-dismissible fade show" role="alert">
-    <strong>{{message}}</strong>
-    <button type="button" class="" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-{% endfor %}
-{% endif %}
-{% endwith %}
-
-<h1>Registrar nuevo ponente</h1>
-<br>
-<div class="form-container">
     <form class="formulario" method="POST" action="{{url_for('ponentes.ponente_nuevo')}}" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
 
-        <div class="espacio_form">
+        <div class="mb-3">
             <input type="text" id="nombre_ponente" placeholder="Nombre Ponente" name="nombre_ponente" required>
         </div>
-        <div class="espacio_form">
+
+        <div class="mb-3">
             <input type="text" id="curp_ponente" placeholder="Curp" name="curp_ponente" required>
         </div>
-        <div class="espacio_form">
+
+        <div class="mb-3">
             <input type="text" id="cedula_ponente" placeholder="Cedula profesional" name="cedula_ponente" required>
         </div>
- 
+
         <h4>Certificaciones</h4>
-        <div id="certificaciones-container">
-            <div class="certificacion-row">
-                <div class="espacio_form">
+        <div id="certificaciones-container" class="mb-3">
+            <div class="row align-items-end mb-2 certificacion-group certificacion-row">
+                <div class="col-md-6 mb-2">
+                    <label for="" class="form-label">Certificado</label>
                     <select name="id_tipoCer[]" required>
-                        <option value="">-Seleccione el certificado-</option>
+                        <option value="">Tipo de Certificado</option>
                         {% if certificados %}
                         {% for certificado in certificados %}
                         <option value="{{ certificado.0 }}">{{ certificado.1 }}</option>
@@ -46,24 +34,25 @@
                         {% endif %}
                     </select>
                 </div>
-                <div class="espacio_form">
+                <div class="col-md-6 mb-2">
                     <input type="text" name="folio[]" placeholder="Folio del certificado" required>
                 </div>
             </div>
         </div>
 
-        <div class="espacio_form">
-            <button type="button" onclick="agregarCertificacion()">+ Agregar otra certificación</button>
+        <div class="mb-4">
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="agregarCertificacion()">Agregar otra
+                certificación</button>
         </div>
 
-        <div class="espacio_form">
-            <button class="botones" type="submit">Guardar</button>
+        <div class="mb-4">
+            <button class="botones-agregar" type="submit">Guardar</button>
         </div>
-        <div class="espacio_form">
-            <a class="botones" href="{{url_for('ponentes.ponentes_buscar')}}">Cancelar</a>
+        <div class="mb-4">
+            <a class="botones-cancelar" href="{{url_for('ponentes.ponentes_buscar')}}">Cancelar</a>
         </div>
     </form>
-</div>
+</main>
 
 <script>
     function agregarCertificacion() {
