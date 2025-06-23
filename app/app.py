@@ -16,6 +16,7 @@ from routes.participantes.routes import participantes
 from routes.sesiones.routes import sesiones
 from routes.constancias.routes import constancias
 from routes.temas.routes import temas
+from routes.pagos.routes import pagos
 
 # ...
 app = Flask(__name__)
@@ -40,6 +41,7 @@ app.register_blueprint(participantes)
 app.register_blueprint(sesiones)
 app.register_blueprint(temas)
 app.register_blueprint(constancias)
+app.register_blueprint(pagos)
 
 #-------------------------- Login y Rutas --------------------------
 @app.route('/loguear', methods=('GET', 'POST'))

@@ -1,0 +1,137 @@
+{% extends './layout.html' %} {% block body %}
+<main class="container my-4">
+    <h2 class="text-center mb-4">Pagos</h2>
+
+    {% with messages = get_flashed_messages() %} {% if messages %} {% for
+    message in messages %}
+    <div class="alert alert-dismissible fade show alert-fixed {% if 'Error' in message %}alert-danger{% elif 'Advertencia' in message %}alert-warning{% else %}alert-success{% endif %}"
+        role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
+
+    <section class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
+        <form id="formBuscar" method="get" action="{{ url_for('pagos.pagos_buscar') }}"
+            class="d-flex flex-grow-1 justify-content-end">
+            <div class="input-group" style="max-width: 300px;">
+                <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
+                    aria-label="Buscar participante por clave o nombre" required
+                    onchange="document.getElementById('formBuscar').submit()" />
+                <button type="submit" class="botones-ver ms-2" aria-label="Buscar">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </form>
+    </section>
+
+    <section class="table-responsive table-sm">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Fecha</th>
+                    <th>Forma Pago</th>
+                    <th>Ingreso</th>
+                    <th>Ingreso factura</th>
+                    <th>Gasto</th>
+                    <th>Devolucion</th>
+                    <th>Clave Rastreo</th>
+                    <th>Participante</th>
+                    <th>Clave</th>
+                    <th>Confirmacion</th>
+                    <th>Conceptos</th>
+                    <th>Concepto factura</th>
+                </tr>
+            </thead>
+            <tbody>
+                <td>{{ pagos.id_pago }}</td>
+                <td>{{ pagos.fecha_pago }}</td>
+                <td>{{ pagos.forma_pago }}</td>
+                <td>{{ pagos.ingresos }}</td>
+                <td>{{ pagos.ingreso_factura }}</td>
+                <td>{{ pagos.gasto }}</td>
+                <td>{{ pagos.devolucion }}</td>
+                <td>{{ pagos.clave_rastreo }}</td>
+                <td>{{ pagos.nombre_participante }}</td>
+                <td>{{ pagos.clave_participante }}</td>
+                <td>{{ pagos.validacion_pago }}</td>
+                <td>{{ pagos.conceptos }}</td>
+                <td>{{ pagos.concepto_factura }}</td>
+            </tbody>
+        </table>
+    </section>
+
+    <nav class="pagination-container mt-4" aria-label="Navegación de páginas de empleados">
+        <ul class="pagination justify-content-center">
+            {% if page > 1 %}
+            <li class="page-item">
+                <a class="page-link bg-warning"
+                    href="{{ url_for('pagos.pagos_buscar') }}?page={{ page - 1 }}&per_page={{ per_page }}"
+                    aria-label="Anterior">
+                    &laquo;
+                </a>
+            </li>
+
+            {% if page > 2 %}
+            <li class="page-item">
+                <a class="page-link bg-warning"
+                    href="{{ url_for('pagos.pagos_buscar') }}?page=1&per_page={{ per_page }}">1</a>
+            </li>
+            {% if page > 3 %}
+            <li class="page-item disabled">
+                <span class="page-link bg-warning">...</span>
+            </li>
+            {% endif %} {% endif %}
+
+            <li class="page-item">
+                <a class="page-link bg-warning"
+                    href="{{ url_for('pagos.pagos_buscar') }}?page={{ page - 1 }}&per_page={{ per_page }}">{{
+                    page - 1 }}</a>
+            </li>
+            {% endif %}
+
+            <li class="page-item active" aria-current="page">
+                <span class="page-link bg-warning">{{ page }}</span>
+            </li>
+
+            {% if page < total_pages %} <li class="page-item">
+                <a class="page-link bg-warning"
+                    href="{{ url_for('pagos.pagos_buscar') }}?page={{ page + 1 }}&per_page={{ per_page }}">{{
+                    page + 1 }}</a>
+                </li>
+
+                {% if page < total_pages - 1 %} {% if page < total_pages - 2 %} <li class="page-item disabled">
+                    <span class="page-link bg-warning">...</span>
+                    </li>
+                    {% endif %}
+                    <li class="page-item">
+                        <a class="page-link bg-warning"
+                            href="{{ url_for('pagos.pagos_buscar') }}?page={{ total_pages }}&per_page={{ per_page }}">{{
+                            total_pages }}</a>
+                    </li>
+                    {% endif %}
+
+                    <li class="page-item">
+                        <a class="page-link bg-warning"
+                            href="{{ url_for('pagos.pagos_buscar') }}?page={{ page + 1 }}&per_page={{ per_page }}"
+                            aria-label="Siguiente">
+                            &raquo;
+                        </a>
+                    </li>
+                    {% endif %}
+        </ul>
+    </nav>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const inputBuscar = document.querySelector("input[name='buscar']");
+            const form = document.getElementById("formBuscar");
+
+            inputBuscar.addEventListener("change", function () {
+                form.submit();
+            });
+        });
+    </script>
+</main>
+{% endblock %}
