@@ -2,7 +2,7 @@
 <main class="w-100 d-flex flex-column" style="margin: -1px; padding: 0;">
 
     <!-- TÍTULO -->
-    <h2 class="text-center mb-4">Participantes</h2>
+    <h2 class="text-center mb-4">Participantes en grabaciones</h2>
 
     <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
     {% with messages = get_flashed_messages() %} {% if messages %} {% for
@@ -23,7 +23,7 @@
         </button>
 
         <!-- Buscador por clave a la derecha -->
-        <form id="formBuscar" method="get" action="{{ url_for('participantes.participantes_buscar') }}"
+        <form id="formBuscar" method="get" action="{{ url_for('participantes.participantes_grabaciones') }}"
             class="d-flex flex-grow-1 justify-content-end">
             <div class="input-group" style="max-width: 300px;">
                 <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
@@ -40,7 +40,7 @@
     <!-- FILTROS CENTRADOS ABAJO -->
 
     <section class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
-        <form method="get" action="{{ url_for('participantes.participantes_buscar') }}"
+        <form method="get" action="{{ url_for('participantes.participantes_grabaciones') }}"
             class="d-flex flex-wrap align-items-center gap-2" id="filtroForm">
 
             <!-- Mes -->
@@ -96,7 +96,7 @@
             </select>
 
             <!-- Limpiar -->
-            <a href="{{ url_for('participantes.participantes_buscar') }}"
+            <a href="{{ url_for('participantes.participantes_grabaciones') }}"
                 class="btn btn-outline-secondary btn-sm">Limpiar</a>
 
         </form>
@@ -329,39 +329,39 @@
             {% if page > 1 %}
             <li class="page-item">
                 <a class="page-link bg-warning"
-                    href="{{url_for('participantes.participantes_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                    href="{{url_for('participantes.participantes_grabaciones')}}?page={{ page - 1 }}&per_page={{ per_page }}"
                     aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
             {% if page != 1 and page != 2 %}
             <li class="page-item"><a class="page-link bg-warning"
-                    href="{{url_for('participantes.participantes_buscar')}}">1</a></li>
+                    href="{{url_for('participantes.participantes_grabaciones')}}">1</a></li>
             {% if page != 3 %}
             <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
             {% endif %}
             {% endif %}
             <li class="page-item"><a class="page-link bg-warning"
-                    href="{{url_for('participantes.participantes_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+                    href="{{url_for('participantes.participantes_grabaciones')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
             </li>
             {% endif %}
 
             <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
 
             {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
-                    href="{{url_for('participantes.participantes_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+                    href="{{url_for('participantes.participantes_grabaciones')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
                 </li>
                 {% if page != total_pages and page != total_pages-1 %}
                 {% if page != total_pages-2 %}
                 <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
                 {% endif %}
                 <li class="page-item"><a class="page-link bg-warning"
-                        href="{{url_for('participantes.participantes_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                        href="{{url_for('participantes.participantes_grabaciones')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
                 </li>
                 {% endif %}
                 <li class="page-item">
                     <a class="page-link bg-warning"
-                        href="{{url_for('participantes.participantes_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                        href="{{url_for('participantes.participantes_grabaciones')}}?page={{ page + 1 }}&per_page={{ per_page }}"
                         aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
@@ -400,7 +400,7 @@
                     </div>
                     <div class="form-check form-switch">
                         <input class="form-check-input" name="grabacion" type="checkbox" id="flexSwitchCheckDefault">
-                        <label class="form-check-label" for="flexSwitchCheckDefault">Cambiar a grabacion?</label>
+                        <label class="form-check-label" for="flexSwitchCheckDefault">En vivo</label>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -417,8 +417,8 @@
 <script>
     document.getElementById('flexSwitchCheckDefault').addEventListener('change', function () {
         if (this.checked) {
-            window.location.href = '{{ url_for("participantes.participantes_grabaciones") }}';
-            this.checked = true;
+            window.location.href = '{{ url_for("participantes.participantes_buscar") }}';
+            this.checked = false;
         }
     });
 </script>
@@ -482,39 +482,5 @@
 
 
 </script>
-<!-- 
-<script>
-    function guardarCambios(button) {
-        const fila = button.closest("tr");
-        const id = fila.getAttribute("data-id");
-
-        const datos = {};
-        fila.querySelectorAll("input, select").forEach(element => {
-            if (element.type === "checkbox") {
-                datos[element.name] = element.checked;
-            } else {
-                datos[element.name] = element.value;
-            }
-        });
-
-
-        fetch(`/participantes/actualizar/${id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': "{{ csrf_token() }}"  // si usas CSRF protection
-            },
-            body: JSON.stringify(datos)
-        })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message || 'Datos actualizados');
-            })
-            .catch(error => {
-                alert('Error al actualizar');
-                console.error(error);
-            });
-    }
-</script> -->
 
 {% endblock %}

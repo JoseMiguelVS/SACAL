@@ -3,7 +3,7 @@ from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
 
-from utils.listas import lista_cuentas, lista_cursos, lista_equipos, lista_meses, lista_paquetes, lista_sesiones, lista_semanas
+from utils.listas import lista_cuentas, lista_cursos, lista_equipos, lista_meses, lista_paquetes, lista_participantes, lista_sesiones, lista_semanas
 
 from ..utils.utils import get_db_connection, paginador3
 
@@ -13,6 +13,76 @@ participantes = Blueprint('participantes', __name__)
 @participantes.route("/participantes")
 @login_required
 def participantes_buscar():
+    search_query = request.args.get('buscar', '', type=str)
+    equipos = request.args.get('equipos', '', type=str)
+    mes = request.args.get('mes', '', type=str)
+    semana = request.args.get('semana', '', type=str)
+    fecha_raw = request.args.get('fecha', '', type=str)
+
+    fecha = ''
+    cursos = ''
+    equipo = ''
+    if fecha_raw:
+        partes = fecha_raw.split('/')
+        if len(partes) == 3:
+            fecha = partes[1]
+            cursos = partes[2]
+
+    if equipos:
+        partesEquipos = equipos.split(',')
+        if len(partesEquipos) == 2:
+            equipo = partesEquipos[1]
+
+    sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
+                WHERE (%s = '' OR meses ILIKE %s)
+                    AND (%s = '' OR nombre_equipo ILIKE %s)
+                    AND (%s = '' OR semanas ILIKE %s)
+                    AND (%s = '' OR fecha ILIKE %s)
+                    AND (%s = '' OR cursos ILIKE %s)
+                    AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s) 
+                    AND grabaciones = 'False' ''' 
+
+    sql_lim = '''SELECT * FROM asistencias_detalladas
+                WHERE (%s = '' OR meses ILIKE %s)
+                    AND (%s = '' OR nombre_equipo ILIKE %s)
+                    AND (%s = '' OR semanas ILIKE %s)
+                    AND (%s = '' OR fecha ILIKE %s)
+                    AND (%s = '' OR cursos ILIKE %s)
+                    AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s) 
+                    AND grabaciones = 'False' 
+                ORDER BY nombre_participante DESC
+                LIMIT %s OFFSET %s'''
+
+    paginado = paginador3(
+        sql_count, sql_lim,
+        [
+            mes, mes,
+            equipo, equipo,
+            semana, semana,
+            fecha, fecha,
+            cursos, cursos,
+            search_query, search_query, search_query  # nombre y clave usan el mismo valor
+        ],
+        1, 50
+    )
+
+    return render_template('participantes/participantes.html',
+                           equipos=lista_equipos(),
+                           meses=lista_meses(),
+                           cursos=lista_cursos(),
+                           semanas=lista_semanas(),
+                           sesiones=lista_sesiones(),
+                           paquetes=lista_paquetes(),
+                           cuentas=lista_cuentas(),
+                           participantes=paginado[0],
+                           page=paginado[1],
+                           per_page=paginado[2],
+                           total_items=paginado[3],
+                           total_pages=paginado[4])
+
+@participantes.route("/participantes/grabaciones")
+@login_required
+def participantes_grabaciones():
     search_query = request.args.get('buscar', '', type=str)
     equipos = request.args.get('equipos', '', type=str)
     mes = request.args.get('mes', '', type=str)
@@ -38,7 +108,8 @@ def participantes_buscar():
                     AND (%s = '' OR semanas ILIKE %s)
                     AND (%s = '' OR fecha ILIKE %s)
                     AND (%s = '' OR cursos ILIKE %s)
-                    AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)''' 
+                    AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)
+                    AND grabaciones = 'True' ''' 
 
     sql_lim = '''SELECT * FROM asistencias_detalladas
                 WHERE (%s = '' OR meses ILIKE %s)
@@ -47,6 +118,7 @@ def participantes_buscar():
                     AND (%s = '' OR fecha ILIKE %s)
                     AND (%s = '' OR cursos ILIKE %s)
                     AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)
+                    AND grabaciones = 'True'
                 ORDER BY nombre_participante DESC
                 LIMIT %s OFFSET %s'''
 
@@ -63,7 +135,7 @@ def participantes_buscar():
         1, 50
     )
 
-    return render_template('participantes/participantes.html',
+    return render_template('participantes/participantes_grabaciones.html',
                            equipos=lista_equipos(),
                            meses=lista_meses(),
                            cursos=lista_cursos(),

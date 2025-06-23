@@ -60,3 +60,6 @@ def lista_privilegios():
 
 def lista_equipos():
     return listar_tabla('equipos', 'id_equipo')
+
+def lista_participantes():
+    return listar_tabla('participantes','id_participante')
