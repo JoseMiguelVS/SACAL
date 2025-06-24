@@ -7,22 +7,56 @@ from ..constancias.generador import generar_constancia
 from ..constancias.qr import generar_qr
 from utils.listas import lista_categorias, lista_cuentas, lista_cursos, lista_equipos, lista_meses, lista_paquetes, lista_ponente, lista_privilegios, lista_semanas, lista_sesiones
 
-from ..utils.utils import get_db_connection, paginador3
+from ..utils.utils import get_db_connection, paginador1, paginador2, paginador3
 
 constancias = Blueprint('constancias', __name__)
 
 #-----------------------------------------PRINCIPAL-------------------------------------------------
 
-@constancias.route("/constancias") 
+@constancias.route("/constancias")
 @login_required
 def constancias_buscar():
-    search_query = request.args.get('buscar', '', type=str)
+    search_query = request.args.get('buscar', '', type=str).strip()
+    search_query_sql = f"%{search_query}%"
+
+    sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas_constancias
+                   WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
+                   AND constancia_enviada = False'''
+
+    sql_lim = '''SELECT * FROM asistencias_detalladas_constancias
+                 WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
+                 AND constancia_enviada = False
+                 ORDER BY nombre_participante DESC
+                 LIMIT %s OFFSET %s'''
+
+    paginado = paginador3(sql_count, sql_lim, [search_query_sql, search_query_sql], 1, 50)
+
+    return render_template('constancias/constancias.html',
+                           equipos=lista_equipos(),
+                           categorias=lista_categorias(),
+                           cursos=lista_cursos(),
+                           sesiones=lista_sesiones(),
+                           paquetes=lista_paquetes(),
+                           cuentas=lista_cuentas(),
+                           privilegios=lista_privilegios(),
+                           meses=lista_meses(),
+                           semanas=lista_semanas(),
+                           constancias=paginado[0],
+                           page=paginado[1],
+                           per_page=paginado[2],
+                           total_items=paginado[3],
+                           total_pages=paginado[4],
+                           search_query=search_query)
+
+@constancias.route("/constancias/filtros") 
+@login_required
+def constancias_filtros():
+    # search_query = request.args.get('buscar', '', type=str)
     nombre_mes = request.args.get('mes', '', type=str)
     semana = request.args.get('semana', '', type=str)
     fecha_raw = request.args.get('fecha', '', type=str)  # Usar directamente el valor completo
 
     fecha = ''
-    cursos = ''
     inicio = ''
     fin = ''
     if fecha_raw:
@@ -37,7 +71,6 @@ def constancias_buscar():
                     AND (%s = '' OR semana ILIKE %s)
                     AND (%s = '' OR fecha ILIKE %s)
                     AND (%s = '' OR horario_inicio::text = %s AND horario_fin::text = %s)
-                    AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)
                 AND constancia_enviada = False '''
 
     sql_lim = '''SELECT * FROM asistencias_detalladas_constancias
@@ -45,7 +78,6 @@ def constancias_buscar():
                 AND (%s = '' OR semana ILIKE %s)
                 AND (%s = '' OR fecha ILIKE %s)
                 AND (%s = '' OR horario_inicio::text = %s AND horario_fin::text = %s)
-                AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)
                 AND constancia_enviada = False
             ORDER BY nombre_participante DESC
             LIMIT %s OFFSET %s'''
@@ -56,8 +88,8 @@ def constancias_buscar():
             nombre_mes, nombre_mes, 
             semana, semana, 
             fecha, fecha,
-            inicio, inicio, fin,
-            search_query, search_query, search_query  # nombre y clave usan el mismo valor
+            inicio, inicio, fin
+            # search_query, search_query, search_query
         ],
         1, 50
     )

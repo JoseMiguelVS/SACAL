@@ -15,7 +15,40 @@ participantes = Blueprint('participantes', __name__)
 @participantes.route("/participantes")
 @login_required
 def participantes_buscar():
-    search_query = request.args.get('buscar', '', type=str)
+    search_query = request.args.get('buscar', '', type=str).strip()
+    search_query_sql = f"%{search_query}%"
+
+    sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
+                   WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
+                   AND grabaciones = 'False' 
+                   '''
+
+    sql_lim = '''SELECT * FROM asistencias_detalladas
+                 WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
+                 AND grabaciones = 'False' 
+                 ORDER BY nombre_participante DESC
+                 LIMIT %s OFFSET %s'''
+
+    paginado = paginador3(sql_count, sql_lim, [search_query_sql, search_query_sql], 1, 50)
+
+    return render_template('participantes/participantes.html',
+                           equipos=lista_equipos(),
+                           cursos=lista_cursos(),
+                           sesiones=lista_sesiones(),
+                           paquetes=lista_paquetes(),
+                           cuentas=lista_cuentas(),
+                           meses=lista_meses(),
+                           semanas=lista_semanas(),
+                           constancias=paginado[0],
+                           page=paginado[1],
+                           per_page=paginado[2],
+                           total_items=paginado[3],
+                           total_pages=paginado[4],
+                           search_query=search_query)
+
+@participantes.route("/participantes/filtros")
+@login_required
+def participantes_filtros():
     equipos = request.args.get('equipos', '', type=str)
     mes = request.args.get('mes', '', type=str)
     semana = request.args.get('semana', '', type=str)
@@ -41,7 +74,6 @@ def participantes_buscar():
                     AND (%s = '' OR semanas ILIKE %s)
                     AND (%s = '' OR fecha ILIKE %s)
                     AND (%s = '' OR cursos ILIKE %s)
-                    AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s) 
                     AND grabaciones = 'False' ''' 
 
     sql_lim = '''SELECT * FROM asistencias_detalladas
@@ -50,7 +82,6 @@ def participantes_buscar():
                     AND (%s = '' OR semanas ILIKE %s)
                     AND (%s = '' OR fecha ILIKE %s)
                     AND (%s = '' OR cursos ILIKE %s)
-                    AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s) 
                     AND grabaciones = 'False' 
                 ORDER BY nombre_participante DESC
                 LIMIT %s OFFSET %s'''
@@ -63,7 +94,6 @@ def participantes_buscar():
             semana, semana,
             fecha, fecha,
             cursos, cursos,
-            search_query, search_query, search_query  # nombre y clave usan el mismo valor
         ],
         1, 50
     )
