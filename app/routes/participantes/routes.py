@@ -1,11 +1,13 @@
-from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash
+import os
+from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, current_app
 from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
+from werkzeug.utils import secure_filename
 
-from utils.listas import lista_cuentas, lista_cursos, lista_equipos, lista_meses, lista_paquetes, lista_participantes, lista_sesiones, lista_semanas
+from utils.listas import lista_cuentas, lista_cursos, lista_equipos, lista_meses, lista_paquetes, lista_sesiones, lista_semanas
 
-from ..utils.utils import get_db_connection, paginador3
+from ..utils.utils import allowed_file, get_db_connection, my_random_string, paginador3
 
 participantes = Blueprint('participantes', __name__) 
 
@@ -297,4 +299,46 @@ def participante_actualizar(id):
         cur.close()
         con.close()
         flash("Participante cambiado de sesion")
+    return redirect(url_for('participantes.participantes_buscar'))
+
+@participantes.route('/participantes/comprobante/<string:id>', methods=['POST'])
+@login_required
+def participante_comprobante(id):
+    nombre_participante = request.form['nombre_participante']
+    apellidos_participante = request.form['apellidos_participante']
+    clave_participante = request.form['clave_participante']
+    creado = datetime.now()
+
+    if request.method == 'POST':
+        imagenes = request.files.getlist('fotos')
+        ruta = current_app.config['UPLOAD_FOLDER']
+
+        con = get_db_connection()
+        cur = con.cursor()
+
+        for imagen in imagenes:
+            if imagen and allowed_file(imagen.filename):
+                cadena_aleatoria = my_random_string(10)
+                filename = (
+                    f"{nombre_participante}_{apellidos_participante}_{clave_participante}_{str(creado)[:10]}_{cadena_aleatoria}_{secure_filename(imagen.filename)}"
+                )
+                file_path = os.path.join(ruta, filename)
+
+                if os.path.exists(file_path):
+                    flash(f'Ya existe un archivo llamado {filename}.')
+                    continue
+
+                imagen.save(file_path)
+
+                sql = 'INSERT INTO comprobantes_pago (participante_id, comprobante_img, fecha_creacion) VALUES (%s, %s, %s)'
+                valores = (id, filename, creado)
+                cur.execute(sql, valores)
+
+        con.commit()
+        cur.close()
+        con.close()
+
+        flash('Comprobantes subidos correctamente')
+        return redirect(url_for('participantes.participantes_buscar'))
+
     return redirect(url_for('participantes.participantes_buscar'))

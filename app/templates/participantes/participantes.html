@@ -190,7 +190,13 @@
                             <button type="button" class="botones-editar" data-bs-toggle="modal"
                                 data-bs-target="#modalEditar-{{p.id_participante}}"
                                 aria-label="Editar participante {{ p.nombre_participante }}">
-                                <i class="fa fa-edit" style="font-size: 18px"></i>
+                                <i class="fa fa-edit" style="font-size: 14px"></i>
+                            </button>
+
+                            <button type="button" class="botones-editar" data-bs-toggle="modal"
+                                data-bs-target="#modalComprobante-{{p.id_participante}}"
+                                aria-label="Editar participante {{ p.nombre_participante }}">
+                                <i class="fas fa-receipt" style="font-size: 14px"></i>
                             </button>
                         </td>
                         <!-- <td><button onclick="guardarCambios(this)">Guardar</button></td> -->
@@ -238,10 +244,8 @@
                     <p><strong>Equipo:</strong> {{ partes_equipo[1] }}</p>
                     {% endif %}
 
-
                     <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
                     <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
-
 
                     <div class="row g-3">
                         <!-- Clave -->
@@ -310,6 +314,7 @@
                         </div>
 
                     </div>
+
                 </div>
 
                 <div class="modal-footer">
@@ -407,9 +412,72 @@
             </form>
         </div>
     </div>
+
+    <div class="modal fade" id="modalComprobante-{{ p.id_participante }}" data-bs-backdrop="static"
+        data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalComprobanteLabel-{{ p.id_participante }}"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="post" action="{{ url_for('participantes.participante_comprobante', id=p.id_participante) }}"
+                class="modal-content" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="idEditarLabel-{{ p.id_participante }}">Registrar Comprobante de
+                        Participante</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" name="nombre_participante" value="{{ p.nombre_participante }}">
+                    <input type="hidden" name="apellidos_participante" value="{{ p.apellidos_participante }}">
+                    <input type="hidden" name="clave_participante" value="{{ p.clave_participante }}">
+
+                    <!-- Zona drag and drop -->
+                    <div class="drop-zone" id="drop-zone-{{ p.id_participante }}">
+                        <p>Arrastra y suelta tus imágenes aquí o haz clic para elegir archivos</p>
+                        <input type="file" id="file-input-{{ p.id_participante }}" name="fotos" multiple
+                            accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="botones-cancelar" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="botones-guardar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
     {% endfor %} {% endif %}
 
 </main>
+
+{% if participantes %} {% for p in participantes %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dropZone = document.getElementById('drop-zone-{{ p.id_participante }}');
+        const fileInput = document.getElementById('file-input-{{ p.id_participante }}');
+
+        // Click en zona = click en input
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        // Añadir clases visuales al arrastrar
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+            }
+        });
+    });
+</script>
+{% endfor %} {% endif %}
 
 <script>
     document.getElementById('flexSwitchCheckDefault').addEventListener('change', function () {

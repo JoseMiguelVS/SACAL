@@ -32,6 +32,7 @@
         <nav>
             <ul class="nav-links">
                 <li><a href="{{ url_for('empleados.empleadosBuscar') }}">Empleados</a></li>
+
                 <li><a class="herramientas" href="#">Bitacoras <i class="fas fa-angle-down"></i></a>
                     <ul class="tools">
                         <li><a href="{{ url_for('sesiones.sesiones_buscar') }}">Sesiones</a></li>
@@ -40,6 +41,7 @@
                         <li><a href="{{ url_for('pagos.pagos_buscar')}}">Pagos</a></li>
                     </ul>
                 </li>
+
                 <li>
                     <a class="herramientas" href="#">Herramientas <i class="fas fa-angle-down"></i></a>
                     <ul class="tools">
@@ -54,8 +56,8 @@
                 </li>
             </ul>
         </nav>
-        <a href="{{url_for('logout')}}" class="btn"><button>Cerrar sesion</button></a>
 
+        <a href="{{url_for('logout')}}" class="btn"><button>Cerrar sesion</button></a>
         <a href="#" onclick="openNav()" class="menu"><button>Menu</button></a>
 
         <div class="overlay" id="mobile-menu">

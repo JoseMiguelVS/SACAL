@@ -1,4 +1,5 @@
 import os
+import uuid
 import psycopg2
 import re
 from psycopg2.extras import RealDictCursor
@@ -175,3 +176,18 @@ def paginador3(sql_count: str, sql_lim: str, filtros: list, in_page: int, per_pa
 
     total_pages = (total_items + per_page - 1) // per_page
     return items, page, per_page, total_items, total_pages
+
+# --------------------------------------------------------------IMAGENES--------------------------------------------------------------
+
+def my_random_string(string_length=10):
+    """Regresa una cadena aleatoria de la longitud de string_length."""
+    random = str(uuid.uuid4()) # Conviente el formato UUID a una cadena de Python.
+    random = random.upper() # Hace todos los caracteres mayusculas.
+    random = random.replace("-","") # remueve el separador UUID '-'.
+    return random[0:string_length] # regresa la cadena aleatoria.
+
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect, request, flash
+from flask import Flask, current_app, render_template, url_for, redirect, request, flash
 from flask_login import LoginManager, login_user, logout_user, login_required
 from flask_wtf.csrf import CSRFProtect
 
@@ -22,7 +22,6 @@ from routes.pagos.routes import pagos
 app = Flask(__name__)
 csrf = CSRFProtect(app) 
 app.secret_key = 'secret'
-
 
 # Login
 login_manager = LoginManager(app)
@@ -73,6 +72,10 @@ def login():
 @login_required
 def index():
     return render_template('/index.html')
+
+app.config['UPLOAD_FOLDER'] = './static/img/uploads/'
+ruta_comprobantes = app.config['UPLOAD_FOLDER']
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 #-------------------------- Errores --------------------------
 def pagina_no_encontrada(error):
