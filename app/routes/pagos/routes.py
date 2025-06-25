@@ -31,8 +31,26 @@ def pagos_comprobantes(id):
     with get_db_connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute('SELECT * FROM detalles_pagos WHERE id_participante = %s',(id,))
-            participante = cur.fetchone()
-    if participante is None:
+            pagos = cur.fetchone()
+    if pagos is None:
         flash('El particiante no existe o ha sido eliminado.')
         return redirect(url_for('pagos.pagos_buscar'))
     return render_template('pagos/pagos_detalles.html', pagos = pagos)
+
+@pagos.route("/pagos/comprobantes/editar/<string:id>", methods=['POST'])
+@login_required
+def pagos_actualizar(id):
+    if request.method == 'POST':
+        clave_rastreo = request.form['clave_rastreo']
+        validacion_pago = request.form['validacion_pago']
+
+        con = get_db_connection()
+        cur = con.cursor()
+        sql = 'UPDATE pagos SET clave_rastreo = %s, validacion_pago = %s WHERE participante = %s'
+        valores = (clave_rastreo, validacion_pago, id)
+        cur.execute(sql, valores)
+        con.commit()
+        cur.close()
+        con.close()
+        flash('Pago actualizado correctamente')
+    return redirect(url_for('pagos.pagos_buscar'))
