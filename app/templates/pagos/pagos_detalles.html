@@ -1,0 +1,22 @@
+{% extends './layout.html' %} {% block body %}
+
+<main class="container my-4">
+    <h2 class="text-center mb-4">Comprobante de participante</h2>
+    <!-- ------------------------------COMPROBANTE DE PAGO------------------------------------- -->
+    <div class="mt-2 mb-3">
+        <div class="row justify-content-center">
+            <div class="col-7 col-sm-5 col-md-4 col-lg-3">
+                <div class="ratio ratio-1x1 bg-secondary overflow-hidden" style="border-radius: 10px;">
+                    {% if pagos.14 == null or pagos.14 == "" %}
+                    <img src="{{ url_for('static', filename='img/sin_comprobante.png') }}" alt="Sin comprobante">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='img/uploads/' + pagos.14) }}" alt="Comprobante de pago">
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+{% endblock %}

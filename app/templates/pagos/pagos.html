@@ -60,7 +60,10 @@
                 <td>{{ p.validacion_pago }}</td>
                 <td>{{ p.conceptos }}</td>
                 <td>{{ p.concepto_factura }}</td>
-                <td>{{ p.concepto_factura }}</td>
+                <td>
+                    <a class="botones-ver" href="{{ url_for('pagos.pagos_comprobantes', id = p.id_pago) }}"><i
+                            class="fa fa-eye"></i>Ver</a>
+                </td>
                 {% endfor %}
                 {% else %}
                 <tr>

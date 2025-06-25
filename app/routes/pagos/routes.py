@@ -25,3 +25,14 @@ def pagos_buscar():
                            search_query = search_query)
 
 # 
+@pagos.route("/pagos/comprobantes/<string:id>")
+@login_required
+def pagos_comprobantes(id):
+    with get_db_connection() as conn:
+        with conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute('SELECT * FROM detalles_pagos WHERE id_participante = %s',(id,))
+            participante = cur.fetchone()
+    if participante is None:
+        flash('El particiante no existe o ha sido eliminado.')
+        return redirect(url_for('pagos.pagos_buscar'))
+    return render_template('pagos/pagos_detalles.html', pagos = pagos)
