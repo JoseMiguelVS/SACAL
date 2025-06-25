@@ -1,4 +1,5 @@
 import os
+import re
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, current_app
 from flask_login import login_required
 from datetime import datetime
@@ -20,12 +21,12 @@ def participantes_buscar():
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
                    WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
-                   AND grabaciones = 'False' 
+                   AND grabaciones = False
                    '''
 
     sql_lim = '''SELECT * FROM asistencias_detalladas
                  WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
-                 AND grabaciones = 'False' 
+                 AND grabaciones = False
                  ORDER BY nombre_participante DESC
                  LIMIT %s OFFSET %s'''
 
@@ -39,7 +40,7 @@ def participantes_buscar():
                            cuentas=lista_cuentas(),
                            meses=lista_meses(),
                            semanas=lista_semanas(),
-                           constancias=paginado[0],
+                           participantes=paginado[0],
                            page=paginado[1],
                            per_page=paginado[2],
                            total_items=paginado[3],
@@ -74,7 +75,7 @@ def participantes_filtros():
                     AND (%s = '' OR semanas ILIKE %s)
                     AND (%s = '' OR fecha ILIKE %s)
                     AND (%s = '' OR cursos ILIKE %s)
-                    AND grabaciones = 'False' ''' 
+                    AND grabaciones = False ''' 
 
     sql_lim = '''SELECT * FROM asistencias_detalladas
                 WHERE (%s = '' OR meses ILIKE %s)
@@ -82,7 +83,7 @@ def participantes_filtros():
                     AND (%s = '' OR semanas ILIKE %s)
                     AND (%s = '' OR fecha ILIKE %s)
                     AND (%s = '' OR cursos ILIKE %s)
-                    AND grabaciones = 'False' 
+                    AND grabaciones = False
                 ORDER BY nombre_participante DESC
                 LIMIT %s OFFSET %s'''
 
@@ -95,7 +96,7 @@ def participantes_filtros():
             fecha, fecha,
             cursos, cursos,
         ],
-        1, 50
+        1, 50   
     )
 
     return render_template('participantes/participantes.html',
@@ -195,16 +196,17 @@ def participante_agregar():
 @participantes.route('/participantes/agregar/nuevo', methods=('GET', 'POST'))
 @login_required
 def participante_nuevo():
+
     if request.method == 'POST':
         nombre_participante = request.form['nombre_participante']
         apellidos_participante = request.form['apellidos_participante']
-        num_telefono = request.form['num_telefono']
+        num_telefono = re.sub(r'\D', '', request.form['num_telefono'])
         clave_participante = request.form['clave_participante']
         nombre_empleado = request.form['nombre_empleado']
         cuenta_destino = request.form['id_cuenta']
         paquete = request.form['paquete']
         sesion = request.form['id_sesion']
-        equipos = request.form['equipo']
+        equipos = request.form['equipos']
         estado = True
         constancia_generada = False
         constancia_enviada = False
@@ -213,9 +215,9 @@ def participante_nuevo():
         precio_paquete = ''
         if paquete:
             partes = paquete.split(',')
-            if len(paquete) == 2:
-                nombre_paquete == partes[1]
-                precio_paquete == partes[1]
+            if len(partes) == 2:
+                nombre_paquete = partes[0].strip()
+                precio_paquete = partes[1].strip()
 
         con = get_db_connection()
         cur = con.cursor(cursor_factory=RealDictCursor)
@@ -246,7 +248,7 @@ def participante_nuevo():
         cur.execute(sql3, valores3)
 
         sql4 = "INSERT INTO pagos (ingresos, participante) VALUES (%s, %s)"
-        valores4 = (precio_paquete, clave_participante )
+        valores4 = (precio_paquete, participante_id )
         cur.execute(sql4, valores4)
 
         # 4. Guardar cambios y cerrar conexión
@@ -334,41 +336,38 @@ def participante_actualizar(id):
 @participantes.route('/participantes/comprobante/<string:id>', methods=['POST'])
 @login_required
 def participante_comprobante(id):
-    nombre_participante = request.form['nombre_participante']
-    apellidos_participante = request.form['apellidos_participante']
-    clave_participante = request.form['clave_participante']
+    nombre_participante = request.form['nombre_participante'].strip()
+    apellidos_participante = request.form['apellidos_participante'].strip()
+    clave_participante = request.form['clave_participante'].strip()
     creado = datetime.now()
 
-    if request.method == 'POST':
-        imagenes = request.files.getlist('fotos')
-        ruta = current_app.config['UPLOAD_FOLDER']
+    imagenes = request.files.getlist('fotos')
+    ruta = current_app.config['UPLOAD_FOLDER']
 
-        con = get_db_connection()
-        cur = con.cursor()
+    con = get_db_connection()
+    cur = con.cursor()
 
-        for imagen in imagenes:
-            if imagen and allowed_file(imagen.filename):
-                cadena_aleatoria = my_random_string(10)
-                filename = (
-                    f"{nombre_participante}_{apellidos_participante}_{clave_participante}_{str(creado)[:10]}_{cadena_aleatoria}_{secure_filename(imagen.filename)}"
-                )
-                file_path = os.path.join(ruta, filename)
+    for imagen in imagenes:
+        if imagen and allowed_file(imagen.filename):
+            cadena_aleatoria = my_random_string()
+            nombre_archivo = f"{nombre_participante}_{apellidos_participante}_{clave_participante}_{creado.strftime('%Y-%m-%d')}_{cadena_aleatoria}_{secure_filename(imagen.filename)}"
+            file_path = os.path.join(ruta, nombre_archivo)
 
-                if os.path.exists(file_path):
-                    flash(f'Ya existe un archivo llamado {filename}.')
-                    continue
+            if os.path.exists(file_path):
+                flash(f'Ya existe un archivo llamado {nombre_archivo}.')
+                continue
 
-                imagen.save(file_path)
+            imagen.save(file_path)
 
-                sql = 'INSERT INTO comprobantes_pago (participante_id, comprobante_img, fecha_creacion) VALUES (%s, %s, %s)'
-                valores = (id, filename, creado)
-                cur.execute(sql, valores)
+            sql = '''
+                INSERT INTO comprobantes_pago (participante_id, comprobante_img, fecha_creacion)
+                VALUES (%s, %s, %s)
+            '''
+            cur.execute(sql, (id, nombre_archivo, creado))
 
-        con.commit()
-        cur.close()
-        con.close()
+    con.commit()
+    cur.close()
+    con.close()
 
-        flash('Comprobantes subidos correctamente')
-        return redirect(url_for('participantes.participantes_buscar'))
-
+    flash('Comprobantes subidos correctamente')
     return redirect(url_for('participantes.participantes_buscar'))

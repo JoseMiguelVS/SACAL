@@ -42,22 +42,31 @@
                     <th>Confirmacion</th>
                     <th>Conceptos</th>
                     <th>Concepto factura</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                <td>{{ pagos.id_pago }}</td>
-                <td>{{ pagos.fecha_pago }}</td>
-                <td>{{ pagos.forma_pago }}</td>
-                <td>{{ pagos.ingresos }}</td>
-                <td>{{ pagos.ingreso_factura }}</td>
-                <td>{{ pagos.gasto }}</td>
-                <td>{{ pagos.devolucion }}</td>
-                <td>{{ pagos.clave_rastreo }}</td>
-                <td>{{ pagos.nombre_participante }}</td>
-                <td>{{ pagos.clave_participante }}</td>
-                <td>{{ pagos.validacion_pago }}</td>
-                <td>{{ pagos.conceptos }}</td>
-                <td>{{ pagos.concepto_factura }}</td>
+                {% if pagos %} {% for p in pagos %}
+                <td>{{ p.id_pago }}</td>
+                <td>{{ p.fecha_pago }}</td>
+                <td>{{ p.forma_pago }}</td>
+                <td>{{ p.ingresos }}</td>
+                <td>{{ p.ingreso_factura }}</td>
+                <td>{{ p.gasto }}</td>
+                <td>{{ p.devolucion }}</td>
+                <td>{{ p.clave_rastreo }}</td>
+                <td>{{ p.nombre_participante }}</td>
+                <td>{{ p.clave_participante }}</td>
+                <td>{{ p.validacion_pago }}</td>
+                <td>{{ p.conceptos }}</td>
+                <td>{{ p.concepto_factura }}</td>
+                <td>{{ p.concepto_factura }}</td>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td align="center" colspan="15">No existen participantes</td>
+                </tr>
+                {% endif %}
             </tbody>
         </table>
     </section>

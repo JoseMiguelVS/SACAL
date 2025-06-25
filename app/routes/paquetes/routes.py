@@ -60,39 +60,17 @@ def paquete_nuevo():
             fecha_modificacion = datetime.now()
 
             # Verificamos si el usuario marcó la casilla de regalos
-            regalo = 'regalo' in request.form
-
-            # Solo tomamos los valores si regalo está marcado
-            num_cursos = int(request.form['num_cursos']) if regalo and request.form['num_cursos'] else 0
-            diploma_flash = 'diploma_flash' in request.form if regalo else False
-            solo_global = 'solo_global' in request.form if regalo else False
-
             try:
                 con = get_db_connection()
                 cur = con.cursor(cursor_factory=RealDictCursor)
 
                 # Insertar paquete y recuperar su ID
-                sql = '''
-                    INSERT INTO paquetes (nombre_paquete, precio_paquete, categoria_paquete, estado, fecha_creacion, fecha_modificacion)
-                    VALUES (%s, %s, %s, %s, %s, %s) RETURNING id_paquete
-                '''
+                sql='''
+                        INSERT INTO paquetes (nombre_paquete, precio_paquete, categoria_paquete, estado, fecha_creacion, fecha_modificacion)
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                    '''
                 valores = (nombre_paquete, precio_paquete, categoria_paquete, estado, fecha_creacion, fecha_modificacion)
                 cur.execute(sql, valores)
-                paquete_id = cur.fetchone()['id_paquete']
-
-                # Insertar regalo y recuperar su ID
-                sql2 = '''
-                    INSERT INTO regalos (num_cursos, diploma_flash, solo_global)
-                    VALUES (%s, %s, %s) RETURNING id_regalo
-                '''
-                valores2 = (num_cursos, diploma_flash, solo_global)
-                cur.execute(sql2, valores2)
-                regalos_id = cur.fetchone()['id_regalo']
-
-                # Insertar privilegio (relación)
-                sql3 = 'INSERT INTO privilegios (paquete_id, regalos_id) VALUES (%s, %s)'
-                valores3 = (paquete_id, regalos_id)
-                cur.execute(sql3, valores3)
 
                 con.commit()
                 flash('Paquete agregado correctamente')

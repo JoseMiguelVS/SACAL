@@ -547,41 +547,6 @@
 
 
 </script>
-<!-- 
-<script>
-    function guardarCambios(button) {
-        const fila = button.closest("tr");
-        const id = fila.getAttribute("data-id");
-
-        const datos = {};
-        fila.querySelectorAll("input, select").forEach(element => {
-            if (element.type === "checkbox") {
-                datos[element.name] = element.checked;
-            } else {
-                datos[element.name] = element.value;
-            }
-        });
-
-
-        fetch(`/participantes/actualizar/${id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': "{{ csrf_token() }}"  // si usas CSRF protection
-            },
-            body: JSON.stringify(datos)
-        })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message || 'Datos actualizados');
-            })
-            .catch(error => {
-                alert('Error al actualizar');
-                console.error(error);
-            });
-    }
-</script> -->
-
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -605,6 +570,16 @@
             } else {
                 formBuscar.action = "{{ url_for('participantes.participantes_buscar') }}";
             }
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const telefonoInput = document.getElementById('num_telefono');
+
+        telefonoInput.addEventListener('input', function () {
+            this.value = this.value.replace(/\s+/g, '');
         });
     });
 </script>

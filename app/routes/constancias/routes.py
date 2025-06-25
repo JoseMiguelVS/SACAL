@@ -29,7 +29,7 @@ def constancias_buscar():
                  ORDER BY nombre_participante DESC
                  LIMIT %s OFFSET %s'''
 
-    paginado = paginador3(sql_count, sql_lim, [search_query_sql, search_query_sql], 1, 50)
+    paginado = paginador3(sql_count, sql_lim, [search_query_sql, search_query_sql], 1, 25)
 
     return render_template('constancias/constancias.html',
                            equipos=lista_equipos(),
@@ -91,7 +91,7 @@ def constancias_filtros():
             inicio, inicio, fin
             # search_query, search_query, search_query
         ],
-        1, 50
+        1, 25
     )
 
     return render_template('constancias/constancias.html',

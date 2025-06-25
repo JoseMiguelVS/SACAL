@@ -249,6 +249,7 @@
                                                         aria-label="Cerrar"></button>
                                         </div>
                                         <div class="modal-body">
+                                                <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
                                                 <div class="mb-3">
                                                         <label for="nombre-{{paquete.id_paquete}}"
                                                                 class="form-label">Nombre</label>
@@ -265,60 +266,17 @@
                                                 </div>
                                                 <div class="mb-3">
                                                         <select name="id_categoria" id="id_categoria"
-                                                                class="form-select mb-2">
-                                                                <option value="" disabled>Categoria</option>
-                                                                {% if categorias %}
+                                                                class="form-select" aria-label="Seleccione categoría">
+                                                                <option value="true">--Seleccione la categoría--
+                                                                </option>
                                                                 {% for categoria in categorias %}
                                                                 <option value="{{ categoria.0 }}" {% if
-                                                                        categoria.0==paquete.nombre_categoria %}
+                                                                        categoria.0==paquete.categoria_paquete %}
                                                                         selected {% endif %}>
                                                                         {{ categoria.1 }}
                                                                 </option>
                                                                 {% endfor %}
-                                                                {% else %}
-                                                                <option disabled>Aun no hay registros</option>
-                                                                {% endif %}
                                                         </select>
-                                                </div>
-
-                                                <div class="form-check mb-3">
-                                                        <input class="form-check-input" type="checkbox" value="1"
-                                                                id="regalo-{{paquete.id_paquete}}" name="regalo" {% if
-                                                                paquete.regalo %}checked{% endif %}>
-                                                        <label class="form-check-label"
-                                                                for="regalo-{{paquete.id_paquete}}">¿Incluye
-                                                                regalo?</label>
-                                                </div>
-
-                                                <div id="regalo_campos-{{paquete.id_paquete}}" style="display: none;">
-                                                        <div class="mb-3">
-                                                                <label for="num_cursos-{{paquete.id_paquete}}"
-                                                                        class="form-label">Número de Cursos</label>
-                                                                <input type="number" class="form-control"
-                                                                        id="num_cursos-{{paquete.id_paquete}}"
-                                                                        name="num_cursos"
-                                                                        value="{{paquete.num_cursos or ''}}">
-                                                        </div>
-                                                        <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox"
-                                                                        value="1"
-                                                                        id="diploma_flash-{{paquete.id_paquete}}"
-                                                                        name="diploma_flash" {% if paquete.diploma_flash
-                                                                        %}checked{% endif %}>
-                                                                <label class="form-check-label"
-                                                                        for="diploma_flash-{{paquete.id_paquete}}">Diploma
-                                                                        Flash</label>
-                                                        </div>
-                                                        <div class="form-check">
-                                                                <input class="form-check-input" type="checkbox"
-                                                                        value="1"
-                                                                        id="solo_global-{{paquete.id_paquete}}"
-                                                                        name="solo_global" {% if paquete.solo_global
-                                                                        %}checked{% endif %}>
-                                                                <label class="form-check-label"
-                                                                        for="solo_global-{{paquete.id_paquete}}">Solo
-                                                                        Global</label>
-                                                        </div>
                                                 </div>
                                         </div>
                                         <div class="modal-footer">
@@ -331,56 +289,8 @@
                 </div>
         </div>
 
-        <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                        const regaloCheckbox = document.getElementById('regalo-{{paquete.id_paquete}}');
-                        const camposRegalo = document.getElementById('regalo_campos-{{paquete.id_paquete}}');
-                        const numCursos = document.getElementById('num_cursos-{{paquete.id_paquete}}');
-                        const diplomaFlash = document.getElementById('diploma_flash-{{paquete.id_paquete}}');
-                        const soloGlobal = document.getElementById('solo_global-{{paquete.id_paquete}}');
-
-                        function toggleCamposRegalo() {
-                                if (regaloCheckbox.checked) {
-                                        camposRegalo.style.display = 'block';
-                                } else {
-                                        camposRegalo.style.display = 'none';
-                                        if (numCursos) numCursos.value = '';
-                                        if (diplomaFlash) diplomaFlash.checked = false;
-                                        if (soloGlobal) soloGlobal.checked = false;
-                                }
-                        }
-
-                        toggleCamposRegalo();
-                        regaloCheckbox.addEventListener('change', toggleCamposRegalo);
-                });
-        </script>
-
         {% endfor %} {% else %} {% endif %}
 
-        <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                        const regaloCheckbox = document.getElementById('regalo');
-                        const camposRegalo = document.getElementById('regalo_campos');
-
-                        function toggleCamposRegalo() {
-                                if (regaloCheckbox.checked) {
-                                        camposRegalo.style.display = 'block';
-                                } else {
-                                        camposRegalo.style.display = 'none';
-                                        // También puedes limpiar los valores si se desea
-                                        document.getElementById('num_cursos').value = '';
-                                        document.getElementById('diploma_flash').checked = false;
-                                        document.getElementById('solo_global').checked = false;
-                                }
-                        }
-
-                        // Inicializar visibilidad al cargar
-                        toggleCamposRegalo();
-
-                        // Escuchar cambios en el checkbox
-                        regaloCheckbox.addEventListener('change', toggleCamposRegalo);
-                });
-        </script>
 </main>
 
 {% endblock %}
