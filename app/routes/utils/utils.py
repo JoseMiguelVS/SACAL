@@ -4,13 +4,16 @@ import psycopg2
 import re
 from psycopg2.extras import RealDictCursor
 from flask import Flask, request
+from dotenv import load_dotenv
+load_dotenv()
+
 
 #--------------------------------CONEXION BD------------------------
 def get_db_connection():
     try:
-        conn = psycopg2.connect(host='localhost',
+        conn = psycopg2.connect(host=os.environ['host'],
                                 # port='5433', 
-                                dbname='SGCC', 
+                                dbname=os.environ['db_name'], 
                                 user=os.environ['db_username'], 
                                 password=os.environ['db_password'])
         return conn
