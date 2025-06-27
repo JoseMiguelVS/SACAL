@@ -2,49 +2,44 @@
 
 <main class="container my-4">
     <h2 class="text-center mb-4">Comprobante de participante</h2>
-    <!-- ------------------------------COMPROBANTE DE PAGO------------------------------------- -->
-    <div class="mt-2 mb-3">
-        <div class="row justify-content-center align-items-start">
-            <!-- Columna de Imágenes -->
-            <div class="row justify-content-center align-items-start">
-                <!-- Columna de Imágenes (en fila horizontal) -->
-                <div class="col-12 col-md-6 col-lg-5">
-                    <div class="d-flex gap-2 bg-secondary p-2 rounded overflow-auto">
-                        {% if not pagos.comprobantes %}
-                        <img src="{{ url_for('static', filename='img/sin_comprobante.png') }}" alt="Sin comprobante"
-                            class="img-fluid rounded" style="max-height: 200px;">
-                        {% else %}
-                        {% for imagen in pagos.comprobantes.split(',') %}
-                        <img src="{{ url_for('static', filename='img/uploads/' + imagen.strip()) }}"
-                            alt="Comprobante de pago" class="img-fluid rounded" style="max-height: 400px;">
-                        {% endfor %}
-                        {% endif %}
-                    </div>
-                </div>
 
-                <!-- Columna del Formulario -->
-                <div class="col-12 col-md-6 col-lg-5">
-                    <form action="{{ url_for('pagos.pagos_actualizar', id = pagos.id_participante) }}" method="post" class="border p-3 rounded bg-light shadow-sm">
-                        <div class="mb-3">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                            <label for="estado" class="form-label">Estado del comprobante</label>
-                            <select name="validacion_pago" id="validacion_pago" class="form-select">
-                                <option value="1">No encontrado</option>
-                                <option value="2">Pendiente</option>
-                                <option value="3">Validado</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="clave" class="form-label">Clave de rastreo</label>
-                            <input type="text" name="clave_rastreo" id="clave_rastreo" class="form-control">
-                        </div>
-                        <button type="submit" class="botones-guardar w-100">Guardar cambios</button>
-                    </form>
-                </div>
+    <div class="row justify-content-center align-items-start">
+        <!-- Columna de Imágenes -->
+        <div class="col-12 col-md-6 col-lg-5 mb-3">
+            <div class="d-flex gap-2 bg-secondary p-2 rounded overflow-auto">
+                {% if not pagos.comprobantes %}
+                <img src="{{ url_for('static', filename='img/sin_comprobante.png') }}" alt="Sin comprobante"
+                    class="img-fluid rounded" style="max-height: 200px;">
+                {% else %}
+                {% for imagen in pagos.comprobantes.split(',') %}
+                <img src="{{ url_for('static', filename='img/uploads/' + imagen.strip()) }}" alt="Comprobante de pago"
+                    class="img-fluid rounded" style="max-height: 400px;">
+                {% endfor %}
+                {% endif %}
             </div>
         </div>
 
-
+        <!-- Columna del Formulario -->
+        <div class="col-12 col-md-6 col-lg-5 mb-3">
+            <form action="{{ url_for('pagos.pagos_actualizar', id = pagos.id_participante) }}" method="post"
+                class="">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <div class="mb-3">
+                    <label for="estado" class="form-label">Estado del comprobante</label>
+                    <select name="validacion_pago" id="validacion_pago" class="form-select">
+                        <option value="1">No encontrado</option>
+                        <option value="2">Pendiente</option>
+                        <option value="3">Validado</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="clave" class="form-label">Clave de rastreo</label>
+                    <input type="text" name="clave_rastreo" id="clave_rastreo" class="form-control">
+                </div>
+                <button type="submit" class="botones-guardar w-100">Guardar cambios</button>
+            </form>
+        </div>
+    </div>
 </main>
 
 {% endblock %}

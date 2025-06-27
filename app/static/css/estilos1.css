@@ -9,6 +9,116 @@
   font-size: 20px;
 }
 
+body {
+  padding-bottom: 100px;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.header {
+  background-color: #14447c;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 85px;
+  padding: 5px 10%;
+  position: relative;
+  z-index: 10;
+}
+
+.header .logo img {
+  height: 70px;
+  width: auto;
+  transition: all 0.3s ease;
+}
+
+.header .logo img:hover {
+  transform: scale(1.2);
+}
+
+.header .nav-links {
+  list-style: none;
+  display: flex;
+}
+
+.header .nav-links li {
+  position: relative;
+  padding: 0 20px;
+}
+
+.header .nav-links a {
+  text-decoration: none;
+  font-weight: 700;
+  color: #fff;
+  transition: all 0.3s ease;
+  padding: 10px;
+  display: block;
+}
+
+.header .nav-links li:hover,
+.header .overlay a:hover {
+  transform: scale(1.1);
+}
+
+.header .nav-links li a:hover {
+  color: #eb5d10;
+}
+
+.header .btn button,
+.header .menu button {
+  font-weight: 700;
+  color: #f3a474;
+  padding: 9px 25px;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.header .btn button:hover,
+.header .menu button:hover {
+  background-color: #eb5d10;
+  color: #fff;
+  transform: scale(1.1);
+}
+
+/* Menús desplegables */
+.nav-links li ul.tools {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #14447c;
+  min-width: 180px;
+  border-radius: 8px;
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.nav-links li:hover ul.tools {
+  display: block;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nav-links li ul.tools li {
+  display: block;
+  padding: 5px 20px;
+}
+
+.herramientas {
+  border: 1px solid #f0f0f0;
+  border-radius: 5px;
+}
+
+/* Checkbox estilo píldora */
 .checkbox-pill input[type="checkbox"] {
   display: none;
 }
@@ -30,139 +140,45 @@
   color: white;
 }
 
-body {
-  padding-bottom: 100px;
-  /* espacio suficiente para que el contenido no quede bajo el footer */
-  min-height: 100vh;
-  overflow-y: auto;
-  /* fuerza scroll si es necesario */
-}
-
-html {
-  scroll-behavior: smooth;
-  /* Desplazamiento suave */
-}
-
-#filtro-auto {
-  z-index: 0;
-  /* O más alto, según sea necesario */
-}
-
-/* Estilos del encabezado */
-.header {
-  background-color: #14447c;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 85px;
-  padding: 5px 10%;
-}
-
-.header .logo {
-  cursor: pointer;
-}
-
-.header .logo img {
-  height: 70px;
-  width: auto;
-  transition: all 0.3s ease;
-}
-
-.header .logo img:hover {
-  transform: scale(1.2);
-}
-
-/* Enlaces de navegación principal */
-.header .nav-links {
-  list-style: none;
-}
-
-.header .nav-links li {
-  display: inline-block;
-  padding: 0 20px;
-}
-
-.header .nav-links li:hover,
-.header .overlay a:hover {
-  /* Combinado con overlay hover */
-  transform: scale(1.1);
-}
-
-.header .nav-links a {
-  text-decoration: none;
-  font-weight: 700;
-  /* Asumiendo que 700 era un font-weight */
-  color: #fff;
-  transition: all 0.3s ease;
-  padding: 10px;
-  display: block;
-}
-
-.header .nav-links li a:hover {
-  color: #eb5d10;
-}
-
-/* Botones del encabezado y menú */
-.header .btn button,
-.header .menu button {
-  font-weight: 700;
-  color: #f3a474;
-  padding: 9px 25px;
-  background-color: #f0f0f0;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  transition: all 0.3s ease 0s;
-  text-decoration: none;
-}
-
-.header .btn button:hover,
-.header .menu button:hover {
-  background-color: #eb5d10;
-  color: #fff;
-  transform: scale(1.1);
-}
-
-/* Menú desplegable de escritorio (Herramientas) */
-.nav-links>li {
-  float: left;
-}
-
-.nav-links li ul {
-  display: none;
-  position: absolute;
-  background-color: #14447c;
-  padding: 10px 0;
-  border-radius: 5px;
-  transition: all 0.3s ease;
-  transform: scale(0);
+/* Menú móvil (overlay) */
+.overlay {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  top: 0;
   left: 0;
-  top: 100%;
-  min-width: 150px;
-  /* Ajusta según sea necesario */
-  z-index: 1000;
+  background-color: rgba(20, 68, 124, 0.95);
+  z-index: 10000;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.nav-links li:hover>ul {
-  transform: scale(1);
-  display: block;
+.overlay-content {
+  list-style: none;
+  text-align: center;
 }
 
-.nav-links li ul li {
-  position: relative;
-  display: block;
-  /* Los elementos del dropdown se apilan verticalmente */
-  padding: 5px 20px;
-  /* Relleno para los elementos del dropdown */
+.overlay-content li {
+  margin: 20px 0;
 }
 
-.herramientas {
-  border: #f0f0f0 solid 1px;
-  border-radius: 5px;
+.overlay-content a {
+  color: white;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 24px;
 }
 
-.tools {
-  z-index: 999999;
+/* Botón cerrar overlay */
+.overlay .close {
+  position: absolute;
+  top: 20px;
+  right: 45px;
+  font-size: 40px;
+  color: white;
+  cursor: pointer;
 }
 
 /* Contenedores de formulario */
@@ -471,6 +487,10 @@ footer {
   /* Oculto por defecto, se muestra en pantallas pequeñas */
 }
 
+
+/* ========================
+   Media Queries
+======================== */
 @media screen and (max-width: 1400px) {
   * {
     font-size: 15px;
@@ -478,135 +498,20 @@ footer {
 }
 
 @media screen and (max-width: 1000px) {
-
-  /* Combinado para evitar repetición */
   .nav-links,
   .btn {
-    display: none;
-    /* Oculta el menú de escritorio y el botón en pantallas pequeñas */
+    display: none !important;
   }
 
   .menu {
-    display: inherit;
-    /* Muestra el botón de menú móvil */
+    display: inline-block !important;
   }
-
-  /* Ajuste de tamaño de fuente para pantallas más pequeñas */
-  * {
+  *{
     font-size: 15px;
   }
 }
 
-.header a {
-  text-decoration: none;
-  /* Regla general para enlaces en el header */
-}
 
-.header .overlay {
-  height: 100%;
-  width: 0;
-  /* Oculto por defecto */
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  background-color: #eb5d10;
-  overflow-x: hidden;
-  /* Cambiado a hidden para evitar scroll horizontal innecesario */
-  transition: all 0.3s ease 0s;
-}
-
-.header .overlay .overlay-content {
-  display: flex;
-  height: 100%;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  list-style: none;
-  /* Elimina el estilo de lista para los elementos principales */
-  padding: 0;
-  /* Asegura que no haya padding extra que cause desbordamiento */
-}
-
-.header .overlay a {
-  padding: 15px;
-  font-size: 36px;
-  display: block;
-  transition: all 0.3s ease 0s;
-  color: aliceblue;
-  width: 100%;
-  /* Asegura que los enlaces ocupen el ancho completo para el clic */
-  text-align: center;
-  /* Centra el texto de los enlaces */
-}
-
-/* Estilos para el ul anidado en el menú móvil (submenú) */
-.header .overlay .overlay-content li ul {
-  position: static;
-  /* Elimina el posicionamiento absoluto */
-  display: none;
-  /* OCULTA EL SUBMENÚ POR DEFECTO EN EL MÓVIL */
-  background-color: transparent;
-  /* Sin fondo para la lista anidada en el móvil */
-  padding: 0;
-  border-radius: 0;
-  transform: none;
-  /* No se necesita transformación */
-  text-align: center;
-  /* Centra los elementos */
-  width: 100%;
-  /* Ocupa todo el ancho */
-  max-height: 0;
-  /* Para la animación de desplegar/plegar */
-  overflow: hidden;
-  /* Para que la animación de max-height funcione */
-  transition: max-height 0.3s ease-out;
-  /* Transición suave para el desplegable */
-}
-
-/* Muestra el submenú cuando el LI padre tiene la clase 'active' */
-.header .overlay .overlay-content li.active>ul {
-  display: block;
-  max-height: 500px;
-  /* Un valor lo suficientemente grande para que se muestre todo el contenido */
-}
-
-.header .overlay .overlay-content li ul li {
-  display: block;
-  /* Asegura que los elementos se apilen verticalmente */
-  padding: 5px 0;
-  /* Relleno para los elementos anidados, un poco menos que el principal */
-}
-
-.header .overlay .overlay-content li ul li a {
-  font-size: 24px;
-  /* Ajusta el tamaño de fuente para los enlaces anidados */
-  padding: 5px 0;
-  color: #fff;
-}
-
-.header .overlay .overlay-content li ul li a:hover {
-  color: #14447c;
-  /* Color de hover para los enlaces anidados */
-}
-
-/* Corrección de selector y hover */
-.header .overlay a:hover,
-.header .overlay a:focus {
-  color: #14447c;
-  /* Cambiado a un color que contraste mejor con el naranja */
-}
-
-.header .overlay .close {
-  position: absolute;
-  top: 20px;
-  right: 45px;
-  font-size: 65px;
-  color: #fff;
-  /* Asegura que la 'X' sea visible */
-}
-
-/* Media query para pantallas pequeñas (altura) */
 @media screen and (max-height: 450px) {
   .header .overlay a {
     font-size: 20px;
@@ -626,23 +531,19 @@ footer {
 
   .header .overlay {
     overflow-y: auto;
-    /* Permite scroll vertical si hay muchas opciones */
   }
 
   .header .overlay a {
     font-size: 24px;
-    /* Reduce tamaño de enlaces principales */
     padding: 10px;
-  }
-
-  .header .overlay .overlay-content li ul li a {
-    font-size: 18px;
-    /* Reduce tamaño de submenú */
   }
 
   .header .overlay .overlay-content {
     padding: 20px 10px;
-    /* Agrega un poco de padding */
+  }
+
+  .header .overlay .overlay-content li ul li a {
+    font-size: 18px;
   }
 
   .header .overlay .close {
@@ -650,8 +551,4 @@ footer {
     top: 15px;
     right: 25px;
   }
-}
-
-.header .overlay {
-  max-height: 100vh;
 }
