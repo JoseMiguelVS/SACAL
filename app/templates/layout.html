@@ -21,40 +21,38 @@
 
 <body>
     <header class="header">
-        <div class="logo">
+        <div class="logo-container">
             <a href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='images/conecta.png') }}"
                     alt="Logo Conecta Academy Latinoamerica" /></a>
-        </div>
-        <div class="logo">
-            <a href="{{ url_for('index') }}"> <img src="{{ url_for('static', filename='images/DIPAAM.png') }}"
+            <a href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='images/DIPAAM.png') }}"
                     alt="Logo DIPAAM" /></a>
         </div>
-        <nav>
-            <ul class="nav-links">
-                <li><a href="{{ url_for('empleados.empleadosBuscar') }}">Empleados</a></li>
 
-                <li><a class="herramientas" href="#">Bitacoras <i class="fas fa-angle-down"></i></a>
-                    <ul class="tools">
-                        <li><a href="{{ url_for('sesiones.sesiones_buscar') }}">Sesiones</a></li>
-                        <li><a href="{{ url_for('participantes.participantes_buscar') }}">Participantes</a></li>
-                        <li><a href="{{ url_for('constancias.constancias_buscar') }}">Constancias</a></li>
-                        <li><a href="{{ url_for('pagos.pagos_buscar')}}">Pagos</a></li>
-                    </ul>
-                </li>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('empleados.empleadosBuscar') }}">Empleados</a></li>
 
-                <li>
-                    <a class="herramientas" href="#">Herramientas <i class="fas fa-angle-down"></i></a>
-                    <ul class="tools">
-                        <li><a href="{{ url_for('ponentes.ponentes_buscar') }}">Ponentes</a></li>
-                        <li><a href="{{ url_for('categorias.categorias_buscar') }}">Categorias</a></li>
-                        <li><a href="{{ url_for('paquete.paquetes_buscar') }}">Paquetes</a></li>
-                        <li><a href="{{ url_for('cursos.cursos_buscar') }}">Cursos</a></li>
-                        <li><a href="{{ url_for('temas.temas_buscar') }}">Temas</a></li>
-                        <li><a href="#">Perfil</a></li>
-                    </ul>
-                </li>
-                </li>
-            </ul>
+            <li><a class="herramientas" href="#">Bitacoras <i class="fas fa-angle-down"></i></a>
+                <ul class="tools">
+                    <li><a href="{{ url_for('sesiones.sesiones_buscar') }}">Sesiones</a></li>
+                    <li><a href="{{ url_for('participantes.participantes_buscar') }}">Participantes</a></li>
+                    <li><a href="{{ url_for('constancias.constancias_buscar') }}">Constancias</a></li>
+                    <li><a href="{{ url_for('pagos.pagos_buscar')}}">Pagos</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <a class="herramientas" href="#">Herramientas <i class="fas fa-angle-down"></i></a>
+                <ul class="tools">
+                    <li><a href="{{ url_for('ponentes.ponentes_buscar') }}">Ponentes</a></li>
+                    <li><a href="{{ url_for('categorias.categorias_buscar') }}">Categorias</a></li>
+                    <li><a href="{{ url_for('paquete.paquetes_buscar') }}">Paquetes</a></li>
+                    <li><a href="{{ url_for('cursos.cursos_buscar') }}">Cursos</a></li>
+                    <li><a href="{{ url_for('temas.temas_buscar') }}">Temas</a></li>
+                    <li><a href="#">Perfil</a></li>
+                </ul>
+            </li>
+            </li>
+        </ul>
         </nav>
 
         <a href="{{url_for('logout')}}" class="btn"><button>Cerrar sesion</button></a>

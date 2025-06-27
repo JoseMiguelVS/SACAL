@@ -301,6 +301,10 @@ def actualizar_participante(id):
     )
 
     cur.execute(sql, valores)
+    sql2 = '''' 
+    UPDATE pagos SET
+        fecha_pago
+    '''
     con.commit()
     cur.close()
     con.close()

@@ -487,10 +487,36 @@ footer {
   /* Oculto por defecto, se muestra en pantallas pequeñas */
 }
 
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  /* Espacio entre logos */
+}
+
+.logo-container img {
+  height: 70px;
+  width: auto;
+  transition: transform 0.3s ease;
+}
+
+.logo-container img:hover {
+  transform: scale(1.1);
+}
 
 /* ========================
    Media Queries
 ======================== */
+
+/* Responsivo para pantallas pequeñas */
+@media screen and (max-width: 600px) {
+  .logo-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
 @media screen and (max-width: 1400px) {
   * {
     font-size: 15px;
@@ -498,6 +524,7 @@ footer {
 }
 
 @media screen and (max-width: 1000px) {
+
   .nav-links,
   .btn {
     display: none !important;
@@ -506,11 +533,11 @@ footer {
   .menu {
     display: inline-block !important;
   }
-  *{
+
+  * {
     font-size: 15px;
   }
 }
-
 
 @media screen and (max-height: 450px) {
   .header .overlay a {
