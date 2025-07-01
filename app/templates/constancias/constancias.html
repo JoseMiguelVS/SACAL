@@ -109,8 +109,10 @@
                     {% if constancias %}
                     {% set mostrar_una = True %}
                     {% for p in constancias %}
+                    {% if p.validacion_pago in [2, 3] %}
                     {% if p.nombre_categoria == 'Especializacion' and p.solo_global and mostrar_una %}
                     {% set mostrar_una = False %}
+
                     <tr data-id="{{ p.id_participante }}">
                         <!-- Botón Detalles -->
                         <td>
@@ -165,9 +167,10 @@
                             </td>
                         </form>
                     </tr>
+
                     {% elif not (p.nombre_categoria == 'Especializacion' and p.solo_global and p.constancia_enviada ==
-                    True)
-                    %}
+                    True)%}
+
                     <!-- Mostrar normalmente -->
                     <tr data-id="{{ p.id_participante }}">
                         <td>
@@ -191,7 +194,15 @@
                         <td class="text-nowrap">{{ p.clave_participante }}</td>
                         <td class="text-nowrap">{{ p.nombre_participante }} <br> {{ p.apellidos_participante }}</td>
                         <td class="truncate-text">{{ p.nombre_curso }}</td>
-                        <td class="text-nowrap">{{ p.validacion_pago }}</td>
+                        <td>
+                            {% if p.validacion_pago == 3 %}
+                            Validado
+                            {% elif p.validacion_pago == 2 %}
+                            Pendiente
+                            {% else %}
+                            No encontrado
+                            {% endif %}
+                        </td>
                         <td class="text-nowrap">
                             <input type="checkbox" readonly {% if p.constancia_generada %}checked{% endif %} disabled>
                         </td>
@@ -211,6 +222,8 @@
                             </td>
                         </form>
                     </tr>
+
+                    {% endif %}
                     {% endif %}
                     {% endfor %}
                     {% else %}
@@ -292,7 +305,7 @@
                     </div>
                     <div class="modal-body">
                         <input type="text" name="folio_constancia" placeholder="Folio de la constancia"
-                            class="form-control" required>
+                            class="form-control" value="{{ p.folio_constancia }}" required>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>

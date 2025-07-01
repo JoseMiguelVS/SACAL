@@ -21,22 +21,37 @@
 
         <!-- Columna del Formulario -->
         <div class="col-12 col-md-6 col-lg-5 mb-3">
-            <form action="{{ url_for('pagos.pagos_actualizar', id = pagos.id_participante) }}" method="post"
-                class="">
+            <form action="{{ url_for('pagos.pagos_actualizar', id = pagos.id_participante) }}" method="post" class="">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 <div class="mb-3">
                     <label for="estado" class="form-label">Estado del comprobante</label>
                     <select name="validacion_pago" id="validacion_pago" class="form-select">
+                        {% if pagos.validacion_pago %}
+                        {% if pagos.validacion_pago == 3 %}
+                        <option value="3">Validado</option>
+                        {% elif pagos.validacion_pago == 2 %}
+                        <option value="2">Pendiente</option>
+                        {% else %}
+                        <option value="1">No encontrado</option>
+                        {% endif %}
+                        {% else %}
                         <option value="1">No encontrado</option>
                         <option value="2">Pendiente</option>
                         <option value="3">Validado</option>
+                        {% endif %}
                     </select>
                 </div>
                 <div class="mb-3">
                     <label for="clave" class="form-label">Clave de rastreo</label>
-                    <input type="text" name="clave_rastreo" id="clave_rastreo" class="form-control">
+                    <input type="text" name="clave_rastreo" id="clave_rastreo" class="form-control"
+                        value="{{ pagos.clave_rastreo }}">
                 </div>
-                <button type="submit" class="botones-guardar w-100">Guardar cambios</button>
+                <div class="mb-3">
+                    <label for="devolucion" class="form-label">¿Es devolucion?</label>
+                    <input type="checkbox" name="devolucion" id="devolucion">
+                </div>
+                <button type="submit" class="botones-guardar w-100 mb-1">Guardar cambios</button>
+                <a href="{{ url_for('pagos.pagos_buscar') }}" class="botones-cancelar w-100 mb-1">Cancelar</a>
             </form>
         </div>
     </div>

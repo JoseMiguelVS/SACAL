@@ -84,126 +84,136 @@ def generar_constancia(participante, qr_path=None):
     duracion_curso = participante['duracion_curso']
     clave = participante['clave_participante']
     folio_constancia = participante['folio_constancia']
-    nombre_tipo = participante['nombre_tipo']
-    categoria = participante['nombre_categoria']
+    tema = participante['nombre_tema'].lower()
     current_year = datetime.now().year
 
     nombre_completo = f'{nombre.upper()} {apellidos.upper()}'
     curso_com = f"\"{curso.upper()}\""
 
+    match nombre_tipo.lower():
+        case 'publico en general':
 
-    if nombre_tipo in ('especializacion', 'mini especializacion'):
-        # definir textos
-        rotulo = "ESPECIALIZACIÓN:" if 'espe' in nombre_tipo else "MINI ESPECIALIZACIÓN:"
-        dur_txt = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
-        realz = "REALIZADO ONLINE EN VIVO,"
-        fecha_txt = f"{nombre_mes} DE {current_year}."
-
-        centro = draw_centrado(c, nombre_completo, 300, font="Montserrat-Bold", size=18, return_center=True)
-        c.setFillColor(HexColor("#003366"))
-        draw_texto_centrado_multilinea(c, rotulo, 230, "Metropolis-Black", 25, 500, x_centro=centro)
-        draw_texto_centrado_multilinea(c, curso, 210, "Metropolis-Black", 20, 500, x_centro=centro)
-        c.setFillColor(HexColor("#000000"))
-        draw_centrado(c, dur_txt,   165, "Montserrat-Bold", 10)
-        draw_centrado(c, realz,     150, "Montserrat-Bold", 10)
-        draw_centrado(c, fecha_txt, 135, "Montserrat-Bold", 10)
-        if qr_path:
-            c.drawImage(qr_path, x=50, y=25, width=90, height=90)
-
-    else:
-        match nombre_tipo.lower():
-            case 'publico en general':
-
-                if duracion_curso == '8':
+            if duracion_curso == '8':
                     participacion = "POR SU PARTICIPACIÓN EN EL CURSO-TALLER NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO-TALLER INTERNACIONAL"
-                else:
+            else:
                     participacion = "POR SU PARTICIPACIÓN EN EL CURSO NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO INTERNACIONAL"
 
-                texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
-                realizado = "REALIZADO ONLINE EN VIVO,"
-                texto_fecha = f"EL {dia} DE {nombre_mes.upper()} DE {current_year}."
+            texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
+            realizado = "REALIZADO ONLINE EN VIVO,"
+            texto_fecha = f"EL {dia} DE {nombre_mes.upper()} DE {current_year}."
 
-                centro_nombre = draw_centrado(c, nombre_completo, 270, font="Montserrat-Bold", size=18, return_center=True)
-                draw_centrado(c, participacion, 230, "Montserrat-Bold", 14)
-                draw_texto_centrado_multilinea(c, curso_com, 200, "Metropolis-Black", 25, 500, x_centro=centro_nombre)
+            centro_nombre = draw_centrado(c, nombre_completo, 270, font="Montserrat-Bold", size=18, return_center=True)
+            draw_centrado(c, participacion, 230, "Montserrat-Bold", 14)
+            draw_texto_centrado_multilinea(c, curso_com, 200, "Metropolis-Black", 25, 500, x_centro=centro_nombre)
 
-                draw_centrado(c, texto_duracion, 150, "Montserrat-Bold", 10)
-                draw_centrado(c, realizado, 135, "Montserrat-Bold", 10)
-                draw_centrado(c, texto_fecha, 120, "Montserrat-Bold", 10)   
+            draw_centrado(c, texto_duracion, 150, "Montserrat-Bold", 10)
+            draw_centrado(c, realizado, 135, "Montserrat-Bold", 10)
+            draw_centrado(c, texto_fecha, 120, "Montserrat-Bold", 10)   
 
-                if qr_path:
-                    c.drawImage(qr_path, x=250, y=25, width=90, height=90)
+            if qr_path:
+                c.drawImage(qr_path, x=250, y=25, width=90, height=90)
 
-            case 'empresarial':
-                texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
-                realizado = "REALIZADO ONLINE EN VIVO,"
-                texto_fecha = f"EL {dia} DE {nombre_mes.upper()} DE {current_year}."
+        case 'empresarial':
+            texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
+            realizado = "REALIZADO ONLINE EN VIVO,"
+            texto_fecha = f"EL {dia} DE {nombre_mes.upper()} DE {current_year}."
 
-                if duracion_curso == '8':
-                    participacion = "POR SU PARTICIPACIÓN EN EL CURSO-TALLER NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO-TALLER INTERNACIONAL"
-                else:
-                    participacion = "POR SU PARTICIPACIÓN EN EL CURSO NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO INTERNACIONAL"
+            if duracion_curso == '8':
+                participacion = "POR SU PARTICIPACIÓN EN EL CURSO-TALLER NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO-TALLER INTERNACIONAL"
+            else:
+                participacion = "POR SU PARTICIPACIÓN EN EL CURSO NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO INTERNACIONAL"
 
-                centro_nombre = draw_centrado(c, nombre_completo, 300, font="Montserrat-Bold", size=18, return_center=True)
-                draw_centrado(c, participacion, 260, "Montserrat-Bold", 14)
-                draw_texto_centrado_multilinea(c, curso_com, 230, "Metropolis-Black", 25, 500, x_centro=centro_nombre)
+            centro_nombre = draw_centrado(c, nombre_completo, 300, font="Montserrat-Bold", size=18, return_center=True)
+            draw_centrado(c, participacion, 260, "Montserrat-Bold", 14)
+            draw_texto_centrado_multilinea(c, curso_com, 230, "Metropolis-Black", 25, 500, x_centro=centro_nombre)
 
-                draw_centrado(c, texto_duracion, 180, "Montserrat-Bold", 10)
-                draw_centrado(c, realizado, 165, "Montserrat-Bold", 10)
-                draw_centrado(c, texto_fecha, 150, "Montserrat-Bold", 10)
+            draw_centrado(c, texto_duracion, 180, "Montserrat-Bold", 10)
+            draw_centrado(c, realizado, 165, "Montserrat-Bold", 10)
+            draw_centrado(c, texto_fecha, 150, "Montserrat-Bold", 10)
 
-                if qr_path:
-                    c.drawImage(qr_path, x=250, y=25, width=90, height=90)
+            if qr_path:
+                c.drawImage(qr_path, x=250, y=25, width=90, height=90)
 
-            case 'psicologia':
+        case 'psicologia':
 
-                if duracion_curso == '8':
-                    participacion = "POR SU PARTICIPACIÓN EN EL CURSO-TALLER NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO-TALLER INTERNACIONAL"
-                else:
-                    participacion = "POR SU PARTICIPACIÓN EN EL CURSO NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO INTERNACIONAL"
+            if duracion_curso == '8':
+                participacion = "POR SU PARTICIPACIÓN EN EL CURSO-TALLER NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO-TALLER INTERNACIONAL"
+            else:
+                participacion = "POR SU PARTICIPACIÓN EN EL CURSO NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO INTERNACIONAL"
 
-                texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
-                realizado = "REALIZADO ONLINE EN VIVO,"
-                texto_fecha = f"EL {dia} DE {nombre_mes.upper()} DE {current_year}."
+            texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
+            realizado = "REALIZADO ONLINE EN VIVO,"
+            texto_fecha = f"EL {dia} DE {nombre_mes.upper()} DE {current_year}."
 
-                centro_nombre = draw_centrado(c, nombre_completo, 270, font="Montserrat-Bold", size=18, return_center=True)
-                draw_centrado(c, participacion, 230, "Montserrat-Bold", 14)
-                draw_texto_centrado_multilinea(c, curso_com, 200, "Metropolis-Black", 25, 500, x_centro=centro_nombre)
+            centro_nombre = draw_centrado(c, nombre_completo, 270, font="Montserrat-Bold", size=18, return_center=True)
+            draw_centrado(c, participacion, 230, "Montserrat-Bold", 14)
+            draw_texto_centrado_multilinea(c, curso_com, 200, "Metropolis-Black", 25, 500, x_centro=centro_nombre)
 
-                draw_centrado(c, texto_duracion, 150, "Montserrat-Bold", 10)
-                draw_centrado(c, realizado, 135, "Montserrat-Bold", 10)
-                draw_centrado(c, texto_fecha, 120, "Montserrat-Bold", 10)
+            draw_centrado(c, texto_duracion, 150, "Montserrat-Bold", 10)
+            draw_centrado(c, realizado, 135, "Montserrat-Bold", 10)
+            draw_centrado(c, texto_fecha, 120, "Montserrat-Bold", 10)
 
-                if qr_path:
-                    c.drawImage(qr_path, x=50, y=25, width=150, height=150)
+            if qr_path:
+                c.drawImage(qr_path, x=50, y=25, width=150, height=150)
 
-        c.showPage()
+        case 'especializaciones':
+            # definir textos
+            rotulo = "ESPECIALIZACIÓN:" if 'espe' in nombre_tipo else "MINI ESPECIALIZACIÓN:"
+            dur_txt = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
+            realz = "REALIZADO ONLINE EN VIVO,"
+            fecha_txt = f"{nombre_mes} DE {current_year}."
+
+            centro = draw_centrado(c, nombre_completo, 300, font="Montserrat-Bold", size=18, return_center=True)
+            c.setFillColor(HexColor("#003366"))
+            draw_texto_centrado_multilinea(c, rotulo, 230, "Metropolis-Black", 25, 500, x_centro=centro)
+            draw_texto_centrado_multilinea(c, curso, 210, "Metropolis-Black", 20, 500, x_centro=centro)
+            c.setFillColor(HexColor("#000000"))
+            draw_centrado(c, dur_txt,   165, "Montserrat-Bold", 10)
+            draw_centrado(c, realz,     150, "Montserrat-Bold", 10)
+            draw_centrado(c, fecha_txt, 135, "Montserrat-Bold", 10)
+
+            if qr_path:
+                c.drawImage(qr_path, x=50, y=25, width=90, height=90)
+                
+            c.drawString(100, 100, "Test de impresión")
+
+
+    c.showPage()
         
-        # Aquí editas la segunda página, puedes usar las mismas funciones o texto libre
+    if nombre_tipo == 'especializaciones':
+            # Aquí editas la segunda página, puedes usar las mismas funciones o texto libre
+        c.setFont("Montserrat-Bold", 11)
+        c.setFillColor(HexColor("#CF1111"))
+        c.drawString(255, 543, f"{folio_constancia}")  # Ajusta según el margen izquierdo deseado
+        c.setFillColor(HexColor("#000000"))
+        c.drawString(255, 523, nombre_completo)
+    
+    else:
+            # Aquí editas la segunda página, puedes usar las mismas funciones o texto libre
         c.setFont("Montserrat-Bold", 11)
         c.setFillColor(HexColor("#CF1111"))
         c.drawString(255, 543, f"{folio_constancia}")  # Ajusta según el margen izquierdo deseado
         c.setFillColor(HexColor("#000000"))
         c.drawString(255, 523, nombre_completo)
 
-        c.showPage()  # <-- Mueve esto aquí para asegurar el cierre correcto de la página
+    c.showPage()  # <-- Mueve esto aquí para asegurar el cierre correcto de la página
 
-        c.save()
-        packet.seek(0)
+    c.save()
+    packet.seek(0)
 
     new_pdf = PdfReader(packet)
-    if nombre_tipo.lower() == 'especializacion':
+    if nombre_tipo == 'especializacion':
         plantilla_path = {
-            'espe. ing': "static/pdf/especializacion_ing.pdf",
-            'espe. lic': "static/pdf/especializacion_lic.pdf",
-            'mini espe. ing': "static/pdf/especializacion_ing.pdf",
-        }.get(categoria.lower(), "static/pdf/especializacion_lic.pdf")
+            'especializacion ing': "static/pdf/especializacion_ing.pdf",
+            'especializacion lic': "static/pdf/especializacion_lic.pdf",
+            'mini especializacion ing': "static/pdf/especializacion_ing.pdf",
+        }.get(tema.lower(), "static/pdf/especializacion_lic.pdf")
         
     else:
         plantilla_path = {
             'psicologia': "static/pdf/psicologia.pdf",
             'empresarial': "static/pdf/empresarial.pdf"
-        }.get(nombre_tipo.lower(), "static/pdf/publico.pdf")
+        }.get(nombre_tipo, "static/pdf/publico.pdf")
 
     # Mejora: cerrar el archivo PDF al usarlo
     with open(plantilla_path, "rb") as f:
@@ -217,7 +227,7 @@ def generar_constancia(participante, qr_path=None):
                 base_page.merge_page(overlay_page)
             output.add_page(base_page)
 
-        constancia_path = f'static/constancias/{clave}-E.pdf' if nombre_tipo.lower() in ('especializacion', 'mini especializacion') else f'static/constancias/{clave}.pdf'
+        constancia_path = f'static/constancias/{clave}-E.pdf' if nombre_tipo in ('especializacion', 'mini especializacion') else f'static/constancias/{clave}.pdf'
 
         with open(constancia_path, "wb") as outputStream:
             output.write(outputStream)

@@ -43,6 +43,7 @@ def pagos_actualizar(id):
     if request.method == 'POST':
         clave_rastreo = request.form['clave_rastreo']
         validacion_pago = request.form['validacion_pago']
+        devolucion = request.form['devolucion']
 
         con = get_db_connection()
         cur = con.cursor()
