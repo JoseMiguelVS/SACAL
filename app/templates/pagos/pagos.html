@@ -57,7 +57,17 @@
                 <td>{{ p.clave_rastreo }}</td>
                 <td>{{ p.nombre_participante }}</td>
                 <td>{{ p.clave_participante }}</td>
-                <td>{{ p.validacion_pago }}</td>
+
+                <td>
+                    {% if p.validacion_pago == 3 %}
+                    Validado
+                    {% elif p.validacion_pago == 2 %}
+                    Pendiente
+                    {% else %}
+                    No encontrado
+                    {% endif %}
+                </td>
+
                 <td>{{ p.conceptos }}</td>
                 <td>{{ p.concepto_factura }}</td>
                 <td>

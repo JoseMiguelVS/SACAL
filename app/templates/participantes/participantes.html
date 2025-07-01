@@ -153,7 +153,15 @@
                                 {% endif %}
                             </select>
                         </td>
-                        <td>{{ p.validacion_pago }}</td>
+                        <td>
+                            {% if p.validacion_pago == 3 %}
+                            Validado
+                            {% elif p.validacion_pago == 2 %}
+                            Pendiente
+                            {% else %}
+                            No encontrado
+                            {% endif %}
+                        </td>
                         <td><input type="date" name="fecha_pago" value="{{ p.fecha_pago }}"
                                 onchange="guardarFila(this)"></td>
                         <td><input type="checkbox" name="factura_pago" onchange="guardarFila(this)" {% if p.factura_pago

@@ -137,7 +137,15 @@
                         <td class="text-nowrap">{{ p.clave_participante }}</td>
                         <td class="text-nowrap">{{ p.nombre_participante }} <br> {{ p.apellidos_participante }}</td>
                         <td class="truncate-text">{{ p.nombre_curso }}</td>
-                        <td class="text-nowrap">{{ p.validacion_pago }}</td>
+                        <td>
+                            {% if p.validacion_pago == 3 %}
+                            Validado
+                            {% elif p.validacion_pago == 2 %}
+                            Pendiente
+                            {% else %}
+                            No encontrado
+                            {% endif %}
+                        </td>
                         <td class="text-nowrap">
                             <input type="checkbox" readonly {% if p.constancia_generada %}checked{% endif %} disabled>
                         </td>
