@@ -98,6 +98,7 @@
                     {% if p.nombre_categoria == 'Especializacion' and p.solo_global and mostrar_una %}
                     {% set mostrar_una = False %}
                     <tr data-id="{{ p.id_participante }}">
+
                         <!-- Botón Detalles -->
                         <td>
                             <a class="botones-ver"
@@ -105,13 +106,16 @@
                                 <li class="fa fa-eye" style="font-size: 18px;"></li>
                             </a>
                         </td>
+
                         <!-- Botón Descargar -->
                         <td>
-                            <button class="botones" data-bs-toggle="modal"
-                                data-bs-target="#staticBackdrop-{{ p.id_participante }}{{ p.nombre_curso }}{{ p.fecha }}">
+                            {% set modal_id = 'staticBackdrop-' ~ p.id_participante ~ '-' ~ p.nombre_curso|replace(' ',
+                            '_')|replace(':', '')|replace(',', '')|replace('.', '') ~ '-' ~ p.fecha %}
+                            <button class="botones-guardar" data-bs-toggle="modal" data-bs-target="#{{ modal_id }}">
                                 <li class="fas fa-download" style="font-size: 18px;"></li>
                             </button>
                         </td>
+
                         <!-- Botón Editar -->
                         <td>
                             <a class="botones-editar"
@@ -123,7 +127,15 @@
                         <td class="text-nowrap">{{ p.clave_participante }}</td>
                         <td class="text-nowrap">{{ p.nombre_participante }} <br> {{ p.apellidos_participante }}</td>
                         <td class="truncate-text">{{ p.nombre_curso }}</td>
-                        <td class="text-nowrap">{{ p.validacion_pago }}</td>
+                        <td>
+                            {% if p.validacion_pago == 3 %}
+                            Validado
+                            {% elif p.validacion_pago == 2 %}
+                            Pendiente
+                            {% else %}
+                            No encontrado
+                            {% endif %}
+                        </td>
                         <td class="text-nowrap">
                             <input type="checkbox" readonly {% if p.constancia_generada %}checked{% endif %} disabled>
                         </td>
@@ -139,28 +151,31 @@
                                 <input type="date" name="fecha_envio" value="{{ p.fecha_envio | default('', true) }}">
                             </td>
                             <td class="text-nowrap">
-                                <button type="submit">Guardar</button>
+                                <button type="submit" class="botones-guardar">Guardar</button>
                             </td>
                         </form>
                     </tr>
+
                     {% elif not (p.nombre_categoria == 'Especializacion' and p.solo_global and p.constancia_enviada ==
-                    True)
-                    %}
+                    True)%}
+
                     <!-- Mostrar normalmente -->
                     <tr data-id="{{ p.id_participante }}">
                         <td>
-                            <a href="{{ url_for('constancias.constancias_detalles', id=p.id_participante) }}">
+                            <a href="{{ url_for('constancias.constancias_detalles', id=p.id_participante) }}"
+                                class="botones-ver">
                                 <li class="fa fa-eye" style="font-size: 18px;"></li>
                             </a>
                         </td>
                         <td>
-                            <button class="botones" data-bs-toggle="modal"
-                                data-bs-target="#staticBackdrop-{{ p.id_participante }}">
+                            {% set modal_id = 'staticBackdrop-' ~ p.id_participante ~ '-' ~ p.nombre_curso|replace(' ',
+                            '_')|replace(':', '')|replace(',', '')|replace('.', '') ~ '-' ~ p.fecha %}
+                            <button class="botones-guardar" data-bs-toggle="modal" data-bs-target="#{{ modal_id }}">
                                 <li class="fas fa-download" style="font-size: 18px;"></li>
                             </button>
                         </td>
                         <td>
-                            <a
+                            <a class="botones-editar"
                                 href="{{ url_for('constancias.constancias_editar', id=p.id_participante, curso=p.nombre_curso, fecha=p.fecha) }}">
                                 <li class="fa fa-edit" style="font-size: 18px;"></li>
                             </a>
@@ -169,7 +184,15 @@
                         <td class="text-nowrap">{{ p.clave_participante }}</td>
                         <td class="text-nowrap">{{ p.nombre_participante }} <br> {{ p.apellidos_participante }}</td>
                         <td class="truncate-text">{{ p.nombre_curso }}</td>
-                        <td class="text-nowrap">{{ p.validacion_pago }}</td>
+                        <td>
+                            {% if p.validacion_pago == 3 %}
+                            Validado
+                            {% elif p.validacion_pago == 2 %}
+                            Pendiente
+                            {% else %}
+                            No encontrado
+                            {% endif %}
+                        </td>
                         <td class="text-nowrap">
                             <input type="checkbox" readonly {% if p.constancia_generada %}checked{% endif %} disabled>
                         </td>
@@ -185,10 +208,11 @@
                                 <input type="date" name="fecha_envio" value="{{ p.fecha_envio | default('', true) }}">
                             </td>
                             <td class="text-nowrap">
-                                <button type="submit">Guardar</button>
+                                <button class="botones-guardar" type="submit">Guardar</button>
                             </td>
                         </form>
                     </tr>
+
                     {% endif %}
                     {% endfor %}
                     {% else %}
@@ -207,39 +231,39 @@
             {% if page > 1 %}
             <li class="page-item">
                 <a class="page-link bg-warning"
-                    href="{{url_for('constancias.constancias_hechas')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                    href="{{url_for('constancias.constancias_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
                     aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
             {% if page != 1 and page != 2 %}
             <li class="page-item"><a class="page-link bg-warning"
-                    href="{{url_for('constancias.constancias_hechas')}}">1</a></li>
+                    href="{{url_for('constancias.constancias_buscar')}}">1</a></li>
             {% if page != 3 %}
             <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
             {% endif %}
             {% endif %}
             <li class="page-item"><a class="page-link bg-warning"
-                    href="{{url_for('constancias.constancias_hechas')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+                    href="{{url_for('constancias.constancias_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
             </li>
             {% endif %}
 
             <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
 
             {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
-                    href="{{url_for('constancias.constancias_hechas')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+                    href="{{url_for('constancias.constancias_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
                 </li>
                 {% if page != total_pages and page != total_pages-1 %}
                 {% if page != total_pages-2 %}
                 <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
                 {% endif %}
                 <li class="page-item"><a class="page-link bg-warning"
-                        href="{{url_for('constancias.constancias_hechas')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                        href="{{url_for('constancias.constancias_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
                 </li>
                 {% endif %}
                 <li class="page-item">
                     <a class="page-link bg-warning"
-                        href="{{url_for('constancias.constancias_hechas')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                        href="{{url_for('constancias.constancias_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
                         aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
@@ -253,8 +277,8 @@
     <form method="post"
         action="{{ url_for('constancias.folio_constancia') }}?id={{ p.id_participante }}&curso={{ p.nombre_curso }}&fecha={{ p.fecha }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <div class="modal fade" id="staticBackdrop-{{ p.id_participante }}" data-bs-backdrop="static"
-            data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+        <div class="modal fade" id="{{ modal_id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -263,13 +287,15 @@
                     </div>
                     <div class="modal-body">
                         <input type="text" name="folio_constancia" placeholder="Folio de la constancia"
-                            class="form-control" required>
+                            class="form-control" value="{{ p.folio_constancia }}" required>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
                         <button type="button" class="botones-guardar"
-                            onclick="enviarFolioYGenerar('{{ p.id_participante }}', '{{ p.nombre_curso }}', '{{ p.fecha }}')">Guardar
-                            y generar</button>
+                            onclick="enviarFolioYGenerar('{{ modal_id }}', '{{ p.id_participante }}', '{{ p.nombre_curso }}', '{{ p.fecha }}')">
+                            Guardar y generar
+                        </button>
+
                     </div>
                 </div>
             </div>
@@ -278,9 +304,9 @@
 
     <!-- Script para generación de constancia -->
     <script>
-        function enviarFolioYGenerar(id, curso, fecha) {
+        function enviarFolioYGenerar(modal_id, id, curso, fecha) {
             const form = new FormData();
-            const folio = document.querySelector(`#staticBackdrop-${id} input[name='folio_constancia']`).value;
+            const folio = document.querySelector(`#${modal_id} input[name='folio_constancia']`).value;
             form.append("folio_constancia", folio);
 
             fetch(`/constancias/folio/?id=${id}&curso=${encodeURIComponent(curso)}&fecha=${fecha}`, {
@@ -316,6 +342,17 @@
     </script>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const inputBuscar = document.querySelector("input[name='buscar']");
+            const form = document.getElementById("formBuscar");
+
+            inputBuscar.addEventListener("change", function () {
+                form.submit();
+            });
+        });
+    </script>
+
+    <script>
         function guardarFila(elemento) {
             const fila = elemento.closest('tr');
             const id = fila.dataset.id;
@@ -329,7 +366,7 @@
                 }
             });
 
-            fetch(`/constancias/hechas&enviadas/${id}`, {
+            fetch(`/constancias/actualizar/${id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -347,6 +384,32 @@
                     alert('Error al guardar los cambios');
                 });
         }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const formBuscar = document.getElementById('formBuscar');
+            const filtroMes = document.getElementById('filtroMes');
+            const filtroSemana = document.getElementById('filtroSemana');
+            const filtroSesion = document.getElementById('filtroSesion');
+            const filtroEquipo = document.getElementById('filtroEquipo');
+
+            formBuscar.addEventListener('submit', function (e) {
+                // Detectar si hay filtros activos
+                const hayFiltros =
+                    filtroMes?.value.trim() !== '' ||
+                    filtroSemana?.value.trim() !== '' ||
+                    filtroSesion?.value.trim() !== '' ||
+                    filtroEquipo?.value.trim() !== '';
+
+                // Cambiar la ruta de acción según haya filtros
+                if (hayFiltros) {
+                    formBuscar.action = "{{ url_for('constancias.constancias_filtros') }}";
+                } else {
+                    formBuscar.action = "{{ url_for('constancias.constancias_buscar') }}";
+                }
+            });
+        });
     </script>
 
 </main>

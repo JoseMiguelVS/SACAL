@@ -74,8 +74,8 @@ def generar_constancia(participante, qr_path=None):
     c = canvas.Canvas(packet, pagesize=psz)
 
 
-    nombre = participante['nombre_participante']
-    apellidos = participante['apellidos_participante']
+    nombre = participante['nombre_participante'].upper()
+    apellidos = participante['apellidos_participante'].upper()
     curso = participante['nombre_curso']
     es_nacional = participante['es_nacional']
     fecha = participante['fecha']
@@ -156,45 +156,41 @@ def generar_constancia(participante, qr_path=None):
             if qr_path:
                 c.drawImage(qr_path, x=50, y=25, width=150, height=150)
 
-        case 'especializaciones':
+        case 'especializacion':
             # definir textos
-            rotulo = "ESPECIALIZACIÓN:" if 'espe' in nombre_tipo else "MINI ESPECIALIZACIÓN:"
             dur_txt = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
             realz = "REALIZADO ONLINE EN VIVO,"
-            fecha_txt = f"{nombre_mes} DE {current_year}."
+            fecha_txt = f"{nombre_mes.upper()} DE {current_year}."
 
-            centro = draw_centrado(c, nombre_completo, 300, font="Montserrat-Bold", size=18, return_center=True)
+            centro = draw_centrado(c, nombre_completo, 372, font="Montserrat-Bold", size=18, return_center=True)
             c.setFillColor(HexColor("#003366"))
-            draw_texto_centrado_multilinea(c, rotulo, 230, "Metropolis-Black", 25, 500, x_centro=centro)
-            draw_texto_centrado_multilinea(c, curso, 210, "Metropolis-Black", 20, 500, x_centro=centro)
+            draw_texto_centrado_multilinea(c, curso_com, 280, "Metropolis-Black", 20, 500, x_centro=centro)
             c.setFillColor(HexColor("#000000"))
-            draw_centrado(c, dur_txt,   165, "Montserrat-Bold", 10)
-            draw_centrado(c, realz,     150, "Montserrat-Bold", 10)
-            draw_centrado(c, fecha_txt, 135, "Montserrat-Bold", 10)
+            draw_centrado(c, dur_txt,   235, "Montserrat-Bold", 10) 
+            draw_centrado(c, realz,     225, "Montserrat-Bold", 10)
+            draw_centrado(c, fecha_txt, 215, "Montserrat-Bold", 10)
 
             if qr_path:
-                c.drawImage(qr_path, x=50, y=25, width=90, height=90)
-                
-            c.drawString(100, 100, "Test de impresión")
-
+                c.drawImage(qr_path, x=175, y=80, width=90, height=90)
 
     c.showPage()
         
-    if nombre_tipo == 'especializaciones':
+    if nombre_tipo == 'especializacion':
             # Aquí editas la segunda página, puedes usar las mismas funciones o texto libre
         c.setFont("Montserrat-Bold", 11)
         c.setFillColor(HexColor("#CF1111"))
-        c.drawString(255, 543, f"{folio_constancia}")  # Ajusta según el margen izquierdo deseado
+        c.drawString(205, 714, f"{folio_constancia}")  # Ajusta según el margen izquierdo deseado
         c.setFillColor(HexColor("#000000"))
-        c.drawString(255, 523, nombre_completo)
+        c.drawString(205, 695, nombre)
+        c.drawString(205, 685, apellidos)
     
     else:
             # Aquí editas la segunda página, puedes usar las mismas funciones o texto libre
         c.setFont("Montserrat-Bold", 11)
         c.setFillColor(HexColor("#CF1111"))
-        c.drawString(255, 543, f"{folio_constancia}")  # Ajusta según el margen izquierdo deseado
+        c.drawString(255, 643, f"{folio_constancia}")  # Ajusta según el margen izquierdo deseado
         c.setFillColor(HexColor("#000000"))
-        c.drawString(255, 523, nombre_completo)
+        c.drawString(255, 623, nombre_completo)
 
     c.showPage()  # <-- Mueve esto aquí para asegurar el cierre correcto de la página
 
