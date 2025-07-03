@@ -63,3 +63,6 @@ def lista_equipos():
 
 def lista_participantes():
     return listar_tabla('participantes','id_participante')
+
+def lista_formaPago():
+    return listar_tabla('formas_pago', 'id_forma')

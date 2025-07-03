@@ -6,7 +6,7 @@ from datetime import datetime
 from psycopg2.extras import RealDictCursor
 from werkzeug.utils import secure_filename
 
-from utils.listas import lista_cuentas, lista_cursos, lista_equipos, lista_meses, lista_paquetes, lista_sesiones, lista_semanas
+from utils.listas import lista_cuentas, lista_cursos, lista_equipos, lista_formaPago, lista_meses, lista_paquetes, lista_sesiones, lista_semanas
 
 from ..utils.utils import allowed_file, get_db_connection, my_random_string, paginador3
 
@@ -33,6 +33,7 @@ def participantes_buscar():
     paginado = paginador3(sql_count, sql_lim, [search_query_sql, search_query_sql], 1, 50)
 
     return render_template('participantes/participantes.html',
+                           formas = lista_formaPago(),
                            equipos=lista_equipos(),
                            cursos=lista_cursos(),
                            sesiones=lista_sesiones(),
@@ -100,6 +101,7 @@ def participantes_filtros():
     )
 
     return render_template('participantes/participantes.html',
+                           formas =lista_formaPago(),
                            equipos=lista_equipos(),
                            meses=lista_meses(),
                            cursos=lista_cursos(),
@@ -169,6 +171,7 @@ def participantes_grabaciones():
     )
 
     return render_template('participantes/participantes_grabaciones.html',
+                           formas =lista_formaPago(),
                            equipos=lista_equipos(),
                            meses=lista_meses(),
                            cursos=lista_cursos(),
@@ -187,7 +190,8 @@ def participantes_grabaciones():
 @participantes.route("/participantes/agregar")
 @login_required
 def participante_agregar():
-    return render_template('participantes/participantes_agregar.html', 
+    return render_template('participantes/participantes_agregar.html',
+                           formas = lista_formaPago(),
                            cursos = lista_cursos(),
                            sesiones = lista_sesiones(),
                            cuentas = lista_cuentas(),
@@ -204,6 +208,7 @@ def participante_nuevo():
         clave_participante = request.form['clave_participante']
         nombre_empleado = request.form['nombre_empleado']
         cuenta_destino = request.form['id_cuenta']
+        forma_pago = request.form['id_forma']
         paquete = request.form['paquete']
         sesion = request.form['id_sesion']
         equipos = request.form['equipos']
@@ -225,11 +230,11 @@ def participante_nuevo():
         # 1. Insertar participante
         sql = '''
             INSERT INTO participantes 
-            (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino, equipos)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino, equipos, forma_pago)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id_participante
         '''
-        valores = (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino, equipos )
+        valores = (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino, equipos, forma_pago )
         cur.execute(sql, valores)
 
         # 2. Obtener el ID recién creado
@@ -276,6 +281,7 @@ def actualizar_participante(id):
             nombre_paquete = %s,
             fecha_pago = %s,
             factura_pago = %s,
+            forma_pago = %s,
             cuenta_destino = %s,
             confirmacion_grupo = %s,
             materiales = %s,
@@ -291,6 +297,7 @@ def actualizar_participante(id):
         datos['nombre_paquete'],
         datos['fecha_pago'] or None,
         datos['factura_pago'],
+        datos['id_forma'],
         datos['cuenta_destino'],
         datos['confirmacion_grupo'],
         datos['materiales'],

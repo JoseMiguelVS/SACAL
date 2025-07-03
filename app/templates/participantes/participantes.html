@@ -95,8 +95,7 @@
             </select>
 
             <!-- Limpiar -->
-            <a href="{{ url_for('participantes.participantes_buscar') }}"
-                class="botones btn-sm">Limpiar</a>
+            <a href="{{ url_for('participantes.participantes_buscar') }}" class="botones btn-sm">Limpiar</a>
 
         </form>
         <div class="form-check form-switch">
@@ -115,15 +114,16 @@
                         <th>Nombre</th>
                         <th>Apellidos</th>
                         <th>Paquete</th>
-                        <th>Pago <br>validado</th>
-                        <th>Fecha del pago</th>
+                        <th>Pago<br>validado</th>
+                        <th>Fecha del<br>pago</th>
                         <th>Factura</th>
                         <th>Forma pago</th>
+                        <th>Cuenta<br>Destino</th>
                         <th>Promotor</th>
                         <th>WhatsApp</th>
                         <th>Materiales</th>
                         <th>Grabaciones</th>
-                        <th>Evaluación <br>recibida</th>
+                        <th>Evaluación<br>recibida</th>
                         <th>Observaciones</th>
                         <th>Acciones</th>
                     </tr>
@@ -166,6 +166,22 @@
                                 onchange="guardarFila(this)"></td>
                         <td><input type="checkbox" name="factura_pago" onchange="guardarFila(this)" {% if p.factura_pago
                                 %}checked{% endif %}></td>
+
+                        <td>
+                            <!-- Forma de pago -->
+                            <select name="id_forma" id="id_forma" required onchange="guardarFila(this)">
+                                <option value="" disabled {% if not p.forma_pago %} selected {% endif %}>Seleccione
+                                    la forma de pago</option>
+                                {% if formas %}
+                                {% for forma in formas %}
+                                <option value="{{ forma.0 }}" {% if forma.1|string==p.forma_pago|string %} selected {%
+                                    endif %}>{{ forma.1 }}</option>
+                                {% endfor %}
+                                {% else %}
+                                <option disabled>Aun no hay registros</option>
+                                {% endif %}
+                            </select>
+                        </td>
                         <td>
                             <select name="cuenta_destino" id="cuenta_destino" onchange="guardarFila(this)">
                                 <option value="" disabled {% if not p.cuenta_destino %}selected{% endif %}>Cuenta
@@ -233,24 +249,26 @@
 
                 <div class="modal-body">
 
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <input type="hidden" name="nombre_empleado" value="{{ current_user.id_empleado }}">
+                    <div class="">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="nombre_empleado" value="{{ current_user.id_empleado }}">
 
-                    {# Extraer partes de la fecha solo si existen #}
-                    {% set fecha_raw = request.args.get('fecha', '') %}
-                    {% set partesSesiones = fecha_raw.split('/') if fecha_raw else [] %}
+                        {# Extraer partes de la fecha solo si existen #}
+                        {% set fecha_raw = request.args.get('fecha', '') %}
+                        {% set partesSesiones = fecha_raw.split('/') if fecha_raw else [] %}
 
-                    {% if partesSesiones|length == 3 %}
-                    <input type="hidden" name="id_sesion" id="id_sesion" value="{{ partesSesiones[0] }}">
-                    <p><strong>Sesión:</strong> {{ partesSesiones[1] }}, {{ partesSesiones[2] }}</p>
-                    {% endif %}
-                    <input type="hidden" name="fecha" value="{{ fecha_raw }}">
+                        {% if partesSesiones|length == 3 %}
+                        <input type="hidden" name="id_sesion" id="id_sesion" value="{{ partesSesiones[0] }}">
+                        <p><strong>Sesión:</strong> {{ partesSesiones[1] }}, {{ partesSesiones[2] }}</p>
+                        {% endif %}
+                        <input type="hidden" name="fecha" value="{{ fecha_raw }}">
 
-                    {% set partes_equipo = request.args.get('equipos', '').split(',') %}
-                    {% if partes_equipo | length == 2 %}
-                    <input type="hidden" name="equipos" id="equipos" value="{{ partes_equipo[0] }}">
-                    <p><strong>Equipo:</strong> {{ partes_equipo[1] }}</p>
-                    {% endif %}
+                        {% set partes_equipo = request.args.get('equipos', '').split(',') %}
+                        {% if partes_equipo | length == 2 %}
+                        <input type="hidden" name="equipos" id="equipos" value="{{ partes_equipo[0] }}">
+                        <p><strong>Equipo:</strong> {{ partes_equipo[1] }}</p>
+                        {% endif %}
+                    </div>
 
                     <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
                     <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
@@ -282,6 +300,21 @@
                             <label for="apellidos_participante" class="form-label">Apellidos</label>
                             <input type="text" id="apellidos_participante" name="apellidos_participante"
                                 class="form-control" placeholder="Apellidos" required>
+                        </div>
+
+                        <!-- Forma de pago -->
+                        <div class="col-md-6">
+                            <label for="forma" class="form-label">Forma de pago</label>
+                            <select name="id_forma" id="id_forma" class="form-select" required>
+                                <option value="" selected disabled>Seleccione la forma de pago</option>
+                                {% if formas %}
+                                {% for forma in formas %}
+                                <option value="{{ forma.0 }}">{{ forma.1 }}</option>
+                                {% endfor %}
+                                {% else %}
+                                <option disabled>Aun no hay registros</option>
+                                {% endif %}
+                            </select>
                         </div>
 
                         <!-- Cuenta destino -->
