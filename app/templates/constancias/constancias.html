@@ -298,6 +298,8 @@
 
     <!-- Modal de folio de constancias -->
     {% if constancias %} {% for p in constancias %}
+    {% set modal_id = 'staticBackdrop-' ~ p.id_participante ~ '-' ~ p.nombre_curso|replace(' ',
+    '_')|replace(':', '')|replace(',', '')|replace('.', '') ~ '-' ~ p.fecha %}
     <form method="post"
         action="{{ url_for('constancias.folio_constancia') }}?id={{ p.id_participante }}&curso={{ p.nombre_curso }}&fecha={{ p.fecha }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
