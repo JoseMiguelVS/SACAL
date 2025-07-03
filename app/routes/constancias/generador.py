@@ -181,8 +181,8 @@ def generar_constancia(participante, qr_path=None):
         c.setFillColor(HexColor("#CF1111"))
         c.drawString(205, 714, f"{folio_constancia}")  # Ajusta según el margen izquierdo deseado
         c.setFillColor(HexColor("#000000"))
-        c.drawString(205, 695, nombre)
-        c.drawString(205, 685, apellidos)
+        c.drawString(205, 695, nombre_completo)
+        # c.drawString(205, 685, apellidos)
     
     else:
             # Aquí editas la segunda página, puedes usar las mismas funciones o texto libre

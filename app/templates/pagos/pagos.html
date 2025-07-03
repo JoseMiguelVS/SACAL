@@ -1,5 +1,5 @@
 {% extends './layout.html' %} {% block body %}
-<main class="container my-4">
+<main class="w-100 d-flex flex-column">
     <h2 class="text-center mb-4">Pagos</h2>
 
     {% with messages = get_flashed_messages() %} {% if messages %} {% for
@@ -12,6 +12,11 @@
     {% endfor %} {% endif %} {% endwith %}
 
     <section class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
+
+        <button type="button" class="botones m-2" data-bs-toggle="modal" data-bs-target="#modalAgregarGasto">
+            <i class="fa fa-plus"></i> Nuevo gasto
+        </button>
+
         <form id="formBuscar" method="get" action="{{ url_for('pagos.pagos_buscar') }}"
             class="d-flex flex-grow-1 justify-content-end">
             <div class="input-group" style="max-width: 300px;">
@@ -25,10 +30,38 @@
         </form>
     </section>
 
+    <section class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
+        <form method="get" action="{{ url_for('pagos.pagos_filtros') }}"
+            class="d-flex flex-wrap align-items-center gap-2" id="filtroForm">
+
+            <!-- Mes -->
+            <label for="filtroMes" class="form-label mb-1">Mes</label>
+            <select id="filtroMes" name="mes" class="form-select-sm filtro-auto">
+                <option value="">Todos</option>
+                {% for mes in meses %}
+                <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>{{ mes.1 }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <!-- Semana -->
+            <label for="filtroSemana" class="form-label mb-1">Semana</label>
+            <select id="filtroSemana" name="semana" class="form-select-sm filtro-auto">
+                <option value="">Todas</option>
+                {% for semana in semanas %}
+                <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>{{
+                    semana.1 }}</option>
+                {% endfor %}
+            </select>
+        </form>
+        <a href="{{ url_for('pagos.pagos_buscar') }}" class="botones btn-sm">Limpiar</a>
+    </section>
+
     <section class="table-responsive tables_participantes table-sm">
         <table class="table table-hover">
             <thead>
                 <tr>
+                    <th>Ver más</th>
                     <th>Id</th>
                     <th>Fecha</th>
                     <th>Forma Pago</th>
@@ -42,38 +75,54 @@
                     <th>Confirmacion</th>
                     <th>Conceptos</th>
                     <th>Concepto factura</th>
-                    <th>Acciones</th>
+                    <th>Editar</th>
+                    <th>Factura</th>
                 </tr>
             </thead>
             <tbody>
                 {% if pagos %} {% for p in pagos %}
-                <td>{{ p.id_pago }}</td>
-                <td>{{ p.fecha_pago }}</td>
-                <td>{{ p.forma_pago }}</td>
-                <td>{{ p.ingresos }}</td>
-                <td>{{ p.ingreso_factura }}</td>
-                <td>{{ p.gasto }}</td>
-                <td>{{ p.devolucion }}</td>
-                <td>{{ p.clave_rastreo }}</td>
-                <td>{{ p.nombre_participante }}</td>
-                <td>{{ p.clave_participante }}</td>
+                <tr>
+                    <td>
+                        <a href="{{ url_for('pagos.pagos_detalles', id = p.id_pago) }}" class="botones-ver"
+                            aria-label="Ver detalles de {{ p.nombre_participante }}">
+                            <i class="fa fa-eye" style="font-size: 18px;"></i>
+                        </a>
+                    </td>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ p.fecha_pago }}</td>
+                    <td>{{ p.forma_pago }}</td>
+                    <td>{{ p.ingresos }}</td>
+                    <td>{{ p.ingreso_factura }}</td>
+                    <td>{{ p.gasto }}</td>
+                    <td>{{ p.devolucion }}</td>
+                    <td>{{ p.clave_rastreo }}</td>
+                    <td>{{ p.nombre_participante }}</td>
+                    <td>{{ p.clave_participante }}</td>
 
-                <td>
-                    {% if p.validacion_pago == 3 %}
-                    Validado
-                    {% elif p.validacion_pago == 2 %}
-                    Pendiente
-                    {% else %}
-                    No encontrado
-                    {% endif %}
-                </td>
+                    <td>
+                        {% if p.validacion_pago == 3 %}
+                        Validado
+                        {% elif p.validacion_pago == 2 %}
+                        Pendiente
+                        {% else %}
+                        No encontrado
+                        {% endif %}
+                    </td>
 
-                <td>{{ p.conceptos }}</td>
-                <td>{{ p.concepto_factura }}</td>
-                <td>
-                    <a class="botones-ver" href="{{ url_for('pagos.pagos_comprobantes', id = p.id_participante) }}"><i
-                            class="fa fa-eye"></i>Ver</a>
-                </td>
+                    <td>{{ p.conceptos }}</td>
+                    <td>{{ p.concepto_factura }}</td>
+                    <td>
+                        <a class="botones-editar"
+                            href="{{ url_for('pagos.pagos_comprobantes', id = p.id_participante) }}"><i
+                                class="fa fa-edit"></i></a>
+                    </td>
+                    <td>
+                        <button type="button" class="botones" data-bs-toggle="modal"
+                            data-bs-target="#modalAgregarFactura">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                    </td>
+                </tr>
                 {% endfor %}
                 {% else %}
                 <tr>
@@ -84,66 +133,77 @@
         </table>
     </section>
 
-    <nav class="pagination-container mt-4" aria-label="Navegación de páginas de empleados">
-        <ul class="pagination justify-content-center">
+    <!-- -------------------------------------------------PAGINADOR----------------------------------------------- -->
+    <nav class="pagination-container mt-4" aria-label="Page navigation" class="justify-content-center">
+        <ul class="pagination justify-content-center" style="margin:20px 0">
             {% if page > 1 %}
             <li class="page-item">
                 <a class="page-link bg-warning"
-                    href="{{ url_for('pagos.pagos_buscar') }}?page={{ page - 1 }}&per_page={{ per_page }}"
-                    aria-label="Anterior">
-                    &laquo;
+                    href="{{url_for('pagos.pagos_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                    aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
-
-            {% if page > 2 %}
-            <li class="page-item">
-                <a class="page-link bg-warning"
-                    href="{{ url_for('pagos.pagos_buscar') }}?page=1&per_page={{ per_page }}">1</a>
-            </li>
-            {% if page > 3 %}
-            <li class="page-item disabled">
-                <span class="page-link bg-warning">...</span>
-            </li>
-            {% endif %} {% endif %}
-
-            <li class="page-item">
-                <a class="page-link bg-warning"
-                    href="{{ url_for('pagos.pagos_buscar') }}?page={{ page - 1 }}&per_page={{ per_page }}">{{
-                    page - 1 }}</a>
+            {% if page != 1 and page != 2 %}
+            <li class="page-item"><a class="page-link bg-warning" href="{{url_for('pagos.pagos_buscar')}}">1</a></li>
+            {% if page != 3 %}
+            <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
+            {% endif %}
+            {% endif %}
+            <li class="page-item"><a class="page-link bg-warning"
+                    href="{{url_for('pagos.pagos_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
             </li>
             {% endif %}
 
-            <li class="page-item active" aria-current="page">
-                <span class="page-link bg-warning">{{ page }}</span>
-            </li>
+            <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
 
-            {% if page < total_pages %} <li class="page-item">
-                <a class="page-link bg-warning"
-                    href="{{ url_for('pagos.pagos_buscar') }}?page={{ page + 1 }}&per_page={{ per_page }}">{{
-                    page + 1 }}</a>
+            {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
+                    href="{{url_for('pagos.pagos_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
                 </li>
-
-                {% if page < total_pages - 1 %} {% if page < total_pages - 2 %} <li class="page-item disabled">
-                    <span class="page-link bg-warning">...</span>
-                    </li>
-                    {% endif %}
-                    <li class="page-item">
-                        <a class="page-link bg-warning"
-                            href="{{ url_for('pagos.pagos_buscar') }}?page={{ total_pages }}&per_page={{ per_page }}">{{
-                            total_pages }}</a>
-                    </li>
-                    {% endif %}
-
-                    <li class="page-item">
-                        <a class="page-link bg-warning"
-                            href="{{ url_for('pagos.pagos_buscar') }}?page={{ page + 1 }}&per_page={{ per_page }}"
-                            aria-label="Siguiente">
-                            &raquo;
-                        </a>
-                    </li>
-                    {% endif %}
+                {% if page != total_pages and page != total_pages-1 %}
+                {% if page != total_pages-2 %}
+                <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
+                {% endif %}
+                <li class="page-item"><a class="page-link bg-warning"
+                        href="{{url_for('pagos.pagos_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                </li>
+                {% endif %}
+                <li class="page-item">
+                    <a class="page-link bg-warning"
+                        href="{{url_for('pagos.pagos_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                        aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
         </ul>
     </nav>
+
+    <div class="modal fade" id="modalAgregarGasto" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="modalAgregarGastoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form action="{{ url_for('pagos.pagos_nuevo') }}" method="post" class="formulario modal-content">
+                <h5 class="modal-title" id="modalAgregarGastoLabel">Agregar Gasto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label for="gasto" class="form-label">Cantidad</label>
+                        <input type="number" name="gasto" id="gasto" class="form-control" placeholder="$0.00" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="concepto" class="form-label">Concepto</label>
+                        <textarea class="form-control" name="conceptos" id="conceptos"
+                            placeholder="Concepto del gasto"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="botones-guardar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -152,6 +212,41 @@
 
             inputBuscar.addEventListener("change", function () {
                 form.submit();
+            });
+        });
+    </script>
+
+    <script>
+        let debounceTimeout = null;
+
+        document.querySelectorAll('.filtro-auto').forEach(select => {
+            select.addEventListener('change', () => {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(() => {
+                    document.getElementById('filtroForm').submit();
+                }, 400); // Espera 400ms tras el último cambio
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const formBuscar = document.getElementById('formBuscar');
+            const filtroMes = document.getElementById('filtroMes');
+            const filtroSemana = document.getElementById('filtroSemana');
+
+            formBuscar.addEventListener('submit', function (e) {
+                // Detectar si hay filtros activos
+                const hayFiltros =
+                    filtroMes?.value.trim() !== '' ||
+                    filtroSemana?.value.trim() !== ''
+
+                // Cambiar la ruta de acción según haya filtros
+                if (hayFiltros) {
+                    formBuscar.action = "{{ url_for('pagos.pagos_filtros') }}";
+                } else {
+                    formBuscar.action = "{{ url_for('pagos.pagos_buscar') }}";
+                }
             });
         });
     </script>
