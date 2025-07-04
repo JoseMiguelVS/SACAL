@@ -165,8 +165,11 @@
                         <td><input type="date" name="fecha_pago" value="{{ p.fecha_pago }}"
                                 onchange="guardarFila(this)"></td>
 
-                        <td><input type="checkbox" name="factura_pago" onchange="guardarFila(this)" {% if p.factura_pago
-                                %}checked{% endif %}></td>
+                        <td>
+                            <input type="hidden" name="ingresos" value="{{ p.ingresos }}">
+                            <input type="checkbox" name="factura_pago" onchange="guardarFila(this)" {% if p.factura_pago
+                                %}checked{% endif %}>
+                        </td>
 
                         <td>
                             <!-- Forma de pago -->
@@ -547,6 +550,7 @@
         const id = fila.dataset.id;
         const datos = {};
 
+        // Recolectar todos los valores del formulario (input y select)
         fila.querySelectorAll('input, select').forEach(el => {
             if (el.type === 'checkbox') {
                 datos[el.name] = el.checked;
@@ -555,34 +559,29 @@
             }
         });
 
-        // 🔸 Si el checkbox factura_pago está marcado, calcular ingreso_factura = ingreso * 1.6
-        const ingresoBaseInput = fila.querySelector('[name="ingreso"]'); // asegúrate que el input se llame "ingreso"
-        const ingreso = parseFloat(ingresoBaseInput?.value) || 0;
+        // Obtener ingreso base (desde el input oculto o visible)
+        const ingresos = parseFloat(datos['ingresos']) || 0;
 
-        if (datos['factura_pago']) {
-            datos['ingreso_factura'] = (ingreso * 1.6).toFixed(2);
-        } else {
-            datos['ingreso_factura'] = ingreso.toFixed(2); // sin incremento
-        }
-
+        // Enviar datos al backend
         fetch(`/participantes/actualizar/${id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token() }}'  // Solo si usas Flask-WTF
+                'X-CSRFToken': '{{ csrf_token() }}'  // solo si usas Flask-WTF
             },
             body: JSON.stringify(datos)
         })
             .then(res => res.json())
             .then(data => {
                 console.log(data.alert);
-                // Aquí podrías mostrar una notificación visual si deseas
+                // Aquí puedes usar Toast, alert(), o cambiar color de fila para indicar éxito
             })
             .catch(error => {
                 console.error('Error al guardar:', error);
                 alert('Error al guardar los cambios');
             });
     }
+
 </script>
 
 <script>

@@ -274,7 +274,7 @@ def actualizar_participante(id):
     con = get_db_connection()
     cur = con.cursor()
 
-    # Actualiza los datos del participante
+    # ------------------- Actualiza los datos del participante -------------------
     sql_participante = '''
         UPDATE participantes SET
             clave_participante = %s,
@@ -310,22 +310,32 @@ def actualizar_participante(id):
     )
     cur.execute(sql_participante, valores)
 
-    # Actualiza el ingreso_factura en la tabla pagos
+    # ------------------- Calcula ingreso_factura con IVA 16% -------------------
+    try:
+        ingresos = float(datos['ingresos'])
+        ingreso_factura = round(ingresos * 1.16, 2)
+    except (KeyError, ValueError):
+        ingreso_factura = None  # o puedes manejar un valor por defecto
+
+    # ------------------- Actualiza tabla pagos -------------------
     sql_pago = '''
         UPDATE pagos 
-        SET ingreso_factura = %s, fecha_pago = %s 
-        WHERE id_participante = %s
+        SET ingreso_factura = %s, fecha_pago = %s, ingresos = '0'
+        WHERE participante = %s
     '''
-    cur.execute(sql_pago, 
-        (
-            datos['ingreso_factura'], 
-            datos['fecha_pago'], 
-            id
-        ))
+    cur.execute(sql_pago, (
+        ingreso_factura,
+        datos['fecha_pago'] or None,
+        id
+    ))
 
+    # ------------------- Finaliza conexión -------------------
     con.commit()
     cur.close()
     con.close()
+
+    return jsonify({'alert': 'Participante actualizado correctamente'})
+
 
 @participantes.route('/participantes/actualizar/sesion/<string:id>', methods=['POST'])
 @login_required

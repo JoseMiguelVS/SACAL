@@ -66,6 +66,7 @@
                     <th>Fecha</th>
                     <th>Forma Pago</th>
                     <th>Cuenta destino</th>
+                    <th>Factura</th>
                     <th>Ingreso</th>
                     <th>Ingreso factura</th>
                     <th>Gasto</th>
@@ -91,8 +92,9 @@
                     </td>
                     <td>{{ loop.index }}</td>
                     <td>{{ p.fecha_pago }}</td>
-                    <td>{{ p.forma_pago }}</td>
+                    <td>{{ p.nombre_forma }}</td>
                     <td>{{ p.cuenta_destino }}</td>
+                    <td><input type="checkbox" readonly disabled {% if p.factura_pago %}checked{% endif %}></td>
                     <td>{{ p.ingresos }}</td>
                     <td>{{ p.ingreso_factura }}</td>
                     <td>{{ p.gasto }}</td>
