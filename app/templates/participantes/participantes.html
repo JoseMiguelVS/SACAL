@@ -164,6 +164,7 @@
                         </td>
                         <td><input type="date" name="fecha_pago" value="{{ p.fecha_pago }}"
                                 onchange="guardarFila(this)"></td>
+
                         <td><input type="checkbox" name="factura_pago" onchange="guardarFila(this)" {% if p.factura_pago
                                 %}checked{% endif %}></td>
 
@@ -554,11 +555,21 @@
             }
         });
 
+        // 🔸 Si el checkbox factura_pago está marcado, calcular ingreso_factura = ingreso * 1.6
+        const ingresoBaseInput = fila.querySelector('[name="ingreso"]'); // asegúrate que el input se llame "ingreso"
+        const ingreso = parseFloat(ingresoBaseInput?.value) || 0;
+
+        if (datos['factura_pago']) {
+            datos['ingreso_factura'] = (ingreso * 1.6).toFixed(2);
+        } else {
+            datos['ingreso_factura'] = ingreso.toFixed(2); // sin incremento
+        }
+
         fetch(`/participantes/actualizar/${id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token() }}'  // Si estás usando CSRF con Flask-WTF
+                'X-CSRFToken': '{{ csrf_token() }}'  // Solo si usas Flask-WTF
             },
             body: JSON.stringify(datos)
         })

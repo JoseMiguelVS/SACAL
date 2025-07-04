@@ -215,6 +215,7 @@ def participante_nuevo():
         estado = True
         constancia_generada = False
         constancia_enviada = False
+        ingreso_factura='0'
 
         nombre_paquete = ''
         precio_paquete = ''
@@ -230,11 +231,11 @@ def participante_nuevo():
         # 1. Insertar participante
         sql = '''
             INSERT INTO participantes 
-            (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino, equipos, forma_pago)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino, equipos, forma_pago, ingreso_factura)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id_participante
         '''
-        valores = (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino, equipos, forma_pago )
+        valores = (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino, equipos, forma_pago, ingreso_factura )
         cur.execute(sql, valores)
 
         # 2. Obtener el ID recién creado
@@ -273,7 +274,8 @@ def actualizar_participante(id):
     con = get_db_connection()
     cur = con.cursor()
 
-    sql = '''
+    # Actualiza los datos del participante
+    sql_participante = '''
         UPDATE participantes SET
             clave_participante = %s,
             nombre_participante = %s,
@@ -306,17 +308,24 @@ def actualizar_participante(id):
         datos['observaciones'],
         id
     )
+    cur.execute(sql_participante, valores)
 
-    cur.execute(sql, valores)
-    sql2 = '''' 
-    UPDATE pagos SET
-        fecha_pago
+    # Actualiza el ingreso_factura en la tabla pagos
+    sql_pago = '''
+        UPDATE pagos 
+        SET ingreso_factura = %s, fecha_pago = %s 
+        WHERE id_participante = %s
     '''
+    cur.execute(sql_pago, 
+        (
+            datos['ingreso_factura'], 
+            datos['fecha_pago'], 
+            id
+        ))
+
     con.commit()
     cur.close()
     con.close()
-
-    return jsonify({'alert': 'Participante actualizado correctamente'})
 
 @participantes.route('/participantes/actualizar/sesion/<string:id>', methods=['POST'])
 @login_required

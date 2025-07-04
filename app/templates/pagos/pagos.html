@@ -119,8 +119,8 @@
                                 class="fa fa-edit"></i></a>
                     </td>
                     <td>
-                        <button type="button" class="botones" data-bs-toggle="modal"
-                            data-bs-target="#modalAgregarFactura">
+                        <button type="button" class="botones-editar" data-bs-toggle="modal"
+                            data-bs-target="#modalAgregar-{{p.id_pago}}" aria-label="Editar pago">
                             <i class="fa fa-plus"></i>
                         </button>
                     </td>
@@ -206,6 +206,38 @@
             </form>
         </div>
     </div>
+
+    {% if pagos %} {% for p in pagos %}
+    <div class="modal fade" id="modalAgregar-{{p.id_pago}}" data-bs-backdrop="static" data-bs-keyboard="false"
+        tabindex="-1" aria-labelledby="modalAgregarFacturaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form action="{{url_for('pagos.factura_nueva', id=p.id_pago)}}" method="post" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarLabel-{{p.nombre_participante}}">
+                        Agregar Factura
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <div class="mb-2">
+                        <label for="" class="form-label">Ingreso factura</label>
+                        <input type="number" name="ingreso_factura" id="ingreso_factura" class="form-control"
+                            value="{{p.ingresos * 1.16}}" placeholder="0.00">
+                    </div>
+                    <div class="mb-2">
+                        <label for="" class="form-label">Concepto de la factura</label>
+                        <textarea class="form-control" name="concepto_factura" id="concepto_factura"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="botones-cancelar" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="botones-guardar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endfor %} {% endif %}
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {

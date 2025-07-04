@@ -161,16 +161,17 @@ def pagos_nuevo():
 @login_required
 def factura_nueva(id):
     if request.method == 'POST':
+        ingresos = '0'
         ingreso_factura = request.form['ingreso_factura']
-        concepto_factura = request.form['conceptos_factura']
+        concepto_factura = request.form['concepto_factura']
 
         con = get_db_connection()
         cur = con.cursor(cursor_factory=RealDictCursor)
 
         sql = '''
-                    UPDATE pagos SET ingreso_factura = %s, concepto_factura =%s WHERE id_pago = %s
+                    UPDATE pagos SET ingresos =%s, ingreso_factura = %s, concepto_factura =%s WHERE id_pago = %s
               '''
-        cur.execute(sql,(ingreso_factura, concepto_factura, id))
+        cur.execute(sql,(ingresos, ingreso_factura, concepto_factura, id))
 
         con.commit()
         cur.close()
