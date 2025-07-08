@@ -66,3 +66,5 @@ def lista_participantes():
 
 def lista_formaPago():
     return listar_tabla('formas_pago', 'id_forma')
+def lista_conceptos():
+    return listar_tabla('tipo_concepto_factura', 'id_concepto')

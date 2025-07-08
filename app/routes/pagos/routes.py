@@ -3,7 +3,7 @@ from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
 
-from utils.listas import lista_meses, lista_semanas
+from utils.listas import lista_conceptos, lista_meses, lista_semanas
 
 from ..utils.utils import get_db_connection, paginador3
 
@@ -14,22 +14,38 @@ pagos = Blueprint('pagos', __name__)
 @pagos.route("/pagos")
 @login_required
 def pagos_buscar():
+    # Búsqueda
     search_query = request.args.get('buscar', '', type=str).strip()
     search_query_sql = f"%{search_query}%"
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
 
+    # Pagos con búsqueda
     sql_count = '''
         SELECT COUNT(*) FROM detalles_pagos 
         WHERE (clave_participante ILIKE %s OR nombre_participante ILIKE %s)
     '''
-
     sql_lim = '''
         SELECT * FROM detalles_pagos 
         WHERE (clave_participante ILIKE %s OR nombre_participante ILIKE %s) 
         ORDER BY id_pago DESC 
         LIMIT %s OFFSET %s
     '''
+    paginado = paginador3(sql_count, sql_lim, [search_query_sql, search_query_sql], page, per_page)
 
-    paginado = paginador3(sql_count, sql_lim, [search_query_sql, search_query_sql], 1, 5)
+    
+    conn = get_db_connection()  # o como sea tu conexión
+    cursor = conn.cursor()
+        # Últimos 10 gastos (no filtrados)
+    sql_gastos = '''
+        SELECT *
+        FROM detalles_gastos
+        ORDER BY fecha DESC
+        LIMIT 10
+    '''
+    cursor.execute(sql_gastos)
+    gastos = cursor.fetchall()
+
 
     return render_template('pagos/pagos.html',
                            meses=lista_meses(),
@@ -39,45 +55,69 @@ def pagos_buscar():
                            per_page=paginado[2],
                            total_items=paginado[3],
                            total_pages=paginado[4],
-                           search_query=search_query)
-
+                           search_query=search_query,
+                           gastos=gastos)
 
 @pagos.route("/pagos/filtros")
 @login_required
 def pagos_filtros():
     mes = request.args.get('mes', '', type=str)
     semana = request.args.get('semana', '', type=str)
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
 
+    # -------------------- PAGOS --------------------
     sql_count = '''
-                    SELECT COUNT(*) FROM detalles_pagos
-                    WHERE (%s = '' OR meses ILIKE %s)
-                    AND (%s = '' OR semanas ILIKE %s)
-                '''
+        SELECT COUNT(*) FROM detalles_pagos
+        WHERE (%s = '' OR meses ILIKE %s)
+        AND (%s = '' OR semanas ILIKE %s)
+    '''
     
     sql_lim = '''
-                    SELECT * FROM detalles_pagos
-                    WHERE (%s = '' OR meses ILIKE %s)
-                    AND (%s = '' OR semanas ILIKE %s)
-                    ORDER BY id_pago DESC
-                    LIMIT %s OFFSET %s
-                '''
+        SELECT * FROM detalles_pagos
+        WHERE (%s = '' OR meses ILIKE %s)
+        AND (%s = '' OR semanas ILIKE %s)
+        ORDER BY id_pago DESC
+        LIMIT %s OFFSET %s
+    '''
+
     paginado = paginador3(
         sql_count, sql_lim,
-        [
-            mes, mes,
-            semana, semana
-        ],
-        1, 20
+        [mes, mes, semana, semana],
+        page, per_page
+    )
+
+    # -------------------- GASTOS --------------------
+    sql_countG = '''
+        SELECT COUNT(*) FROM detalles_gastos
+        WHERE (%s = '' OR mes ILIKE %s)
+        AND (%s = '' OR semana ILIKE %s)
+    '''
+
+    sql_limG = '''
+        SELECT * FROM detalles_gastos
+        WHERE (%s = '' OR mes ILIKE %s)
+        AND (%s = '' OR semana ILIKE %s)
+        ORDER BY fecha DESC
+        LIMIT %s OFFSET %s
+    '''
+
+    paginado_gastos = paginador3(
+        sql_countG, sql_limG,
+        [mes, mes, semana, semana],
+        1, 10  # puedes dejarlo paginado si lo necesitas
     )
 
     return render_template('pagos/pagos.html',
-                           meses=lista_meses(),
-                           semanas=lista_semanas(),
                            pagos=paginado[0],
                            page=paginado[1],
                            per_page=paginado[2],
                            total_items=paginado[3],
-                           total_pages=paginado[4])
+                           total_pages=paginado[4],
+                           gastos=paginado_gastos[0],
+                           concepto=lista_conceptos(),
+                           meses=lista_meses(),
+                           semanas=lista_semanas())
 
 # -----------------------------COMPROBANTES-----------------------------
 @pagos.route("/pagos/comprobantes/<string:id>")
@@ -98,7 +138,6 @@ def pagos_actualizar(id):
     if request.method == 'POST':
         clave_rastreo = request.form['clave_rastreo']
         validacion_pago = request.form['validacion_pago']
-        devolucion = request.form['devolucion']
 
         con = get_db_connection()
         cur = con.cursor()
@@ -109,6 +148,25 @@ def pagos_actualizar(id):
         cur.close()
         con.close()
         flash('Pago actualizado correctamente')
+    return redirect(url_for('pagos.pagos_buscar'))
+
+@pagos.route("/pagos/devolucion/<string:id>", methods=['POST'])
+@login_required
+def pagos_devolucion(id):
+    if request.method == 'POST':
+        ingresos = 0
+        ingreso_factura = 0
+        devolucion=request.form['devolucion']
+
+        con = get_db_connection()
+        cur= con.cursor()
+        sql = 'UPDATE pagos SET ingresos = %s, ingreso_factura = %s, devolucion = %s WHERE participante = %s'
+        valores = (ingresos, ingreso_factura, devolucion, id)
+        cur.execute(sql, valores)
+        con.commit()
+        cur.close()
+        con.close()
+        flash('Devolucion registrada correctamente')
     return redirect(url_for('pagos.pagos_buscar'))
 
 # -----------------------------------DETALLES DE PAGOS-----------------------------------
@@ -129,23 +187,21 @@ def pagos_detalles(id):
 @login_required
 def pagos_nuevo():
     if request.method == 'POST':
-        gasto = request.form['gasto']
-        conceptos = request.form['conceptos']
-        ingresos = '0'
-        clave_rastreo = 'N/A'
-        fecha_pago = datetime.now()
-        validacion_pago = '3'
-        participante = '1'
+        monto_gasto = request.form['gasto']
+        concepto_gasto = request.form['conceptos']
+        mes = request.form['mes']
+        semana = request.form['semana']
+        fecha = datetime.now()
 
         con = get_db_connection()
         cur = con.cursor(cursor_factory=RealDictCursor)
 
         sql = '''
-                    INSERT INTO pagos
-                        (gasto, ingresos, clave_rastreo, conceptos, fecha_pago,validacion_pago, participante)
-                        VALUES (%s, %s, %s, %s, %s, %s, %s)
+                    INSERT INTO gastos
+                        (fecha, monto_gasto, concepto_gasto, mes, semana)
+                        VALUES (%s, %s, %s, %s, %s)
               '''
-        valores = (gasto, ingresos, clave_rastreo, conceptos, fecha_pago,validacion_pago, participante)
+        valores = (fecha, monto_gasto, concepto_gasto, mes, semana)
         cur.execute(sql, valores)
 
         con.commit()

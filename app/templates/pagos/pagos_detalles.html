@@ -46,15 +46,13 @@
                     <input type="text" name="clave_rastreo" id="clave_rastreo" class="form-control"
                         value="{{ pagos.clave_rastreo }}">
                 </div>
-                <div class="mb-3">
-                    <label for="devolucion" class="form-label">¿Es devolucion?</label>
-                    <input type="checkbox" name="devolucion" id="devolucion">
-                </div>
+
                 <button type="submit" class="botones-guardar w-100 mb-1">Guardar cambios</button>
                 <a href="{{ url_for('pagos.pagos_buscar') }}" class="botones-cancelar w-100 mb-1">Cancelar</a>
             </form>
         </div>
     </div>
 </main>
+
 
 {% endblock %}

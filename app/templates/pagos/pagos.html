@@ -69,14 +69,13 @@
                     <th>Factura</th>
                     <th>Ingreso</th>
                     <th>Ingreso factura</th>
-                    <th>Gasto</th>
                     <th>Devolucion</th>
                     <th>Clave Rastreo</th>
                     <th>Participante</th>
                     <th>Clave</th>
                     <th>Confirmacion</th>
-                    <th>Conceptos</th>
-                    <th>Concepto factura</th>
+                    <th>Concepto <br>factura</th>
+                    <th>Devolucion</th>
                     <th>Editar</th>
                     <th>Factura</th>
                 </tr>
@@ -97,7 +96,6 @@
                     <td><input type="checkbox" readonly disabled {% if p.factura_pago %}checked{% endif %}></td>
                     <td>{{ p.ingresos }}</td>
                     <td>{{ p.ingreso_factura }}</td>
-                    <td>{{ p.gasto }}</td>
                     <td>{{ p.devolucion }}</td>
                     <td>{{ p.clave_rastreo }}</td>
                     <td>{{ p.nombre_participante }}</td>
@@ -113,11 +111,15 @@
                         {% endif %}
                     </td>
 
-                    <td>{{ p.conceptos }}</td>
                     <td>{{ p.concepto_factura }}</td>
                     <td>
-                        <a class="botones-editar"
-                            href="{{ url_for('pagos.pagos_comprobantes', id = p.id_participante) }}"><i
+                        <button type="button" class="botones-editar" data-bs-toggle="modal"
+                            data-bs-target="#modalEditarDevolucion-{{p.participante}}" aria-label="Agregar devolucion">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                    </td>
+                    <td>
+                        <a class="botones-editar" href="{{ url_for('pagos.pagos_comprobantes', id = p.id_pagos) }}"><i
                                 class="fa fa-edit"></i></a>
                     </td>
                     <td>
@@ -130,9 +132,37 @@
                 {% endfor %}
                 {% else %}
                 <tr>
-                    <td align="center" colspan="15">No existen participantes</td>
+                    <td align="center" colspan="15">No existen pagos</td>
                 </tr>
                 {% endif %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="table-responsive tables-sm">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Ver mas</th>
+                    <th>ID</th>
+                    <th>Fecha</th>
+                    <th>Monto</th>
+                    <th>Concepto</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if gastos %} {% for g in gastos %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ g.fecha }}</td>
+                    <td>{{ g.monto_gasto }}</td>
+                    <td>{{ g.nombre_gasto }}</td>
+                    {% endfor %} {% else %}
+                <tr>
+                    <td align="center" colspan="15">No existen gastos</td>
+                </tr>
+                {% endif %}
+                </tr>
             </tbody>
         </table>
     </section>
@@ -230,6 +260,39 @@
                     <div class="mb-2">
                         <label for="" class="form-label">Concepto de la factura</label>
                         <textarea class="form-control" name="concepto_factura" id="concepto_factura"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="botones-cancelar" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="botones-guardar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalEditarDevolucion-{{p.participante}}" data-bs-backdrop="static"
+        data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalEditarDevolucionLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form action="{{url_for('pagos.pagos_devolucion', id=p.participante)}}" method="post" class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarLabel-{{p.nombre_participante}}">
+                        Agregar Factura
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <div class="mb-2">
+                        <label for="" class="form-label">Monto de devolucion</label>
+                        {% if not p.ingresos == 0.0 %}
+                        <input type="number" name="devolucion" id="devolucion" class="form-control"
+                        value="{{p.ingresos - (p.ingresos * 0.16)}}"
+                        placeholder="{{p.ingresos - (p.ingresos * 0.16)}}">
+                        {% else %}
+                        <input type="number" name="devolucion" id="devolucion" class="form-control"
+                            value="{{p.ingreso_factura - (p.ingreso_factura * 0.16)}}"
+                            placeholder="{{p.ingreso_factura - (p.ingreso_factura * 0.16)}}">
+                            {% endif %}
                     </div>
                 </div>
                 <div class="modal-footer">
