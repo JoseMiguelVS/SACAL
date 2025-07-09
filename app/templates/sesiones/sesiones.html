@@ -35,11 +35,11 @@
     <section class="table-responsive table-sm">
         <table class="table table-hover">
             <thead>
-                <tr>
+                <tr align="center">
                     <th>Curso</th>
-                    <th>Fecha</th>
-                    <th>Hora inicio</th>
-                    <th>Hora fin</th>
+                    <th>Fecha </th>
+                    <th>Hora de inicio </th>
+                    <th>Hora de fin </th>
                     <th>Mes</th>
                     <th>Semana</th>
                     <th>Editar</th>
@@ -48,18 +48,17 @@
             </thead>
             <tbody>
                 {% if sesiones %} {% for sesion in sesiones %} {% if sesion.estado == True %}
-                <tr>
+                <tr align="center">
                     <td>{{ sesion.cursos }}</td>
-                    <td>{{ sesion.fecha }}</td>
-                    <td>{{ sesion.horario_inicio }}</td>
-                    <td>{{ sesion.horario_fin }}</td>
+                    <td>{{ sesion.fecha.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ sesion.horario_inicio.strftime('%I:%M %p') }}</td>
+                    <td>{{ sesion.horario_fin.strftime('%I:%M %p') }}</td>
                     <td>{{ sesion.nombre_mes }}</td>
                     <td>{{ sesion.semana }}</td>
                     <td>
-                        <button type="button" class="botones-editar" data-bs-toggle="modal"
-                            data-bs-target="#modalEditar-{{ sesion.id_sesion }}"
-                            aria-label="Editar sesion {{ sesion.fecha }}">
-                            <i class="fa fa-edit" style="font-size: 18px;"></i></button>
+                        <a href="{{ url_for('sesiones.sesion_editar', id=sesion.id_sesion) }}" class="botones-editar">
+                            <i class="fa fa-edit" style="font-size: 18px;"></i>
+                        </a>
                     </td>
                     <td>
                         <button class="botones-eliminar" type="button" data-bs-toggle="modal"

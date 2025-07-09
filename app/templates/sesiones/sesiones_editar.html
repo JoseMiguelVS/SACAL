@@ -113,8 +113,8 @@
 
     <!-- Botones -->
     <div class="text-center">
-        <a class="btn btn-secondary me-2" href="{{ url_for('sesiones.sesiones_buscar') }}">Cancelar</a>
-        <button type="submit" class="btn btn-success">Guardar</button>
+        <a class="botones-cancelar" href="{{ url_for('sesiones.sesiones_buscar') }}">Cancelar</a>
+        <button type="submit" class="botones-guardar">Guardar</button>
     </div>
 </form>
 
@@ -145,7 +145,7 @@
                 </select>
             </div>
             <div class="col-md-2 d-grid">
-                <button type="button" class="btn btn-danger mt-4" onclick="this.closest('.row').remove()">Eliminar</button>
+                <button type="button" class="botones-cancelar" onclick="this.closest('.row').remove()">Eliminar</button>
             </div>
         `;
         container.appendChild(row);

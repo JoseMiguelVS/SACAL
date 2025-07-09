@@ -28,6 +28,23 @@ def sesiones_buscar():
 
     paginado = paginador2(sql_count, sql_lim, params_count, params_lim, 1, 5)
 
+    for sesion in paginado[0]:
+        if isinstance(sesion['fecha'], str):
+            try:
+                sesion['fecha'] = datetime.strptime(sesion['fecha'], "%Y-%m-%d")
+            except ValueError:
+                pass
+        if isinstance(sesion['horario_inicio'], str):
+            try:
+                sesion['horario_inicio'] = datetime.strptime(sesion['horario_inicio'], "%H:%M:%S")
+            except ValueError:
+                pass
+        if isinstance(sesion['horario_fin'], str):
+            try:
+                sesion['horario_fin'] = datetime.strptime(sesion['horario_fin'], "%H:%M:%S")
+            except ValueError:
+                pass
+
     return render_template('sesiones/sesiones.html',
                            cursos = lista_cursos(), 
                            semanas = lista_semanas(), 
@@ -203,6 +220,23 @@ def sesiones_papelera():
         params_lim = ()
 
     paginado = paginador2(sql_count, sql_lim, params_count, params_lim, 1, 5)
+
+    for sesion in paginado[0]:
+        if isinstance(sesion['fecha'], str):
+            try:
+                sesion['fecha'] = datetime.strptime(sesion['fecha'], "%Y-%m-%d")
+            except ValueError:
+                pass
+        if isinstance(sesion['horario_inicio'], str):
+            try:
+                sesion['horario_inicio'] = datetime.strptime(sesion['horario_inicio'], "%H:%M:%S")
+            except ValueError:
+                pass
+        if isinstance(sesion['horario_fin'], str):
+            try:
+                sesion['horario_fin'] = datetime.strptime(sesion['horario_fin'], "%H:%M:%S")
+            except ValueError:
+                pass
 
     return render_template('sesiones/sesiones_papelera.html',
                            sesiones=paginado[0],

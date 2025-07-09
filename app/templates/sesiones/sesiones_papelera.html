@@ -37,7 +37,7 @@
     <section class="table-responsive table-sm">
         <table class="table table-hover">
             <thead>
-                <tr>
+                <tr align="center">
                     <th>Curso</th>
                     <th>Fecha</th>
                     <th>Hora inicio</th>
@@ -51,11 +51,11 @@
                 {% if sesiones %}
                 {% for sesion in sesiones %}
                 {% if not sesion.estado %}
-                <tr>
+                <tr align="center">
                     <td>{{ sesion.cursos }}</td>
-                    <td>{{ sesion.fecha }}</td>
-                    <td>{{ sesion.horario_inicio }}</td>
-                    <td>{{ sesion.horario_fin }}</td>
+                    <td>{{ sesion.fecha.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ sesion.horario_inicio.strftime('%I:%M %p') }}</td>
+                    <td>{{ sesion.horario_fin.strftime('%I:%M %p') }}</td>
                     <td>{{ sesion.nombre_mes }}</td>
                     <td>{{ sesion.semana }}</td>
                     <td>
