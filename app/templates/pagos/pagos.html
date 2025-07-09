@@ -76,7 +76,7 @@
                     <th>Confirmacion</th>
                     <th>Concepto <br>factura</th>
                     <th>Devolucion</th>
-                    <th>Editar</th>
+                    <th>Recibo(s)</th>
                     <th>Factura</th>
                 </tr>
             </thead>
@@ -114,13 +114,13 @@
                     <td>{{ p.concepto_factura }}</td>
                     <td>
                         <button type="button" class="botones-editar" data-bs-toggle="modal"
-                            data-bs-target="#modalEditarDevolucion-{{p.participante}}" aria-label="Agregar devolucion">
+                            data-bs-target="#modalEditarDevolucion-{{p.id_pago}}" aria-label="Agregar devolucion">
                             <i class="fa fa-edit"></i>
                         </button>
                     </td>
                     <td>
-                        <a class="botones-editar" href="{{ url_for('pagos.pagos_comprobantes', id = p.id_pagos) }}"><i
-                                class="fa fa-edit"></i></a>
+                        <a class="botones-editar" href="{{ url_for('pagos.pagos_comprobantes', id = p.id_pago) }}"><i
+                                class="fas fa-receipt"></i></a>
                     </td>
                     <td>
                         <button type="button" class="botones-editar" data-bs-toggle="modal"
@@ -132,7 +132,7 @@
                 {% endfor %}
                 {% else %}
                 <tr>
-                    <td align="center" colspan="15">No existen pagos</td>
+                    <td align="center" colspan="17">No existen pagos</td>
                 </tr>
                 {% endif %}
             </tbody>
@@ -143,27 +143,38 @@
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th>Ver mas</th>
                     <th>ID</th>
                     <th>Fecha</th>
                     <th>Monto</th>
                     <th>Concepto</th>
                 </tr>
             </thead>
+
             <tbody>
                 {% if gastos %} {% for g in gastos %}
                 <tr>
                     <td>{{ loop.index }}</td>
                     <td>{{ g.fecha }}</td>
-                    <td>{{ g.monto_gasto }}</td>
+                    <td>${{ "%.2f"|format(g.monto_gasto) }}</td>
                     <td>{{ g.nombre_gasto }}</td>
                     {% endfor %} {% else %}
                 <tr>
-                    <td align="center" colspan="15">No existen gastos</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td align="center" colspan="4">No existen gastos</td>
                 </tr>
                 {% endif %}
                 </tr>
             </tbody>
+            {% if gastos %}
+            <tfoot>
+                <tr>
+                    <th colspan="2">Total</th>
+                    <th colspan="2">${{ "%.2f"|format(total_gasto) }}</th>
+                </tr>
+            </tfoot>
+            {% endif %}
         </table>
     </section>
 
@@ -221,14 +232,41 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 <div class="modal-body">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+
+                    {% set mes_sel = request.args.get('mes', '') %}
+                    {% set semana_sel = request.args.get('semana', '') %}
+                    <input type="hidden" name="mes_filtro" value="{{ mes_sel }}">
+                    <input type="hidden" name="semana_filtro" value="{{ semana_sel }}">
+
+                    {% if meses %}
+                    {% for m in meses %}
+                    {% if mes_sel == m[1] %}
+                    <input type="hidden" name="mes" value="{{ m[0] }}">
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+
+                    {% if semanas %}
+                    {% for s in semanas %}
+                    {% if semana_sel == s[1] %}
+                    <input type="hidden" name="semana" value="{{ s[0] }}">
+                    {% endif %}
+                    {% endfor %}
+                    {% endif %}
+
                     <div class="mb-3">
                         <label for="gasto" class="form-label">Cantidad</label>
                         <input type="number" name="gasto" id="gasto" class="form-control" placeholder="$0.00" required>
                     </div>
                     <div class="mb-3">
-                        <label for="concepto" class="form-label">Concepto</label>
-                        <textarea class="form-control" name="conceptos" id="conceptos"
-                            placeholder="Concepto del gasto"></textarea>
+                        <label for="" class="form-label mb-2">Concepto</label>
+                        <select name="conceptos" id="conceptos" class="concepto form-select-sm">
+                            <option value="">Todos</option>
+                            {% for g in gasto %}
+                            <option value="{{ g.0 }}">{{ g.1 }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -255,11 +293,18 @@
                     <div class="mb-2">
                         <label for="" class="form-label">Ingreso factura</label>
                         <input type="number" name="ingreso_factura" id="ingreso_factura" class="form-control"
-                            value="{{p.ingresos * 1.16}}" placeholder="0.00">
+                            value="{{p.ingresos * 1.16 | round(2)}}" placeholder="0.00">
                     </div>
+                    <!-- Checkboxes -->
                     <div class="mb-2">
-                        <label for="" class="form-label">Concepto de la factura</label>
-                        <textarea class="form-control" name="concepto_factura" id="concepto_factura"></textarea>
+                        <label><input type="checkbox" id="persona_fisica"> Persona Física</label>
+                        <label><input type="checkbox" id="persona_moral"> Persona Moral</label>
+                    </div>
+
+                    <!-- Campo de concepto de factura -->
+                    <div class="mb-2">
+                        <label for="concepto_factura" class="form-label">Concepto de la factura</label>
+                        <input type="text" class="form-control" id="concepto_factura" name="concepto_factura" disabled>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -270,10 +315,10 @@
         </div>
     </div>
 
-    <div class="modal fade" id="modalEditarDevolucion-{{p.participante}}" data-bs-backdrop="static"
+    <div class="modal fade" id="modalEditarDevolucion-{{ p.id_pago }}" data-bs-backdrop="static"
         data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalEditarDevolucionLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <form action="{{url_for('pagos.pagos_devolucion', id=p.participante)}}" method="post" class="modal-content">
+            <form action="{{url_for('pagos.pagos_devolucion', id=p.id_pago)}}" method="post" class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalEditarLabel-{{p.nombre_participante}}">
                         Agregar Factura
@@ -283,16 +328,17 @@
                 <div class="modal-body">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <div class="mb-2">
-                        <label for="" class="form-label">Monto de devolucion</label>
-                        {% if not p.ingresos == 0.0 %}
+                        <label class="form-label">Monto de devolucion</label>
+                        {% if p.ingresos != 0 %}
                         <input type="number" name="devolucion" id="devolucion" class="form-control"
-                        value="{{p.ingresos - (p.ingresos * 0.16)}}"
-                        placeholder="{{p.ingresos - (p.ingresos * 0.16)}}">
+                            value="{{ (p.ingresos - (p.ingresos * 0.16)) | round(2) }}"
+                            placeholder="{{ (p.ingresos - (p.ingresos * 0.16)) | round(2) }}">
                         {% else %}
                         <input type="number" name="devolucion" id="devolucion" class="form-control"
-                            value="{{p.ingreso_factura - (p.ingreso_factura * 0.16)}}"
-                            placeholder="{{p.ingreso_factura - (p.ingreso_factura * 0.16)}}">
-                            {% endif %}
+                            value="{{ (p.ingreso_factura - (p.ingreso_factura * 0.16)) | round(2) }}"
+                            placeholder="{{ (p.ingreso_factura - (p.ingreso_factura * 0.16)) | round(2) }}">
+                        {% endif %}
+
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -302,6 +348,37 @@
             </form>
         </div>
     </div>
+
+    <!-- Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const chkFisica = document.getElementById("persona_fisica");
+            const chkMoral = document.getElementById("persona_moral");
+            const conceptoInput = document.getElementById("concepto_factura");
+
+            // Nombre del participante desde backend (usa Jinja o algo similar)
+            const nombreParticipante = "{{ p.nombre_participante }}";
+
+            function actualizarConcepto() {
+                if (chkFisica.checked) {
+                    chkMoral.checked = false;
+                    conceptoInput.value = nombreParticipante;
+                    conceptoInput.disabled = true;
+                } else if (chkMoral.checked) {
+                    chkFisica.checked = false;
+                    conceptoInput.value = "";
+                    conceptoInput.disabled = false;
+                    conceptoInput.placeholder = "Nombre de la empresa";
+                } else {
+                    conceptoInput.value = "";
+                    conceptoInput.disabled = true;
+                }
+            }
+
+            chkFisica.addEventListener("change", actualizarConcepto);
+            chkMoral.addEventListener("change", actualizarConcepto);
+        });
+    </script>
     {% endfor %} {% endif %}
 
     <script>

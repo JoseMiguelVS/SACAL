@@ -3,7 +3,7 @@ from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
 
-from utils.listas import lista_conceptos, lista_meses, lista_semanas
+from utils.listas import lista_conceptos, lista_gastos, lista_meses, lista_semanas
 
 from ..utils.utils import get_db_connection, paginador3
 
@@ -55,6 +55,8 @@ def pagos_buscar():
                            per_page=paginado[2],
                            total_items=paginado[3],
                            total_pages=paginado[4],
+                           concepto=lista_conceptos(),
+                           gasto=lista_gastos(),
                            search_query=search_query,
                            gastos=gastos)
 
@@ -89,35 +91,44 @@ def pagos_filtros():
 
     # -------------------- GASTOS --------------------
     sql_countG = '''
-        SELECT COUNT(*) FROM detalles_gastos
-        WHERE (%s = '' OR mes ILIKE %s)
-        AND (%s = '' OR semana ILIKE %s)
+    SELECT COUNT(*) FROM detalles_gastos
+    WHERE (%s = '' OR mes ILIKE %s)
+    AND (%s = '' OR semana ILIKE %s)
     '''
 
     sql_limG = '''
-        SELECT * FROM detalles_gastos
+        SELECT id_gasto, fecha, monto_gasto, nombre_gasto, mes, semana FROM detalles_gastos
         WHERE (%s = '' OR mes ILIKE %s)
         AND (%s = '' OR semana ILIKE %s)
         ORDER BY fecha DESC
         LIMIT %s OFFSET %s
     '''
 
+    # Ejecutar paginador con los valores adecuados
     paginado_gastos = paginador3(
         sql_countG, sql_limG,
         [mes, mes, semana, semana],
-        1, 10  # puedes dejarlo paginado si lo necesitas
+        1, 10
     )
 
+    # Calcular suma del monto
+# Calcular total del gasto
+    total_gasto = sum([float(g['monto_gasto']) for g in paginado_gastos[0]])
+
+    # Renderizar plantilla
     return render_template('pagos/pagos.html',
-                           pagos=paginado[0],
-                           page=paginado[1],
-                           per_page=paginado[2],
-                           total_items=paginado[3],
-                           total_pages=paginado[4],
-                           gastos=paginado_gastos[0],
-                           concepto=lista_conceptos(),
-                           meses=lista_meses(),
-                           semanas=lista_semanas())
+                        pagos=paginado[0],
+                        page=paginado[1],
+                        per_page=paginado[2],
+                        total_items=paginado[3],
+                        total_pages=paginado[4],
+                        gastos=paginado_gastos[0],
+                        concepto=lista_conceptos(),
+                        gasto=lista_gastos(),
+                        meses=lista_meses(),
+                        semanas=lista_semanas(),
+                        total_gasto=total_gasto)
+
 
 # -----------------------------COMPROBANTES-----------------------------
 @pagos.route("/pagos/comprobantes/<string:id>")
@@ -125,7 +136,7 @@ def pagos_filtros():
 def pagos_comprobantes(id):
     with get_db_connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute('SELECT * FROM detalles_pagos2 WHERE id_participante = %s',(id,))
+            cur.execute('SELECT * FROM detalles_pagos2 WHERE id_pago = %s',(id,))
             pagos = cur.fetchone()
     if pagos is None:
         flash('El particiante no existe o ha sido eliminado.')
@@ -150,24 +161,34 @@ def pagos_actualizar(id):
         flash('Pago actualizado correctamente')
     return redirect(url_for('pagos.pagos_buscar'))
 
+
 @pagos.route("/pagos/devolucion/<string:id>", methods=['POST'])
 @login_required
 def pagos_devolucion(id):
-    if request.method == 'POST':
-        ingresos = 0
-        ingreso_factura = 0
-        devolucion=request.form['devolucion']
+    devolucion = request.form.get('devolucion', '0')
 
+    try:
         con = get_db_connection()
-        cur= con.cursor()
-        sql = 'UPDATE pagos SET ingresos = %s, ingreso_factura = %s, devolucion = %s WHERE participante = %s'
-        valores = (ingresos, ingreso_factura, devolucion, id)
+        cur = con.cursor()
+        sql = '''
+            UPDATE pagos
+            SET ingresos = %s,
+                ingreso_factura = %s,
+                devolucion = %s
+            WHERE id_pago = %s
+        '''
+        valores = (0, 0, devolucion, id)
         cur.execute(sql, valores)
         con.commit()
+        flash('Devolución registrada correctamente', 'success')
+    except Exception as e:
+        flash(f'Error al registrar devolución: {e}', 'danger')
+    finally:
         cur.close()
         con.close()
-        flash('Devolucion registrada correctamente')
+
     return redirect(url_for('pagos.pagos_buscar'))
+
 
 # -----------------------------------DETALLES DE PAGOS-----------------------------------
 @pagos.route("/pagos/detalles/<int:id>")
@@ -187,11 +208,13 @@ def pagos_detalles(id):
 @login_required
 def pagos_nuevo():
     if request.method == 'POST':
+        mes_filtro = request.form['mes_filtro']
+        semana_filtro = request.form['semana_filtro']
         monto_gasto = request.form['gasto']
         concepto_gasto = request.form['conceptos']
         mes = request.form['mes']
         semana = request.form['semana']
-        fecha = datetime.now()
+        fecha = datetime.now().date()
 
         con = get_db_connection()
         cur = con.cursor(cursor_factory=RealDictCursor)
@@ -209,7 +232,7 @@ def pagos_nuevo():
         con.close()
 
         flash("Gasto registrado correctamente.")
-        return redirect(url_for('pagos.pagos_buscar'))
+        return redirect(url_for('pagos.pagos_filtros', mes = mes_filtro, semana = semana_filtro))
     
     return redirect(url_for('pagos.pagos_buscar'))
 
@@ -217,9 +240,8 @@ def pagos_nuevo():
 @login_required
 def factura_nueva(id):
     if request.method == 'POST':
-        ingresos = '0'
         ingreso_factura = request.form['ingreso_factura']
-        concepto_factura = request.form['concepto_factura']
+        concepto_factura = request.form['conceptos']
 
         con = get_db_connection()
         cur = con.cursor(cursor_factory=RealDictCursor)
@@ -227,7 +249,7 @@ def factura_nueva(id):
         sql = '''
                     UPDATE pagos SET ingresos =%s, ingreso_factura = %s, concepto_factura =%s WHERE id_pago = %s
               '''
-        cur.execute(sql,(ingresos, ingreso_factura, concepto_factura, id))
+        cur.execute(sql,(0, ingreso_factura, concepto_factura, id))
 
         con.commit()
         cur.close()
