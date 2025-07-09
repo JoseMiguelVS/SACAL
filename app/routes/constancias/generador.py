@@ -179,9 +179,9 @@ def generar_constancia(participante, qr_path=None):
             # Aquí editas la segunda página, puedes usar las mismas funciones o texto libre
         c.setFont("Montserrat-Bold", 11)
         c.setFillColor(HexColor("#CF1111"))
-        c.drawString(205, 714, f"{folio_constancia}")  # Ajusta según el margen izquierdo deseado
+        c.drawString(207, 712, f"{folio_constancia}")  # Ajusta según el margen izquierdo deseado
         c.setFillColor(HexColor("#000000"))
-        c.drawString(205, 695, nombre_completo)
+        c.drawString(207, 693, nombre_completo)
         # c.drawString(205, 685, apellidos)
     
     else:

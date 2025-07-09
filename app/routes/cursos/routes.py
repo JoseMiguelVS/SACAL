@@ -7,7 +7,7 @@ from utils.listas import lista_temas
 
 from ..utils.utils import get_db_connection, paginador1
 
-# Definir Blueprint
+# Definir Blueprint 
 cursos = Blueprint('cursos', __name__)
 
 #-------------------------------BUSCAR CURSO--------------------------
@@ -107,8 +107,8 @@ def curso_actualizar(id):
         nombre_curso = request.form['nombre_curso']
         codigo_curso = request.form['codigo_curso']
         tema_curso = request.form['id_tema']
-        es_nacional = request.form.get('es_nacional') or None
         duracion_curso = request.form['duracion_curso']
+        es_nacional = request.form.get('es_nacional') or None
         fecha_modificacion= datetime.now()
         
         con = get_db_connection()
