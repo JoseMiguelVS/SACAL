@@ -31,21 +31,11 @@ def pagos_buscar():
         ORDER BY id_pago DESC 
         LIMIT %s OFFSET %s
     '''
-    paginado = paginador3(sql_count, sql_lim, [search_query_sql, search_query_sql], page, per_page)
-
-    
-    conn = get_db_connection()  # o como sea tu conexión
-    cursor = conn.cursor()
-        # Últimos 10 gastos (no filtrados)
-    sql_gastos = '''
-        SELECT *
-        FROM detalles_gastos
-        ORDER BY fecha DESC
-        LIMIT 10
-    '''
-    cursor.execute(sql_gastos)
-    gastos = cursor.fetchall()
-
+    paginado = paginador3(sql_count, sql_lim, 
+                          [
+                              search_query_sql, search_query_sql
+                          ], 
+                          page, per_page)
 
     return render_template('pagos/pagos.html',
                            meses=lista_meses(),
@@ -57,8 +47,7 @@ def pagos_buscar():
                            total_pages=paginado[4],
                            concepto=lista_conceptos(),
                            gasto=lista_gastos(),
-                           search_query=search_query,
-                           gastos=gastos)
+                           search_query=search_query)
 
 @pagos.route("/pagos/filtros")
 @login_required
@@ -91,13 +80,13 @@ def pagos_filtros():
 
     # -------------------- GASTOS --------------------
     sql_countG = '''
-    SELECT COUNT(*) FROM detalles_gastos
-    WHERE (%s = '' OR mes ILIKE %s)
-    AND (%s = '' OR semana ILIKE %s)
+        SELECT COUNT(*) FROM detalles_gastos
+        WHERE (%s = '' OR mes ILIKE %s)
+        AND (%s = '' OR semana ILIKE %s)
     '''
 
     sql_limG = '''
-        SELECT id_gasto, fecha, monto_gasto, nombre_gasto, mes, semana FROM detalles_gastos
+        SELECT * FROM detalles_gastos
         WHERE (%s = '' OR mes ILIKE %s)
         AND (%s = '' OR semana ILIKE %s)
         ORDER BY fecha DESC
@@ -107,13 +96,12 @@ def pagos_filtros():
     # Ejecutar paginador con los valores adecuados
     paginado_gastos = paginador3(
         sql_countG, sql_limG,
-        [mes, mes, semana, semana],
+        [
+         mes, mes, 
+         semana, semana
+        ],
         1, 10
     )
-
-    # Calcular suma del monto
-# Calcular total del gasto
-    total_gasto = sum([float(g['monto_gasto']) for g in paginado_gastos[0]])
 
     # Renderizar plantilla
     return render_template('pagos/pagos.html',
@@ -126,9 +114,7 @@ def pagos_filtros():
                         concepto=lista_conceptos(),
                         gasto=lista_gastos(),
                         meses=lista_meses(),
-                        semanas=lista_semanas(),
-                        total_gasto=total_gasto)
-
+                        semanas=lista_semanas())
 
 # -----------------------------COMPROBANTES-----------------------------
 @pagos.route("/pagos/comprobantes/<string:id>")
@@ -161,7 +147,7 @@ def pagos_actualizar(id):
         flash('Pago actualizado correctamente')
     return redirect(url_for('pagos.pagos_buscar'))
 
-
+#----------------------------------------------DEVOLUCION----------------------------------------------
 @pagos.route("/pagos/devolucion/<string:id>", methods=['POST'])
 @login_required
 def pagos_devolucion(id):
@@ -188,7 +174,6 @@ def pagos_devolucion(id):
         con.close()
 
     return redirect(url_for('pagos.pagos_buscar'))
-
 
 # -----------------------------------DETALLES DE PAGOS-----------------------------------
 @pagos.route("/pagos/detalles/<int:id>")
@@ -236,6 +221,7 @@ def pagos_nuevo():
     
     return redirect(url_for('pagos.pagos_buscar'))
 
+#-----------------------------------------AGREGAR FACTURA-----------------------------------------
 @pagos.route("/pagos/agregar/factura/<string:id>", methods=["POST"])
 @login_required
 def factura_nueva(id):
