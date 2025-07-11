@@ -1,0 +1,47 @@
+{% extends './layout.html' %} {% block body %}
+
+<main class="container my-4">
+    
+    <form method="get" class="mb-3">
+        <input type="text" name="mes" placeholder="Mes" value="{{ mes }}">
+        <input type="text" name="semana" placeholder="Semana" value="{{ semana }}">
+        <button type="submit">Filtrar</button>
+    </form>
+
+    <table border="1" style="border-collapse: collapse; width: 100%;">
+        <thead>
+            <tr style="background-color: #ddd;">
+                <th>Curso</th>
+                <th>Precio Paquete</th>
+                <th>Total Promesas</th>
+                <th>Total Pagados</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% set current_curso = None %}
+            {% for fila in datos %}
+            {% if fila.nombre_curso != current_curso %}
+            <tr style="background-color: #fff2cc;">
+                <td rowspan="{{ datos | selectattr('nombre_curso', 'equalto', fila.nombre_curso) | list | length }}"
+                    style="font-weight:bold; vertical-align: middle;">
+                    {{ fila.nombre_curso }}
+                </td>
+                <td>{{ fila.precio_paquete | float | round(2) }}</td>
+                <td>{{ fila.total_promesas }}</td>
+                <td>{{ fila.total_pagados }}</td>
+            </tr>
+            {% set current_curso = fila.nombre_curso %}
+            {% else %}
+            <tr>
+                <td>{{ fila.precio_paquete | float | round(2) }}</td>
+                <td>{{ fila.total_promesas }}</td>
+                <td>{{ fila.total_pagados }}</td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+</main>
+
+{% endblock %}

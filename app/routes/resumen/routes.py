@@ -5,38 +5,28 @@ from psycopg2.extras import RealDictCursor
 
 from ..utils.utils import get_db_connection, paginador3
 
-resumen = Blueprint('resumen', __name__)
+resumen_semanal = Blueprint('resumen_semanal', __name__)
 
 #--------------------------------------------MAIN--------------------------------------------
 
-@resumen.route("/resumen")
+@resumen_semanal.route('/resumen', methods=['GET'])
 @login_required
-def resumen_filtros():
+def resumen():
     mes = request.args.get('mes', '', type=str)
     semana = request.args.get('semana', '', type=str)
 
-    cursos_ponentes='''
-                        SELECT 
-                    '''
+    sql = ''' 
+                SELECT * FROM resumen_semanal
+                WHERE (%(mes)s = '' OR nombre_mes ILIKE %(mes)s)
+                AND (%(semana)s = '' OR semana ILIKE %(semana)s)
+          '''
+    
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)  # Aquí el cambio
+    cur.execute(sql, {'mes': mes, 'semana': semana})
+    resumen_datos = cur.fetchall()
 
-    sql_count = '''
-                    SELECT COUNT(*) FROM asistencias_detalladas_constancias
-                    WHERE ingresos <> 0 or ingreso_factura <> 0
-                    AND (%s = '' OR meses ILIKE %s )
-                    AND (%s = '' OR semanas ILIKE %s )
-                '''
-    
-    sql_lim = '''
-                    SELECT * FROM asistencias_detalladas_constancias
-                    WHERE ingresos <> 0 or ingreso_factura <> 0
-                    AND (%s = '' OR meses ILIKE %s )
-                    AND (%s = '' OR semanas ILIKE %s )
-             '''
-    
-    paginado = paginador3(
-        sql_count, sql_lim,
-        [
-            mes, mes,
-            semana, semana
-        ], 1, 5
-        )
+    cur.close()
+    conn.close()
+
+    return render_template('resumen/resumen.html', datos=resumen_datos, mes=mes, semana=semana)
