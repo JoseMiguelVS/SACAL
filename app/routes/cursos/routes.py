@@ -3,7 +3,7 @@ from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
 
-from utils.listas import lista_temas
+from utils.listas import lista_categorias, lista_temas
 
 from ..utils.utils import get_db_connection, paginador1
 
@@ -20,19 +20,23 @@ def cursos_buscar():
     paginado = paginador1(sql_count,sql_lim, search_query, 1, 5)
     return render_template('cursos/cursos.html',
                            temas = lista_temas(),
+                           categorias = lista_categorias(),
                            cursos=paginado[0],
                            page=paginado[1],
                            per_page=paginado[2],
                            total_items=paginado[3],
                            total_pages=paginado[4],
-                           search_query = search_query)
+                           search_query = search_query,)
 
 #--------------------------------------AGREGAR CURSO-----------------------
 @cursos.route("/cursos/agregar")
 @login_required
 def curso_agregar():
     titulo = 'Agregar curso'
-    return render_template('cursos/cursos_agregar.html', titulo = titulo, temas = lista_temas())
+    return render_template('cursos/cursos_agregar.html', 
+                           titulo = titulo, 
+                           temas = lista_temas(), 
+                           categorias = lista_categorias())
 
 @cursos.route("/cursos/agregar/nuevo", methods=('GET', 'POST'))
 @login_required
@@ -42,6 +46,7 @@ def cursos_nuevo():
         nombre_curso = request.form['nombre_curso']
         tema_curso = request.form['id_tema']
         duracion_curso = request.form['duracion_curso']
+        categoria_id = request.form['categoria_id']
 
         # Validación para 'es_nacional': si no viene, asignar None
         es_nacional = request.form.get('es_nacional') or None
@@ -62,9 +67,9 @@ def cursos_nuevo():
             return redirect(url_for('cursos.curso_agregar'))
         else:
             sql = '''INSERT INTO cursos 
-                     (nombre_curso, codigo_curso, tema_curso, duracion_curso, es_nacional, estado, fecha_creacion, fecha_modificacion) 
-                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'''
-            valores = (nombre_curso, codigo_curso, tema_curso, duracion_curso, es_nacional, estado, fecha_creacion, fecha_modificacion)
+                     (nombre_curso, codigo_curso, tema_curso, duracion_curso, es_nacional, estado, fecha_creacion, fecha_modificacion, categoria_id) 
+                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)'''
+            valores = (nombre_curso, codigo_curso, tema_curso, duracion_curso, es_nacional, estado, fecha_creacion, fecha_modificacion, categoria_id)
             cur.execute(sql, valores)
             con.commit()
             cur.close()
@@ -98,7 +103,7 @@ def curso_editar(id):
     con.commit()
     cur.close()
     con.close()
-    return render_template('cursos/curso_editar.html',curso = curso[0], temas = lista_temas() )
+    return render_template('cursos/curso_editar.html',curso = curso[0], temas = lista_temas(), categorias = lista_categorias() )
 
 @cursos.route('/cursos/editar/<string:id>', methods=['POST', 'GET'])
 @login_required
@@ -107,14 +112,15 @@ def curso_actualizar(id):
         nombre_curso = request.form['nombre_curso']
         codigo_curso = request.form['codigo_curso']
         tema_curso = request.form['id_tema']
+        categoria_id = request.form['categoria_id']
         duracion_curso = request.form['duracion_curso']
         es_nacional = request.form.get('es_nacional') or None
         fecha_modificacion= datetime.now()
         
         con = get_db_connection()
         cur = con.cursor()
-        sql="UPDATE cursos SET nombre_curso = %s, codigo_curso = %s, tema_curso = %s, duracion_curso = %s, es_nacional = %s, fecha_modificacion = %s WHERE id_curso = %s"
-        valores=(nombre_curso, codigo_curso, tema_curso, duracion_curso, es_nacional, fecha_modificacion, id)
+        sql="UPDATE cursos SET nombre_curso = %s, codigo_curso = %s, tema_curso = %s, duracion_curso = %s, es_nacional = %s, fecha_modificacion = %s, categoria_id = %s WHERE id_curso = %s"
+        valores=(nombre_curso, codigo_curso, tema_curso, duracion_curso, es_nacional, fecha_modificacion, categoria_id, id)
         cur.execute(sql, valores)
         con.commit()
         cur.close()

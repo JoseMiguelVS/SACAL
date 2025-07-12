@@ -1,47 +1,179 @@
 {% extends './layout.html' %} {% block body %}
+<main class="w-100 d-flex flex-column">
+    <h2 class="text-center mb-4">Resumen generales</h2>
 
-<main class="container my-4">
-    
-    <form method="get" class="mb-3">
-        <input type="text" name="mes" placeholder="Mes" value="{{ mes }}">
-        <input type="text" name="semana" placeholder="Semana" value="{{ semana }}">
-        <button type="submit">Filtrar</button>
-    </form>
+    {% with messages = get_flashed_messages() %} {% if messages %} {% for
+    message in messages %}
+    <div class="alert alert-dismissible fade show alert-fixed {% if 'Error' in message %}alert-danger{% elif 'Advertencia' in message %}alert-warning{% else %}alert-success{% endif %}"
+        role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
 
-    <table border="1" style="border-collapse: collapse; width: 100%;">
-        <thead>
-            <tr style="background-color: #ddd;">
-                <th>Curso</th>
-                <th>Precio Paquete</th>
-                <th>Total Promesas</th>
-                <th>Total Pagados</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% set current_curso = None %}
-            {% for fila in datos %}
-            {% if fila.nombre_curso != current_curso %}
-            <tr style="background-color: #fff2cc;">
-                <td rowspan="{{ datos | selectattr('nombre_curso', 'equalto', fila.nombre_curso) | list | length }}"
-                    style="font-weight:bold; vertical-align: middle;">
-                    {{ fila.nombre_curso }}
-                </td>
-                <td>{{ fila.precio_paquete | float | round(2) }}</td>
-                <td>{{ fila.total_promesas }}</td>
-                <td>{{ fila.total_pagados }}</td>
-            </tr>
-            {% set current_curso = fila.nombre_curso %}
-            {% else %}
-            <tr>
-                <td>{{ fila.precio_paquete | float | round(2) }}</td>
-                <td>{{ fila.total_promesas }}</td>
-                <td>{{ fila.total_pagados }}</td>
-            </tr>
-            {% endif %}
-            {% endfor %}
-        </tbody>
-    </table>
+    <section class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
+        <form method="get" action="{{ url_for('resumen_semanal.resumen') }}"
+            class="d-flex flex-wrap align-items-center gap-2" id="filtroForm">
+
+            <!-- Mes -->
+            <label for="filtroMes" class="form-label mb-1">Mes</label>
+            <select id="filtroMes" name="mes" class="form-select-sm filtro-auto">
+                <option value="">Todos</option>
+                {% for mes in meses %}
+                <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>{{ mes.1 }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <!-- Semana -->
+            <label for="filtroSemana" class="form-label mb-1">Semana</label>
+            <select id="filtroSemana" name="semana" class="form-select-sm filtro-auto">
+                <option value="">Todas</option>
+                {% for semana in semanas %}
+                <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>{{
+                    semana.1 }}</option>
+                {% endfor %}
+            </select>
+
+            <!-- Limpiar -->
+            <a href="{{ url_for('resumen_semanal.resumen') }}" class="botones btn-sm">Limpiar</a>
+
+        </form>
+        <div class="form-check form-switch">
+            <input class="form-check-input" name="grabacion" type="checkbox" id="flexSwitchCheckDefault">
+            <label class="form-check-label" for="flexSwitchCheckDefault">Grabaciones</label>
+        </div>
+    </section>
+
+    <section class="tables_participantes table">
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle text-nowrap">
+                <thead class="table-light small">
+                    <tr>
+                        <th colspan="14" style="text-align: center;">Curso en Vivo</th>
+                    </tr>
+                    <tr>
+                        <th class="text-nowrap">Ponente</th>
+                        <th class="text-nowrap">Curso</th>
+                        <th class="text-nowrap">Precio</th>
+                        <th class="text-nowrap">Promesas</th>
+                        <th class="text-nowrap">Pagos</th>
+                        <th class="text-nowrap">Género</th>
+                        <th class="text-nowrap">Total Generado</th>
+                        <th class="text-nowrap">Publicidad</th>
+                        <th class="text-nowrap">Gasto Ponente</th>
+                        <th class="text-nowrap">IVA</th>
+                        <th class="text-nowrap">Diferencia</th>
+                        <th class="text-nowrap">Total Promesas</th>
+                        <th class="text-nowrap">Total Pagados</th>
+                    </tr>
+                </thead>
+
+                <tbody class="small">
+                    {% for key, filas in agrupado.items() %}
+                    {% set first = filas[0] %}
+                    {% set rowspan = filas | length %}
+                    {% set total_promesas = filas | map(attribute='total_promesas') | sum %}
+                    {% set total_pagados = filas | map(attribute='total_pagados') | sum %}
+                    {% for i in range(filas | length) %}
+                    {% set f = filas[i] %}
+                    <tr>
+                        {% if i == 0 %}
+                        <td rowspan="{{ rowspan }}">{{ f.nombre_ponente }}</td>
+                        <td rowspan="{{ rowspan }}">{{ f.nombre_curso }}</td>
+                        {% endif %}
+                        <td>${{ f.precio_paquete | float | round(2) }}</td>
+                        <td>{{ f.total_promesas }}</td>
+                        <td>{{ f.total_pagados }}</td>
+                        <td>-</td>
+                        <td>${{ f.total_generado | float | round(2) }}</td>
+                        <td>${{ f.publicidad | float | round(2) }}</td>
+                        <td>${{ f.gasto_ponente | float | round(2) }}</td>
+                        <td>${{ f.iva | float | round(2) }}</td>
+                        <td>${{ f.diferencia | float | round(2) }}</td>
+                        {% if i == 0 %}
+                        <td rowspan="{{ rowspan }}">{{ total_promesas }}</td>
+                        <td rowspan="{{ rowspan }}">{{ total_pagados }}</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="tables_participantes table">
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered align-middle text-nowrap">
+                <thead class="table-light small">
+                    <tr>
+                        <th colspan="14" style="text-align: center;">Curso en Vivo</th>
+                    </tr>
+                    <tr>
+                        <th class="text-nowrap">Ponente</th>
+                        <th class="text-nowrap">Curso</th>
+                        <th class="text-nowrap">Precio</th>
+                        <th class="text-nowrap">Promesas</th>
+                        <th class="text-nowrap">Pagos</th>
+                        <th class="text-nowrap">Género</th>
+                        <th class="text-nowrap">Total Generado</th>
+                        <th class="text-nowrap">Publicidad</th>
+                        <th class="text-nowrap">Gasto Ponente</th>
+                        <th class="text-nowrap">IVA</th>
+                        <th class="text-nowrap">Diferencia</th>
+                        <th class="text-nowrap">Total Promesas</th>
+                        <th class="text-nowrap">Total Pagados</th>
+                    </tr>
+                </thead>
+
+                <tbody class="small">
+                    {% for key, filas in agrupado.items() %}
+                    {% set first = filas[0] %}
+                    {% set rowspan = filas | length %}
+                    {% set total_promesas = filas | map(attribute='total_promesas') | sum %}
+                    {% set total_pagados = filas | map(attribute='total_pagados') | sum %}
+                    {% for i in range(filas | length) %}
+                    {% set f = filas[i] %}
+                    <tr>
+                        {% if i == 0 %}
+                        <td rowspan="{{ rowspan }}">{{ f.nombre_ponente }}</td>
+                        <td rowspan="{{ rowspan }}">{{ f.nombre_curso }}</td>
+                        {% endif %}
+                        <td>${{ f.precio_paquete | float | round(2) }}</td>
+                        <td>{{ f.total_promesas }}</td>
+                        <td>{{ f.total_pagados }}</td>
+                        <td>-</td>
+                        <td>${{ f.total_generado | float | round(2) }}</td>
+                        <td>${{ f.publicidad | float | round(2) }}</td>
+                        <td>${{ f.gasto_ponente | float | round(2) }}</td>
+                        <td>${{ f.iva | float | round(2) }}</td>
+                        <td>${{ f.diferencia | float | round(2) }}</td>
+                        {% if i == 0 %}
+                        <td rowspan="{{ rowspan }}">{{ total_promesas }}</td>
+                        <td rowspan="{{ rowspan }}">{{ total_pagados }}</td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
 
 </main>
+
+<script>
+    let debounceTimeout = null;
+
+    document.querySelectorAll('.filtro-auto').forEach(select => {
+        select.addEventListener('change', () => {
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(() => {
+                document.getElementById('filtroForm').submit();
+            }, 400); // Espera 400ms tras el último cambio
+        });
+    });
+</script>
 
 {% endblock %}
