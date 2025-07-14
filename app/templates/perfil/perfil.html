@@ -1,0 +1,45 @@
+{% extends './layout.html' %} {% block body %}
+
+<main class="container my-4">
+    <h2>Bienvenido(a) {{ perfil.nombre_empleado }} {{ perfil.apellido_pat }} {{ perfil.apellido_mat }}</h2>
+
+    <section class="table-responsive">
+        <table class="table table-bordered">
+            <tr>
+                <th>Nombre</th>
+                <td>{{ perfil.nombre_empleado }}</td>
+            </tr>
+            <tr>
+                <th>Apellidos</th>
+                <td>{{ perfil.apellido_pat }} {{ perfil.apellido_mat }} </td>
+            </tr>
+            <tr>
+                <th>Usuario</th>
+                <td>{{ perfil.nombre_usuario }}</td>
+            </tr>
+            <tr>
+                <th>Correo</th>
+                <td>{{ perfil.correo_empleado }}</td>
+            </tr>
+            <tr>
+                <th>Rol</th>
+                <td>{{ perfil.nombre_rol }}</td>
+            </tr>
+            <tr>
+                <th>Estado</th>
+                <td>{{ 'Activo' if perfil.estado else 'Inactivo' }}</td>
+            </tr>
+            <tr>
+                <th>Fecha de creación</th>
+                <td>{{ perfil.fecha_creacion }}</td>
+            </tr>
+            <tr>
+                <th>Última modificación</th>
+                <td>{{ perfil.fecha_modificacion }}</td>
+            </tr>
+        </table>
+    </section>
+
+</main>
+
+{% endblock %}

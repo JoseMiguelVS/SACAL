@@ -18,6 +18,7 @@ from routes.constancias.routes import constancias
 from routes.temas.routes import temas
 from routes.pagos.routes import pagos
 from routes.resumen.routes import resumen_semanal
+from routes.perfil.routes import perfil
 
 # ...
 app = Flask(__name__)
@@ -43,6 +44,7 @@ app.register_blueprint(temas)
 app.register_blueprint(constancias)
 app.register_blueprint(pagos)
 app.register_blueprint(resumen_semanal)
+app.register_blueprint(perfil)
 
 #-------------------------- Login y Rutas --------------------------
 @app.route('/loguear', methods=('GET', 'POST'))
