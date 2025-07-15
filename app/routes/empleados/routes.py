@@ -131,6 +131,26 @@ def empleado_actualizar(id):
         flash("Empleado actualizado correctamente")
     return redirect(url_for('empleados.empleadosBuscar'))
 
+@empleados.route('/empleados/editar/contraseña/<string:id>', methods = ['POST'])
+@login_required
+def empleado_actualizarContraseña(id):
+    if request.method  == 'POST':
+        contrasenia_empleado = request.form['contrasenia_empleado']
+        Pass = generate_password_hash(contrasenia_empleado)
+        fecha_modificacion = datetime.now()
+
+        con = get_db_connection()
+        cur = con.cursor()
+        sql = "UPDATE empleados SET contrasenia_empleado = %s, fecha_modificacion = %s WHERE id_empleado = %s"
+        valores = (Pass, fecha_modificacion, id)
+        cur.execute(sql, valores)
+        con.commit()
+        cur.close()
+        con.close()
+        flash("Empleado actualizado correctamente")
+    return redirect(url_for('empleados.empleadosBuscar'))
+
+
 #--------------------------------ELIMINAR EMPLEADO------------------------------
 
 @empleados.route('/empleados/eliminar/<string:id>')

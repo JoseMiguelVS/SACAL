@@ -33,19 +33,20 @@
         <section class="table-responsive table-sm">
                 <table class="table table-hover">
                         <thead>
-                                <tr>
+                                <tr align="center">
                                         <th>Ver</th>
                                         <th>Nombre de usuario</th>
                                         <th>Nombre empleado</th>
                                         <th>Apellidos</th>
                                         <th>Correo</th>
+                                        <th>Contraseña</th>
                                         <th>Editar</th>
                                         <th>Eliminar</th>
                                 </tr>
                         </thead>
                         <tbody>
                                 {% if empleados %} {% for empleado in empleados if empleado.estado %}
-                                <tr>
+                                <tr align="center">
                                         <td>
                                                 <a class="botones-ver"
                                                         href="{{ url_for('empleados.empleado_detalles', id=empleado.id_empleado) }}"
@@ -57,6 +58,13 @@
                                         <td>{{ empleado.nombre_empleado }}</td>
                                         <td>{{ empleado.apellido_pat }} {{ empleado.apellido_mat }}</td>
                                         <td>{{ empleado.correo_empleado }}</td>
+                                        <td>
+                                                <button type="button" class="botones-editar" data-bs-toggle="modal"
+                                                        data-bs-target="#modalEditarContra-{{empleado.id_empleado}}"
+                                                        aria-label="Editar contraseña de empleado {{empleado.nombre_empleado}}">
+                                                        <i class="fas fa-lock" style="font-size: 18px;"></i>
+                                                </button>
+                                        </td>
                                         <td>
                                                 <button type="button" class="botones-editar" data-bs-toggle="modal"
                                                         data-bs-target="#modalEditar-{{empleado.id_empleado}}"
@@ -85,7 +93,7 @@
                 <ul class="pagination justify-content-center">
                         {% if page > 1 %}
                         <li class="page-item">
-                                <a class="page-link bg-warning"
+                                <a class="page-link"
                                         href="{{ url_for('empleados.empleadosBuscar') }}?page={{ page - 1 }}&per_page={{ per_page }}"
                                         aria-label="Anterior">
                                         &laquo;
@@ -94,46 +102,46 @@
 
                         {% if page > 2 %}
                         <li class="page-item">
-                                <a class="page-link bg-warning"
+                                <a class="page-link"
                                         href="{{ url_for('empleados.empleadosBuscar') }}?page=1&per_page={{ per_page }}">1</a>
                         </li>
                         {% if page > 3 %}
                         <li class="page-item disabled">
-                                <span class="page-link bg-warning">...</span>
+                                <span class="page-link">...</span>
                         </li>
                         {% endif %} {% endif %}
 
                         <li class="page-item">
-                                <a class="page-link bg-warning"
+                                <a class="page-link"
                                         href="{{ url_for('empleados.empleadosBuscar') }}?page={{ page - 1 }}&per_page={{ per_page }}">{{
                                         page - 1 }}</a>
                         </li>
                         {% endif %}
 
                         <li class="page-item active" aria-current="page">
-                                <span class="page-link bg-warning">{{ page }}</span>
+                                <span class="page-link">{{ page }}</span>
                         </li>
 
                         {% if page < total_pages %} <li class="page-item">
-                                <a class="page-link bg-warning"
+                                <a class="page-link"
                                         href="{{ url_for('empleados.empleadosBuscar') }}?page={{ page + 1 }}&per_page={{ per_page }}">{{
                                         page + 1 }}</a>
                                 </li>
 
                                 {% if page < total_pages - 1 %} {% if page < total_pages - 2 %} <li
                                         class="page-item disabled">
-                                        <span class="page-link bg-warning">...</span>
+                                        <span class="page-link">...</span>
                                         </li>
                                         {% endif %}
                                         <li class="page-item">
-                                                <a class="page-link bg-warning"
+                                                <a class="page-link"
                                                         href="{{ url_for('empleados.empleadosBuscar') }}?page={{ total_pages }}&per_page={{ per_page }}">{{
                                                         total_pages }}</a>
                                         </li>
                                         {% endif %}
 
                                         <li class="page-item">
-                                                <a class="page-link bg-warning"
+                                                <a class="page-link"
                                                         href="{{ url_for('empleados.empleadosBuscar') }}?page={{ page + 1 }}&per_page={{ per_page }}"
                                                         aria-label="Siguiente">
                                                         &raquo;
@@ -253,6 +261,40 @@
                                                         <option disabled>Aún no hay registros</option>
                                                         {% endif %}
                                                 </select>
+                                        </div>
+                                </div>
+                                <div class="modal-footer">
+                                        <button type="button" class="botones-cancelar" data-bs-dismiss="modal">
+                                                Cancelar
+                                        </button>
+                                        <button type="submit" class="botones-guardar">Guardar</button>
+                                </div>
+                        </form>
+                </div>
+        </div>
+
+        <div class="modal fade" id="modalEditarContra-{{empleado.id_empleado}}" data-bs-backdrop="static"
+                data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalEditarLabel-{{ empleado.id_empleado }}"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                        <form action="{{ url_for('empleados.empleado_actualizarContraseña', id=empleado.id_empleado) }}"
+                                method="post" class="modal-content">
+                                <div class="modal-header">
+                                        <h5 class="modal-title" id="modalEditarLabel-{{ empleado.id_empleado }}">
+                                                Editar Contraseña de Empleado
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Cerrar"></button>
+                                </div>
+                                <div class="modal-body">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                                        <div class="mb-2">
+                                                <label for="usuario-{{ empleado.id_empleado }}"
+                                                        class="form-label">Contraseña</label>
+                                                <input type="password" name="contrasenia_empleado" class="form-control"
+                                                        id="usuario-{{ empleado.contrasenia_empleado }}"
+                                                        placeholder="Nueva contraseña" limit="8" required />
                                         </div>
                                 </div>
                                 <div class="modal-footer">

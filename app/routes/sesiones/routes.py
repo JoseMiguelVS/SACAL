@@ -126,64 +126,106 @@ def sesion_nuevo():
 def sesion_editar(id):
     con = get_db_connection()
     cur = con.cursor()
-    cur.execute('SELECT * FROM sesiones_curso WHERE id_sesion = {0}'.format(id))
-    sesiones = cur.fetchall()
-    con.commit()
+    # Obtener datos generales de la sesión
+    cur.execute("SELECT * FROM sesiones_curso WHERE id_sesion = %s;", (id,))
+    sesion = cur.fetchone()
+
+    # Obtener cursos y ponentes de la sesión
+    cur.execute("""
+                    SELECT *
+                    FROM detalles_cursos_ponentes
+                    WHERE sesion_id = %s;
+                """, (id,))
+    cursos_ponentes = [
+        {'curso_id': row[0], 'curso_nombre': row[1], 'ponente_id': row[2], 'ponente_nombre': row[3]}
+        for row in cur.fetchall()
+    ]
+
+    # Listas para selects
+    cur.execute("SELECT id_curso, nombre_curso FROM cursos;")
+    todos_los_cursos = cur.fetchall()
+
+    cur.execute("SELECT id_ponentes, nombre_ponente FROM ponentes;")
+    todos_los_ponentes = cur.fetchall()
+
+    cur.execute("SELECT id_categoria, nombre_categoria FROM categorias;")
+    categorias = cur.fetchall()
+
+    cur.execute("SELECT id_mes, nombre_mes FROM meses;")
+    meses = cur.fetchall()
+
+    cur.execute("SELECT id_semana, semana FROM semanas;")
+    semanas = cur.fetchall()
+
     cur.close()
     con.close()
-    return render_template('sesiones/sesiones_editar.html', 
-                           sesiones = sesiones[0], 
-                           cursos = lista_cursos(), 
-                           semanas = lista_semanas(), 
-                           meses = lista_meses(),
-                           categorias = lista_categorias(),
-                           ponentes = lista_ponente())
+
+    # Pasar al template
+    return render_template('sesiones/sesiones_editar.html',
+        sesiones=sesion,
+        cursos_sesion=cursos_ponentes,
+        cursos=todos_los_cursos,
+        ponentes=todos_los_ponentes,
+        categorias=categorias,
+        semanas=semanas,
+        meses=meses
+    )
+
 
 @sesiones.route("/participantes/sesiones/editar/<string:id>", methods=["POST"])
 @login_required
 def sesion_actualizar(id):
-    if request.method == "POST":
-        # Campos generales
-        fecha = request.form['fecha']
-        horario_inicio = request.form['horario_inicio']
-        horario_fin = request.form['horario_fin']
-        categoria = request.form['id_categoria']
-        mes = request.form['id_mes']
-        semana = request.form['id_semana']
+    # Campos generales
+    fecha = request.form['fecha']
+    horario_inicio = request.form['horario_inicio']
+    horario_fin = request.form['horario_fin']
+    categoria = request.form['id_categoria']
+    mes = request.form['id_mes']
+    semana = request.form['id_semana']
 
-        # Listas de cursos y ponentes
-        cursos = request.form.getlist('cursos[]')
-        ponentes = request.form.getlist('ponentes[]')
+    # Listas de cursos y ponentes
+    cursos = request.form.getlist('cursos[]')
+    ponentes = request.form.getlist('ponentes[]')
 
-        con = get_db_connection()
-        cur = con.cursor()
+    if len(cursos) != len(ponentes):
+        flash("Error: La cantidad de cursos y ponentes no coincide", "Error")
+        return redirect(url_for("sesiones.sesiones_buscar"))
 
+    con = get_db_connection()
+    cur = con.cursor()
+
+    try:
         # Actualiza sesión
-        sql_update_sesion = """
+        cur.execute("""
             UPDATE sesiones_curso 
             SET fecha = %s, horario_inicio = %s, horario_fin = %s, categoria = %s, mes = %s, semana = %s 
             WHERE id_sesion = %s
-        """
-        cur.execute(sql_update_sesion, (fecha, horario_inicio, horario_fin, categoria, mes, semana, id))
+        """, (fecha, horario_inicio, horario_fin, categoria, mes, semana, id))
 
-        # Elimina cursos/ponentes anteriores
+        # Elimina los registros anteriores de cursos/ponentes
         cur.execute("DELETE FROM cursos_sesion WHERE sesion_id = %s", (id,))
 
         # Inserta nuevas combinaciones
-        sql_insert_cs = """
+        insert_sql = """
             INSERT INTO cursos_sesion (sesion_id, curso_id, ponente_id)
             VALUES (%s, %s, %s)
         """
         for curso, ponente in zip(cursos, ponentes):
-            cur.execute(sql_insert_cs, (id, curso, ponente))
+            cur.execute(insert_sql, (id, curso, ponente))
 
         con.commit()
+        flash("Sesión actualizada correctamente", "success")
+
+    except Exception as e:
+        con.rollback()
+        flash(f"Error al actualizar la sesión: {e}", "Error")
+
+    finally:
         cur.close()
         con.close()
 
-        flash("Sesión actualizada correctamente")
-
     return redirect(url_for("sesiones.sesiones_buscar"))
+
 
 #-----------------------------------CANCELAR SESION---------------------------------
 @sesiones.route("/participantes/sesiones/cancelar/<string:id>")

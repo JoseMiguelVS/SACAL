@@ -74,58 +74,41 @@
     </div>
 
     <!-- Cursos y Ponentes -->
-    <div id="curso-container">
-        {% for curso_ponente in cursos_sesion %}
-        <div class="row align-items-end mb-3">
-            <div class="col-md-5">
-                <label class="form-label">Curso</label>
-                <select name="cursos[]" class="form-select" required>
-                    <option value="">-Seleccione el curso-</option>
-                    {% for curso in cursos %}
-                    <option value="{{ curso[0] }}" {% if curso[0]==curso_ponente.curso_id %}selected{% endif %}>{{
-                        curso[1] }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-5">
-                <label class="form-label">Ponente</label>
-                <select name="ponentes[]" class="form-select" required>
-                    <option value="">-Seleccione el ponente-</option>
-                    {% for ponente in ponentes %}
-                    <option value="{{ ponente[0] }}" {% if ponente[0]==curso_ponente.ponente_id %}selected{% endif %}>{{
-                        ponente[1] }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-2 d-grid">
-                <button type="button" class="btn btn-danger mt-4"
-                    onclick="this.closest('.row').remove()">Eliminar</button>
-            </div>
+    {% for curso_ponente in cursos_sesion %}
+    <div class="row align-items-end mb-3 curso-group">
+        <div class="col-md-5">
+            <label class="form-label">Curso</label>
+            <select name="cursos[]" class="form-select" required>
+                <option value="">-Seleccione el curso-</option>
+                {% for curso in cursos %}
+                <option value="{{ curso[0] }}" {% if curso[0]|int==curso_ponente['curso_id']|int %}selected{% endif %}>
+                    {{ curso[1] }}
+                </option>
+                {% endfor %}
+            </select>
         </div>
-        {% endfor %}
+        <div class="col-md-5">
+            <label class="form-label">Ponente</label>
+            <select name="ponentes[]" class="form-select" required>
+                <option value="">-Seleccione el ponente-</option>
+                {% for ponente in ponentes %}
+                <option value="{{ ponente[0] }}" {% if ponente[0]|int==curso_ponente['ponente_id']|int %}selected{%
+                    endif %}>
+                    {{ ponente[1] }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="button" class="btn btn-danger mt-4"
+                onclick="this.closest('.curso-group').remove()">Eliminar</button>
+        </div>
     </div>
+    {% endfor %}
 
-    <!-- Botón para agregar más -->
-    <div class="mb-4 text-center">
-        <button type="button" class="btn btn-outline-primary" onclick="agregarCursoPonente()">+ Agregar curso y
-            ponente</button>
-    </div>
-
-    <!-- Botones -->
-    <div class="text-center">
-        <a class="botones-cancelar" href="{{ url_for('sesiones.sesiones_buscar') }}">Cancelar</a>
-        <button type="submit" class="botones-guardar">Guardar</button>
-    </div>
-</form>
-
-<!-- Script para agregar dinámicamente -->
-<script>
-    function agregarCursoPonente() {
-        const container = document.getElementById("curso-container");
-        const row = document.createElement("div");
-        row.classList.add("row", "align-items-end", "mb-3");
-
-        row.innerHTML = `
+    <!-- Plantilla oculta para clonar -->
+    <div id="curso-template" class="d-none">
+        <div class="row align-items-end mb-3 curso-group">
             <div class="col-md-5">
                 <label class="form-label">Curso</label>
                 <select name="cursos[]" class="form-select" required>
@@ -145,12 +128,36 @@
                 </select>
             </div>
             <div class="col-md-2 d-grid">
-                <button type="button" class="botones-cancelar" onclick="this.closest('.row').remove()">Eliminar</button>
+                <button type="button" class="btn btn-danger mt-4"
+                    onclick="this.closest('.curso-group').remove()">Eliminar</button>
             </div>
-        `;
-        container.appendChild(row);
+        </div>
+    </div>
+
+    <div class="text-center my-3">
+        <button type="button" class="btn btn-outline-primary" onclick="agregarCursoPonente()">
+            + Agregar curso y ponente
+        </button>
+    </div>
+
+
+    <!-- Botones -->
+    <div class="text-center">
+        <a class="botones-cancelar" href="{{ url_for('sesiones.sesiones_buscar') }}">Cancelar</a>
+        <button type="submit" class="botones-guardar">Guardar</button>
+    </div>
+</form>
+
+<!-- Script para agregar dinámicamente -->
+<script>
+    function agregarCursoPonente() {
+        const template = document.getElementById("curso-template").innerHTML;
+        const container = document.getElementById("curso-container");
+        container.insertAdjacentHTML("beforeend", template);
     }
 </script>
+
+
 
 
 {% endblock %}

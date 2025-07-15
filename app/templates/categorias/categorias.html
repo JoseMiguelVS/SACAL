@@ -32,7 +32,7 @@
         <div class="table-responsive table-sm">
                 <table class="table table-hover">
                         <thead>
-                                <tr>
+                                <tr align="center">
                                         <th>Nombre Categoria</th>
                                         <th>Editar</th>
                                         <th>Eliminar</th>
@@ -42,7 +42,7 @@
                                 {% if categorias %}
                                 {% for categoria in categorias %}
                                 {% if categoria.estado == true %}
-                                <tr>
+                                <tr align="center">
                                         <td>{{ categoria.nombre_categoria }}</td>
                                         <td>
                                                 <button type="button" class="botones-editar" data-bs-toggle="modal"
@@ -117,8 +117,7 @@
 
         <!-- -----------------------------------------------PAPELERA--------------------------------------------------- -->
         <aside class="mt-3">
-                <a href="{{ url_for('categorias.categorias_papelera') }}"
-                        class="btn btn-outline-danger d-inline-flex align-items-center">
+                <a href="{{ url_for('categorias.categorias_papelera') }}" class="botones align-items-center">
                         <li class="fa fa-folder" style="font-size: 18px;"></li>
                 </a>
         </aside>
@@ -150,26 +149,37 @@
 
         <!-- -----------------------------------------AGREGAR--------------------------------------------- -->
         <div class="modal fade" id="modalAgregarCategoria" data-bs-backdrop="static" data-bs-keyboard="false"
-                tabindex="-1" aria-labelledby="modalAgregarTemaLabel" aria-hidden="true">
+                tabindex="-1" aria-labelledby="modalAgregarCategoriaLabel" aria-hidden="true">
                 <div class="modal-dialog">
-                        <form action="{{url_for('categorias.categoria_nuevo')}}" method="post"
-                                class="formulario modal-content">
-                                <h5 class="modal-title" id="modalAgregarCategoriaLabel">Agregar Categoria</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Cerrar"></button>
-                                <div class="modal-body">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <div class="mb-3">
-                                                <label for="categoria" class="form-label">Categoria</label>
-                                                <input type="text" class="form-control" name="nombre_categoria"
-                                                        id="nombre_categoria" required maxlength="15">
+                        <div class="modal-content">
+                                <form action="{{ url_for('categorias.categoria_nuevo') }}" method="POST"
+                                        class="formulario">
+
+                                        <div class="modal-header">
+                                                <h5 class="modal-title" id="modalAgregarCategoriaLabel">Agregar
+                                                        Categoría</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Cerrar"></button>
                                         </div>
-                                </div>
-                                <div class="modal-footer">
-                                        <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
-                                        <button type="submit" class="botones-guardar">Guardar</button>
-                                </div>
-                        </form>
+
+                                        <div class="modal-body">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <div class="mb-3">
+                                                        <label for="nombre_categoria"
+                                                                class="form-label">Categoría</label>
+                                                        <input type="text" class="form-control" name="nombre_categoria"
+                                                                id="nombre_categoria" maxlength="15" required>
+                                                </div>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-primary">Guardar</button>
+                                        </div>
+
+                                </form>
+                        </div>
                 </div>
         </div>
 
@@ -187,8 +197,12 @@
                                         <form action="{{ url_for('categorias.categoria_editar', id = categoria.id_categoria) }}"
                                                 method="post" class="formulario">
                                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                                <input type="text" name="categoria" id="categoria"
-                                                        value="{{ categoria.nombre_categoria }}">
+                                                <div class="mb-3">
+                                                        <label
+                                                                for="categoria-{{categoria.nombre_categoria}}">Categoria</label>
+                                                        <input type="text" name="categoria" id="categoria"
+                                                                value="{{ categoria.nombre_categoria }}">
+                                                </div>
                                 </div>
                                 <div class="modal-footer">
                                         <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>

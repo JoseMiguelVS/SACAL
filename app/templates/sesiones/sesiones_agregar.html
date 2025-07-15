@@ -54,7 +54,7 @@
 
         <div id="cursos-container" class="mb-3">
             <div class="row align-items-end mb-2 curso-group">
-                <div class="col-md-6 mb-2">
+                <div class="col-md-5 mb-2">
                     <label class="form-label">Curso:</label>
                     <select name="cursos[]" class="form-select" required>
                         <option value="">Curso</option>
@@ -63,7 +63,8 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-6 mb-2">
+
+                <div class="col-md-5 mb-2">
                     <label class="form-label">Ponente:</label>
                     <select name="ponentes[]" class="form-select" required>
                         <option value="">Ponente</option>
@@ -72,13 +73,21 @@
                         {% endfor %}
                     </select>
                 </div>
+
+                <div class="col-md-2 mb-2 text-center">
+                    <button type="button" class="btn btn-danger btn-sm eliminar-curso">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
         <div class="mb-4">
-            <button type="button" id="agregar-curso" class="btn btn-outline-secondary btn-sm">Agregar otro
-                curso</button>
+            <button type="button" id="agregar-curso" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-plus"></i> Agregar otro curso
+            </button>
         </div>
+
 
         <div class="d-flex justify-content-between">
             <button type="submit" class="botones-guardar">Guardar</button>
@@ -89,17 +98,41 @@
 
 <!-- Script para clonar grupo de curso y ponente -->
 <script>
-    // Clonar cursos y ponentes
     document.getElementById('agregar-curso').addEventListener('click', function () {
         const contenedor = document.getElementById('cursos-container');
         const grupo = contenedor.querySelector('.curso-group');
         const nuevoGrupo = grupo.cloneNode(true);
 
-        // Limpia valores seleccionados
+        // Limpia los selects
         nuevoGrupo.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+
+        // Asegura que haya un botón de eliminar
+        if (!nuevoGrupo.querySelector('.eliminar-curso')) {
+            const btnEliminar = document.createElement('button');
+            btnEliminar.type = 'button';
+            btnEliminar.className = 'btn btn-danger btn-sm eliminar-curso';
+            btnEliminar.innerHTML = '<i class="fas fa-trash-alt"></i>';
+
+            const col = document.createElement('div');
+            col.className = 'col-md-2 mb-2 text-center';
+            col.appendChild(btnEliminar);
+
+            nuevoGrupo.appendChild(col);
+        }
 
         contenedor.appendChild(nuevoGrupo);
     });
+
+    // Delegación de eventos para eliminar grupos
+    document.getElementById('cursos-container').addEventListener('click', function (e) {
+        if (e.target.closest('.eliminar-curso')) {
+            const grupos = document.querySelectorAll('.curso-group');
+            if (grupos.length > 1) {
+                e.target.closest('.curso-group').remove();
+            }
+        }
+    });
 </script>
+
 
 {% endblock %}
