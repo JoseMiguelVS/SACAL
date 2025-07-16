@@ -1,6 +1,9 @@
 {% extends './layout.html' %} {% block body %}
+<a href="{{url_for('constancias.constancias_buscar')}}" class="botones">
+    <i class="fas fa-arrow-left"></i>
+</a>
 <main class="container my-4 ">
-    <a href="" class="botones"><i class="fa"></i></a>
+
     <h2 class="text-center mb-4">Constancias enviadas</h2>
     <!-- Alertas -->
     {% with messages = get_flashed_messages() %} {% if messages %} {% for
@@ -12,62 +15,81 @@
     </div>
     {% endfor %} {% endif %} {% endwith %}
 
-    <section class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
-        <form method="get" action="{{ url_for('constancias.constancias_hechas') }}"
-            class="d-flex flex-wrap align-items-center gap-2" id="filtroForm">
+    <section class="container mb-4">
+        <!-- Filtros principales -->
+        <form method="get" action="{{ url_for('constancias.constancias_filtros') }}" id="filtroForm">
 
-            <!-- Mes -->
-            <label for="filtroMes" class="form-label mb-1">Mes</label>
-            <select id="filtroMes" name="mes" class="form-select-sm filtro-auto">
-                <option value="">Todos</option>
-                {% for mes in meses %}
-                <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>{{ mes.1 }}
-                </option>
-                {% endfor %}
-            </select>
+            <div class="row g-3 align-items-end">
 
-            <!-- Semana -->
-            <label for="filtroSemana" class="form-label mb-1">Semana</label>
-            <select id="filtroSemana" name="semana" class="form-select-sm filtro-auto">
-                <option value="">Todas</option>
-                {% for semana in semanas %}
-                <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>{{
-                    semana.1 }}</option>
-                {% endfor %}
-            </select>
+                <!-- Mes -->
+                <div class="col-sm-3">
+                    <label for="filtroMes" class="form-label">Mes</label>
+                    <select id="filtroMes" name="mes" class="form-select form-select-sm filtro-auto">
+                        <option value="">Todos</option>
+                        {% for mes in meses %}
+                        <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>
+                            {{ mes.1 }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-            <!-- Sesión -->
-            <label for="filtroSesion" class="form-label mb-1">Sesión</label>
-            <select id="filtroSesion" name="fecha" style="max-width: 400px; min-width: 400px"
-                class="form-select-sm filtro-auto">
-                <option value="">Todas</option>
-                {% set equipo_sel = request.args.get('equipos', '') %}
-                {% set mes_sel = request.args.get('mes', '') %}
-                {% set semana_sel = request.args.get('semana', '') %}
-                {% set fecha_actual = request.args.get('fecha', '') %}
-                {% for sesion in sesiones %}
-                {% if sesion.6 == mes_sel and sesion.5 == semana_sel or sesion.1 == equipo_sel %}
-                {% set valor = sesion.1 ~ '/' ~ sesion.2 ~ '/' ~ sesion.3 ~ '/' ~ sesion.7 %}
-                <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
-                    {{ sesion.2 }} | {{ sesion.3 }} || {{ sesion.1 }} || {{ sesion.7 }}
-                </option>
-                {% endif %}
-                {% endfor %}
-            </select>
+                <!-- Semana -->
+                <div class="col-sm-3">
+                    <label for="filtroSemana" class="form-label">Semana</label>
+                    <select id="filtroSemana" name="semana" class="form-select form-select-sm filtro-auto">
+                        <option value="">Todas</option>
+                        {% for semana in semanas %}
+                        <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>
+                            {{ semana.1 }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-            <!-- Equipo -->
-            <label for="filtroEquipo" class="form-label mb-1">Equipo</label>
-            <select id="filtroEquipo" name="equipos" class="form-select-sm filtro-auto">
-                <option value="">Todos</option>
-                {% for equipo in equipos %}
-                <option value="{{ equipo.1 }}" {% if request.args.get('equipos')==equipo.1 %}selected{% endif %}>{{
-                    equipo.1 }}</option>
-                {% endfor %}
-            </select>
+                <!-- Sesión -->
+                <div class="col-sm-4">
+                    <label for="filtroSesion" class="form-label">Sesión</label>
+                    <select id="filtroSesion" name="fecha" style="max-width: 360px; min-width: 360px"
+                        class="form-select form-select-sm filtro-auto">
+                        <option value="">Todas</option>
+                        {% set equipo_sel = request.args.get('equipos', '') %}
+                        {% set mes_sel = request.args.get('mes', '') %}
+                        {% set semana_sel = request.args.get('semana', '') %}
+                        {% set fecha_actual = request.args.get('fecha', '') %}
+                        {% for sesion in sesiones %}
+                        {% if sesion.6 == mes_sel and sesion.5 == semana_sel or sesion.1 == equipo_sel %}
+                        {% set valor = sesion.1 ~ '/' ~ sesion.2 ~ '/' ~ sesion.3 ~ '/' ~ sesion.7 %}
+                        <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
+                            {{ sesion.1 }} || {{ sesion.2 }} | {{ sesion.3 }} || {{ sesion.7 }}
+                        </option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
 
-            <!-- Limpiar -->
-            <a href="{{ url_for('constancias.constancias_hechas') }}"
-                class="btn btn-outline-secondary btn-sm">Limpiar</a>
+                <!-- Equipo -->
+                <div class="col-sm-2">
+                    <label for="filtroEquipo" class="form-label">Equipo</label>
+                    <select id="filtroEquipo" name="equipos" class="form-select form-select-sm filtro-auto">
+                        <option value="">Todos</option>
+                        {% for equipo in equipos %}
+                        <option value="{{ equipo.1 }}" {% if request.args.get('equipos')==equipo.1 %}selected{% endif
+                            %}>
+                            {{ equipo.1 }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Fila inferior: botón Limpiar -->
+            <div class="row mt-3">
+                <div class="col-auto">
+                    <a href="{{ url_for('constancias.constancias_buscar') }}"
+                        class="btn btn-outline-secondary btn-sm">Limpiar</a>
+                </div>
+            </div>
 
         </form>
     </section>
@@ -213,7 +235,6 @@
                         </form>
                     </tr>
 
-                    {% endif %}
                     {% endif %}
                     {% endfor %}
                     {% else %}

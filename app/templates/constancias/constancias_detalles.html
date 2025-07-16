@@ -1,37 +1,39 @@
-{% extends './layout.html' %}
+{% extends './layout.html' %} {% block body %}
 
-{% block body %}
-<h2>Detalles de Constancia</h2>
-<p class="fc">Fecha modificación: {{ participantes.fecha_modificacion }}</p>
-<br />
-<!-- ----------------------------------------------------------------------------------------------- -->
-<table>
-    <thead>
-        <tr>
-            <th>Nombre participante</th>
-            <th>Clave participante</th>
-            <th>Curso</th>
-            <th>Categoria</th>
-            <th>Ponente</th>
-            <th>Fecha</th>
-            <th>Hora inicio</th>
-            <th>Hora fin</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>{{ participantes.nombre_participante }}</td>
-            <td>{{ participantes.clave_participante }}</td>
-            <td>{{ participantes.nombre_curso }}</td>
-            <td>{{ participantes.nombre_categoria }}</td>
-            <td>{{ participantes.nombre_ponente }}</td>
-            <td>{{ participantes.fecha }}</td>
-            <td>{{ participantes.horario_inicio }}</td>
-            <td>{{ participantes.horario_fin }}</td>
-        </tr>
-    </tbody>
-</table>
-<div>
-    <a class="botones" href="{{ url_for('constancias.constancias_buscar') }}">Cancelar</a>
-</div>
+<main class="container my-2">
+    <h2>Detalles de Constancia</h2>
+    <p class="fc">Fecha modificación: {{ participantes.fecha_modificacion }}</p>
+    <br />
+    <!-- ----------------------------------------------------------------------------------------------- -->
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre participante</th>
+                <th>Clave participante</th>
+                <th>Curso</th>
+                <th>Ponente</th>
+                <th>Fecha</th>
+                <th>Hora inicio</th>
+                <th>Hora fin</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ participantes.nombre_participante }}</td>
+                <td>{{ participantes.clave_participante }}</td>
+                <td>{{ participantes.nombre_curso }}</td>
+                <td>{{ participantes.nombre_ponente }}</td>
+                <td>{{ participantes.fecha }}</td>
+                <td>{{ participantes.horario_inicio }}</td>
+                <td>{{ participantes.horario_fin }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <aside class="mt-3">
+        <a class="botones" href="{{ url_for('constancias.constancias_buscar') }}">Cancelar</a>
+    </aside>
+
+</main>
+
 {% endblock %}

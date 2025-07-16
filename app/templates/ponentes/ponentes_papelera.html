@@ -1,5 +1,9 @@
 {% extends './layout.html' %} {% block body %}
 
+<a href="{{url_for('ponentes.ponentes_buscar')}}" class="botones">
+        <i class="fas fa-arrow-left"></i>
+</a>
+
 <main class="container my-4">
         <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
         {% with messages = get_flashed_messages() %} {% if messages %} {% for message in messages %}
@@ -65,39 +69,38 @@
                 <ul class="pagination justify-content-center" style="margin:20px 0">
                         {% if page > 1 %}
                         <li class="page-item">
-                                <a class="page-link bg-warning"
+                                <a class="page-link"
                                         href="{{url_for('ponentes_papelera')}}?page={{ page - 1 }}&per_page={{ per_page }}"
                                         aria-label="Previous">
                                         <span aria-hidden="true">&laquo;</span>
                                 </a>
                         </li>
                         {% if page != 1 and page != 2 %}
-                        <li class="page-item"><a class="page-link bg-warning"
-                                        href="{{url_for('ponentes_papelera')}}">1</a></li>
+                        <li class="page-item"><a class="page-link" href="{{url_for('ponentes_papelera')}}">1</a></li>
                         {% if page != 3 %}
-                        <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
+                        <li class="page-item"><a class="page-link disabled">...</a></li>
                         {% endif %}
                         {% endif %}
-                        <li class="page-item"><a class="page-link bg-warning"
+                        <li class="page-item"><a class="page-link"
                                         href="{{url_for('ponentes_papelera')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
                         </li>
                         {% endif %}
 
-                        <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
+                        <li class="page-item"><a class="page-link active" href="#">{{page}}</a></li>
 
                         {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
                                         href="{{url_for('ponentes_papelera')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
                                 </li>
                                 {% if page != total_pages and page != total_pages-1 %}
                                 {% if page != total_pages-2 %}
-                                <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
+                                <li class="page-item"><a class="page-link disabled">...</a></li>
                                 {% endif %}
-                                <li class="page-item"><a class="page-link bg-warning"
+                                <li class="page-item"><a class="page-link"
                                                 href="{{url_for('ponentes_papelera')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
                                 </li>
                                 {% endif %}
                                 <li class="page-item">
-                                        <a class="page-link bg-warning"
+                                        <a class="page-link"
                                                 href="{{url_for('ponentes_papelera')}}?page={{ page + 1 }}&per_page={{ per_page }}"
                                                 aria-label="Next">
                                                 <span aria-hidden="true">&raquo;</span>

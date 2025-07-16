@@ -30,32 +30,41 @@
         </form>
     </section>
 
-    <section class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
-        <form method="get" action="{{ url_for('pagos.pagos_filtros') }}"
-            class="d-flex flex-wrap align-items-center gap-2" id="filtroForm">
+    <section class="d-flex justify-content-center align-items-end flex-wrap gap-3 mb-3">
+        <form method="get" action="{{ url_for('pagos.pagos_filtros') }}" class="d-flex flex-wrap align-items-end gap-3"
+            id="filtroForm">
 
             <!-- Mes -->
-            <label for="filtroMes" class="form-label mb-1">Mes</label>
-            <select id="filtroMes" name="mes" class="form-select-sm filtro-auto">
-                <option value="">Todos</option>
-                {% for mes in meses %}
-                <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>{{ mes.1 }}
-                </option>
-                {% endfor %}
-            </select>
+            <div class="d-flex flex-column ml-2">
+                <label for="filtroMes" class="form-label mb-1">Mes</label>
+                <select id="filtroMes" name="mes" class="form-select form-select-sm filtro-auto">
+                    <option value="">Todos</option>
+                    {% for mes in meses %}
+                    <option value="{{ mes[1] }}" {% if request.args.get('mes')==mes[1] %}selected{% endif %}>{{ mes[1]
+                        }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
             <!-- Semana -->
-            <label for="filtroSemana" class="form-label mb-1">Semana</label>
-            <select id="filtroSemana" name="semana" class="form-select-sm filtro-auto">
-                <option value="">Todas</option>
-                {% for semana in semanas %}
-                <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>{{
-                    semana.1 }}</option>
-                {% endfor %}
-            </select>
+            <div class="d-flex flex-column ml-2">
+                <label for="filtroSemana" class="form-label mb-1">Semana</label>
+                <select id="filtroSemana" name="semana" class="form-select form-select-sm filtro-auto">
+                    <option value="">Todas</option>
+                    {% for semana in semanas %}
+                    <option value="{{ semana[1] }}" {% if request.args.get('semana')==semana[1] %}selected{% endif %}>{{
+                        semana[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
         </form>
-        <a href="{{ url_for('pagos.pagos_buscar') }}" class="botones btn-sm">Limpiar</a>
+
+        <!-- Botón Limpiar -->
+        <div>
+            <a href="{{ url_for('pagos.pagos_buscar') }}" class="botones ml-2">Limpiar</a>
+        </div>
     </section>
+
 
     <section class="table-responsive tables_participantes table-sm">
         <table class="table table-hover">
@@ -216,56 +225,66 @@
 
     <div class="modal fade" id="modalAgregarGasto" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="modalAgregarGastoLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <form action="{{ url_for('pagos.pagos_nuevo') }}" method="post" class="formulario modal-content">
-                <h5 class="modal-title" id="modalAgregarGastoLabel">Agregar Gasto</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                <div class="modal-body">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-
-                    {% set mes_sel = request.args.get('mes', '') %}
-                    {% set semana_sel = request.args.get('semana', '') %}
-                    <input type="hidden" name="mes_filtro" value="{{ mes_sel }}">
-                    <input type="hidden" name="semana_filtro" value="{{ semana_sel }}">
-
-                    {% if meses %}
-                    {% for m in meses %}
-                    {% if mes_sel == m[1] %}
-                    <input type="hidden" name="mes" value="{{ m[0] }}">
-                    {% endif %}
-                    {% endfor %}
-                    {% endif %}
-
-                    {% if semanas %}
-                    {% for s in semanas %}
-                    {% if semana_sel == s[1] %}
-                    <input type="hidden" name="semana" value="{{ s[0] }}">
-                    {% endif %}
-                    {% endfor %}
-                    {% endif %}
-
-                    <div class="mb-3">
-                        <label for="gasto" class="form-label">Cantidad</label>
-                        <input type="number" name="gasto" id="gasto" class="form-control" placeholder="$0.00" required>
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4 shadow-lg">
+                <form action="{{ url_for('pagos.pagos_nuevo') }}" method="post">
+                    <div class="modal-header border-bottom-0">
+                        <h5 class="modal-title" id="modalAgregarGastoLabel">Agregar Gasto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
-                    <div class="mb-3">
-                        <label for="" class="form-label mb-2">Concepto</label>
-                        <select name="conceptos" id="conceptos" class="concepto form-select-sm">
-                            <option value="">Todos</option>
-                            {% for g in gasto %}
-                            <option value="{{ g.0 }}">{{ g.1 }}</option>
-                            {% endfor %}
-                        </select>
+
+                    <div class="modal-body px-4">
+                        <!-- Tokens y filtros ocultos -->
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        {% set mes_sel = request.args.get('mes', '') %}
+                        {% set semana_sel = request.args.get('semana', '') %}
+                        <input type="hidden" name="mes_filtro" value="{{ mes_sel }}">
+                        <input type="hidden" name="semana_filtro" value="{{ semana_sel }}">
+
+                        {% if meses %}
+                        {% for m in meses %}
+                        {% if mes_sel == m[1] %}
+                        <input type="hidden" name="mes" value="{{ m[0] }}">
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
+
+                        {% if semanas %}
+                        {% for s in semanas %}
+                        {% if semana_sel == s[1] %}
+                        <input type="hidden" name="semana" value="{{ s[0] }}">
+                        {% endif %}
+                        {% endfor %}
+                        {% endif %}
+
+                        <!-- Campos del formulario -->
+                        <div class="mb-3">
+                            <label for="gasto" class="form-label">Cantidad</label>
+                            <input type="number" name="gasto" id="gasto" class="form-control" placeholder="$0.00"
+                                min="0" step="0.01" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="conceptos" class="form-label">Concepto</label>
+                            <select name="conceptos" id="conceptos" class="form-select" required>
+                                <option value="">Selecciona un concepto</option>
+                                {% for g in gasto %}
+                                <option value="{{ g[0] }}">{{ g[1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="botones-guardar">Guardar</button>
-                </div>
-            </form>
+
+                    <div class="modal-footer border-top-0 d-flex justify-content-end gap-2 px-4 pb-4">
+                        <button type="button" class="btn btn-secondary rounded-pill px-4"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4">Guardar</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
+
 
     {% if pagos %} {% for p in pagos %}
     <div class="modal fade" id="modalAgregar-{{p.id_pago}}" data-bs-backdrop="static" data-bs-keyboard="false"

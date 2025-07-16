@@ -14,51 +14,55 @@
 {% endif %}
 {% endwith %}
 
-<div class="form-container">
-    <form method="POST" class="" action="{{ url_for('constancias.constancias_actualizar' ,id = participante[0]) }}">
-        <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+<div class="container my-5">
+    <div class="">
+        <div class="card-body p-5">
+            <h2 class="text-center mb-4">Editar datos del participante para constancia</h2>
+            <form method="POST" action="{{ url_for('constancias.constancias_actualizar', id=participante[0]) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-        <div class="espacio_form">
-            <label>Clave participante:</label>
-            <input type="text" name="clave_participante" value="{{ participante[2] }}" required>
+                <div class="mb-3">
+                    <label class="form-label">Clave participante</label>
+                    <input type="text" name="clave_participante" class="form-control" value="{{ participante[2] }}"
+                        required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Nombre participante</label>
+                    <input type="text" name="nombre_participante" class="form-control" value="{{ participante[3] }}"
+                        required>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Horario inicio</label>
+                        <input type="time" name="horario_inicio" class="form-control" value="{{ participante[22] }}"
+                            required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Horario fin</label>
+                        <input type="time" name="horario_fin" class="form-control" value="{{ participante[23] }}"
+                            required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Fecha</label>
+                    <input type="date" name="fecha" class="form-control" value="{{ participante[21] }}" required>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="botones-guardar px-5 py-2 rounded-pill">
+                        Guardar
+                    </button>
+
+                    <a class="botones-cancelar px-5 py-2 rounded-pill"
+                        href="{{url_for('constancias.constancias_buscar')}}">Cancelar</a>
+                </div>
+            </form>
         </div>
-
-        <div class="espacio_form">
-            <label>Nombre participante:</label>
-            <input type="text" name="nombre_participante" value="{{ participante[3] }}" required>
-        </div>
-
-        <div class="espacio_form">
-            <label>Horario inicio:</label>
-            <input type="time" name="horario_inicio" value="{{ participante[22] }}" required>
-        </div>
-
-        <div class="espacio_form">
-            <label>Horario fin:</label>
-            <input type="time" name="horario_fin" value="{{ participante[23] }}" required>
-        </div>
-
-        <div class="espacio_form">
-            <label>Fecha:</label>
-            <input type="date" name="fecha" value="{{participante[21] }}" required>
-        </div>
-
-        <div class="espacio_form">
-            <select name="id_categoria" id="id_categoria" class="form-select">
-                <option value="true" selected>Categoria</option>
-                {% if categorias %}
-                {% for categoria in categorias %}
-                <option value="{{categoria.0}}" {% if categoria.1==participante[30] %} selected {% endif %}>{{
-                    categoria.1 }}</option>
-                {% endfor %}
-                {% else %}
-                <option>Aun no hay registros</option>
-                {% endif %}
-            </select>
-        </div>
-
-        <button type="submit">Guardar cambios</button>
-    </form>
+    </div>
 </div>
+
 
 {% endblock %}

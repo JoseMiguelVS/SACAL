@@ -240,14 +240,12 @@ def constancias_actualizar(id):
             horario_inicio = %s,
             horario_fin = %s,
             fecha = %s,
-            categoria = %s
         WHERE id_sesion = %s
     '''
     valores2 = (
         datos['horario_inicio'],
         datos['horario_fin'],
         datos['fecha'],
-        datos['id_categoria'],
         id
     )
 
