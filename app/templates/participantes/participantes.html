@@ -15,7 +15,6 @@
     {% endfor %} {% endif %} {% endwith %}
 
     <!-- NUEVO + BUSCADOR -->
-
     <section class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
         <!-- Botón "Nuevo" alineado a la izquierda -->
         <button type="button" class="botones m-2" data-bs-toggle="modal" data-bs-target="#modalAgregarParticipante">
@@ -37,71 +36,88 @@
     </section>
 
     <!-- FILTROS CENTRADOS ABAJO -->
+    <section class="container mb-4">
 
-    <section class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
-        <form method="get" action="{{ url_for('participantes.participantes_filtros') }}"
-            class="d-flex flex-wrap align-items-center gap-2" id="filtroForm">
+        <!-- Filtros principales (Mes, Semana, Sesión, Equipo) -->
+        <form method="get" action="{{ url_for('participantes.participantes_filtros') }}" class="row g-3 align-items-end"
+            id="filtroForm">
 
             <!-- Mes -->
-            <label for="filtroMes" class="form-label mb-1">Mes</label>
-            <select id="filtroMes" name="mes" class="form-select-sm filtro-auto">
-                <option value="">Todos</option>
-                {% for mes in meses %}
-                <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>{{ mes.1 }}
-                </option>
-                {% endfor %}
-            </select>
+            <div class="col-sm-3">
+                <label for="filtroMes" class="form-label">Mes</label>
+                <select id="filtroMes" name="mes" class="form-select form-select-sm filtro-auto">
+                    <option value="">Todos</option>
+                    {% for mes in meses %}
+                    <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>{{ mes.1 }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
 
             <!-- Semana -->
-            <label for="filtroSemana" class="form-label mb-1">Semana</label>
-            <select id="filtroSemana" name="semana" class="form-select-sm filtro-auto">
-                <option value="">Todas</option>
-                {% for semana in semanas %}
-                <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>{{
-                    semana.1 }}</option>
-                {% endfor %}
-            </select>
+            <div class="col-sm-3">
+                <label for="filtroSemana" class="form-label">Semana</label>
+                <select id="filtroSemana" name="semana" class="form-select form-select-sm filtro-auto">
+                    <option value="">Todas</option>
+                    {% for semana in semanas %}
+                    <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>{{
+                        semana.1 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
             <!-- Sesión -->
-            <label for="filtroSesion" class="form-label mb-1">Sesión</label>
-            <select id="filtroSesion" name="fecha" style="max-width: 400px; min-width: 400px"
-                class="form-select-sm filtro-auto">
-                <option value="">Todas</option>
-                {% set equipo_sel = request.args.get('equipos', '') %}
-                {% set mes_sel = request.args.get('mes', '') %}
-                {% set semana_sel = request.args.get('semana', '') %}
-                {% set fecha_actual = request.args.get('fecha', '') %}
-                {% for sesion in sesiones %}
-                {% if sesion.6 == mes_sel and sesion.5 == semana_sel or sesion.1 == equipo_sel %}
-                {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.7 %}
-                <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
-                    {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.7 }}
-                </option>
-                {% endif %}
-                {% endfor %}
-            </select>
+            <div class="col-sm-4">
+                <label for="filtroSesion" class="form-label">Sesión</label>
+                <select id="filtroSesion" name="fecha" style="max-width: 360px; min-width: 360px"
+                    class="form-select form-select-sm filtro-auto ">
+                    <option value="">Todas</option>
+                    {% set equipo_sel = request.args.get('equipos', '') %}
+                    {% set mes_sel = request.args.get('mes', '') %}
+                    {% set semana_sel = request.args.get('semana', '') %}
+                    {% set fecha_actual = request.args.get('fecha', '') %}
+                    {% for sesion in sesiones %}
+                    {% if sesion.6 == mes_sel and sesion.5 == semana_sel or sesion.1 == equipo_sel %}
+                    {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.7 %}
+                    <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
+                        {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.7 }}
+                    </option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
 
             <!-- Equipo -->
-            <label for="filtroEquipo" class="form-label mb-1">Equipo</label>
-            <select id="filtroEquipo" name="equipos" class="form-select-sm filtro-auto">
-                <option value="">Todos</option>
-                {% for equipo in equipos %}
-                {% set valorEquipo = equipo.0 ~ ',' ~ equipo.1 %}
-                <option value="{{ valorEquipo }}" {% if request.args.get('equipos', '' ).split(',')[-1]==equipo.1
-                    %}selected{% endif %}>
-                    {{ equipo.1 }}
-                </option>
-                {% endfor %}
-            </select>
+            <div class="col-sm-2">
+                <label for="filtroEquipo" class="form-label">Equipo</label>
+                <select id="filtroEquipo" name="equipos" class="form-select form-select-sm filtro-auto">
+                    <option value="">Todos</option>
+                    {% for equipo in equipos %}
+                    {% set valorEquipo = equipo.0 ~ ',' ~ equipo.1 %}
+                    <option value="{{ valorEquipo }}" {% if request.args.get('equipos', '' ).split(',')[-1]==equipo.1
+                        %}selected{% endif %}>
+                        {{ equipo.1 }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-            <!-- Limpiar -->
-            <a href="{{ url_for('participantes.participantes_buscar') }}" class="botones btn-sm">Limpiar</a>
+            <!-- Segunda fila: Limpiar + Grabaciones -->
+            <div class="col-12 d-flex align-items-center gap-4 mt-2">
 
+                <!-- Botón limpiar -->
+                <a href="{{ url_for('participantes.participantes_buscar') }}"
+                    class="btn btn-outline-secondary btn-sm">Limpiar</a>
+
+                <!-- Switch grabaciones -->
+                <div class="form-check form-switch ml-1">
+                    <input class="form-check-input" name="grabacion" type="checkbox" id="flexSwitchCheckDefault">
+                    <label class="form-check-label" for="flexSwitchCheckDefault">Grabaciones</label>
+                </div>
+
+            </div>
         </form>
-        <div class="form-check form-switch">
-            <input class="form-check-input" name="grabacion" type="checkbox" id="flexSwitchCheckDefault">
-            <label class="form-check-label" for="flexSwitchCheckDefault">Grabaciones</label>
-        </div>
+
     </section>
 
     <!-- TABLA DE PARTICIPANTES -->
@@ -375,39 +391,39 @@
         <ul class="pagination justify-content-center" style="margin:20px 0">
             {% if page > 1 %}
             <li class="page-item">
-                <a class="page-link bg-warning"
+                <a class="page-link"
                     href="{{url_for('participantes.participantes_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
                     aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
             {% if page != 1 and page != 2 %}
-            <li class="page-item"><a class="page-link bg-warning"
-                    href="{{url_for('participantes.participantes_buscar')}}">1</a></li>
+            <li class="page-item"><a class="page-link" href="{{url_for('participantes.participantes_buscar')}}">1</a>
+            </li>
             {% if page != 3 %}
-            <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
+            <li class="page-item"><a class="page-link disabled">...</a></li>
             {% endif %}
             {% endif %}
-            <li class="page-item"><a class="page-link bg-warning"
+            <li class="page-item"><a class="page-link"
                     href="{{url_for('participantes.participantes_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
             </li>
             {% endif %}
 
-            <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
+            <li class="page-item"><a class="page-link active" href="#">{{page}}</a></li>
 
             {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
                     href="{{url_for('participantes.participantes_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
                 </li>
                 {% if page != total_pages and page != total_pages-1 %}
                 {% if page != total_pages-2 %}
-                <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
+                <li class="page-item"><a class="page-link disabled">...</a></li>
                 {% endif %}
-                <li class="page-item"><a class="page-link bg-warning"
+                <li class="page-item"><a class="page-link"
                         href="{{url_for('participantes.participantes_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
                 </li>
                 {% endif %}
                 <li class="page-item">
-                    <a class="page-link bg-warning"
+                    <a class="page-link"
                         href="{{url_for('participantes.participantes_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
                         aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>

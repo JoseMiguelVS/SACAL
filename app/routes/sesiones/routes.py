@@ -122,7 +122,7 @@ def sesion_nuevo():
 
 #------------------------------------EDITAR SESION-------------------------------
 @sesiones.route('/participantes/sesiones/editar/<string:id>')
-@login_required
+@login_required 
 def sesion_editar(id):
     con = get_db_connection()
     cur = con.cursor()
@@ -131,11 +131,17 @@ def sesion_editar(id):
     sesion = cur.fetchone()
 
     # Obtener cursos y ponentes de la sesión
-    cur.execute("""
-                    SELECT *
-                    FROM detalles_cursos_ponentes
-                    WHERE sesion_id = %s;
-                """, (id,))
+    cur.execute(
+        """
+            SELECT ce.curso_id,
+                c.nombre_curso,
+                ce.ponente_id,
+                p.nombre_ponente
+            FROM cursos_sesion ce
+            JOIN cursos c ON c.id_curso = ce.curso_id
+            JOIN ponentes p ON p.id_ponentes = ce.ponente_id
+            WHERE ce.sesion_id = %s;
+        """, (id,))
     cursos_ponentes = [
         {'curso_id': row[0], 'curso_nombre': row[1], 'ponente_id': row[2], 'ponente_nombre': row[3]}
         for row in cur.fetchall()

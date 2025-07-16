@@ -1,4 +1,8 @@
 {% extends './layout.html' %} {% block body %}
+<!-- Botón a la izquierda -->
+<a href="{{ url_for('sesiones.sesiones_buscar') }}" class="botones">
+    <i class="fas fa-arrow-left"></i>
+</a>
 <main class="container my-4">
     <h2 class="text-center mb-4">Sesiones Canceladas</h2>
 
@@ -11,12 +15,6 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {% endfor %} {% endif %} {% endwith %}
-
-    <!-- Buscador -->
-    <!-- Botón a la izquierda -->
-    <a href="{{ url_for('sesiones.sesiones_buscar') }}" class="botones">
-        <i class="fas fa-arrow-left"></i>
-    </a>
 
     <!-- Contenedor centrado para el formulario -->
     <section class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
