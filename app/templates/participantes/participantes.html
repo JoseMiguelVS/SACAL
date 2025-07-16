@@ -18,15 +18,15 @@
     <section class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
         <!-- Botón "Nuevo" alineado a la izquierda -->
         <button type="button" class="botones m-2" data-bs-toggle="modal" data-bs-target="#modalAgregarParticipante">
-            <i class="fa fa-plus"></i> Nuevo
+            <i class="fa fa-plus mr-2"></i> Nuevo
         </button>
 
         <!-- Buscador por clave a la derecha -->
         <form id="formBuscar" method="get" action="{{ url_for('participantes.participantes_buscar') }}"
             class="d-flex flex-grow-1 justify-content-end">
-            <div class="input-group" style="max-width: 300px;">
-                <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
-                    aria-label="Buscar participante por clave o nombre" required
+            <div class="input-group mr-2" style="max-width: 300px;">
+                <input class="form-control mr-2" type="text" name="buscar" value="{{ search_query }}"
+                    placeholder="Buscar..." aria-label="Buscar participante por clave o nombre" required
                     onchange="document.getElementById('formBuscar').submit()" />
                 <button type="submit" class="botones-ver ms-2" aria-label="Buscar">
                     <i class="fas fa-search"></i>
@@ -323,38 +323,38 @@
                         </div>
 
                         <!-- Forma de pago -->
-                        <div class="col-md-6">
-                            <label for="forma" class="form-label">Forma de pago</label>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_forma" class="form-label">Forma de pago</label>
                             <select name="id_forma" id="id_forma" class="form-select" required>
                                 <option value="" selected disabled>Seleccione la forma de pago</option>
                                 {% if formas %}
                                 {% for forma in formas %}
-                                <option value="{{ forma.0 }}">{{ forma.1 }}</option>
+                                <option value="{{ forma[0] }}">{{ forma[1] }}</option>
                                 {% endfor %}
                                 {% else %}
-                                <option disabled>Aun no hay registros</option>
+                                <option disabled>No hay registros</option>
                                 {% endif %}
                             </select>
                         </div>
 
                         <!-- Cuenta destino -->
-                        <div class="col-md-6">
+                        <div class="col-md-6 mb-3">
                             <label for="id_cuenta" class="form-label">Cuenta destino</label>
                             <select name="id_cuenta" id="id_cuenta" class="form-select" required>
                                 <option value="" selected disabled>Selecciona una cuenta</option>
                                 {% if cuentas %}
                                 {% for cuenta in cuentas %}
-                                <option value="{{ cuenta.0 }}">{{ cuenta.1 }}</option>
+                                <option value="{{ cuenta[0] }}">{{ cuenta[1] }}</option>
                                 {% endfor %}
                                 {% else %}
-                                <option disabled>Aún no hay registros</option>
+                                <option disabled>No hay registros</option>
                                 {% endif %}
                             </select>
                         </div>
 
                         <!-- Paquete -->
-                        <div class="col-md-6">
-                            <label for="paquete" class="form-label">Paquete</label>
+                        <div class="col-md-6 mb-3">
+                            <label for="paquete" class="form-label">Paquete de curso</label>
                             <select name="paquete" id="paquete" class="form-select" required>
                                 <option value="" selected disabled>Selecciona un paquete</option>
                                 {% if paquetes and sesiones %}
@@ -362,8 +362,8 @@
                                 {% set mostrados = [] %}
                                 {% for paquete in paquetes %}
                                 {% if paquete[4] and paquete[3] in categorias_validas and paquete[0] not in mostrados %}
-                                <option value="{{ paquete[0] }}, {{ paquete[2] }}">{{ paquete[1] }} Precio: ${{
-                                    paquete[2] }}
+                                <option value="{{ paquete[0] }},{{ paquete[2] }}">
+                                    {{ paquete[1] }} — ${{ paquete[2] }}
                                 </option>
                                 {% set _ = mostrados.append(paquete[0]) %}
                                 {% endif %}
@@ -373,9 +373,7 @@
                                 {% endif %}
                             </select>
                         </div>
-
                     </div>
-
                 </div>
 
                 <div class="modal-footer">
@@ -409,7 +407,10 @@
             </li>
             {% endif %}
 
-            <li class="page-item"><a class="page-link active" href="#">{{page}}</a></li>
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">{{ page }}</span>
+            </li>
+
 
             {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
                     href="{{url_for('participantes.participantes_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>

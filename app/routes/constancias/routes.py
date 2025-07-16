@@ -301,36 +301,68 @@ def modificar_constancia():
 @constancias.route("/constancias/hechas&enviadas")
 @login_required
 def constancias_hechas():
-    search_query = request.args.get('buscar', '', type=str)
+    search_query = request.args.get('buscar', '', type=str).strip()
+    search_query_sql = f"%{search_query}%"
+
+    sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas_constancias
+                   WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
+                   AND constancia_enviada = True'''
+
+    sql_lim = '''SELECT * FROM asistencias_detalladas_constancias
+                 WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
+                 AND constancia_enviada = True
+                 ORDER BY nombre_participante DESC
+                 LIMIT %s OFFSET %s'''
+
+    paginado = paginador3(sql_count, sql_lim, [search_query_sql, search_query_sql], 1, 25)
+
+    return render_template('constancias/constancias_hechas.html',
+                           equipos=lista_equipos(),
+                           categorias=lista_categorias(),
+                           cursos=lista_cursos(),
+                           sesiones=lista_sesiones(),
+                           paquetes=lista_paquetes(),
+                           cuentas=lista_cuentas(),
+                           privilegios=lista_privilegios(),
+                           meses=lista_meses(),
+                           semanas=lista_semanas(),
+                           constancias=paginado[0],
+                           page=paginado[1],
+                           per_page=paginado[2],
+                           total_items=paginado[3],
+                           total_pages=paginado[4],
+                           search_query=search_query)
+
+@constancias.route("/constancias/filtros/hechas&enviadas") 
+@login_required
+def constancias_hechas_filtros():
+    # search_query = request.args.get('buscar', '', type=str)
     nombre_mes = request.args.get('mes', '', type=str)
     semana = request.args.get('semana', '', type=str)
     fecha_raw = request.args.get('fecha', '', type=str)  # Usar directamente el valor completo
 
     fecha = ''
-    horario_inicio = ''
-    horario_fin = ''
-    
+    inicio = ''
+    fin = ''
     if fecha_raw:
-        partes = fecha_raw.split(',')
+        partes = fecha_raw.split('/')
         if len(partes) == 4:
-            fecha = partes[1]
-            horario_inicio = f"{partes[2]}"
-            horario_fin = f"{partes[3]}"
+            fecha = partes[0]
+            inicio = partes[1]
+            fin = partes[2]
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas_constancias
                 WHERE (%s = '' OR nombre_mes ILIKE %s)
                     AND (%s = '' OR semana ILIKE %s)
                     AND (%s = '' OR fecha ILIKE %s)
-                    AND (%s = '' OR horario_inicio::text ILIKE %s AND horario_fin::text ILIKE %s)
-                    AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)
+                    AND (%s = '' OR horario_inicio::text = %s AND horario_fin::text = %s)
                 AND constancia_enviada = True '''
 
     sql_lim = '''SELECT * FROM asistencias_detalladas_constancias
             WHERE (%s = '' OR nombre_mes ILIKE %s)
                 AND (%s = '' OR semana ILIKE %s)
-                AND (%s = '' OR fecha ILIKE %s) 
-                AND (%s = '' OR horario_inicio::text ILIKE %s AND horario_fin::text ILIKE %s)
-                AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)
+                AND (%s = '' OR fecha ILIKE %s)
+                AND (%s = '' OR horario_inicio::text = %s AND horario_fin::text = %s)
                 AND constancia_enviada = True
             ORDER BY nombre_participante DESC
             LIMIT %s OFFSET %s'''
@@ -341,12 +373,10 @@ def constancias_hechas():
             nombre_mes, nombre_mes, 
             semana, semana, 
             fecha, fecha,
-            horario_inicio, 
-            horario_inicio,
-            horario_fin,
-            search_query, search_query, search_query  # nombre y clave usan el mismo valor
+            inicio, inicio, fin
+            # search_query, search_query, search_query
         ],
-        1, 50
+        1, 25
     )
 
     return render_template('constancias/constancias_hechas.html',

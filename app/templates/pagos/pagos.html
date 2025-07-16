@@ -14,14 +14,14 @@
     <section class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
 
         <button type="button" class="botones m-2" data-bs-toggle="modal" data-bs-target="#modalAgregarGasto">
-            <i class="fa fa-plus"></i> Nuevo gasto
+            <i class="fa fa-plus mr-2"></i> Nuevo gasto
         </button>
 
         <form id="formBuscar" method="get" action="{{ url_for('pagos.pagos_buscar') }}"
             class="d-flex flex-grow-1 justify-content-end">
-            <div class="input-group" style="max-width: 300px;">
-                <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
-                    aria-label="Buscar participante por clave o nombre" required
+            <div class="input-group mr-2" style="max-width: 300px;">
+                <input class="form-control mr-2" type="text" name="buscar" value="{{ search_query }}"
+                    placeholder="Buscar..." aria-label="Buscar participante por clave o nombre" required
                     onchange="document.getElementById('formBuscar').submit()" />
                 <button type="submit" class="botones-ver ms-2" aria-label="Buscar">
                     <i class="fas fa-search"></i>
@@ -70,7 +70,6 @@
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th>Ver más</th>
                     <th>Id</th>
                     <th>Fecha</th>
                     <th>Forma Pago</th>
@@ -92,12 +91,12 @@
             <tbody>
                 {% if pagos %} {% for p in pagos %}
                 <tr>
-                    <td>
+                    <!-- <td>
                         <a href="{{ url_for('pagos.pagos_detalles', id = p.id_pago) }}" class="botones-ver"
                             aria-label="Ver detalles de {{ p.nombre_participante }}">
                             <i class="fa fa-eye" style="font-size: 18px;"></i>
                         </a>
-                    </td>
+                    </td> -->
                     <td>{{ loop.index }}</td>
                     <td>{{ p.fecha_pago }}</td>
                     <td>{{ p.nombre_forma }}</td>
@@ -199,7 +198,9 @@
             </li>
             {% endif %}
 
-            <li class="page-item"><a class="page-link active" href="#">{{page}}</a></li>
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">{{ page }}</span>
+            </li>
 
             {% if page < total_pages %} <li class="page-item"><a class="page-link"
                     href="{{url_for('pagos.pagos_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>

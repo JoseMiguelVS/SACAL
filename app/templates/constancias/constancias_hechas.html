@@ -1,7 +1,9 @@
 {% extends './layout.html' %} {% block body %}
-<a href="{{url_for('constancias.constancias_buscar')}}" class="botones">
+
+<a href="{{url_for('constancias.constancias_buscar')}}" class="botones m-2">
     <i class="fas fa-arrow-left"></i>
 </a>
+
 <main class="container my-4 ">
 
     <h2 class="text-center mb-4">Constancias enviadas</h2>
@@ -15,9 +17,24 @@
     </div>
     {% endfor %} {% endif %} {% endwith %}
 
+    <section class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <!-- Buscador por clave a la derecha -->
+        <form id="formBuscar" method="get" action="{{ url_for('constancias.constancias_hechas') }}"
+            class="d-flex flex-grow-1 justify-content-end">
+            <div class="input-group" style="max-width: 300px;">
+                <input class="form-control mr-2" type="text" name="buscar" value="{{ search_query }}"
+                    placeholder="Buscar..." aria-label="Buscar participante por clave o nombre" required
+                    onchange="document.getElementById('formBuscar').submit()" />
+                <button type="submit" class="botones-ver ms-2" aria-label="Buscar">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </form>
+    </section>
+
     <section class="container mb-4">
         <!-- Filtros principales -->
-        <form method="get" action="{{ url_for('constancias.constancias_filtros') }}" id="filtroForm">
+        <form method="get" action="{{ url_for('constancias.constancias_hechas_filtros') }}" id="filtroForm">
 
             <div class="row g-3 align-items-end">
 
@@ -86,7 +103,7 @@
             <!-- Fila inferior: botón Limpiar -->
             <div class="row mt-3">
                 <div class="col-auto">
-                    <a href="{{ url_for('constancias.constancias_buscar') }}"
+                    <a href="{{ url_for('constancias.constancias_hechas') }}"
                         class="btn btn-outline-secondary btn-sm">Limpiar</a>
                 </div>
             </div>
@@ -252,39 +269,41 @@
         <ul class="pagination justify-content-center" style="margin:20px 0">
             {% if page > 1 %}
             <li class="page-item">
-                <a class="page-link bg-warning"
+                <a class="page-link"
                     href="{{url_for('constancias.constancias_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
                     aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
             {% if page != 1 and page != 2 %}
-            <li class="page-item"><a class="page-link bg-warning"
-                    href="{{url_for('constancias.constancias_buscar')}}">1</a></li>
+            <li class="page-item"><a class="page-link" href="{{url_for('constancias.constancias_buscar')}}">1</a></li>
             {% if page != 3 %}
-            <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
+            <li class="page-item"><a class="page-link disabled">...</a></li>
             {% endif %}
             {% endif %}
-            <li class="page-item"><a class="page-link bg-warning"
+            <li class="page-item"><a class="page-link"
                     href="{{url_for('constancias.constancias_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
             </li>
             {% endif %}
 
-            <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">{{ page }}</span>
+            </li>
 
-            {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
+
+            {% if page < total_pages %} <li class="page-item"><a class="page-link"
                     href="{{url_for('constancias.constancias_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
                 </li>
                 {% if page != total_pages and page != total_pages-1 %}
                 {% if page != total_pages-2 %}
-                <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
+                <li class="page-item"><a class="page-link disabled">...</a></li>
                 {% endif %}
-                <li class="page-item"><a class="page-link bg-warning"
+                <li class="page-item"><a class="page-link"
                         href="{{url_for('constancias.constancias_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
                 </li>
                 {% endif %}
                 <li class="page-item">
-                    <a class="page-link bg-warning"
+                    <a class="page-link"
                         href="{{url_for('constancias.constancias_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
                         aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>

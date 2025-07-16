@@ -1,9 +1,7 @@
 {% extends './layout.html' %} {% block body %}
-<div class="main">
-        <a href="{{ url_for('empleados.empleadosBuscar') }}" class="botones">
-                <i class="fas fa-arrow-left"></i>
-        </a>
-</div>
+<a href="{{ url_for('empleados.empleadosBuscar') }}" class="botones m-2">
+        <i class="fas fa-arrow-left"></i>
+</a>
 
 <main class="container my-4">
         <h2 class="mb-4 text-center">Papelera de Empleados</h2>
@@ -74,38 +72,41 @@
                 <ul class="pagination justify-content-center">
                         {% if page > 1 %}
                         <li class="page-item">
-                                <a class="page-link bg-warning"
+                                <a class="page-link"
                                         href="{{ url_for('empleados.empleados_papelera') }}?page={{ page - 1 }}&per_page={{ per_page }}"
                                         aria-label="Anterior">&laquo;</a>
                         </li>
                         {% if page > 2 %}
-                        <li class="page-item"><a class="page-link bg-warning"
+                        <li class="page-item"><a class="page-link"
                                         href="{{ url_for('empleados.empleados_papelera') }}?page=1&per_page={{ per_page }}">1</a>
                         </li>
                         {% if page > 3 %}
-                        <li class="page-item disabled"><span class="page-link bg-warning">...</span></li>
+                        <li class="page-item disabled"><span class="page-link">...</span></li>
                         {% endif %}
                         {% endif %}
-                        <li class="page-item"><a class="page-link bg-warning"
+                        <li class="page-item"><a class="page-link"
                                         href="{{ url_for('empleados.empleados_papelera') }}?page={{ page - 1 }}&per_page={{ per_page }}">{{
                                         page - 1 }}</a></li>
                         {% endif %}
 
-                        <li class="page-item active"><span class="page-link bg-warning">{{ page }}</span></li>
+                        <li class="page-item active" aria-current="page">
+                                <span class="page-link">{{ page }}</span>
+                        </li>
 
-                        {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
+
+                        {% if page < total_pages %} <li class="page-item"><a class="page-link"
                                         href="{{ url_for('empleados.empleados_papelera') }}?page={{ page + 1 }}&per_page={{ per_page }}">{{
                                         page + 1 }}</a></li>
                                 {% if page < total_pages - 1 %} {% if page < total_pages - 2 %} <li
                                         class="page-item disabled">
-                                        <span class="page-link bg-warning">...</span></li>
+                                        <span class="page-link">...</span></li>
                                         {% endif %}
-                                        <li class="page-item"><a class="page-link bg-warning"
+                                        <li class="page-item"><a class="page-link"
                                                         href="{{ url_for('empleados.empleados_papelera') }}?page={{ total_pages }}&per_page={{ per_page }}">{{
                                                         total_pages }}</a></li>
                                         {% endif %}
                                         <li class="page-item">
-                                                <a class="page-link bg-warning"
+                                                <a class="page-link"
                                                         href="{{ url_for('empleados.empleados_papelera') }}?page={{ page + 1 }}&per_page={{ per_page }}"
                                                         aria-label="Siguiente">&raquo;</a>
                                         </li>
@@ -115,6 +116,7 @@
 
         <!-- MODALES DE CONFIRMACIÓN PARA RESTAURAR -->
         {% for empleado in empleados %} {% if not empleado.estado %}
+
         <div class="modal fade" id="restaurarModal-{{ empleado.id_empleado }}" tabindex="-1"
                 aria-labelledby="restaurarModalLabel-{{ empleado.id_empleado }}" aria-hidden="true"
                 data-bs-backdrop="static" data-bs-keyboard="false">
@@ -136,12 +138,13 @@
                                                 data-bs-dismiss="modal">Cancelar</button>
                                         <a href="{{ url_for('empleados.empleados_restaurar', id=empleado.id_empleado) }}"
                                                 class="botones-restaurar">
-                                                <i class="fas fa-sync-alt"></i> Restaurar
+                                                <i class="fas fa-sync-alt mr-2"></i> Restaurar
                                         </a>
                                 </div>
                         </div>
                 </div>
         </div>
+
         {% endif %} {% endfor %}
 </main>
 

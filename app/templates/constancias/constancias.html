@@ -16,8 +16,8 @@
         <form id="formBuscar" method="get" action="{{ url_for('constancias.constancias_buscar') }}"
             class="d-flex flex-grow-1 justify-content-end">
             <div class="input-group" style="max-width: 300px;">
-                <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
-                    aria-label="Buscar participante por clave o nombre" required
+                <input class="form-control mr-2" type="text" name="buscar" value="{{ search_query }}"
+                    placeholder="Buscar..." aria-label="Buscar participante por clave o nombre" required
                     onchange="document.getElementById('formBuscar').submit()" />
                 <button type="submit" class="botones-ver ms-2" aria-label="Buscar">
                     <i class="fas fa-search"></i>
@@ -281,8 +281,7 @@
                 </a>
             </li>
             {% if page != 1 and page != 2 %}
-            <li class="page-item"><a class="page-link"
-                    href="{{url_for('constancias.constancias_buscar')}}">1</a></li>
+            <li class="page-item"><a class="page-link" href="{{url_for('constancias.constancias_buscar')}}">1</a></li>
             {% if page != 3 %}
             <li class="page-item"><a class="page-link disabled">...</a></li>
             {% endif %}
@@ -292,7 +291,10 @@
             </li>
             {% endif %}
 
-            <li class="page-item"><a class="page-link active" href="#">{{page}}</a></li>
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">{{ page }}</span>
+            </li>
+
 
             {% if page < total_pages %} <li class="page-item"><a class="page-link"
                     href="{{url_for('constancias.constancias_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>

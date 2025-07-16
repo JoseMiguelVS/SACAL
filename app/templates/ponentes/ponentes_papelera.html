@@ -1,6 +1,6 @@
 {% extends './layout.html' %} {% block body %}
 
-<a href="{{url_for('ponentes.ponentes_buscar')}}" class="botones">
+<a href="{{url_for('ponentes.ponentes_buscar')}}" class="botones m-2">
         <i class="fas fa-arrow-left"></i>
 </a>
 
@@ -19,9 +19,9 @@
                 <form method="get" action="{{ url_for('ponentes.ponentes_papelera') }}"
                         class="d-flex flex-grow-1 justify-content-end">
                         <div class="input-group" style="max-width: 300px;">
-                                <input class="form-control" type="text" name="buscar" value="{{ search_query }}"
+                                <input class="form-control mr-2" type="text" name="buscar" value="{{ search_query }}"
                                         placeholder="Buscar..." required>
-                                <button class="botones ms-2" type="submit" aria-label="Buscar">
+                                <button class="botones-ver ms-2" type="submit" aria-label="Buscar">
                                         <i class="fas fa-search"></i>
                                 </button>
                         </div>
@@ -129,7 +129,8 @@
                                                 data-bs-dismiss="modal">Cancelar</button>
                                         <a class="btn btn-danger"
                                                 href="{{ url_for('ponentes.ponente_restaurar', id = ponente.id_ponentes) }}"
-                                                class="botones-restaurar"><i class="fas fa-trash-alt"></i>Restaurar</a>
+                                                class="botones-restaurar">
+                                                <i class="fas fa-sync-alt mr-2"></i>Restaurar</a>
                                 </div>
                         </div>
                 </div>

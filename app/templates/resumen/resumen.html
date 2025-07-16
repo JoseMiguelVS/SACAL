@@ -16,27 +16,32 @@
             class="d-flex flex-wrap align-items-center gap-2" id="filtroForm">
 
             <!-- Mes -->
-            <label for="filtroMes" class="form-label mb-1 ml-2">Mes</label>
-            <select id="filtroMes" name="mes" class="form-select-sm filtro-auto">
-                <option value="">Todos</option>
-                {% for mes in meses %}
-                <option value="{{ mes[1] }}" {% if request.args.get('mes')==mes[1] %}selected{% endif %}>{{ mes[1] }}
-                </option>
-                {% endfor %}
-            </select>
+            <div class="d-flex flex-column ml-2">
+                <label for="filtroMes" class="form-label mb-1">Mes</label>
+                <select id="filtroMes" name="mes" class="form-select form-select-sm filtro-auto">
+                    <option value="">Todos</option>
+                    {% for mes in meses %}
+                    <option value="{{ mes[1] }}" {% if request.args.get('mes')==mes[1] %}selected{% endif %}>{{ mes[1]
+                        }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
             <!-- Semana -->
-            <label for="filtroSemana" class="form-label mb-1 ml-2">Semana</label>
-            <select id="filtroSemana" name="semana" class="form-select-sm filtro-auto">
-                <option value="">Todas</option>
-                {% for semana in semanas %}
-                <option value="{{ semana[1] }}" {% if request.args.get('semana')==semana[1] %}selected{% endif %}>{{
-                    semana[1] }}</option>
-                {% endfor %}
-            </select>
+            <div class="d-flex flex-column ml-2">
+                <label for="filtroSemana" class="form-label mb-1">Semana</label>
+                <select id="filtroSemana" name="semana" class="form-select form-select-sm filtro-auto">
+                    <option value="">Todas</option>
+                    {% for semana in semanas %}
+                    <option value="{{ semana[1] }}" {% if request.args.get('semana')==semana[1] %}selected{% endif %}>{{
+                        semana[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
 
-            <!-- Limpiar -->
-            <a href="{{ url_for('pagos.pagos_buscar') }}" class="botones ml-2">Limpiar</a>
+        <!-- Limpiar -->
+        <a href="{{ url_for('pagos.pagos_buscar') }}" class="botones ml-2">Limpiar</a>
         </form>
     </section>
 
@@ -138,7 +143,6 @@
             </tr>
         </table>
     </section>
-
 
 </main>
 

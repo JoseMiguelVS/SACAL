@@ -181,12 +181,12 @@ def pagos_devolucion(id):
 def pagos_detalles(id):
     with get_db_connection() as con:
         with con.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute('SELECT * FROM detalles_pagos WHERE id_pago = %s', (id,))
+            cur.execute('SELECT * FROM detalles_pagos2 WHERE id_pago = %s', (id,))
             pago=cur.fetchone()
     if pago is None:
         flash('El pago no existe o ha sido eliminado.')
         return redirect(url_for('pagos.pagos_buscar'))
-    return render_template('pagos/pagos_detalles.html', pago=pago)
+    return render_template('pagos/pagos_detalles.html', pagos=pago)
 
 # ----------------------------------------AGREGAR----------------------------------------
 @pagos.route("/pagos/agregar/gasto", methods = ("GET", "POST"))

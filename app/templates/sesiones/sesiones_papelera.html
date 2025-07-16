@@ -1,8 +1,9 @@
 {% extends './layout.html' %} {% block body %}
 <!-- Botón a la izquierda -->
-<a href="{{ url_for('sesiones.sesiones_buscar') }}" class="botones">
+<a href="{{ url_for('sesiones.sesiones_buscar') }}" class="botones m-2">
     <i class="fas fa-arrow-left"></i>
 </a>
+
 <main class="container my-4">
     <h2 class="text-center mb-4">Sesiones Canceladas</h2>
 
@@ -21,8 +22,8 @@
         <form method="get" action="{{ url_for('sesiones.sesiones_papelera') }}"
             class="d-flex flex-grow-1 justify-content-end">
             <div class="input-group" style="max-width: 300px;">
-                <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
-                    required>
+                <input class="form-control mr-2" type="text" name="buscar" value="{{ search_query }}"
+                    placeholder="Buscar..." required>
                 <button class="botones-ver ms-2" type="submit">
                     <i class="fas fa-search"></i>
             </div>
@@ -93,7 +94,9 @@
                     page - 1 }}</a></li>
             {% endif %}
 
-            <li class="page-item active"><span class="page-link">{{ page }}</span></li>
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">{{ page }}</span>
+            </li>
 
             {% if page < total_pages %} <li class="page-item"><a class="page-link"
                     href="{{ url_for('sesiones.sesiones_papelera') }}?page={{ page + 1 }}&per_page={{ per_page }}">{{
@@ -130,7 +133,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <a class="botones-restaurar" href="{{ url_for('sesiones.sesion_restaurar', id=sesion.id_sesion) }}">
-                        <i class="fas fa-sync-alt"></i> Restaurar
+                        <i class="fas fa-sync-alt mr-2"></i> Restaurar
                     </a>
                 </div>
             </div>
