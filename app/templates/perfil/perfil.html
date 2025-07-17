@@ -1,6 +1,6 @@
 {% extends './layout.html' %} {% block body %}
 
-<main class="container my-2">
+<main class="container my-4">
     <h2>Bienvenido(a) {{ perfil.nombre_empleado }} {{ perfil.apellido_pat }} {{ perfil.apellido_mat }}</h2>
 
     <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
@@ -60,51 +60,62 @@
     <div class="modal fade" id="modalEditar-{{ perfil.id_empleado }}" data-bs-backdrop="static" data-bs-keyboard="false"
         tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <form action="{{ url_for('perfil.actualizar_perfil', id=perfil.id_empleado) }}" method="post"
+                class="modal-content formulario">
                 <div class="modal-header">
-                    <h5 class="modal-tittle" id="staticBackdropLabel">Editar Informacion de Perfil</h5>
+                    <h5 class="modal-title" id="staticBackdropLabel">Editar Información de Perfil</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+
                 <div class="modal-body">
-                    <form action="{{ url_for('perfil.actualizar_perfil', id = perfil.id_empleado) }}" method="post"
-                        class="formulario">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                        <div class="mb-2">
-                            <label for="perfil-{{perfil.nombre_empleado}}" class="form-label">Nombre de empleado</label>
-                            <input type="text" name="nombre_empleado" id="nombre_empleado"
-                                value="{{ perfil.nombre_empleado }}">
+                    <div class="mb-2">
+                        <div class="input-group">
+                            <input type="text" name="nombre_empleado" class="input-field" id="nombre_empleado"
+                                placeholder="Nombre del empleado" value="{{ perfil.nombre_empleado }}" required />
+                            <label for="nombre_empleado" class="input-label">Nombre del Empleado</label>
                         </div>
+                    </div>
 
-                        <div class="mb-2">
-                            <label for="perfil-{{perfil.apellido_pat}}" class="form-label">Apellido Paterno</label>
-                            <input type="text" name="apellido_pat" id="apellido_pat" value="{{ perfil.apellido_pat }}">
+                    <div class="mb-2">
+                        <div class="input-group">
+                            <input type="text" name="apellido_pat" class="input-field" id="apellido_pat"
+                                placeholder="Apellido paterno" value="{{ perfil.apellido_pat }}" required />
+                            <label for="apellido_pat" class="input-label">Apellido Paterno</label>
                         </div>
+                    </div>
 
-                        <div class="mb-2">
-                            <label for="perfil-{{perfil.apellido_mat}}" class="form-label">Apellido Materno</label>
-                            <input type="text" name="apellido_mat" id="apellido_mat" value="{{ perfil.apellido_mat }}">
+                    <div class="mb-2">
+                        <div class="input-group">
+                            <input type="text" name="apellido_mat" class="input-field" id="apellido_mat"
+                                placeholder="Apellido materno" value="{{ perfil.apellido_mat }}" required />
+                            <label for="apellido_mat" class="input-label">Apellido Materno</label>
                         </div>
+                    </div>
 
-                        <div class="mb-2">
-                            <label for="perfil-{{perfil.nombre_usuario}}" class="form-label">Nombre Usuario</label>
-                            <input type="text" name="nombre_usuario" id="nombre_usuario"
-                                value="{{ perfil.nombre_usuario }}">
+                    <div class="mb-2">
+                        <div class="input-group">
+                            <input type="text" name="nombre_usuario" class="input-field" id="nombre_usuario"
+                                placeholder="Nombre de usuario" value="{{ perfil.nombre_usuario }}" required />
+                            <label for="nombre_usuario" class="input-label">Nombre de Usuario</label>
                         </div>
+                    </div>
 
-                        <div class="mb-2">
-                            <label for="perfil-{{perfil.correo_empleado}}" class="form-label">Correo de empleado</label>
-                            <input type="text" name="correo_empleado" id="correo_empleado"
-                                value="{{ perfil.correo_empleado }}">
+                    <div class="mb-2">
+                        <div class="input-group">
+                            <input type="email" name="correo_empleado" class="input-field" id="correo_empleado"
+                                placeholder="Correo electrónico" value="{{ perfil.correo_empleado }}" required />
+                            <label for="correo_empleado" class="input-label">Correo Electrónico</label>
                         </div>
-
+                    </div>
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="botones-guardar">Guardar</button>
                 </div>
-                </form>
-            </div>
+            </form>
         </div>
     </div>
 

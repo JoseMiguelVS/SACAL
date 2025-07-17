@@ -217,61 +217,74 @@
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
                                         <div class="mb-2">
-                                                <label for="usuario-{{ empleado.id_empleado }}"
-                                                        class="form-label">Usuario</label>
-                                                <input type="text" name="nombre_usuario" class="form-control"
-                                                        id="usuario-{{ empleado.id_empleado }}"
-                                                        value="{{ empleado.nombre_usuario }}"
-                                                        placeholder="Nombre Usuario" required />
+                                                <div class="input-group">
+                                                        <input type="text" name="nombre_usuario" class="input-field"
+                                                                id="usuario-{{ empleado.id_empleado }}"
+                                                                value="{{ empleado.nombre_usuario }}"
+                                                                placeholder="Nombre Usuario" required />
+                                                        <label for="usuario-{{ empleado.id_empleado }}"
+                                                                class="input-label">Usuario</label>
+                                                </div>
                                         </div>
                                         <div class="mb-2">
-                                                <label for="nombre-{{ empleado.id_empleado }}"
-                                                        class="form-label">Nombre(s)</label>
-                                                <input type="text" name="nombre_empleado" class="form-control"
-                                                        id="nombre-{{ empleado.id_empleado }}"
-                                                        value="{{ empleado.nombre_empleado }}"
-                                                        placeholder="Nombre Completo" required />
+                                                <div class="input-group">
+                                                        <input type="text" name="nombre_empleado" class="input-field"
+                                                                id="nombre-{{ empleado.id_empleado }}"
+                                                                value="{{ empleado.nombre_empleado }}"
+                                                                placeholder="Nombre Completo" required />
+                                                        <label for="nombre-{{ empleado.id_empleado }}"
+                                                                class="input-label">Nombre(s)</label>
+                                                </div>
                                         </div>
                                         <div class="mb-2">
-                                                <label for="apellido_pat-{{ empleado.id_empleado }}"
-                                                        class="form-label">Apellido paterno</label>
-                                                <input type="text" name="apellido_pat" class="form-control"
-                                                        id="apellido_pat-{{ empleado.id_empleado }}"
-                                                        value="{{ empleado.apellido_pat }}"
-                                                        placeholder="Apellido Paterno" required />
+                                                <div class="input-group">
+                                                        <input type="text" name="apellido_pat" class="input-field"
+                                                                id="apellido_pat-{{ empleado.id_empleado }}"
+                                                                value="{{ empleado.apellido_pat }}"
+                                                                placeholder="Apellido Paterno" required />
+                                                        <label for="apellido_pat-{{ empleado.id_empleado }}"
+                                                                class="input-label">Apellido paterno</label>
+                                                </div>
                                         </div>
                                         <div class="mb-2">
-                                                <label for="apellido_mat-{{ empleado.id_empleado }}"
-                                                        class="form-label">Apellido Materno</label>
-                                                <input type="text" name="apellido_mat" class="form-control"
-                                                        id="apellido_mat-{{ empleado.id_empleado }}"
-                                                        value="{{ empleado.apellido_mat }}"
-                                                        placeholder="Apellido Materno" required />
+                                                <div class="input-group">
+                                                        <input type="text" name="apellido_mat" class="input-field"
+                                                                id="apellido_mat-{{ empleado.id_empleado }}"
+                                                                value="{{ empleado.apellido_mat }}"
+                                                                placeholder="Apellido Materno" required />
+                                                        <label for="apellido_mat-{{ empleado.id_empleado }}"
+                                                                class="input-label">Apellido Materno</label>
+                                                </div>
                                         </div>
                                         <div class="mb-2">
-                                                <label for="email-{{ empleado.id_empleado }}" class="form-label">Correo
-                                                        Electrónico</label>
-                                                <input type="email" name="correo_empleado" class="form-control"
-                                                        id="email-{{ empleado.id_empleado }}"
-                                                        value="{{ empleado.correo_empleado }}"
-                                                        placeholder="Correo Electrónico" required />
+                                                <div class="input-group">
+                                                        <input type="email" name="correo_empleado" class="input-field"
+                                                                id="email-{{ empleado.id_empleado }}"
+                                                                value="{{ empleado.correo_empleado }}"
+                                                                placeholder="Correo Electrónico" required />
+                                                        <label for="email-{{ empleado.id_empleado }}"
+                                                                class="input-label">Correo
+                                                                Electrónico</label>
+                                                </div>
                                         </div>
 
                                         <div class="mb-2">
-                                                <label for="id_rol-{{ empleado.id_empleado }}"
-                                                        class="form-label">Cargo</label>
-                                                <select name="id_rol" class="form-select"
-                                                        id="id_rol-{{ empleado.id_empleado }}" required>
-                                                        <option value="" disabled>Seleccione un Cargo</option>
-                                                        {% if roles %} {% for rol in roles %}
-                                                        <option value="{{ rol.0 }}" {% if rol.0==empleado.id_rol
-                                                                %}selected{% endif %}>
-                                                                {{ rol.1 }}
-                                                        </option>
-                                                        {% endfor %} {% else %}
-                                                        <option disabled>Aún no hay registros</option>
-                                                        {% endif %}
-                                                </select>
+                                                <div class="input-group">
+                                                        <select name="id_rol" class="form-select"
+                                                                id="id_rol-{{ empleado.id_empleado }}" required>
+                                                                <option value="" disabled>Seleccione un Cargo</option>
+                                                                {% if roles %} {% for rol in roles %}
+                                                                <option value="{{ rol.0 }}" {% if rol.0==empleado.id_rol
+                                                                        %}selected{% endif %}>
+                                                                        {{ rol.1 }}
+                                                                </option>
+                                                                {% endfor %} {% else %}
+                                                                <option disabled>Aún no hay registros</option>
+                                                                {% endif %}
+                                                        </select>
+                                                        <label for="id_rol-{{ empleado.id_empleado }}"
+                                                                class="input-label">Cargo</label>
+                                                </div>
                                         </div>
                                 </div>
                                 <div class="modal-footer">
@@ -301,11 +314,14 @@
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
                                         <div class="mb-2">
-                                                <label for="usuario-{{ empleado.id_empleado }}"
-                                                        class="form-label">Contraseña</label>
-                                                <input type="password" name="contrasenia_empleado" class="form-control"
-                                                        id="usuario-{{ empleado.contrasenia_empleado }}"
-                                                        placeholder="Nueva contraseña" limit="8" required />
+                                                <div class="input-group">
+                                                        <input type="password" name="contrasenia_empleado"
+                                                                class="input-field"
+                                                                id="usuario-{{ empleado.contrasenia_empleado }}"
+                                                                placeholder="Nueva contraseña" limit="8" required />
+                                                        <label for="usuario-{{ empleado.id_empleado }}"
+                                                                class="input-label">Nueva Contraseña</label>
+                                                </div>
                                         </div>
                                 </div>
                                 <div class="modal-footer">
@@ -334,53 +350,75 @@
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
                                         <div class="mb-2">
-                                                <label for="new_nombre_usuario" class="form-label">Nombre de
-                                                        Usuario</label>
-                                                <input type="text" name="nombre_usuario" class="form-control"
-                                                        id="nnombre_usuario" placeholder="Nombre Usuario" required />
+                                                <div class="input-group">
+                                                        <input type="text" name="nombre_usuario" class="input-field"
+                                                                id="nnombre_usuario" placeholder="Nombre de Usuario"
+                                                                required />
+                                                        <label for="new_nombre_usuario" class="input-label">Nombre de
+                                                                Usuario</label>
+                                                </div>
                                         </div>
                                         <div class="mb-2">
-                                                <label for="new_nombre_empleado" class="form-label">Nombre(s) del
-                                                        Empleado</label>
-                                                <input type="text" name="nombre_empleado" class="form-control"
-                                                        id="nombre_empleado" placeholder="Nombre Completo" required />
+                                                <div class="input-group">
+                                                        <input type="text" name="nombre_empleado" class="input-field"
+                                                                id="nombre_empleado" placeholder="Nombre Completo"
+                                                                required />
+                                                        <label for="new_nombre_empleado" class="input-label">Nombre(s)
+                                                                del
+                                                                Empleado</label>
+                                                </div>
                                         </div>
                                         <div class="mb-2">
-                                                <label for="new_apellido_pat" class="form-label">Apellido
-                                                        Paterno</label>
-                                                <input type="text" name="apellido_pat" class="form-control"
-                                                        id="apellido_pat" placeholder="Apellido Paterno" required />
+                                                <div class="input-group">
+                                                        <input type="text" name="apellido_pat" class="input-field"
+                                                                id="apellido_pat" placeholder="Apellido Paterno"
+                                                                required />
+                                                        <label for="new_apellido_pat" class="input-label">Apellido
+                                                                Paterno</label>
+                                                </div>
                                         </div>
                                         <div class="mb-2">
-                                                <label for="new_apellido_mat" class="form-label">Apellido
-                                                        Materno</label>
-                                                <input type="text" name="apellido_mat" class="form-control"
-                                                        id="apellido_mat" placeholder="Apellido Materno" required />
+                                                <div class="input-group">
+                                                        <input type="text" name="apellido_mat" class="input-field"
+                                                                id="apellido_mat" placeholder="Apellido Materno"
+                                                                required />
+                                                        <label for="new_apellido_mat" class="input-label">Apellido
+                                                                Materno</label>
+                                                </div>
                                         </div>
                                         <div class="mb-2">
-                                                <label for="new_correo_empleado" class="form-label">Correo
-                                                        Electrónico</label>
-                                                <input type="email" name="correo_empleado" class="form-control"
-                                                        id="correo_empleado" placeholder="Correo Electrónico"
-                                                        required />
+                                                <div class="input-group">
+                                                        <input type="email" name="correo_empleado" class="input-field"
+                                                                id="correo_empleado" placeholder="Correo Electrónico"
+                                                                required />
+                                                        <label for="new_correo_empleado" class="input-label">Correo
+                                                                Electrónico</label>
+                                                </div>
                                         </div>
 
                                         <div class="mb-2">
-                                                <label for="new_id_rol" class="form-label">Cargo</label>
-                                                <select name="id_rol" class="form-select" id="id_rol" required>
-                                                        <option value="" disabled selected>Seleccione un Cargo</option>
-                                                        {% if roles %} {% for rol in roles %}
-                                                        <option value="{{ rol.0 }}">{{ rol.1 }}</option>
-                                                        {% endfor %} {% else %}
-                                                        <option disabled>Aún no hay registros</option>
-                                                        {% endif %}
-                                                </select>
+                                                <div class="input-group">
+                                                        <select name="id_rol" class="form-select" id="id_rol" required>
+                                                                <option value="" disabled selected>Seleccione un Cargo
+                                                                </option>
+                                                                {% if roles %} {% for rol in roles %}
+                                                                <option value="{{ rol.0 }}">{{ rol.1 }}</option>
+                                                                {% endfor %} {% else %}
+                                                                <option disabled>Aún no hay registros</option>
+                                                                {% endif %}
+                                                        </select>
+                                                        <label for="new_id_rol" class="input-label">Cargo</label>
+                                                </div>
                                         </div>
 
                                         <div class="mb-2">
-                                                <label for="contrasenia_empleado" class="form-label">Contraseña</label>
-                                                <input type="password" name="contrasenia_empleado" class="form-control"
-                                                        id="contrasenia_empleado" placeholder="Contraseña" required />
+                                                <div class="input-group">
+                                                        <input type="password" name="contrasenia_empleado"
+                                                                class="input-field" id="contrasenia_empleado"
+                                                                placeholder="Contraseña" required />
+                                                        <label for="contrasenia_empleado"
+                                                                class="input-label">Contraseña</label>
+                                                </div>
                                         </div>
                                 </div>
                                 <div class="modal-footer">

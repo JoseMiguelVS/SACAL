@@ -1,69 +1,67 @@
 {% extends './layout.html' %} {% block body %}
 
 <main class="container my-4">
+    <h2 class="text-center mb-4">Registrar nuevo ponente</h2>
 
-    <form class="container py-4 px-3" method="POST" action="{{ url_for('ponentes.ponente_nuevo') }}"
-        enctype="multipart/form-data">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-        <h2 class="text-center mb-4">Registrar nuevo ponente</h2>
-
-        <!-- Nombre -->
-        <div class="mb-3">
-            <label for="nombre_ponente" class="form-label">Nombre del Ponente</label>
-            <input type="text" id="nombre_ponente" name="nombre_ponente" class="form-control"
-                placeholder="Nombre completo" required>
+    <!-- Nombre -->
+    <div class="d-flex justify-content-center">
+        <div class="input-group mb-3" style="width: 400px;">
+            <input type="text" id="nombre_ponente" name="nombre_ponente" class="input-field" required placeholder="">
+            <label for="nombre_ponente" class="input-label">Nombre del Ponente</label>
         </div>
+    </div>
 
-        <!-- CURP -->
-        <div class="mb-3">
-            <label for="curp_ponente" class="form-label">CURP</label>
-            <input type="text" id="curp_ponente" name="curp_ponente" class="form-control" placeholder="CURP del ponente"
-                required>
+    <!-- CURP -->
+    <div class="d-flex justify-content-center">
+        <div class="input-group mb-3" style="width: 400px;">
+            <input type="text" id="curp_ponente" name="curp_ponente" class="input-field" required placeholder="">
+            <label for="curp_ponente" class="input-label">CURP del ponente</label>
         </div>
+    </div>
 
-        <!-- Cédula -->
-        <div class="mb-4">
-            <label for="cedula_ponente" class="form-label">Cédula profesional</label>
-            <input type="text" id="cedula_ponente" name="cedula_ponente" class="form-control"
-                placeholder="Número de cédula" required>
+    <!-- Cédula -->
+    <div class="d-flex justify-content-center">
+        <div class="input-group mb-4" style="width: 400px;">
+            <input type="text" id="cedula_ponente" name="cedula_ponente" class="input-field" required placeholder="">
+            <label for="cedula_ponente" class="input-label">Cédula profesional</label>
         </div>
+    </div>
 
-        <!-- Certificaciones -->
-        <h4 class="mb-3">Certificaciones</h4>
-        <div id="certificaciones-container" class="mb-3">
-            <div class="row align-items-end certificacion-row g-2">
-                <div class="col-md-6">
-                    <label class="form-label">Tipo de Certificado</label>
-                    <select name="id_tipoCer[]" class="form-select" required>
-                        <option value="">Seleccione una opción</option>
-                        {% for certificado in certificados %}
-                        <option value="{{ certificado[0] }}">{{ certificado[1] }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-5">
-                    <label class="form-label">Folio del Certificado</label>
-                    <input type="text" name="folio[]" class="form-control" placeholder="Folio del certificado" required>
-                </div>
-                <div class="col-md-1 d-flex align-items-end">
-                    <!-- Espacio vacío para primera fila (no se puede borrar) -->
-                </div>
+    <!-- Certificaciones -->
+    <h4 class="mb-3">Certificaciones</h4>
+    <div id="certificaciones-container" class="mb-3">
+        <div class="row align-items-end certificacion-row g-2">
+            <div class="col-md-6">
+                <label class="form-label">Tipo de Certificado</label>
+                <select name="id_tipoCer[]" class="form-select" required>
+                    <option value="">Seleccione una opción</option>
+                    {% for certificado in certificados %}
+                    <option value="{{ certificado[0] }}">{{ certificado[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label">Folio del Certificado</label>
+                <input type="text" name="folio[]" class="form-control" placeholder="Folio del certificado" required>
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <!-- Espacio vacío para primera fila (no se puede borrar) -->
             </div>
         </div>
+    </div>
 
-        <!-- Botón para agregar más certificaciones -->
-        <div class="mb-4">
-            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="agregarCertificacion()">
-                Agregar otra certificación
-            </button>
-        </div>
+    <!-- Botón para agregar más certificaciones -->
+    <div class="mb-4">
+        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="agregarCertificacion()">
+            Agregar otra certificación
+        </button>
+    </div>
 
-        <!-- Botones finales -->
-        <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
-            <button type="submit" class="botones-guardar px-5 py-2 rounded-pill ml-2">Guardar</button>
-            <a href="{{ url_for('ponentes.ponentes_buscar') }}" class="botones px-5 py-2 rounded-pill ml-2">Cancelar</a>
-        </div>
+    <!-- Botones finales -->
+    <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
+        <button type="submit" class="botones-guardar px-5 py-2 rounded-pill ml-2">Guardar</button>
+        <a href="{{ url_for('ponentes.ponentes_buscar') }}" class="botones px-5 py-2 rounded-pill ml-2">Cancelar</a>
+    </div>
     </form>
 </main>
 

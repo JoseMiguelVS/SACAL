@@ -31,7 +31,7 @@
         <section class="table-responsive table-sm">
                 <table class="table table-hover">
                         <thead>
-                                <tr>
+                                <tr align="center">
                                         <th>Ver</th>
                                         <th>Nombre curso</th>
                                         <th>Codigo</th>
@@ -46,7 +46,7 @@
                                 {% if cursos %}
                                 {% for curso in cursos %}
                                 {% if curso.estado == true %}
-                                <tr>
+                                <tr align="center">
                                         <td>
                                                 <a class="botones-ver"
                                                         href="{{url_for('cursos.curso_detalles',id = curso.id_curso)}}">
@@ -109,7 +109,9 @@
                         </li>
                         {% endif %}
 
-                        <li class="page-item"><a class="page-link active" href="#">{{page}}</a></li>
+                        <li class="page-item active" aria-current="page">
+                                <span class="page-link">{{ page }}</span>
+                        </li>
 
                         {% if page < total_pages %} <li class="page-item"><a class="page-link"
                                         href="{{url_for('cursos.cursos_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
@@ -135,8 +137,8 @@
 
         <!-- -----------------------------------------------PAPELERA--------------------------------------------------- -->
         <aside class="mt-3">
-                <a href="{{ url_for('cursos.cursos_papelera') }}" class="btn botones-papelera">
-                        <li class="fa fa-folder" style="font-size: 18px;"></li> Papelera
+                <a href="{{ url_for('cursos.cursos_papelera') }}" class="botones-papelera px-5 py-2 rounded-pill">
+                        <li class="fa fa-folder mr-2" style="font-size: 18px;"></li> Papelera
                 </a>
         </aside>
 
@@ -152,7 +154,7 @@
                                                 aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                        ¿Deseas cancelar el curso <strong>{{ curso.nombre_curso }}</strong>?
+                                        ¿Deseas cancelar el curso/especializacion <strong>{{ curso.nombre_curso }}</strong>?
                                 </div>
                                 <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary"
@@ -168,68 +170,105 @@
         <div class="modal fade" id="modalEditar-{{ curso.id_curso }}" data-bs-backdrop="static" data-bs-keyboard="false"
                 tabindex="-1" aria-labelledby="modalEditarLabel-{{ curso.id_curso }}" aria-hidden="true">
                 <div class="modal-dialog">
-                        <form action="{{url_for('cursos.curso_actualizar', id = curso.id_curso)}}"
+                        <form action="{{ url_for('cursos.curso_actualizar', id=curso.id_curso) }}"
                                 enctype="multipart/form-data" method="post" class="modal-content">
                                 <div class="modal-header">
-                                        <h5 class="modal-tittle" id="modalEditarLabel-{{ curso.id_curso }}">Editar curso
+                                        <h5 class="modal-title" id="modalEditarLabel-{{ curso.id_curso }}">Editar curso
                                         </h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                 aria-label="Cerrar"></button>
                                 </div>
+
                                 <div class="modal-body">
-                                        <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                                        <label for="">Codigo del curso</label>
-                                        <input type="text" id="codigo_curso" placeholder="Codigo curso"
-                                                name="codigo_curso" value="{{curso.codigo_curso}}">
+                                        <div class="mb-2">
+                                                <div class="input-group">
+                                                        <input type="text" name="codigo_curso" class="input-field"
+                                                                id="codigo_curso" placeholder="Código del curso"
+                                                                value="{{ curso.codigo_curso }}" required />
+                                                        <label for="codigo_curso" class="input-label">Código del
+                                                                curso</label>
+                                                </div>
+                                        </div>
 
-                                        <label for="">Nombre del curso</label>
-                                        <input type="text" id="nombre_curso" placeholder="Nombre Curso"
-                                                name="nombre_curso" value="{{curso.nombre_curso}}">
+                                        <div class="mb-2">
+                                                <div class="input-group">
+                                                        <input type="text" name="nombre_curso" class="input-field"
+                                                                id="nombre_curso" placeholder="Nombre del curso"
+                                                                value="{{ curso.nombre_curso }}" required />
+                                                        <label for="nombre_curso" class="input-label">Nombre del
+                                                                curso</label>
+                                                </div>
+                                        </div>
 
-                                        <label for="">Duracion del curso</label>
-                                        <input type="text" id="duracion_curso" placeholder="Duracion Curso"
-                                                name="duracion_curso" value="{{curso.duracion_curso}}">
+                                        <div class="mb-2">
+                                                <div class="input-group">
+                                                        <input type="text" name="duracion_curso" class="input-field"
+                                                                id="duracion_curso" placeholder="Duración del curso"
+                                                                value="{{ curso.duracion_curso }}" required />
+                                                        <label for="duracion_curso" class="input-label">Duración del
+                                                                curso</label>
+                                                </div>
+                                        </div>
 
-                                        <label for="">Es nacional?</label>
-                                        <input type="checkbox" name="es_nacional" id="es_nacional" {% if
-                                                curso.es_nacional %} checked {% endif %}>
+                                        <div class="mb-2">
+                                                <div class="form-check">
+                                                        <input type="checkbox" class="form-check-input"
+                                                                name="es_nacional" id="es_nacional" {% if
+                                                                curso.es_nacional %} checked {% endif %}>
+                                                        <label class="form-check-label" for="es_nacional">¿Es
+                                                                nacional?</label>
+                                                </div>
+                                        </div>
 
-                                        <!-- ------------------------------------desplegable-------------------------------------------------------------- -->
-                                        <select name="categoria_id" id="categoria_id" class="form-select"
-                                                aria-label="Default select example">
-                                                <option value="true">Categoria</option>
-                                                {% if categorias %}
-                                                {% for categoria in categorias %}
-                                                <option value="{{categoria.0}}" {% if
-                                                        categoria.1==curso.nombre_categoria %} selected {% endif %}>
-                                                        {{categoria.1}}</option>
-                                                {% endfor %}
-                                                {% else %}
-                                                <option>Aún no hay registros</option>
-                                                {% endif %}
-                                        </select>
+                                        <div class="mb-2">
+                                                <div class="input-group">
+                                                        <select name="categoria_id" class="form-select"
+                                                                id="categoria_id" required>
+                                                                <option value="" disabled>Seleccione una categoría
+                                                                </option>
+                                                                {% if categorias %}
+                                                                {% for categoria in categorias %}
+                                                                <option value="{{ categoria.0 }}" {% if
+                                                                        categoria.1==curso.nombre_categoria %} selected
+                                                                        {% endif %}>{{ categoria.1 }}</option>
+                                                                {% endfor %}
+                                                                {% else %}
+                                                                <option disabled>Aún no hay registros</option>
+                                                                {% endif %}
+                                                        </select>
+                                                        <label for="categoria_id" class="input-label">Categoría</label>
+                                                </div>
+                                        </div>
 
-                                        <select name="id_tema" id="id_tema" class="form-select"
-                                                aria-label="Default select example">
-                                                <option value="true">Tema</option>
-                                                {% if temas %}
-                                                {% for tema in temas %}
-                                                <option value="{{tema.0}}" {% if tema.1==curso.nombre_tema %} selected
-                                                        {% endif %}>
-                                                        {{tema.1}}</option>
-                                                {% endfor %}
-                                                {% else %}
-                                                <option>Aún no hay registros</option>
-                                                {% endif %}
-                                        </select>
+                                        <div class="mb-2">
+                                                <div class="input-group">
+                                                        <select name="id_tema" class="form-select" id="id_tema"
+                                                                required>
+                                                                <option value="" disabled>Seleccione un tema</option>
+                                                                {% if temas %}
+                                                                {% for tema in temas %}
+                                                                <option value="{{ tema.0 }}" {% if
+                                                                        tema.1==curso.nombre_tema %} selected {% endif
+                                                                        %}>{{ tema.1 }}</option>
+                                                                {% endfor %}
+                                                                {% else %}
+                                                                <option disabled>Aún no hay registros</option>
+                                                                {% endif %}
+                                                        </select>
+                                                        <label for="id_tema" class="input-label">Tema</label>
+                                                </div>
+                                        </div>
                                 </div>
+
                                 <div class="modal-footer">
                                         <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
                                         <button type="submit" class="botones-guardar">Guardar</button>
                                 </div>
                         </form>
                 </div>
+
         </div>
 
         {% endfor %} {% else %} {% endif %}
@@ -245,47 +284,83 @@
                                                 aria-label="Cerrar"></button>
                                 </div>
                                 <div class="modal-body">
-                                        <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                                        <label for="Codigo">Codigo</label>
-                                        <input type="text" id="codigo_curso" placeholder="Codigo" name="codigo_curso"
-                                                required>
+                                        <div class="mb-2">
+                                                <div class="input-group">
+                                                        <input type="text" name="codigo_curso" class="input-field"
+                                                                id="codigo_curso" placeholder="Código" required />
+                                                        <label for="codigo_curso" class="input-label">Código</label>
+                                                </div>
+                                        </div>
 
-                                        <label for="Curso">Nombre de curso</label>
-                                        <input type="text" id="nombre_curso" placeholder="Nombre Curso"
-                                                name="nombre_curso" required>
+                                        <div class="mb-2">
+                                                <div class="input-group">
+                                                        <input type="text" name="nombre_curso" class="input-field"
+                                                                id="nombre_curso" placeholder="Nombre del Curso"
+                                                                required />
+                                                        <label for="nombre_curso" class="input-label">Nombre del
+                                                                Curso</label>
+                                                </div>
+                                        </div>
 
-                                        <label for="Nacional">Es nacional?</label>
-                                        <input type="checkbox" name="es_nacional" id="es_nacional">
+                                        <div class="mb-2">
+                                                <div class="input-group">
+                                                        <input type="text" name="duracion_curso" class="input-field"
+                                                                id="duracion_curso" placeholder="Duración del Curso"
+                                                                required />
+                                                        <label for="duracion_curso" class="input-label">Duración del
+                                                                Curso (horas)</label>
+                                                </div>
+                                        </div>
 
-                                        <!-- ----------------------------------------Tema-------------------------------------------------------- -->
-                                        <select name="categoria_id" id="categoria_id"
-                                                aria-label="Default select example">
-                                                <option value="true" selected>categoria</option>
-                                                {% if categorias %}
-                                                {% for categoria in categorias %}
-                                                <option value="{{categoria.0}}">{{categoria.1}}</option>
-                                                {% endfor %}
-                                                {% else %}
-                                                <option>Aún no hay registros</option>
-                                                {% endif %}
-                                        </select>
+                                        <div class="mb-2">
+                                                <div class="form-check">
+                                                        <input type="checkbox" class="form-check-input"
+                                                                name="es_nacional" id="es_nacional">
+                                                        <label class="form-check-label" for="es_nacional">¿Es
+                                                                nacional?</label>
+                                                </div>
+                                        </div>
 
-                                        <select name="id_tema" id="id_tema" aria-label="Default select example">
-                                                <option value="true" selected>Tema</option>
-                                                {% if temas %}
-                                                {% for tema in temas %}
-                                                <option value="{{tema.0}}">{{tema.1}}</option>
-                                                {% endfor %}
-                                                {% else %}
-                                                <option>Aún no hay registros</option>
-                                                {% endif %}
-                                        </select>
+                                        <div class="mb-2">
+                                                <div class="input-group">
+                                                        <select name="categoria_id" class="form-select"
+                                                                id="categoria_id" required>
+                                                                <option value="" disabled selected>Seleccione una
+                                                                        categoría</option>
+                                                                {% if categorias %}
+                                                                {% for categoria in categorias %}
+                                                                <option value="{{ categoria.0 }}">{{ categoria.1 }}
+                                                                </option>
+                                                                {% endfor %}
+                                                                {% else %}
+                                                                <option disabled>Aún no hay registros</option>
+                                                                {% endif %}
+                                                        </select>
+                                                        <label for="categoria_id" class="input-label">Categoría</label>
+                                                </div>
+                                        </div>
 
-                                        <label for="nombre_empleado">Duracion del Curso(horas)</label>
-                                        <input type="text" id="duracion_curso" placeholder="Duracion Curso"
-                                                name="duracion_curso" required>
+                                        <div class="mb-2">
+                                                <div class="input-group">
+                                                        <select name="id_tema" class="form-select" id="id_tema"
+                                                                required>
+                                                                <option value="" disabled selected>Seleccione un tema
+                                                                </option>
+                                                                {% if temas %}
+                                                                {% for tema in temas %}
+                                                                <option value="{{ tema.0 }}">{{ tema.1 }}</option>
+                                                                {% endfor %}
+                                                                {% else %}
+                                                                <option disabled>Aún no hay registros</option>
+                                                                {% endif %}
+                                                        </select>
+                                                        <label for="id_tema" class="input-label">Tema</label>
+                                                </div>
+                                        </div>
                                 </div>
+
                                 <div class="modal-footer">
                                         <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
                                         <button type="submit" class="botones-guardar">Guardar</button>

@@ -1,159 +1,160 @@
-{% extends './layout.html' %}
-{% block body %}
+{% extends './layout.html' %} {% block body %}
 
-<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-{% for message in messages %}
-<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
-    {% endif %} alert-dismissible fade show" role="alert">
-    <strong>{{message}}</strong>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-{% endfor %}
-{% endif %}
-{% endwith %}
-<!-- -------------------------------------------------------------------------- -->
-
-<form class="container mt-4" method="POST" action="{{ url_for('sesiones.sesion_actualizar', id=sesiones[0]) }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-    <h2 class="mb-4 text-center">Editar sesión</h2>
-
-    <!-- Fecha y horario -->
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <label for="fecha" class="form-label">Fecha</label>
-            <input type="date" class="form-control" name="fecha" id="fecha" value="{{ sesiones[6] }}" required>
-        </div>
-        <div class="col-md-4">
-            <label for="horario_inicio" class="form-label">Hora de inicio</label>
-            <input type="time" class="form-control" name="horario_inicio" id="horario_inicio" value="{{ sesiones[1] }}"
-                required>
-        </div>
-        <div class="col-md-4">
-            <label for="horario_fin" class="form-label">Hora de fin</label>
-            <input type="time" class="form-control" name="horario_fin" id="horario_fin" value="{{ sesiones[4] }}"
-                required>
-        </div>
-    </div>
-
-    <!-- Categoría -->
-    <div class="mb-3">
-        <label for="id_categoria" class="form-label">Categoría</label>
-        <select name="id_categoria" class="form-select" required>
-            <option value="">-Seleccione la categoría-</option>
-            {% for categoria in categorias %}
-            <option value="{{ categoria[0] }}" {% if categoria[0]==sesiones[7] %}selected{% endif %}>{{ categoria[1] }}
-            </option>
-            {% endfor %}
-        </select>
-    </div>
-
-    <!-- Mes y Semana -->
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <label for="id_mes" class="form-label">Mes</label>
-            <select name="id_mes" class="form-select" required>
-                <option value="">-Seleccione el mes-</option>
-                {% for mes in meses %}
-                <option value="{{ mes[0] }}" {% if mes[0]==sesiones[2] %}selected{% endif %}>{{ mes[1] }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-6">
-            <label for="id_semana" class="form-label">Semana</label>
-            <select name="id_semana" class="form-select" required>
-                <option value="">-Seleccione la semana-</option>
-                {% for semana in semanas %}
-                <option value="{{ semana[0] }}" {% if semana[0]==sesiones[3] %}selected{% endif %}>{{ semana[1] }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-    </div>
-
-    <!-- Cursos y Ponentes -->
-    {% for curso_ponente in cursos_sesion %}
-    <div class="row align-items-end mb-3 curso-group">
-        <div class="col-md-5">
-            <label class="form-label">Curso</label>
-            <select name="cursos[]" class="form-select" required>
-                <option value="">-Seleccione el curso-</option>
-                {% for curso in cursos %}
-                <option value="{{ curso[0] }}" {% if curso[0]|int==curso_ponente['curso_id']|int %}selected{% endif %}>
-                    {{ curso[1] }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-5">
-            <label class="form-label">Ponente</label>
-            <select name="ponentes[]" class="form-select" required>
-                <option value="">-Seleccione el ponente-</option>
-                {% for ponente in ponentes %}
-                <option value="{{ ponente[0] }}" {% if ponente[0]|int==curso_ponente['ponente_id']|int %}selected{%
-                    endif %}>
-                    {{ ponente[1] }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="col-md-2 d-grid">
-            <button type="button" class="btn btn-danger mt-4"
-                onclick="this.closest('.curso-group').remove()">Eliminar</button>
-        </div>
+<main class="container my-4">
+    <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else
+        %}success {% endif %} alert-dismissible fade show" role="alert">
+        <strong>{{message}}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <!-- -------------------------------------------------------------------------- -->
 
-    <!-- Plantilla oculta para clonar -->
-    <div id="curso-template" class="d-none">
-        <div class="row align-items-end mb-3 curso-group">
-            <div class="col-md-5">
-                <label class="form-label">Curso</label>
-                <select name="cursos[]" class="form-select" required>
-                    <option value="">-Seleccione el curso-</option>
-                    {% for curso in cursos %}
-                    <option value="{{ curso[0] }}">{{ curso[1] }}</option>
-                    {% endfor %}
-                </select>
+    <form class="container mt-4" method="POST" action="{{ url_for('sesiones.sesion_actualizar', id=sesiones[0]) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <h2 class="mb-4 text-center">Editar sesión</h2>
+
+        <!-- Fecha y horario -->
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label for="fecha" class="form-label">Fecha</label>
+                <input type="date" class="form-control" name="fecha" id="fecha" value="{{ sesiones[6] }}" required>
             </div>
-            <div class="col-md-5">
-                <label class="form-label">Ponente</label>
-                <select name="ponentes[]" class="form-select" required>
-                    <option value="">-Seleccione el ponente-</option>
-                    {% for ponente in ponentes %}
-                    <option value="{{ ponente[0] }}">{{ ponente[1] }}</option>
-                    {% endfor %}
-                </select>
+            <div class="col-md-4">
+                <label for="horario_inicio" class="form-label">Hora de inicio</label>
+                <input type="time" class="form-control" name="horario_inicio" id="horario_inicio"
+                    value="{{ sesiones[1] }}" required>
             </div>
-            <div class="col-md-2 d-grid">
-                <button type="button" class="btn btn-danger mt-4"
-                    onclick="this.closest('.curso-group').remove()">Eliminar</button>
+            <div class="col-md-4">
+                <label for="horario_fin" class="form-label">Hora de fin</label>
+                <input type="time" class="form-control" name="horario_fin" id="horario_fin" value="{{ sesiones[4] }}"
+                    required>
             </div>
         </div>
-    </div>
 
-    <div class="text-center my-3">
-        <button type="button" class="btn btn-outline-primary" onclick="agregarCursoPonente()">
-            + Agregar curso y ponente
-        </button>
-    </div>
+        <!-- Categoría -->
+        <div class="mb-3">
+            <label for="id_categoria" class="form-label">Categoría</label>
+            <select name="id_categoria" class="form-select" required>
+                <option value="">-Seleccione la categoría-</option>
+                {% for categoria in categorias %}
+                <option value="{{ categoria[0] }}" {% if categoria[0]==sesiones[7] %}selected{% endif %}>{{ categoria[1]
+                    }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
 
-    <!-- Botones -->
-    <div class="text-center">
-        <a class="botones-cancelar" href="{{ url_for('sesiones.sesiones_buscar') }}">Cancelar</a>
-        <button type="submit" class="botones-guardar">Guardar</button>
-    </div>
-</form>
+        <!-- Mes y Semana -->
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="id_mes" class="form-label">Mes</label>
+                <select name="id_mes" class="form-select" required>
+                    <option value="">-Seleccione el mes-</option>
+                    {% for mes in meses %}
+                    <option value="{{ mes[0] }}" {% if mes[0]==sesiones[2] %}selected{% endif %}>{{ mes[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="id_semana" class="form-label">Semana</label>
+                <select name="id_semana" class="form-select" required>
+                    <option value="">-Seleccione la semana-</option>
+                    {% for semana in semanas %}
+                    <option value="{{ semana[0] }}" {% if semana[0]==sesiones[3] %}selected{% endif %}>{{ semana[1] }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
 
-<!-- Script para agregar dinámicamente -->
-<script>
-    function agregarCursoPonente() {
-        const template = document.getElementById("curso-template").innerHTML;
-        const container = document.getElementById("curso-container");
-        container.insertAdjacentHTML("beforeend", template);
-    }
-</script>
+        <!-- Contenedor principal -->
+        <div id="cursos-container" class="mb-3">
+            {% for cp in cursos_sesion %}
+            <div class="row align-items-end mb-2 curso-group">
+                <!-- Curso -->
+                <div class="col-md-5 mb-2">
+                    <label class="form-label">Curso:</label>
+                    <select name="cursos[]" class="form-select" required style="max-width: 360px; min-width: 360px;">
+                        <option value="">Curso</option>
+                        {% for curso in cursos %}
+                        <option value="{{ curso.0 }}" {% if curso.0==cp.curso_id %}selected{% endif %}>{{ curso.1 }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-{% endblock %}
+                <!-- Ponente -->
+                <div class="col-md-5 mb-2">
+                    <label class="form-label">Ponente:</label>
+                    <select name="ponentes[]" class="form-select" required style="max-width: 360px; min-width: 360px;">
+                        <option value="">Ponente</option>
+                        {% for ponente in ponentes %}
+                        <option value="{{ ponente.0 }}" {% if ponente.0==cp.ponente_id %}selected{% endif %}>{{
+                            ponente.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Botón eliminar (visible si hay más de uno) -->
+                <div class="col-md-2 mb-2 text-center {% if loop.length == 1 %}d-none{% endif %}">
+                    <button type="button" class="btn btn-danger btn-sm eliminar-curso">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+
+        <!-- Botón agregar -->
+        <div class="mb-4">
+            <button type="button" id="agregar-curso" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-plus"></i> Agregar otro curso
+            </button>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="text-center">
+            <button type="submit" class="botones-guardar">Guardar</button>
+            <a href="{{ url_for('sesiones.sesiones_buscar') }}" class="botones-cancelar">Cancelar</a>
+        </div>
+
+        <!-- Script -->
+        <script>
+            document.getElementById('agregar-curso').addEventListener('click', function () {
+                const contenedor = document.getElementById('cursos-container');
+                const grupoOriginal = contenedor.querySelector('.curso-group');
+                const nuevoGrupo = grupoOriginal.cloneNode(true);
+
+                // Limpiar selects
+                nuevoGrupo.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+
+                // Mostrar botón eliminar (si está oculto)
+                const btnEliminar = nuevoGrupo.querySelector('.eliminar-curso');
+                if (btnEliminar) {
+                    btnEliminar.closest('div').classList.remove('d-none');
+                }
+
+                contenedor.appendChild(nuevoGrupo);
+            });
+
+            // Delegación para botón eliminar
+            document.getElementById('cursos-container').addEventListener('click', function (e) {
+                if (e.target.closest('.eliminar-curso')) {
+                    const grupos = document.querySelectorAll('.curso-group');
+                    if (grupos.length > 1) {
+                        e.target.closest('.curso-group').remove();
+                    }
+                }
+            });
+        </script>
+
+
+        {% endblock %}

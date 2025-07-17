@@ -47,21 +47,25 @@ app.register_blueprint(resumen_semanal)
 app.register_blueprint(perfil)
 
 #-------------------------- Login y Rutas --------------------------
-@app.route('/loguear', methods=('GET', 'POST'))
+@app.route('/loguear', methods=['GET', 'POST'])
 def loguear():
     if request.method == 'POST':
         nombre_usuario = request.form['nombre_usuario']
-        contrasenia_empleado = request.form['contrasenia']
-        user = User(0, nombre_usuario, contrasenia_empleado, None)
-        loged_user = ModuleUser.login(get_db_connection(), user)
+        contrasenia = request.form['contrasenia']
 
-        if loged_user and loged_user.contrasenia:
+        user_input = User(0, nombre_usuario, contrasenia)
+
+        loged_user = ModuleUser.login(get_db_connection(), user_input)
+
+        if loged_user:
             login_user(loged_user)
             return redirect(url_for('index'))
         else:
-            flash('Nombre de usuario y/o contraseña incorrecta.')
+            flash('Usuario o contraseña incorrectos')
             return redirect(url_for('login'))
-    return redirect(url_for('login'))
+
+    return render_template('login.html')
+
 
 @app.route('/logout')
 def logout():

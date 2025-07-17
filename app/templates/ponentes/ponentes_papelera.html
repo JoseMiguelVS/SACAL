@@ -32,7 +32,7 @@
         <section class="table-responsive table-sm">
                 <table class="table table-hover">
                         <thead>
-                                <tr>
+                                <tr align="center">
                                         <th>Nombre ponente</th>
                                         <th>CURP</th>
                                         <th>Cedula</th>
@@ -43,7 +43,7 @@
                                 {% if ponentes %}
                                 {% for ponente in ponentes %}
                                 {% if ponente.estado == false %}
-                                <tr>
+                                <tr align="center">
                                         <td>{{ponente.nombre_ponente}}</td>
                                         <td>{{ponente.curp_ponente}}</td>
                                         <td>{{ponente.cedula_ponente}}</td>
@@ -64,6 +64,7 @@
                         </tbody>
                 </table>
         </section>
+
         <!-- -------------------------------------------------PAGINADOR----------------------------------------------- -->
         <nav aria-label="Page navigation" class="pagination-container mt-4">
                 <ul class="pagination justify-content-center" style="margin:20px 0">
@@ -86,7 +87,10 @@
                         </li>
                         {% endif %}
 
-                        <li class="page-item"><a class="page-link active" href="#">{{page}}</a></li>
+                        <li class="page-item active" aria-current="page">
+                                <span class="page-link">{{ page }}</span>
+                        </li>
+
 
                         {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
                                         href="{{url_for('ponentes_papelera')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>

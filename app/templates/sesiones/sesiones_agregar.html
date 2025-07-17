@@ -22,41 +22,50 @@
         </div>
 
         <div class="mb-3">
-            <label for="id_categoria" class="form-label">Categoría:</label>
-            <select name="id_categoria" id="id_categoria" class="form-select" required>
-                <option disabled selected>Categoria</option>
-                {% for categoria in categorias %}
-                <option value="{{ categoria.0 }}">{{ categoria.1 }}</option>
-                {% endfor %}
-            </select>
+            <div class="input-group">
+
+                <select name="id_categoria" id="id_categoria" class="form-select" required>
+                    <option disabled selected>Categoria</option>
+                    {% for categoria in categorias %}
+                    <option value="{{ categoria.0 }}">{{ categoria.1 }}</option>
+                    {% endfor %}
+                </select>
+                <label for="id_categoria" class="input-label">Categoría:</label>
+            </div>
         </div>
 
         <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="id_mes" class="form-label">Mes:</label>
-                <select name="id_mes" id="id_mes" class="form-select" required>
-                    <option disabled selected>Mes</option>
-                    {% for mes in meses %}
-                    <option value="{{ mes.0 }}">{{ mes.1 }}</option>
-                    {% endfor %}
-                </select>
+            <div class="input-group">
+                <div class="col-md-6 mb-3">
+                    <select name="id_mes" id="id_mes" class="form-select" required>
+                        <option disabled selected>Mes</option>
+                        {% for mes in meses %}
+                        <option value="{{ mes.0 }}">{{ mes.1 }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="id_mes" class="input-label">Mes:</label>
+                </div>
             </div>
-            <div class="col-md-6 mb-3">
-                <label for="id_semana" class="form-label">Semana:</label>
-                <select name="id_semana" id="id_semana" class="form-select" required>
-                    <option disabled selected>Semana</option>
-                    {% for semana in semanas %}
-                    <option value="{{ semana.0 }}">{{ semana.1 }}</option>
-                    {% endfor %}
-                </select>
+
+            <div class="input-group">
+                <div class="col-md-6 mb-3">
+                    <select name="id_semana" id="id_semana" class="form-select" required>
+                        <option disabled selected>Semana</option>
+                        {% for semana in semanas %}
+                        <option value="{{ semana.0 }}">{{ semana.1 }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="id_semana" class="input-label">Semana:</label>
+                </div>
             </div>
         </div>
 
         <div id="cursos-container" class="mb-3">
             <div class="row align-items-end mb-2 curso-group">
+                <!-- Curso -->
                 <div class="col-md-5 mb-2">
-                    <label class="form-label">Curso:</label>
-                    <select name="cursos[]" class="form-select" required>
+                    <label class="form-label">Cursos de sesión:</label>
+                    <select name="cursos[]" class="form-select" required style="max-width: 360px; min-width: 360px;">
                         <option value="">Curso</option>
                         {% for curso in cursos %}
                         <option value="{{ curso.0 }}">{{ curso.1 }}</option>
@@ -64,9 +73,10 @@
                     </select>
                 </div>
 
+                <!-- Ponente -->
                 <div class="col-md-5 mb-2">
                     <label class="form-label">Ponente:</label>
-                    <select name="ponentes[]" class="form-select" required>
+                    <select name="ponentes[]" class="form-select" required style="max-width: 360px; min-width: 360px;">
                         <option value="">Ponente</option>
                         {% for ponente in ponentes %}
                         <option value="{{ ponente.0 }}">{{ ponente.1 }}</option>
@@ -74,7 +84,8 @@
                     </select>
                 </div>
 
-                <div class="col-md-2 mb-2 text-center">
+                <!-- Botón eliminar -->
+                <div class="col-md-2 mb-2 d-flex justify-content-center">
                     <button type="button" class="btn btn-danger btn-sm eliminar-curso">
                         <i class="fas fa-trash-alt"></i>
                     </button>
@@ -82,13 +93,14 @@
             </div>
         </div>
 
+
         <div class="mb-4">
             <button type="button" id="agregar-curso" class="btn btn-outline-secondary btn-sm">
                 <i class="fas fa-plus"></i> Agregar otro curso
             </button>
         </div>
 
-        <div class="d-flex justify-content-between">
+        <div class="text-center">
             <button type="submit" class="botones-guardar">Guardar</button>
             <a href="{{ url_for('sesiones.sesiones_buscar') }}" class="botones-cancelar">Cancelar</a>
         </div>

@@ -33,7 +33,7 @@
         <section class="table-responsive table-sm">
                 <table class="table-hover table">
                         <thead>
-                                <tr>
+                                <tr align="center">
                                         <th>Ver</th>
                                         <th>Nombre paquete</th>
                                         <th>Precio</th>
@@ -46,7 +46,7 @@
                                 {% if paquetes %}
                                 {% for paquete in paquetes %}
                                 {% if paquete.estado == True %}
-                                <tr>
+                                <tr align="center">
                                         <td>
                                                 <a class="botones-ver"
                                                         href="{{url_for('paquete.paquete_detalles',id = paquete.id_paquete)}}">
@@ -164,7 +164,7 @@
                                         <div class="input-group">
                                                 <select name="id_categoria" id="id_categoria"
                                                         aria-label="Default select example" class="form-select">
-                                                        <option value="true" selected>-Seleccione la Categoria-
+                                                        <option value="true" selected>Seleccione la Categoria
                                                         </option>
                                                         {% if categorias %}
                                                         {% for categoria in categorias %}
@@ -175,32 +175,6 @@
                                                         {% endif %}
                                                 </select>
                                                 <label for="id_categoria" class="input-label">Categoria</label>
-                                        </div>
-
-                                        <div class="checkbox-group">
-                                                <input type="checkbox" name="regalo" id="regalo">
-                                                <label for="solo_global">¿Tiene privilegios?</label>
-                                        </div>
-
-                                        <!-- Agrupa los campos relacionados a regalos -->
-                                        <div id="regalo_campos" style="display: none;">
-                                                <div class="input-group">
-                                                        <input class="input-field" type="number" name="num_cursos"
-                                                                id="num_cursos" placeholder="">
-                                                        <label for="Cursos" class="input-label">¿Cuántos cursos de
-                                                                regalo
-                                                                son?</label>
-                                                </div>
-
-                                                <div class="checkbox-group">
-                                                        <input type="checkbox" name="diploma_flash" id="diploma_flash">
-                                                        <label for="diploma_flash">¿Tiene diploma flash?</label>
-                                                </div>
-
-                                                <div class="checkbox-group">
-                                                        <input type="checkbox" name="solo_global" id="solo_global">
-                                                        <label for="global">¿Solo tiene global?</label>
-                                                </div>
                                         </div>
                                 </div>
                                 <div class="modal-footer">
@@ -252,33 +226,40 @@
                                         </div>
                                         <div class="modal-body">
                                                 <input type="hidden" name="csrf_token" value="{{csrf_token()}}">
-                                                <div class="mb-3">
-                                                        <label for="nombre-{{paquete.id_paquete}}"
-                                                                class="form-label">Nombre</label>
-                                                        <input type="text" class="form-control"
-                                                                id="nombre-{{paquete.id_paquete}}" name="nombre"
-                                                                value="{{paquete.nombre_paquete}}" required>
+                                                <div class="input-group">
+                                                        <div class="mb-3">
+
+                                                                <input type="text" class="input-field"
+                                                                        id="nombre-{{paquete.id_paquete}}" name="nombre"
+                                                                        value="{{paquete.nombre_paquete}}" required>
+                                                                <label for="nombre-{{paquete.id_paquete}}"
+                                                                        class="input-label">Nombre</label>
+                                                        </div>
                                                 </div>
-                                                <div class="mb-3">
-                                                        <label for="precio-{{paquete.id_paquete}}"
-                                                                class="form-label">Precio</label>
-                                                        <input type="number" class="form-control"
-                                                                id="precio-{{paquete.id_paquete}}" name="precio"
-                                                                value="{{paquete.precio_paquete}}" required>
+                                                <div class="input-group">
+                                                        <div class="mb-3">
+
+                                                                <input type="number" class="input-field"
+                                                                        id="precio-{{paquete.id_paquete}}" name="precio"
+                                                                        value="{{paquete.precio_paquete}}" required>
+                                                                <label for="precio-{{paquete.id_paquete}}"
+                                                                        class="input-label">Precio</label>
+                                                        </div>
                                                 </div>
-                                                <div class="mb-3">
+                                                <div class="input-group">
                                                         <select name="id_categoria" id="id_categoria"
                                                                 class="form-select" aria-label="Seleccione categoría">
-                                                                <option value="true">--Seleccione la categoría--
+                                                                <option value="true">Seleccione la categoría
                                                                 </option>
                                                                 {% for categoria in categorias %}
                                                                 <option value="{{ categoria.0 }}" {% if
-                                                                        categoria.0==paquete.categoria_paquete %}
+                                                                        categoria.1==paquete.nombre_categoria %}
                                                                         selected {% endif %}>
                                                                         {{ categoria.1 }}
                                                                 </option>
                                                                 {% endfor %}
                                                         </select>
+                                                        <label for="categoria" class="input-label">Categoria</label>
                                                 </div>
                                         </div>
                                         <div class="modal-footer">

@@ -11,14 +11,14 @@
   <!-- Datos principales -->
   <table class="table table-bordered table-striped">
     <thead class="table-light">
-      <tr>
+      <tr align="center">
         <th>Nombre completo</th>
         <th>CURP</th>
         <th>Cédula</th>
       </tr>
     </thead>
     <tbody>
-      <tr>
+      <tr align="center">
         <td>{{ ponente.nombre_ponente }}</td>
         <td>{{ ponente.curp_ponente }}</td>
         <td>{{ ponente.cedula_ponente }}</td>
@@ -31,14 +31,14 @@
   <h4 class="mt-5 mb-3">Certificaciones</h4>
   <table class="table table-bordered table-striped">
     <thead class="table-light">
-      <tr>
+      <tr align="center">
         <th>Tipo de Certificación</th>
         <th>Folio</th>
       </tr>
     </thead>
     <tbody>
       {% for cert in certificaciones %}
-      <tr>
+      <tr align="center">
         <td>{{ cert.nombre_tipocer }}</td>
         <td>{{ cert.folio }}</td>
       </tr>
@@ -46,7 +46,7 @@
     </tbody>
   </table>
   {% else %}
-  
+
   <p class="text-muted fst-italic">Este ponente no tiene certificaciones registradas.</p>
   {% endif %}
 

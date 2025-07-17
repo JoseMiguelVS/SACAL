@@ -1,10 +1,9 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, Flask, make_response
-from flask_login import login_required, current_user
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
-from werkzeug.security import generate_password_hash
 
-from utils.listas import lista_temas
+from utils.listas import lista_categorias, lista_temas
 
 from ..utils.utils import get_db_connection, paginador2, allowed_paquename
 
@@ -30,6 +29,7 @@ def paquetes_buscar():
     paginado = paginador2(sql_count, sql_lim, params_count, params_lim, 1 , 5)
 
     return render_template('paquetes/paquetes.html',
+                           categorias = lista_categorias(),
                            temas = lista_temas(),
                            paquetes=paginado[0],
                            page=paginado[1],

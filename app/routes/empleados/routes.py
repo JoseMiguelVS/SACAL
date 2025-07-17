@@ -66,7 +66,7 @@ def empleado_nuevo():
                 return redirect(url_for('empleados.empleado_agregar'))
             else:
                 sql="INSERT INTO empleados (nombre_empleado, apellido_mat, apellido_pat, nombre_usuario, correo_empleado, rol, estado, fecha_creacion, fecha_modificacion, contrasenia_empleado) VALUES (%s,%s,%s,%s,%s,%s,%s,%s, %s, %s)"
-                valores=(nombre_empleado, nombre_usuario, apellido_mat, apellido_pat, correo_empleado, rol, estado, fecha_creacion, fecha_modificacion, Pass)
+                valores=(nombre_empleado, apellido_mat, apellido_pat, nombre_usuario, correo_empleado, rol, estado, fecha_creacion, fecha_modificacion, Pass)
                 cur.execute(sql,valores)
                 con.commit()
                 cur.close()

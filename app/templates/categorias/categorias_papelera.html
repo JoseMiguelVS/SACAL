@@ -30,7 +30,7 @@
     <section class="table-responsive table-sm">
         <table class="table table-hover">
             <thead class="text-center">
-                <tr>
+                <tr align="center">
                     <th>Nombre categoria</th>
                     <th>Restaurar</th>
                 </tr>
@@ -39,12 +39,12 @@
                 {% if categorias %}
                 {% for categoria in categorias %}
                 {% if categoria.estado == false %}
-                <tr>
+                <tr align="center">
                     <td>{{categoria.nombre_categoria}}</td>
                     <td>
                         <button class="botones-restaurar" type="button" data-bs-toggle="modal"
-                            data-bs-target="#staticBackdrop-{{categoria.id_categoria}}"><i class="fas fa-sync-alt"
-                                style="font-size: 18px;"></i>
+                            data-bs-target="#staticBackdrop-{{categoria.id_categoria}}">
+                            <i class="fas fa-sync-alt" style="font-size: 18px;"></i>
                         </button>
                     </td>
                     {% endif %}
@@ -118,7 +118,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    ¿Deseas Restaurar a <strong>{{ categoria.nombre_categoria }}</strong>?
+                    ¿Deseas restaurar la categoria <strong>{{ categoria.nombre_categoria }}</strong>?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>

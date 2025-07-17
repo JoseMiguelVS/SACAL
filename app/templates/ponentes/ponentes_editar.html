@@ -1,88 +1,101 @@
 {% extends './layout.html' %}
 {% block body %}
 
-<!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-{% for message in messages %}
-<div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else %}success
-    {% endif %} alert-dismissible fade show" role="alert">
-    <strong>{{message}}</strong>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-{% endfor %}
-{% endif %}
-{% endwith %}
-<!-- -------------------------------------------------------------------------- -->
+<main class="container my-4">
+    <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{% if " Error" in message %}danger {% elif "Advertencia" in message %}warning {% else
+        %}success {% endif %} alert-dismissible fade show" role="alert">
+        <strong>{{message}}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <!-- -------------------------------------------------------------------------- -->
 
-<div class="container py-4">
-    <form class="p-3" method="POST" action="{{ url_for('ponentes.ponente_actualizar', id=ponente.id_ponentes) }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="container py-4">
+        <form class="p-3" method="POST" action="{{ url_for('ponentes.ponente_actualizar', id=ponente.id_ponentes) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-        <h2 class="text-center mb-4">Editar Ponente</h2>
+            <h2 class="text-center mb-4">Editar Ponente</h2>
 
-        <!-- Datos del ponente -->
-        <div class="mb-3">
-            <label class="form-label">Nombre del Ponente</label>
-            <input type="text" name="nombre_ponente" class="form-control" placeholder="Nombre Ponente"
-                value="{{ ponente.nombre_ponente }}" required>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">CURP</label>
-            <input type="text" name="curp_ponente" class="form-control" placeholder="CURP"
-                value="{{ ponente.curp_ponente }}" required>
-        </div>
-
-        <div class="mb-4">
-            <label class="form-label">Cédula Profesional</label>
-            <input type="text" name="cedula_ponente" class="form-control" placeholder="Cédula Profesional"
-                value="{{ ponente.cedula_ponente }}" required>
-        </div>
-
-        <!-- Certificaciones -->
-        <h4 class="mb-3">Certificaciones</h4>
-        <div id="certificaciones-container">
-            {% for cert in certificaciones %}
-            <div class="row align-items-end certificacion-item g-2 mb-2">
-                <div class="col-md-5">
-                    <label class="form-label">Tipo de Certificado</label>
-                    <select name="id_tipoCer[]" class="form-select" required>
-                        {% for tipo in tipos_certificacion %}
-                        <option value="{{ tipo.id_tipo }}" {% if tipo.id_tipo==cert.tipocer_id %}selected{% endif %}>
-                            {{ tipo.nombre_tipocer }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-5">
-                    <label class="form-label">Folio</label>
-                    <input type="text" name="folio[]" class="form-control" placeholder="Folio" value="{{ cert.folio }}"
-                        required>
-                </div>
-                <div class="col-md-2 text-end">
-                    <button type="button" class="btn btn-danger btn-sm" onclick="eliminarCertificacion(this)">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
+            <!-- Nombre -->
+            <div class="d-flex justify-content-center">
+                <div class="input-group mb-3" style="width: 400px;">
+                    <input type="text" name="nombre_ponente" class="input-field" placeholder="Nombre Ponente"
+                        value="{{ ponente.nombre_ponente }}" required>
+                    <label class="input-label">Nombre del Ponente</label>
                 </div>
             </div>
-            {% endfor %}
-        </div>
 
-        <!-- Botón para agregar -->
-        <div class="mb-4">
-            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="agregarCertificacion()">
-                Agregar otra certificación
-            </button>
-        </div>
+            <!-- CURP -->
+            <div class="d-flex justify-content-center">
+                <div class="input-group mb-3" style="width: 400px;">
+                    <input type="text" name="curp_ponente" class="input-field" placeholder="CURP"
+                        value="{{ ponente.curp_ponente }}" required>
+                    <label class="input-label">CURP</label>
+                </div>
+            </div>
 
-        <!-- Botones de acción -->
-        <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
-            <button class="botones-guardar px-5 py-2 rounded-pill ml-2" type="submit">Guardar</button>
-            <a class="botones px-5 py-2 rounded-pill ml-2" href="{{ url_for('ponentes.ponentes_buscar') }}">Cancelar</a>
-        </div>
-    </form>
-</div>
+            <!-- Cédula -->
+            <div class="d-flex justify-content-center">
+                <div class="input-group mb-4" style="width: 400px;">
+                    <input type="text" name="cedula_ponente" class="input-field" placeholder="Cédula Profesional"
+                        value="{{ ponente.cedula_ponente }}" required>
+                    <label class="input-label">Cédula Profesional</label>
+                </div>
+            </div>
+
+
+            <!-- Certificaciones -->
+            <h4 class="mb-3">Certificaciones</h4>
+            <div id="certificaciones-container">
+                {% for cert in certificaciones %}
+                <div class="row align-items-end certificacion-item g-2 mb-2">
+                    <div class="col-md-5">
+                        <label class="form-label">Tipo de Certificado</label>
+                        <select name="id_tipoCer[]" class="form-select" required>
+                            {% for tipo in tipos_certificacion %}
+                            <option value="{{ tipo.id_tipo }}" {% if tipo.id_tipo==cert.tipocer_id %}selected{% endif
+                                %}>
+                                {{ tipo.nombre_tipocer }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label">Folio</label>
+                        <input type="text" name="folio[]" class="form-control" placeholder="Folio"
+                            value="{{ cert.folio }}" required>
+                    </div>
+                    <div class="col-md-2 text-end">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="eliminarCertificacion(this)">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Botón para agregar -->
+            <div class="mb-4">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="agregarCertificacion()">
+                    Agregar otra certificación
+                </button>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="d-flex flex-wrap justify-content-center gap-3 mt-4">
+                <button class="botones-guardar px-5 py-2 rounded-pill ml-2" type="submit">Guardar</button>
+                <a class="botones px-5 py-2 rounded-pill ml-2"
+                    href="{{ url_for('ponentes.ponentes_buscar') }}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</main>
 
 <!-- Script -->
 <script>

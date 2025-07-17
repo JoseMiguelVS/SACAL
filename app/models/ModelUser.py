@@ -1,31 +1,43 @@
-from.entities.user import User
+from .entities.user import User  # <- sin punto
 
-class ModuleUser():
+class ModuleUser:
     @classmethod
-    def login(self,db,user):
+    def login(cls, db, user_input):
         try:
-            cur=db.cursor()
-            sql="SELECT id_empleado,nombre_usuario,contrasenia_empleado,estado FROM empleados WHERE estado='True' and nombre_usuario='{}'".format(user.nombre_usuario)
-            cur.execute(sql)
-            row=cur.fetchone()
-            if row != None:
-                user=User(row[0], row[1],user.check_password(row[2],user.contrasenia),None)
-                return user
-            else:
-                return None
+            cur = db.cursor()
+            sql = "SELECT id_empleado, nombre_usuario, contrasenia_empleado, estado, rol FROM empleados WHERE estado='True' AND nombre_usuario=%s"
+            cur.execute(sql, (user_input.nombre_usuario,))
+            row = cur.fetchone()
+            
+            if row:
+                if User.check_password(row[2], user_input.contrasenia):
+                    user = User(
+                        id_empleado=row[0],
+                        nombre_usuario=row[1],
+                        contrasenia=None,
+                        estado=row[3],
+                        rol=row[4]
+                    )
+                    return user
+            return None
         except Exception as ex:
             raise Exception(ex)
 
     @classmethod
-    def get_by_id(self,db,id_empleado):
+    def get_by_id(cls, db, id_empleado):
         try:
-            cur=db.cursor()
-            sql="SELECT id_empleado,nombre_usuario,contrasenia_empleado FROM empleados WHERE estado='True' and id_empleado='{}'".format(id_empleado)
-            cur.execute(sql)
-            row=cur.fetchone()
-            if row !=None:
-                return User(row[0], row[1], None, row[2])
-            else:
-                return None
+            cur = db.cursor()
+            sql = "SELECT id_empleado, nombre_usuario, contrasenia_empleado, rol FROM empleados WHERE estado='True' AND id_empleado=%s"
+            cur.execute(sql, (id_empleado,))
+            row = cur.fetchone()
+            if row:
+                return User(
+                    id_empleado=row[0],
+                    nombre_usuario=row[1],
+                    contrasenia=None,
+                    estado=None,
+                    rol=row[3]
+                )
+            return None
         except Exception as ex:
             raise Exception(ex)

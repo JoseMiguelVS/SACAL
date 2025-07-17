@@ -36,27 +36,35 @@
         </div>
 
         <ul class="nav-links">
+            {% if current_user.rol == 1 %}
             <li><a href="{{ url_for('empleados.empleadosBuscar') }}">Empleados</a></li>
+            {% endif %}
 
             <li>
                 <a class="herramientas" href="#">Bitácoras <i class="fas fa-angle-down"></i></a>
                 <ul class="tools">
+
                     <li><a href="{{ url_for('sesiones.sesiones_buscar') }}">Sesiones</a></li>
                     <li><a href="{{ url_for('participantes.participantes_buscar') }}">Participantes</a></li>
                     <li><a href="{{ url_for('constancias.constancias_buscar') }}">Constancias</a></li>
+                    {% if current_user.rol == 1 %}
                     <li><a href="{{ url_for('pagos.pagos_buscar') }}">Pagos</a></li>
                     <li><a href="{{ url_for('resumen_semanal.resumen') }}">Resumen</a></li>
+                    {% endif %}
                 </ul>
             </li>
 
             <li>
                 <a class="herramientas" href="#">Herramientas <i class="fas fa-angle-down"></i></a>
                 <ul class="tools">
+                    {% if current_user.rol == 2 or 1 %}
                     <li><a href="{{ url_for('ponentes.ponentes_buscar') }}">Ponentes</a></li>
                     <li><a href="{{ url_for('categorias.categorias_buscar') }}">Categorías</a></li>
                     <li><a href="{{ url_for('paquete.paquetes_buscar') }}">Paquetes</a></li>
                     <li><a href="{{ url_for('cursos.cursos_buscar') }}">Cursos</a></li>
                     <li><a href="{{ url_for('temas.temas_buscar') }}">Temas</a></li>
+                    {% endif %}
+
                     <li><a href="{{ url_for('perfil.ver_perfil') }}">Perfil</a></li>
                 </ul>
             </li>
@@ -68,7 +76,9 @@
         <div class="overlay" id="mobile-menu">
             <a href="javascript:void(0)" onclick="closeNav()" class="close">&times;</a>
             <div class="overlay-content">
+                {% if current_user.rol == 1 %}
                 <li><a href="{{ url_for('empleados.empleadosBuscar') }}">Empleados</a></li>
+                {% endif %}
 
                 <li>
                     <a class="herramientas m-2" href="#">Bitácoras <i class="fas fa-angle-down"></i></a>
@@ -76,8 +86,10 @@
                         <li><a href="{{ url_for('sesiones.sesiones_buscar') }}">Sesiones</a></li>
                         <li><a href="{{ url_for('participantes.participantes_buscar') }}">Participantes</a></li>
                         <li><a href="{{ url_for('constancias.constancias_buscar') }}">Constancias</a></li>
+                        {% if current_user.rol == 1 %}
                         <li><a href="{{ url_for('pagos.pagos_buscar') }}">Pagos</a></li>
                         <li><a href="{{ url_for('resumen_semanal.resumen') }}">Resumen</a></li>
+                        {% endif %}
                     </ul>
                 </li>
 
