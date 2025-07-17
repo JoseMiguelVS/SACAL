@@ -278,14 +278,14 @@
                         {% set partesSesiones = fecha_raw.split('/') if fecha_raw else [] %}
 
                         {% if partesSesiones|length == 3 %}
-                        <input type="hidden" name="id_sesion" id="id_sesion" value="{{ partesSesiones[0] }}">
+                        <input type="hidden" name="id_sesion" id="id_sesion" value="{{ partesSesiones[0] }}" required>
                         <p><strong>Sesión:</strong> {{ partesSesiones[1] }}, {{ partesSesiones[2] }}</p>
                         {% endif %}
-                        <input type="hidden" name="fecha" value="{{ fecha_raw }}">
+                        <input type="hidden" name="fecha" value="{{ fecha_raw }}" required>
 
                         {% set partes_equipo = request.args.get('equipos', '').split(',') %}
                         {% if partes_equipo | length == 2 %}
-                        <input type="hidden" name="equipos" id="equipos" value="{{ partes_equipo[0] }}">
+                        <input type="hidden" name="equipos" id="equipos" value="{{ partes_equipo[0] }}" required>
                         <p><strong>Equipo:</strong> {{ partes_equipo[1] }}</p>
                         {% endif %}
                     </div>

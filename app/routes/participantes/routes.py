@@ -252,8 +252,8 @@ def participante_nuevo():
         valores3 = (participante_id, constancia_generada, constancia_enviada, asistencia_id)
         cur.execute(sql3, valores3)
 
-        sql4 = "INSERT INTO pagos (ingresos, participante) VALUES (%s, %s)"
-        valores4 = (precio_paquete, participante_id )
+        sql4 = "INSERT INTO pagos (ingresos, participante, validacion_pago, forma_pago,concepto_factura) VALUES (%s, %s, %s, %s, %s)"
+        valores4 = (precio_paquete, participante_id, forma_pago,'1','3')
         cur.execute(sql4, valores4)
 
         # 4. Guardar cambios y cerrar conexión
@@ -311,52 +311,22 @@ def actualizar_participante(id):
 
     # ------------------- Calcula ingreso_factura con IVA 16% -------------------
     try:
-        ingresos = float(datos.get('ingresos', 0))
+        ingresos = float(datos['ingresos'])
         ingreso_factura = round(ingresos * 1.16, 2)
-    except (ValueError, TypeError):
-        ingreso_factura = None
+    except (KeyError, ValueError):
+        ingreso_factura = None  # o puedes manejar un valor por defecto
 
-    # ------------------- Actualiza o inserta en pagos según factura_pago -------------------
-    if datos.get('factura_pago'):  # Si existe factura_pago
-        # Actualiza el pago con ingreso_factura (con IVA)
-        sql_pago = '''
-            UPDATE pagos 
-            SET ingreso_factura = %s, fecha_pago = %s, ingresos = %s, forma_pago = %s, validacion_pago = '1', concepto_factura='3'
-            WHERE participante = %s
-        '''
-        cur.execute(sql_pago, (
-            ingreso_factura,
-            datos['fecha_pago'] or None,
-            0,
-            datos['id_forma'],
-            id
-        ))
-    else:
-        # Si no hay factura_pago, actualiza o inserta ingreso directo sin ingreso_factura
-        # Intentamos actualizar si existe registro en pagos
-        sql_update_pago = '''
-            UPDATE pagos 
-            SET ingresos = %s, fecha_pago = %s, forma_pago = %s, validacion_pago = '1', concepto_factura='3', ingreso_factura = NULL
-            WHERE participante = %s
-        '''
-        cur.execute(sql_update_pago, (
-            ingresos,
-            datos['fecha_pago'] or None,
-            datos['id_forma'],
-            id
-        ))
-        # Si no se actualizó (no existe registro), insertamos nuevo pago
-        if cur.rowcount == 0:
-            sql_insert_pago = '''
-                INSERT INTO pagos (participante, ingresos, fecha_pago, forma_pago, validacion_pago, concepto_factura)
-                VALUES (%s, %s, %s, %s, '1', '3')
-            '''
-            cur.execute(sql_insert_pago, (
-                id,
-                ingresos,
-                datos['fecha_pago'] or None,
-                datos['id_forma']
-            ))
+    # ------------------- Actualiza tabla pagos -------------------
+    sql_pago = '''
+        UPDATE pagos 
+        SET ingreso_factura = %s, fecha_pago = %s, ingresos = '0'
+        WHERE participante = %s
+    '''
+    cur.execute(sql_pago, (
+        ingreso_factura,
+        datos['fecha_pago'] or None,
+        id
+    ))
 
     # ------------------- Finaliza conexión -------------------
     con.commit()

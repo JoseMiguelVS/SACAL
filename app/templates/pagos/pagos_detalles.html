@@ -9,16 +9,14 @@
             <div class="d-flex gap-2 bg-secondary p-2 rounded overflow-auto">
                 {% if not pagos.comprobantes %}
                 <img src="{{ url_for('static', filename='img/sin_comprobante.png') }}" alt="Sin comprobante"
-                    class="img-fluid rounded" style="max-height: 200px;">
-                {% else %}
-                {% for imagen in pagos.comprobantes.split(',') %}
+                    class="img-fluid rounded" style="max-height: 200px" />
+                {% else %} {% for imagen in pagos.comprobantes.split(',') %}
                 <img src="{{ url_for('static', filename='img/uploads/' + imagen.strip()) }}" alt="Comprobante de pago"
-                    class="img-fluid rounded" style="max-height: 400px;">
-                {% endfor %}
-                {% endif %}
+                    class="img-fluid rounded" style="max-height: 400px" />
+                {% endfor %} {% endif %}
             </div>
         </div>
- 
+
         <!-- Columna del Formulario -->
         <div class="col-12 col-md-6 col-lg-5 mb-3">
             <form action="{{ url_for('pagos.pagos_actualizar', id = pagos.id_participante) }}" method="post" class="">
@@ -26,33 +24,25 @@
                 <div class="mb-3">
                     <label for="estado" class="form-label">Estado del comprobante</label>
                     <select name="validacion_pago" id="validacion_pago" class="form-select">
-                        {% if pagos.validacion_pago %}
-                        {% if pagos.validacion_pago == 3 %}
-                        <option value="3">Validado</option>
-                        {% elif pagos.validacion_pago == 2 %}
-                        <option value="2">Pendiente</option>
-                        {% else %}
-                        <option value="1">No encontrado</option>
-                        {% endif %}
-                        {% else %}
-                        <option value="1">No encontrado</option>
-                        <option value="2">Pendiente</option>
-                        <option value="3">Validado</option>
-                        {% endif %}
+                        <option value="1" {% if pagos.validacion_pago==1 %}selected{% endif %}>No encontrado</option>
+                        <option value="2" {% if pagos.validacion_pago==2 %}selected{% endif %}>Pendiente</option>
+                        <option value="3" {% if pagos.validacion_pago==3 %}selected{% endif %}>Validado</option>
                     </select>
+
                 </div>
                 <div class="mb-3">
                     <label for="clave" class="form-label">Clave de rastreo</label>
                     <input type="text" name="clave_rastreo" id="clave_rastreo" class="form-control"
-                        value="{{ pagos.clave_rastreo }}">
+                        value="{{ pagos.clave_rastreo }}" />
                 </div>
 
-                <button type="submit" class="botones-guardar w-100 mb-1">Guardar cambios</button>
+                <button type="submit" class="botones-guardar w-100 mb-1">
+                    Guardar cambios
+                </button>
                 <a href="{{ url_for('pagos.pagos_buscar') }}" class="botones-cancelar w-100 mb-1">Cancelar</a>
             </form>
         </div>
     </div>
 </main>
-
 
 {% endblock %}

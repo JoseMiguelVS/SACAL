@@ -9,7 +9,7 @@ from utils.listas import lista_categorias, lista_cuentas, lista_cursos, lista_eq
 
 from ..utils.utils import get_db_connection, paginador1, paginador2, paginador3
 
-constancias = Blueprint('constancias', __name__)
+constancias = Blueprint('constancias', __name__) 
 
 #-----------------------------------------PRINCIPAL-------------------------------------------------
 
@@ -28,11 +28,14 @@ def constancias_buscar():
                  AND constancia_enviada = False
                  ORDER BY nombre_participante DESC
                  LIMIT %s OFFSET %s'''
-    
-    constancias_por_enviar = '''
-                                SELECT COUNT(*) FROM asistencias_detalladas_constancias WHERE constancias_enviada = False
 
-                             '''
+    # Ejecutar el conteo de constancias no enviadas
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute('SELECT COUNT(*) FROM asistencias_detalladas_constancias WHERE constancia_enviada = False')
+    constancias_por_enviar = cur.fetchone()[0]
+    cur.close()
+    conn.close()
 
     paginado = paginador3(sql_count, sql_lim, [search_query_sql, search_query_sql], 1, 25)
 
@@ -52,7 +55,8 @@ def constancias_buscar():
                            total_items=paginado[3],
                            total_pages=paginado[4],
                            search_query=search_query,
-                           constancias_por_enviar = constancias_por_enviar)
+                           constancias_por_enviar=constancias_por_enviar)
+
 
 @constancias.route("/constancias/filtros") 
 @login_required
