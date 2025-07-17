@@ -21,12 +21,12 @@ def participantes_buscar():
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
                    WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
-                   AND grabaciones = False
+                   AND grabacion = False
                    '''
 
     sql_lim = '''SELECT * FROM asistencias_detalladas
                  WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
-                 AND grabaciones = False
+                 AND grabacion = False
                  ORDER BY nombre_participante DESC
                  LIMIT %s OFFSET %s'''
 
@@ -76,7 +76,7 @@ def participantes_filtros():
                     AND (%s = '' OR semanas ILIKE %s)
                     AND (%s = '' OR fecha ILIKE %s)
                     AND (%s = '' OR cursos ILIKE %s)
-                    AND grabaciones = False ''' 
+                    AND grabacion    = False ''' 
 
     sql_lim = '''SELECT * FROM asistencias_detalladas
                 WHERE (%s = '' OR meses ILIKE %s)
@@ -84,7 +84,7 @@ def participantes_filtros():
                     AND (%s = '' OR semanas ILIKE %s)
                     AND (%s = '' OR fecha ILIKE %s)
                     AND (%s = '' OR cursos ILIKE %s)
-                    AND grabaciones = False
+                    AND grabacion    = False
                 ORDER BY nombre_participante DESC
                 LIMIT %s OFFSET %s'''
 
@@ -215,7 +215,6 @@ def participante_nuevo():
         estado = True
         constancia_generada = False
         constancia_enviada = False
-        ingreso_factura='0'
 
         nombre_paquete = ''
         precio_paquete = ''
@@ -231,11 +230,11 @@ def participante_nuevo():
         # 1. Insertar participante
         sql = '''
             INSERT INTO participantes 
-            (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino, equipos, forma_pago, ingreso_factura)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino, equipos, forma_pago)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id_participante
         '''
-        valores = (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino, equipos, forma_pago, ingreso_factura )
+        valores = (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino, equipos, forma_pago )
         cur.execute(sql, valores)
 
         # 2. Obtener el ID recién creado
@@ -312,22 +311,52 @@ def actualizar_participante(id):
 
     # ------------------- Calcula ingreso_factura con IVA 16% -------------------
     try:
-        ingresos = float(datos['ingresos'])
+        ingresos = float(datos.get('ingresos', 0))
         ingreso_factura = round(ingresos * 1.16, 2)
-    except (KeyError, ValueError):
-        ingreso_factura = None  # o puedes manejar un valor por defecto
+    except (ValueError, TypeError):
+        ingreso_factura = None
 
-    # ------------------- Actualiza tabla pagos -------------------
-    sql_pago = '''
-        UPDATE pagos 
-        SET ingreso_factura = %s, fecha_pago = %s, ingresos = '0'
-        WHERE participante = %s
-    '''
-    cur.execute(sql_pago, (
-        ingreso_factura,
-        datos['fecha_pago'] or None,
-        id
-    ))
+    # ------------------- Actualiza o inserta en pagos según factura_pago -------------------
+    if datos.get('factura_pago'):  # Si existe factura_pago
+        # Actualiza el pago con ingreso_factura (con IVA)
+        sql_pago = '''
+            UPDATE pagos 
+            SET ingreso_factura = %s, fecha_pago = %s, ingresos = %s, forma_pago = %s, validacion_pago = '1', concepto_factura='3'
+            WHERE participante = %s
+        '''
+        cur.execute(sql_pago, (
+            ingreso_factura,
+            datos['fecha_pago'] or None,
+            0,
+            datos['id_forma'],
+            id
+        ))
+    else:
+        # Si no hay factura_pago, actualiza o inserta ingreso directo sin ingreso_factura
+        # Intentamos actualizar si existe registro en pagos
+        sql_update_pago = '''
+            UPDATE pagos 
+            SET ingresos = %s, fecha_pago = %s, forma_pago = %s, validacion_pago = '1', concepto_factura='3', ingreso_factura = NULL
+            WHERE participante = %s
+        '''
+        cur.execute(sql_update_pago, (
+            ingresos,
+            datos['fecha_pago'] or None,
+            datos['id_forma'],
+            id
+        ))
+        # Si no se actualizó (no existe registro), insertamos nuevo pago
+        if cur.rowcount == 0:
+            sql_insert_pago = '''
+                INSERT INTO pagos (participante, ingresos, fecha_pago, forma_pago, validacion_pago, concepto_factura)
+                VALUES (%s, %s, %s, %s, '1', '3')
+            '''
+            cur.execute(sql_insert_pago, (
+                id,
+                ingresos,
+                datos['fecha_pago'] or None,
+                datos['id_forma']
+            ))
 
     # ------------------- Finaliza conexión -------------------
     con.commit()
@@ -335,7 +364,6 @@ def actualizar_participante(id):
     con.close()
 
     return jsonify({'alert': 'Participante actualizado correctamente'})
-
 
 @participantes.route('/participantes/actualizar/sesion/<string:id>', methods=['POST'])
 @login_required
@@ -394,6 +422,10 @@ def participante_comprobante(id):
                 VALUES (%s, %s, %s)
             '''
             cur.execute(sql, (id, nombre_archivo, creado))
+
+            sql2 =  '''
+                        INSERT INTO pagos ()
+                    '''
 
     con.commit()
     cur.close()

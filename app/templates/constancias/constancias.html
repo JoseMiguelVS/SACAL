@@ -1,6 +1,7 @@
 {% extends './layout.html' %} {% block body %}
 <main class="container my-4 ">
     <h2 class="text-center mb-4">Constancias</h2>
+    <h3 class="text-center mb-4"> Constancias por enviar: {{constancias.constancias_por_enviar}}</h3>
     <!-- Alertas -->
     {% with messages = get_flashed_messages() %} {% if messages %} {% for
     message in messages %}

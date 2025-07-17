@@ -28,6 +28,11 @@ def constancias_buscar():
                  AND constancia_enviada = False
                  ORDER BY nombre_participante DESC
                  LIMIT %s OFFSET %s'''
+    
+    constancias_por_enviar = '''
+                                SELECT COUNT(*) FROM asistencias_detalladas_constancias WHERE constancias_enviada = False
+
+                             '''
 
     paginado = paginador3(sql_count, sql_lim, [search_query_sql, search_query_sql], 1, 25)
 
@@ -46,7 +51,8 @@ def constancias_buscar():
                            per_page=paginado[2],
                            total_items=paginado[3],
                            total_pages=paginado[4],
-                           search_query=search_query)
+                           search_query=search_query,
+                           constancias_por_enviar = constancias_por_enviar)
 
 @constancias.route("/constancias/filtros") 
 @login_required
