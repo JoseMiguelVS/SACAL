@@ -107,6 +107,7 @@ app.config['UPLOAD_FOLDER'] = './static/img/uploads/'
 ruta_comprobantes = app.config['UPLOAD_FOLDER']
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
+
 #-------------------------- Errores --------------------------
 def pagina_no_encontrada(error):
     return render_template('404.html'), 404
