@@ -2,5 +2,7 @@ services:
   - type: web
     name: SACAL
     env: python
+    plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app
+    startCommand: gunicorn wsgi:app
+    autoDeploy: true
