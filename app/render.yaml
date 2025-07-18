@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: sacal
+    name: SACAL
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: python app.py
+    startCommand: export PATH=$PATH:/usr/local/python3/bin && gunicorn app:app --bind 0.0.0.0:$PORT
