@@ -10,12 +10,16 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.colors import HexColor
 
+# Ruta absoluta desde el archivo actual
+base_dir = os.path.dirname(os.path.abspath(__file__))
+font_dir = os.path.join(base_dir, '..', '..', 'static', 'fonts')
+
 # Registro de fuentes
-pdfmetrics.registerFont(TTFont('Montserrat-Regular', 'static/fonts/Montserrat-Regular.ttf'))
-pdfmetrics.registerFont(TTFont('Montserrat-Bold', 'static/fonts/Montserrat-Bold.ttf'))
-pdfmetrics.registerFont(TTFont('Montserrat-Black', 'static/fonts/Montserrat-Black.ttf'))
-pdfmetrics.registerFont(TTFont('Metropolis-Black', 'static/fonts/Metropolis-Black.ttf'))
-pdfmetrics.registerFont(TTFont('Metropolis-Bold', 'static/fonts/Metropolis-Bold.ttf'))
+pdfmetrics.registerFont(TTFont('Montserrat-Regular', os.path.join(font_dir, 'Montserrat-Regular.ttf')))
+pdfmetrics.registerFont(TTFont('Montserrat-Bold', os.path.join(font_dir, 'Montserrat-Bold.ttf')))
+pdfmetrics.registerFont(TTFont('Montserrat-Black', os.path.join(font_dir, 'Montserrat-Black.ttf')))
+pdfmetrics.registerFont(TTFont('Metropolis-Black', os.path.join(font_dir, 'Metropolis-Black.ttf')))
+pdfmetrics.registerFont(TTFont('Metropolis-Bold', os.path.join(font_dir, 'Metropolis-Bold.ttf')))
 
 # -------------------------------------------
 def draw_centrado(c, texto, y, font="Helvetica", size=12, return_center=False):
