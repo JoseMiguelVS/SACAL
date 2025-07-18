@@ -1,10 +1,42 @@
-{% extends './layout.html' %}
-{% block body %}
+{% extends './layout.html' %} {% block body %}
 
-<body>
-    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Corrupti reiciendis sint eveniet ab? Distinctio, officiis.
-        Inventore libero totam placeat provident sit consequatur quibusdam. Magni inventore quibusdam consectetur numquam
-        voluptatibus alias.</p>
-</body>
+<main class="container my-4">
+    <h1 class="text-center my-4">Bienvenido al Sistema Administrador de Conecta Academy Latinoamerica</h1>
+    <p class="text-center">
+        Administra ponentes, cursos, constancias, pagos y participantes de forma
+        eficiente.
+    </p>
+
+    <!-- Cards con totales -->
+    <div class="row text-center mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm p-3 border-left-primary">
+                <h5 class="text-primary">Cursos</h5>
+                <p class="fs-4">{{ total_cursos }}</p>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm p-3 border-left-success">
+                <h5 class="text-success">Participantes</h5>
+                <p class="fs-4">{{ total_participantes }}</p>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm p-3 border-left-warning">
+                <h5 class="text-warning">Constancias por Enviar</h5>
+                <p class="fs-4">{{ constancias_pendientes }}</p>
+            </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm p-3 border-left-info">
+                <h5 class="text-info">Ponentes</h5>
+                <p class="fs-4">{{ total_ponentes }}</p>
+            </div>
+        </div>
+    </div>
+</main>
 
 {% endblock %}

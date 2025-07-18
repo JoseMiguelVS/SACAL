@@ -1,20 +1,27 @@
-{% extends './layout.html' %} {% block body %}
+{% extends './layout.html' %}
+{% block body %}
 <main class="container my-2">
         <h2 class="text-center mb-4">Categorias</h2>
 
         <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
-        {% with messages = get_flashed_messages() %} {% if messages %} {% for
-        message in messages %}
-        <div class="alert alert-dismissible fade show alert-fixed {% if 'Error' in message %}alert-danger{% elif 'Advertencia' in message %}alert-warning{% else %}alert-success{% endif %}"
-                role="alert">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-dismissible fade show alert-fixed
+                {% if 'Error' in message %}alert-danger
+                {% elif 'Advertencia' in message %}alert-warning
+                {% else %}alert-success
+                {% endif %}" role="alert">
                 <strong>{{ message }}</strong>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        {% endfor %} {% endif %} {% endwith %}
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
 
         <section class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
                 <button class="botones m-2" data-bs-toggle="modal" data-bs-target="#modalAgregarCategoria">
-                        <i class="fa fa-plus mr-2"></i>Nuevo
+                        <i class="fa fa-plus mr-2"></i> Nuevo
                 </button>
 
                 <!-- -------------------------------------BUSCADOR------------------------------------------ -->
@@ -27,6 +34,41 @@
                         </div>
                 </form>
         </section>
+
+        <!-- MODAL AGREGAR CATEGORÍA (fuera del for para evitar IDs duplicados) -->
+        <div class="modal fade" id="modalAgregarCategoria" data-bs-backdrop="static" data-bs-keyboard="false"
+                tabindex="-1" aria-labelledby="modalAgregarCategoriaLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                        <div class="modal-content">
+                                <form action="{{ url_for('categorias.categoria_nuevo') }}" method="POST"
+                                        class="formulario">
+                                        <div class="modal-header">
+                                                <h5 class="modal-title" id="modalAgregarCategoriaLabel">Agregar
+                                                        Categoría</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Cerrar"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <div class="input-group">
+                                                        <div class="mb-3">
+                                                                <input type="text" class="input-field"
+                                                                        name="nombre_categoria" id="nombre_categoria"
+                                                                        maxlength="15" required placeholder="">
+                                                                <label for="nombre_categoria" class="input-label">Nombre
+                                                                        de la Categoría</label>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                                <button type="button" class="botones"
+                                                        data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="botones-guardar">Guardar</button>
+                                        </div>
+                                </form>
+                        </div>
+                </div>
+        </div>
 
         <!-- ------------------------------TABLE -------------------------------- -->
         <div class="table-responsive table-sm">
@@ -46,24 +88,24 @@
                                         <td>{{ categoria.nombre_categoria }}</td>
                                         <td>
                                                 <button type="button" class="botones-editar" data-bs-toggle="modal"
-                                                        data-bs-target="#modalEditar-{{categoria.id_categoria}}">
+                                                        data-bs-target="#modalEditar-{{ categoria.id_categoria }}">
                                                         <li class="fa fa-edit" style="font-size: 18px;"></li>
                                                 </button>
                                         </td>
                                         <td>
                                                 <button class="botones-eliminar" type="button" data-bs-toggle="modal"
-                                                        data-bs-target="#modalEliminar-{{categoria.id_categoria}}">
+                                                        data-bs-target="#modalEliminar-{{ categoria.id_categoria }}">
                                                         <li class="fa fa-trash" style="font-size: 18px;"></li>
                                                 </button>
                                         </td>
-                                        {% endif %}
-                                        {% endfor %}
-                                        {% else %}
-                                <tr>
-                                        <td align="center" colspan="8">No existen categorias</td>
                                 </tr>
                                 {% endif %}
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                        <td align="center" colspan="3">No existen categorias</td>
                                 </tr>
+                                {% endif %}
                         </tbody>
                 </table>
         </div>
@@ -74,20 +116,21 @@
                         {% if page > 1 %}
                         <li class="page-item">
                                 <a class="page-link"
-                                        href="{{url_for('categorias.categorias_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                                        href="{{ url_for('categorias.categorias_buscar') }}?page={{ page - 1 }}&per_page={{ per_page }}"
                                         aria-label="Previous">
                                         <span aria-hidden="true">&laquo;</span>
                                 </a>
                         </li>
                         {% if page != 1 and page != 2 %}
                         <li class="page-item"><a class="page-link"
-                                        href="{{url_for('categorias.categorias_buscar')}}">1</a></li>
+                                        href="{{ url_for('categorias.categorias_buscar') }}">1</a></li>
                         {% if page != 3 %}
                         <li class="page-item"><a class="page-link disabled">...</a></li>
                         {% endif %}
                         {% endif %}
                         <li class="page-item"><a class="page-link"
-                                        href="{{url_for('categorias.categorias_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+                                        href="{{ url_for('categorias.categorias_buscar') }}?page={{ page - 1 }}&per_page={{ per_page }}">{{
+                                        page - 1 }}</a>
                         </li>
                         {% endif %}
 
@@ -95,21 +138,22 @@
                                 <span class="page-link">{{ page }}</span>
                         </li>
 
-
                         {% if page < total_pages %} <li class="page-item"><a class="page-link"
-                                        href="{{url_for('categorias.categorias_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+                                        href="{{ url_for('categorias.categorias_buscar') }}?page={{ page + 1 }}&per_page={{ per_page }}">{{
+                                        page + 1 }}</a>
                                 </li>
-                                {% if page != total_pages and page != total_pages-1 %}
-                                {% if page != total_pages-2 %}
+                                {% if page != total_pages and page != total_pages - 1 %}
+                                {% if page != total_pages - 2 %}
                                 <li class="page-item"><a class="page-link disabled">...</a></li>
                                 {% endif %}
                                 <li class="page-item"><a class="page-link"
-                                                href="{{url_for('categorias.categorias_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                                                href="{{ url_for('categorias.categorias_buscar') }}?page={{ total_pages }}&per_page={{ per_page }}">{{
+                                                total_pages }}</a>
                                 </li>
                                 {% endif %}
                                 <li class="page-item">
                                         <a class="page-link"
-                                                href="{{url_for('categorias.categorias_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                                                href="{{ url_for('categorias.categorias_buscar') }}?page={{ page + 1 }}&per_page={{ per_page }}"
                                                 aria-label="Next">
                                                 <span aria-hidden="true">&raquo;</span>
                                         </a>
@@ -125,10 +169,12 @@
                         <li class="fa fa-folder mr-2" style="font-size: 18px;"></li> Papelera
                 </a>
         </aside>
-        <!-- ------------------------------------------MODAL--------------------------------------------------- -->
 
-        {% if categorias %} {% for categoria in categorias %}
-        <div class="modal fade" id="modalEliminar-{{categoria.id_categoria}}" data-bs-backdrop="static"
+        <!-- ------------------------------------------MODALES POR CATEGORÍA----------------------------------- -->
+        {% if categorias %}
+        {% for categoria in categorias %}
+        <!-- Modal Eliminar -->
+        <div class="modal fade" id="modalEliminar-{{ categoria.id_categoria }}" data-bs-backdrop="static"
                 data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <div class="modal-dialog">
                         <div class="modal-content">
@@ -144,87 +190,49 @@
                                         <button type="button" class="btn btn-secondary"
                                                 data-bs-dismiss="modal">Cancelar</button>
                                         <a class="btn btn-danger"
-                                                href="{{ url_for('categorias.categoria_eliminar', id = categoria.id_categoria) }}"
+                                                href="{{ url_for('categorias.categoria_eliminar', id=categoria.id_categoria) }}"
                                                 class="btn-delete"><i class="fas fa-trash-alt"></i>Eliminar</a>
                                 </div>
                         </div>
                 </div>
         </div>
 
-        <!-- -----------------------------------------AGREGAR--------------------------------------------- -->
-        <div class="modal fade" id="modalAgregarCategoria" data-bs-backdrop="static" data-bs-keyboard="false"
-                tabindex="-1" aria-labelledby="modalAgregarCategoriaLabel" aria-hidden="true">
+        <!-- Modal Editar -->
+        <div class="modal fade" id="modalEditar-{{ categoria.id_categoria }}" data-bs-backdrop="static"
+                data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <div class="modal-dialog">
                         <div class="modal-content">
-                                <form action="{{ url_for('categorias.categoria_nuevo') }}" method="POST"
-                                        class="formulario">
-
+                                <form action="{{ url_for('categorias.categoria_editar', id=categoria.id_categoria) }}"
+                                        method="post" class="formulario">
                                         <div class="modal-header">
-                                                <h5 class="modal-title" id="modalAgregarCategoriaLabel">Agregar
-                                                        Categoría</h5>
+                                                <h5 class="modal-title" id="staticBackdropLabel">Editar Categoria</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Cerrar"></button>
+                                                        aria-label="Close"></button>
                                         </div>
-
                                         <div class="modal-body">
                                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                                 <div class="input-group">
                                                         <div class="mb-3">
-                                                                <input type="text" class="input-field"
-                                                                        name="nombre_categoria" id="nombre_categoria"
-                                                                        maxlength="15" required placeholder="">
-                                                                <label for="nombre_categoria" class="input-label">Nombre
-                                                                        de la Categoría</label>
+                                                                <input class="input-field" type="text" name="categoria"
+                                                                        id="categoria"
+                                                                        value="{{ categoria.nombre_categoria }}"
+                                                                        required>
+                                                                <label class="input-label"
+                                                                        for="categoria">Categoria</label>
                                                         </div>
                                                 </div>
                                         </div>
-
                                         <div class="modal-footer">
                                                 <button type="button" class="botones"
                                                         data-bs-dismiss="modal">Cancelar</button>
                                                 <button type="submit" class="botones-guardar">Guardar</button>
                                         </div>
-
                                 </form>
                         </div>
                 </div>
         </div>
-
-        <!-- -----------------------------------------EDITAR-------------------------------------------- -->
-        <div class="modal fade" id="modalEditar-{{categoria.id_categoria}}" data-bs-backdrop="static"
-                data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                        <div class="modal-content">
-                                <div class="modal-header">
-                                        <h5 class="modal-tittle" id="staticBackdropLabel">Editar Categoria</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                        <form action="{{ url_for('categorias.categoria_editar', id = categoria.id_categoria) }}"
-                                                method="post" class="formulario">
-                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                                <div class="input-group">
-                                                        <div class="mb-3">
-
-                                                                <input class="input-field" type="text" name="categoria"
-                                                                        id="categoria"
-                                                                        value="{{ categoria.nombre_categoria }}">
-                                                                <label class="input-label"
-                                                                        for="categoria-{{categoria.nombre_categoria}}">Categoria</label>
-                                                        </div>
-                                                </div>
-                                </div>
-                                <div class="modal-footer">
-                                        <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
-                                        <button type="submit" class="botones-guardar">Guardar</button>
-                                </div>
-                                </form>
-                        </div>
-                </div>
-        </div>
-
-        {% endfor %} {% else %} {% endif %}
+        {% endfor %}
+        {% endif %}
 
 </main>
 {% endblock %}

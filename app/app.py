@@ -79,7 +79,29 @@ def login():
 @app.route("/index")
 @login_required
 def index():
-    return render_template('/index.html')
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT COUNT(*) FROM cursos")
+    total_cursos = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM participantes")
+    total_participantes = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM asistencias_detalladas_constancias WHERE constancia_enviada = False")
+    constancias_pendientes = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM ponentes")
+    total_ponentes = cursor.fetchone()[0]
+
+    conn.close()
+
+    return render_template("/index.html",
+        total_cursos=total_cursos,
+        total_participantes=total_participantes,
+        constancias_pendientes=constancias_pendientes,
+        total_ponentes=total_ponentes
+    )
 
 app.config['UPLOAD_FOLDER'] = './static/img/uploads/'
 ruta_comprobantes = app.config['UPLOAD_FOLDER']

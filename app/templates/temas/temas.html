@@ -108,54 +108,57 @@
     </nav>
 
     <!-- ----------------------------------------------------MODAL----------------------------- -->
-    {% if temas %} {% for tema in temas %}
-    <div class="modal fade" id="staticBackdrop-{{tema.id_tema}}" data-bs-backdrop="static" data-bs-keyboard="false"
+    <!-- Modal para editar cada tema -->
+    {% for tema in temas %}
+    <div class="modal fade" id="staticBackdrop-{{ tema.id_tema }}" data-bs-backdrop="static" data-bs-keyboard="false"
         tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <form method="POST" class="modal-content formulario"
+                action="{{ url_for('temas.tema_editar', id=tema.id_tema) }}">
                 <div class="modal-header">
-                    <h5 class="modal-tittle" id="staticBackdropLabel">Editar tema</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="staticBackdropLabel">Editar tema</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
+
                 <div class="modal-body">
-                    <form method="POST" class="formulario" action="{{ url_for('temas.tema_editar', id=tema.id_tema) }}">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-                        <div class="mb-2">
-                            <div class="input-group">
-                                <input type="text" name="nombre_tema" class="input-field" id="nombre_tema"
-                                    placeholder="Nombre del tema" value="{{ tema.nombre_tema }}" required />
-                                <label for="nombre_tema" class="input-label">Nombre del Tema</label>
-                            </div>
+                    <div class="mb-2">
+                        <div class="input-group">
+                            <input type="text" name="nombre_tema" class="input-field" id="nombre_tema"
+                                placeholder="Nombre del tema" value="{{ tema.nombre_tema }}" required>
+                            <label for="nombre_tema" class="input-label">Nombre del Tema</label>
                         </div>
+                    </div>
 
-                        <div class="mb-2">
-                            <div class="input-group">
-                                <select name="id_tipo" id="id_tipo" class="form-select" required>
-                                    <option value="" disabled>Seleccione un sector</option>
-                                    {% if tipos %}
-                                    {% for tipo in tipos %}
-                                    <option value="{{ tipo.0 }}" {% if tipo.1==tema.nombre_tipo %} selected {% endif %}>
-                                        {{ tipo.1 }}</option>
-                                    {% endfor %}
-                                    {% else %}
-                                    <option disabled>Aún no hay registros</option>
-                                    {% endif %}
-                                </select>
-                                <label for="id_tipo" class="input-label">Sector</label>
-                            </div>
+                    <div class="mb-2">
+                        <div class="input-group">
+                            <select name="id_tipo" id="id_tipo" class="form-select" required>
+                                <option value="" disabled>Seleccione un sector</option>
+                                {% if tipos %}
+                                {% for tipo in tipos %}
+                                <option value="{{ tipo.0 }}" {% if tipo.1==tema.nombre_tipo %} selected {% endif %}>
+                                    {{ tipo.1 }}
+                                </option>
+                                {% endfor %}
+                                {% else %}
+                                <option disabled>No hay sectores registrados</option>
+                                {% endif %}
+                            </select>
+                            <label for="id_tipo" class="input-label">Sector</label>
                         </div>
-                    </form>
+                    </div>
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
                     <button class="botones-guardar" type="submit">Guardar</button>
-                    </form>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
+    {% endfor %}
+
 
     <!-- MODAL AGREGAR TEMA -->
     <div class="modal fade" id="modalAgregarTema" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
@@ -197,7 +200,6 @@
             </form>
         </div>
     </div>
-    {% endfor %} {% else %} {% endif %}
 
 </main>
 
