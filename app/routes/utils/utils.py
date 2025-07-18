@@ -9,17 +9,22 @@ load_dotenv()
 
 
 #--------------------------------CONEXION BD------------------------
+import os
+import psycopg2
+
 def get_db_connection():
     try:
-        conn = psycopg2.connect(host=os.environ['db_host'],
-                                # port='5433', 
-                                dbname=os.environ['db_name'], 
-                                user=os.environ['db_username'], 
-                                password=os.environ['db_password'])
+        conn = psycopg2.connect(
+            host=os.environ.get('db_host'),
+            dbname=os.environ.get('db_name'),
+            user=os.environ.get('db_username'),
+            password=os.environ.get('db_password')
+        )
         return conn
     except psycopg2.Error as error:
         print(f"Error de conexión: {error}")
         return None
+
 
 #-----------------------------EMPLEADOS / USUARIOS
 def allowed_username(nombre_usuario):
