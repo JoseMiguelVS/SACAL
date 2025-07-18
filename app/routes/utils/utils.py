@@ -12,7 +12,7 @@ load_dotenv()
 def get_db_connection():
     try:
         conn = psycopg2.connect(host=os.environ['db_host'],
-                                port='5433', 
+                                # port='5433', 
                                 dbname=os.environ['db_name'], 
                                 user=os.environ['db_username'], 
                                 password=os.environ['db_password'])

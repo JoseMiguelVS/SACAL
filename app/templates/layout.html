@@ -31,6 +31,10 @@
 </head>
 
 <body>
+    <!-- Loader oculto -->
+    <div id="loader" style="display: none;">
+        <div class="spinner"></div>
+    </div>
     <header class="header">
         <div class="logo-container">
             <a href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='images/conecta.png') }}"
@@ -157,6 +161,37 @@
     <!-- JS personalizados -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     <script src="{{ url_for('static', filename='js/nav.js') }}"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Mostrar el loader cuando se haga clic en enlaces <a>
+            document.querySelectorAll("a").forEach(link => {
+                link.addEventListener("click", function (e) {
+                    const target = e.currentTarget;
+
+                    // Ignora enlaces con target _blank o anclas
+                    if (
+                        target.target === "_blank" ||
+                        target.href.startsWith("javascript:") ||
+                        target.href.includes("#")
+                    ) {
+                        return;
+                    }
+
+                    document.getElementById("loader").style.display = "flex";
+                });
+            });
+
+            // Mostrar loader al enviar formularios también (opcional)
+            document.querySelectorAll("form").forEach(form => {
+                form.addEventListener("submit", function () {
+                    document.getElementById("loader").style.display = "flex";
+                });
+            });
+        });
+    </script>
+
+
 </body>
 
 </html>

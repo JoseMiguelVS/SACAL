@@ -1,4 +1,4 @@
-from .entities.user import User  # <- sin punto
+from .entities.user import User
 
 class ModuleUser:
     @classmethod
