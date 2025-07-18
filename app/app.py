@@ -2,9 +2,9 @@ from flask import Flask, current_app, render_template, url_for, redirect, reques
 from flask_login import LoginManager, login_user, logout_user, login_required
 from flask_wtf.csrf import CSRFProtect
 
-from models.ModelUser import ModuleUser
-from models.entities.user import User
-from routes.utils.utils import get_db_connection
+from app.models.ModelUser import ModuleUser
+from app.models.entities.user import User
+from app.routes.utils.utils import get_db_connection
 
 # Importa tus Blueprints
 from routes.empleados.routes import empleados
