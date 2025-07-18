@@ -5,7 +5,7 @@ from psycopg2.extras import RealDictCursor
 from werkzeug.security import generate_password_hash
 # app/routes/empleados/routes.py
 
-from utils.listas import lista_rol
+from app.utils.listas import lista_rol
 
 from ..utils.utils import get_db_connection, paginador1, allowed_username
 
