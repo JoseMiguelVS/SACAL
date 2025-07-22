@@ -10,27 +10,35 @@
 }
 
 #loader {
-    position: fixed;
-    z-index: 9999;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background-color: rgba(255, 255, 255, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
+
 .spinner {
-    border: 6px solid #f3f3f3;
-    border-top: 6px solid #3498db;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    animation: spin 1s linear infinite;
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #3498db;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 body {
@@ -159,7 +167,7 @@ html {
   transition: all 0.2s;
 }
 
-.checkbox-pill input[type="checkbox"]:checked + label {
+.checkbox-pill input[type="checkbox"]:checked+label {
   background-color: #0d6efd;
   color: white;
 }
@@ -488,8 +496,8 @@ footer {
   outline: none;
 }
 
-.input-field:focus + .input-label,
-.input-field:not(:placeholder-shown) + .input-label {
+.input-field:focus+.input-label,
+.input-field:not(:placeholder-shown)+.input-label {
   top: -0.5rem;
   left: 0.5rem;
   font-size: 0.75rem;
@@ -497,8 +505,8 @@ footer {
 }
 
 /* Mover label cuando hay selección (no es el primer option) */
-.form-select:focus + .input-label,
-.form-select:not([value=""]) + .input-label {
+.form-select:focus+.input-label,
+.form-select:not([value=""])+.input-label {
   top: -0.5rem;
   left: 0.5rem;
   font-size: 0.75rem;
@@ -572,6 +580,7 @@ footer {
 }
 
 @media screen and (max-width: 1000px) {
+
   .nav-links,
   .btn {
     display: none !important;
@@ -625,4 +634,9 @@ footer {
     top: 15px;
     right: 25px;
   }
+  .header .logo img {
+  height: 50px;
+  width: auto;
+  transition: all 0.3s ease;
+}
 }
