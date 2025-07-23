@@ -2,7 +2,7 @@
 
 <main class="container my-4">
     <h2 class="text-center mb-4">Registrar nuevo ponente</h2>
-    <form method="POST" action="{{ url_for('ponente.ponente_nuevo') }}" enctype="multipart/form-data">
+    <form method="POST" action="{{ url_for('ponentes.ponente_nuevo') }}" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
         <!-- Nombre -->
