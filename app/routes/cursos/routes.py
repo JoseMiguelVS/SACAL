@@ -30,6 +30,15 @@ def cursos_buscar():
 
 #--------------------------------------AGREGAR CURSO-----------------------
 
+@cursos.route("/cursos/agregar")
+@login_required
+def curso_agregar():
+    titulo = 'Agregar curso'
+    return render_template('cursos/cursos_agregar.html', 
+                           titulo = titulo, 
+                           temas = lista_temas(), 
+                           categorias = lista_categorias())
+
 @cursos.route("/cursos/agregar/nuevo", methods=('GET', 'POST'))
 @login_required
 def cursos_nuevo():
@@ -85,6 +94,18 @@ def curso_detalles(id):
     return render_template('cursos/curso_detalles.html', curso = curso)
 
 #---------------------------------EDITAR CURSO-----------------------------------
+@cursos.route('/cursos/editar/<string:id>')
+@login_required
+def curso_editar(id):
+    con = get_db_connection()
+    cur = con.cursor()
+    cur.execute('SELECT * FROM cursos WHERE id_curso={0}'.format(id))
+    curso = cur.fetchall()
+    con.commit()
+    cur.close()
+    con.close()
+    return render_template('cursos/curso_editar.html',curso = curso[0], temas = lista_temas(), categorias = lista_categorias() )
+
 @cursos.route('/cursos/editar/<string:id>', methods=['POST', 'GET'])
 @login_required
 def curso_actualizar(id):
