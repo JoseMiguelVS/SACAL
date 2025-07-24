@@ -260,7 +260,7 @@
 
     <div class="modal fade" id="modalAgregarParticipante" data-bs-backdrop="static" data-bs-keyboard="false"
         tabindex="-1" aria-labelledby="modalAgregarParticipanteLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog">
             <form action="{{ url_for('participantes.participante_nuevo') }}" method="post" class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalAgregarParticipanteLabel">Agregar Participante</h5>
@@ -269,7 +269,7 @@
 
                 <div class="modal-body">
 
-                    <div class="">
+                    <div>
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="nombre_empleado" value="{{ current_user.id_empleado }}">
 
@@ -299,7 +299,7 @@
                         <div class="input-group justify-content-center">
                             <div class="col-md-6">
                                 <input type="text" id="clave_participante" name="clave_participante" class="input-field"
-                                    placeholder="Clave" required>
+                                    placeholder="" required>
                                 <label for="clave_participante" class="input-label">Clave de participante</label>
                             </div>
                         </div>
@@ -308,7 +308,7 @@
                         <div class="input-group justify-content-center">
                             <div class="col-md-6">
                                 <input type="text" id="num_telefono" name="num_telefono" class="input-field"
-                                    placeholder="Teléfono" required>
+                                    placeholder="" required>
                                 <label for="num_telefono" class="input-label">Número de teléfono</label>
                             </div>
                         </div>
@@ -317,7 +317,7 @@
                         <div class="input-group justify-content-center">
                             <div class="col-md-6">
                                 <input type="text" id="nombre_participante" name="nombre_participante"
-                                    class="input-field" placeholder="Nombre" required>
+                                    class="input-field" placeholder="" required>
                                 <label for="nombre_participante" class="input-label">Nombre del participante</label>
                             </div>
                         </div>
@@ -326,7 +326,7 @@
                         <div class="input-group justify-content-center">
                             <div class="col-md-6">
                                 <input type="text" id="apellidos_participante" name="apellidos_participante"
-                                    class="input-field" placeholder="Apellidos" required>
+                                    class="input-field" placeholder="" required>
                                 <label for="apellidos_participante" class="input-label">Apellidos del
                                     participante</label>
                             </div>

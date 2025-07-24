@@ -65,7 +65,7 @@
                 <!-- Curso -->
                 <div class="col-md-5 mb-2">
                     <label class="form-label">Cursos de sesión:</label>
-                    <select name="cursos[]" class="form-select" required style="max-width: 360px; min-width: 360px;">
+                    <select name="cursos[]" class="form-select select-buscable" required style="max-width: 360px; min-width: 360px;">
                         <option value="">Curso</option>
                         {% for curso in cursos %}
                         <option value="{{ curso.0 }}">{{ curso.1 }}</option>
@@ -76,7 +76,7 @@
                 <!-- Ponente -->
                 <div class="col-md-5 mb-2">
                     <label class="form-label">Ponente:</label>
-                    <select name="ponentes[]" class="form-select" required style="max-width: 360px; min-width: 360px;">
+                    <select name="ponentes[]" class="form-select select-buscable" required style="max-width: 360px; min-width: 360px;">
                         <option value="">Ponente</option>
                         {% for ponente in ponentes %}
                         <option value="{{ ponente.0 }}">{{ ponente.1 }}</option>

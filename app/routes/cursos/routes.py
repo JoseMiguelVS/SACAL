@@ -29,14 +29,6 @@ def cursos_buscar():
                            search_query = search_query,)
 
 #--------------------------------------AGREGAR CURSO-----------------------
-@cursos.route("/cursos/agregar")
-@login_required
-def curso_agregar():
-    titulo = 'Agregar curso'
-    return render_template('cursos/cursos_agregar.html', 
-                           titulo = titulo, 
-                           temas = lista_temas(), 
-                           categorias = lista_categorias())
 
 @cursos.route("/cursos/agregar/nuevo", methods=('GET', 'POST'))
 @login_required
@@ -64,7 +56,7 @@ def cursos_nuevo():
             cur.close()
             con.close()
             flash('Error: el curso ya existe. Intente con otro')
-            return redirect(url_for('cursos.curso_agregar'))
+            return redirect(url_for('cursos.curso_buscar'))
         else:
             sql = '''INSERT INTO cursos 
                      (nombre_curso, codigo_curso, tema_curso, duracion_curso, es_nacional, estado, fecha_creacion, fecha_modificacion, categoria_id) 
@@ -76,7 +68,7 @@ def cursos_nuevo():
             con.close()
             flash('Curso agregado correctamente')
             return redirect(url_for('cursos.cursos_buscar'))
-    return redirect(url_for('cursos.curso_agregar'))
+    return redirect(url_for('cursos.curso_buscar'))
 
 #----------------------------------DETALLES DE CURSOS---------------------------
 @cursos.route('/cursos/detalles/<int:id>')
@@ -93,18 +85,6 @@ def curso_detalles(id):
     return render_template('cursos/curso_detalles.html', curso = curso)
 
 #---------------------------------EDITAR CURSO-----------------------------------
-@cursos.route('/cursos/editar/<string:id>')
-@login_required
-def curso_editar(id):
-    con = get_db_connection()
-    cur = con.cursor()
-    cur.execute('SELECT * FROM cursos WHERE id_curso={0}'.format(id))
-    curso = cur.fetchall()
-    con.commit()
-    cur.close()
-    con.close()
-    return render_template('cursos/curso_editar.html',curso = curso[0], temas = lista_temas(), categorias = lista_categorias() )
-
 @cursos.route('/cursos/editar/<string:id>', methods=['POST', 'GET'])
 @login_required
 def curso_actualizar(id):
