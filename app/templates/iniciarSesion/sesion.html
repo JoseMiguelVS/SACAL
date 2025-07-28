@@ -11,17 +11,17 @@
 </head>
 
 {% block body %}
+<!-- Alertas -->
+{% with messages = get_flashed_messages() %} {% if messages %} {% for
+message in messages %}
+<div
+  class="alert alert-dismissible fade show alert-fixed {% if 'Error' in message %}alert-danger{% elif 'Advertencia' in message %}alert-warning{% else %}alert-success{% endif %}"
+  role="alert">
+  <strong>{{ message }}</strong>
+  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endfor %} {% endif %} {% endwith %}
 <div class="body1">
-  <!-- Alertas -->
-  {% with messages = get_flashed_messages() %} {% if messages %} {% for
-  message in messages %}
-  <div
-    class="alert alert-dismissible fade show alert-fixed {% if 'Error' in message %}alert-danger{% elif 'Advertencia' in message %}alert-warning{% else %}alert-success{% endif %}"
-    role="alert">
-    <strong>{{ message }}</strong>
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-  {% endfor %} {% endif %} {% endwith %}
 
   <div class="container1">
     <h2>Iniciar Sesión</h2>
