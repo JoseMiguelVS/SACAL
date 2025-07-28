@@ -372,6 +372,7 @@ footer {
 .botones-eliminar,
 .botones-guardar,
 .botones-editar,
+.boton-sesion,
 .botones-ver {
   display: inline-flex;
   /* Usar inline-flex para todos los botones */
@@ -401,6 +402,17 @@ footer {
   color: #fff;
   background-color: #7d1b1b;
   border-color: #7d1b1b;
+}
+
+.boton-sesion {
+  color: #e56411;
+  border-color: #e56411;
+}
+
+.boton-sesion:hover {
+  color: #fff;
+  background-color: #e56411;
+  border-color: #e56411;
 }
 
 .botones-papelera {
@@ -634,9 +646,27 @@ footer {
     top: 15px;
     right: 25px;
   }
+
   .header .logo img {
-  height: 50px;
-  width: auto;
-  transition: all 0.3s ease;
-}
+    height: 30px;
+    width: auto;
+    transition: all 0.3s ease;
+  }
+
+  .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* Espacio entre logos */
+  }
+
+  .logo-container img {
+    height: 50px;
+    width: auto;
+    transition: transform 0.3s ease;
+  }
+
+  .logo-container img:hover {
+    transform: scale(1.1);
+  }
 }

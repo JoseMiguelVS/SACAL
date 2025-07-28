@@ -40,7 +40,7 @@
 </head>
 
 <body>
-    <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
+    <!-- Alertas -->
     {% with messages = get_flashed_messages() %} {% if messages %} {% for
     message in messages %}
     <div class="alert alert-dismissible fade show alert-fixed {% if 'Error' in message %}alert-danger{% elif 'Advertencia' in message %}alert-warning{% else %}alert-success{% endif %}"
@@ -73,18 +73,19 @@
                 <a class="herramientas" href="#">Bitácoras <i class="fas fa-angle-down"></i></a>
                 <ul class="tools">
                     <li>
-                        <a href="{{ url_for('sesiones.sesiones_buscar') }}">Sesiones</a>
+                        <a href="{{ url_for('sesiones.sesiones_buscar') }}" style="color: white;">Sesiones</a>
                     </li>
                     <li>
-                        <a href="{{ url_for('participantes.participantes_buscar') }}">Participantes</a>
+                        <a href="{{ url_for('participantes.participantes_buscar') }}"
+                            style="color: white;">Participantes</a>
                     </li>
                     <li>
-                        <a href="{{ url_for('constancias.constancias_buscar') }}">Constancias</a>
+                        <a href="{{ url_for('constancias.constancias_buscar') }}" style="color: white;">Constancias</a>
                     </li>
                     {% if current_user.rol == 1 %}
-                    <li><a href="{{ url_for('pagos.pagos_buscar') }}">Pagos</a></li>
+                    <li><a href="{{ url_for('pagos.pagos_buscar') }}"> style="color: white;"Pagos</a></li>
                     <li>
-                        <a href="{{ url_for('resumen_semanal.resumen') }}">Resumen</a>
+                        <a href="{{ url_for('resumen_semanal.resumen') }}" style="color: white;">Resumen</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -111,34 +112,36 @@
             </li>
         </ul>
 
-        <a href="{{ url_for('logout') }}" class="btn"><button>Cerrar sesión</button></a>
         <a href="#" onclick="openNav()" class="menu"><button>Menú</button></a>
 
-        <div class="overlay" id="mobile-menu" style="color: white;">
+        <div class="overlay" id="mobile-menu">
             <a href="javascript:void(0)" onclick="closeNav()" class="close">&times;</a>
             <div class="overlay-content">
                 {% if current_user.rol == 1 %}
                 <li>
-                    <a href="{{ url_for('empleados.empleadosBuscar') }}">Empleados</a>
+                    <a href="{{ url_for('empleados.empleadosBuscar') }}" style="color: white;">Empleados</a>
                 </li>
                 {% endif %}
 
                 <li>
-                    <a class="herramientas m-2" href="#">Bitácoras <i class="fas fa-angle-down"></i></a>
+                    <a class="herramientas m-2" href="#" style="color: white;">Bitácoras <i
+                            class="fas fa-angle-down"></i></a>
                     <ul class="tools">
                         <li>
-                            <a href="{{ url_for('sesiones.sesiones_buscar') }}">Sesiones</a>
+                            <a href="{{ url_for('sesiones.sesiones_buscar') }}" style="color: white;">Sesiones</a>
                         </li>
                         <li>
-                            <a href="{{ url_for('participantes.participantes_buscar') }}">Participantes</a>
+                            <a href="{{ url_for('participantes.participantes_buscar') }}"
+                                style="color: white;">Participantes</a>
                         </li>
                         <li>
-                            <a href="{{ url_for('constancias.constancias_buscar') }}">Constancias</a>
+                            <a href="{{ url_for('constancias.constancias_buscar') }}"
+                                style="color: white;">Constancias</a>
                         </li>
                         {% if current_user.rol == 1 %}
-                        <li><a href="{{ url_for('pagos.pagos_buscar') }}">Pagos</a></li>
+                        <li><a href="{{ url_for('pagos.pagos_buscar') }}" style="color: white;">Pagos</a></li>
                         <li>
-                            <a href="{{ url_for('resumen_semanal.resumen') }}">Resumen</a>
+                            <a href="{{ url_for('resumen_semanal.resumen') }}" style="color: white;">Resumen</a>
                         </li>
                         {% endif %}
                     </ul>
@@ -148,20 +151,20 @@
                     <a class="herramientas" href="#">Herramientas <i class="fas fa-angle-down"></i></a>
                     <ul class="tools">
                         <li>
-                            <a href="{{ url_for('ponentes.ponentes_buscar') }}">Ponentes</a>
+                            <a href="{{ url_for('ponentes.ponentes_buscar') }}" style="color: white;">Ponentes</a>
                         </li>
                         <li>
-                            <a href="{{ url_for('categorias.categorias_buscar') }}">Categorías</a>
+                            <a href="{{ url_for('categorias.categorias_buscar') }}" style="color: white;">Categorías</a>
                         </li>
                         <li>
-                            <a href="{{ url_for('paquete.paquetes_buscar') }}">Paquetes</a>
+                            <a href="{{ url_for('paquete.paquetes_buscar') }}" style="color: white;">Paquetes</a>
                         </li>
                         <li>
-                            <a href="{{ url_for('cursos.cursos_buscar') }}">Cursos</a>
+                            <a href="{{ url_for('cursos.cursos_buscar') }}" style="color: white;">Cursos</a>
                         </li>
-                        <li><a href="{{ url_for('temas.temas_buscar') }}">Temas</a></li>
-                        <li><a href="{{ url_for('perfil.ver_perfil') }}">Perfil</a></li>
-                        <li><a href="{{ url_for('logout') }}" class="btn"><button>Cerrar sesión</button></a></li>
+                        <li><a href="{{ url_for('temas.temas_buscar') }}" style="color: white;">Temas</a></li>
+                        <li><a href="{{ url_for('perfil.ver_perfil') }}" style="color: white;">Perfil</a></li>
+                        <li><a href="{{ url_for('logout') }}" style="color: white;">Cerrar sesión</a></li>
                     </ul>
                 </li>
             </div>
