@@ -52,3 +52,23 @@
     background-color: #e56411;
     border-color: #e56411;
 }
+
+.boton-sesion {
+    display: inline-flex;
+    /* Usar inline-flex para todos los botones */
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    border: 1px solid;
+    /* Definir el borde base aquí */
+    border-radius: 0.375rem;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+        border-color 0.15s ease-in-out;
+    background-color: transparent;
+    /* Fondo transparente por defecto */
+}
