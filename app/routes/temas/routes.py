@@ -4,7 +4,7 @@ from psycopg2.extras import RealDictCursor
 
 from app.utils.listas import lista_tiposCur
 
-from ..utils.utils import get_db_connection, paginador2, paginador3
+from ..utils.utils import get_db_connection, paginador2
 
 temas = Blueprint('temas',__name__)
 
@@ -25,7 +25,7 @@ def temas_buscar():
         params_count = ()
         params_lim = ()
 
-    paginado = paginador3(sql_count, sql_lim, params_count, params_lim, 1, 5)
+    paginado = paginador2(sql_count, sql_lim, params_count, params_lim, 1, 5)
 
     return render_template('temas/temas.html',
                                 tipos = lista_tiposCur(),
