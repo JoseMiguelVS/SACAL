@@ -1,48 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="{{ url_for('static',filename = 'css/sesion.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static',filename = 'css/bootstrap.min.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static',filename = 'css/docs.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{{ url_for('static',filename='css/sesion.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static',filename='css/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static',filename='css/docs.css') }}">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css">
+  <title>Iniciar Sesión</title>
 </head>
 
-{% block body %}
-<!-- Alertas -->
-{% with messages = get_flashed_messages() %} {% if messages %} {% for
-message in messages %}
-<div
-  class="alert alert-dismissible fade show alert-fixed {% if 'Error' in message %}alert-danger{% elif 'Advertencia' in message %}alert-warning{% else %}alert-success{% endif %}"
-  role="alert">
-  <strong>{{ message }}</strong>
-  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-{% endfor %} {% endif %} {% endwith %}
-<div class="body1">
+<body>
+  {% block body %}
 
-  <div class="container1">
-    <h2>Iniciar Sesión</h2>
-    <main class="form-signin w-70 m-auto mt-5 mb-5 text-center">
-      <form action="{{ url_for('loguear') }}" method="POST">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <div class="form-group">
-          <label for="nombre_usuario">Nombre usuario</label>
-          <input type="text" class="form-control" id="nombre_usuario" placeholder="Nombre" name="nombre_usuario">
-        </div>
-        <div class="form-group">
-          <label for="contrasenia">Contraseña</label>
-          <input type="password" class="form-control" id="contrasenia" placeholder="Contraseña" name="contrasenia">
-        </div>
-        <button class="boton-sesion align-items-center" type="submit">
-          Entrar
-        </button>
-      </form>
-    </main>
+  <div class="body1">
+    <div class="container1">
+      <h2 class="text-center mb-4">Iniciar Sesión</h2>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i><strong>{{ message }}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+          </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <main class="form-signin text-center">
+        <form action="{{ url_for('loguear') }}" method="POST">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <div class="form-group">
+            <label for="nombre_usuario">Nombre de usuario</label>
+            <input type="text" class="form-control {% if 'usuario' in get_flashed_messages()|join %}is-invalid{% endif %}" 
+                   id="nombre_usuario" placeholder="Nombre" name="nombre_usuario" required>
+          </div>
+
+          <div class="form-group">
+            <label for="contrasenia">Contraseña</label>
+            <input type="password" class="form-control {% if 'contraseña' in get_flashed_messages()|join %}is-invalid{% endif %}" 
+                   id="contrasenia" placeholder="Contraseña" name="contrasenia" required>
+          </div>
+
+          <div class="form-check mt-2 text-start">
+            <input class="form-check-input" type="checkbox" id="mostrarContrasenia" onclick="togglePassword()">
+            <label class="form-check-label" for="mostrarContrasenia">Mostrar contraseña</label>
+          </div>
+
+          <button class="boton-sesion w-100 mt-3" type="submit">Entrar</button>
+        </form>
+      </main>
+    </div>
   </div>
-</div>
-{% endblock %}
 
+  <script>
+    function togglePassword() {
+      const input = document.getElementById("contrasenia");
+      input.type = input.type === "password" ? "text" : "password";
+    }
+  </script>
+
+  {% endblock %}
+</body>
 </html>

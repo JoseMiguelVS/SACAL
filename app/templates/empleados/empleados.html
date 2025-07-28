@@ -316,13 +316,19 @@
                                         <div class="mb-2">
                                                 <div class="input-group">
                                                         <input type="password" name="contrasenia_empleado"
-                                                                class="input-field"
-                                                                id="usuario-{{ empleado.contrasenia_empleado }}"
-                                                                placeholder="Nueva contraseña" limit="8" required />
-                                                        <label for="usuario-{{ empleado.id_empleado }}"
-                                                                class="input-label">Nueva Contraseña</label>
+                                                                class="form-control"
+                                                                id="contrasenia-{{ empleado.id_empleado }}"
+                                                                placeholder="Nueva contraseña" minlength="8" required />
+                                                        <button class="btn btn-outline-secondary" type="button"
+                                                                onclick="togglePassword('{{ empleado.id_empleado }}')">
+                                                                <i class="fa fa-eye"
+                                                                        id="icono-ojo-{{ empleado.id_empleado }}"></i>
+                                                        </button>
                                                 </div>
+                                                <label for="contrasenia-{{ empleado.id_empleado }}"
+                                                        class="form-label">Nueva Contraseña</label>
                                         </div>
+
                                 </div>
                                 <div class="modal-footer">
                                         <button type="button" class="botones-cancelar" data-bs-dismiss="modal">
@@ -414,11 +420,14 @@
                                         <div class="mb-2">
                                                 <div class="input-group">
                                                         <input type="password" name="contrasenia_empleado"
-                                                                class="input-field" id="contrasenia_empleado"
+                                                                class="form-control" id="contrasenia_empleado"
                                                                 placeholder="Contraseña" required />
-                                                        <label for="contrasenia_empleado"
-                                                                class="input-label">Contraseña</label>
+                                                        <button class="btn btn-outline-secondary" type="button"
+                                                                onclick="togglePasswordSimple()">
+                                                                <i class="fa fa-eye" id="icono-ojo-simple"></i>
+                                                        </button>
                                                 </div>
+                                                <label for="contrasenia_empleado" class="form-label">Contraseña</label>
                                         </div>
                                 </div>
                                 <div class="modal-footer">
@@ -431,5 +440,37 @@
                 </div>
         </div>
 </main>
+
+<script>
+        function togglePasswordSimple() {
+                const input = document.getElementById("contrasenia_empleado");
+                const icono = document.getElementById("icono-ojo-simple");
+                if (input.type === "password") {
+                        input.type = "text";
+                        icono.classList.remove("fa-eye");
+                        icono.classList.add("fa-eye-slash");
+                } else {
+                        input.type = "password";
+                        icono.classList.remove("fa-eye-slash");
+                        icono.classList.add("fa-eye");
+                }
+        }
+</script>
+
+<script>
+        function togglePassword(id) {
+                const input = document.getElementById(`contrasenia-${id}`);
+                const icono = document.getElementById(`icono-ojo-${id}`);
+                if (input.type === "password") {
+                        input.type = "text";
+                        icono.classList.remove("fa-eye");
+                        icono.classList.add("fa-eye-slash");
+                } else {
+                        input.type = "password";
+                        icono.classList.remove("fa-eye-slash");
+                        icono.classList.add("fa-eye");
+                }
+        }
+</script>
 
 {% endblock %}

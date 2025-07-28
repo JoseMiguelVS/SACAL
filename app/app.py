@@ -58,17 +58,22 @@ def loguear():
     if request.method == 'POST':
         nombre_usuario = request.form['nombre_usuario']
         contrasenia = request.form['contrasenia']
-        user_input = User(0, nombre_usuario, contrasenia)
-        loged_user = ModuleUser.login(get_db_connection(), user_input)
 
-        if loged_user:
-            login_user(loged_user)
-            return redirect(url_for('index'))
+        db = get_db_connection()
+        user = ModuleUser.get_by_username(db, nombre_usuario)
+
+        if not user:
+            flash('Error en el campo usuario: el usuario no existe', 'danger')
+        elif not User.check_password(user.contrasenia, contrasenia):
+            flash('Error en el campo contraseña: contraseña incorrecta', 'danger')
         else:
-            flash('Usuario o contraseña incorrectos')
-            return redirect(url_for('login'))
+            login_user(user)
+            return redirect(url_for('index'))
+
+        return redirect(url_for('login'))
 
     return render_template('login.html')
+
 
 @app.route('/logout')
 def logout():
@@ -109,6 +114,6 @@ def index():
 # -------------------------- Desarrollo local --------------------------
 if __name__ == '__main__':
     csrf.init_app(app)
-    app.register_error_handler(404, lambda error: render_template('404.html'), 404)
+    app.register_error_handler(404, lambda error: render_template('404.html'))
     app.register_error_handler(401, lambda error: redirect(url_for('login')))
     app.run(debug=True, port=5000)

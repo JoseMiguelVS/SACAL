@@ -41,3 +41,23 @@ class ModuleUser:
             return None
         except Exception as ex:
             raise Exception(ex)
+        
+    @classmethod
+    def get_by_username(cls, db, nombre_usuario):
+        try:
+            cur = db.cursor()
+            sql = "SELECT id_empleado, nombre_usuario, contrasenia_empleado, estado, rol FROM empleados WHERE estado='True' AND nombre_usuario=%s"
+            cur.execute(sql, (nombre_usuario,))
+            row = cur.fetchone()
+            if row:
+                return User(
+                    id_empleado=row[0],
+                    nombre_usuario=row[1],
+                    contrasenia=row[2],  # Conservamos la contraseña para validarla después
+                    estado=row[3],
+                    rol=row[4]
+                )
+            return None
+        except Exception as ex:
+            raise Exception(ex)
+

@@ -25,9 +25,9 @@ def temas_buscar():
         params_count = ()
         params_lim = ()
 
-        paginado = paginador3(sql_count, sql_lim, params_count, params_lim, 1, 5)
+    paginado = paginador3(sql_count, sql_lim, params_count, params_lim, 1, 5)
 
-        return render_template('temas/temas.html',
+    return render_template('temas/temas.html',
                                 tipos = lista_tiposCur(),
                                 temas = paginado[0],
                                 page = paginado[1],
@@ -37,7 +37,7 @@ def temas_buscar():
                                 search_query = search_query)
     
 # ---------------------- AGREGAR TEMA ----------------------
-@temas.route("/cursos/temas/agregar/nuevo", methods=['POST'])
+@temas.route("/temas/agregar/nuevo", methods=['POST'])
 @login_required
 def tema_nuevo():
     if request.method == 'POST':
@@ -68,7 +68,7 @@ def tema_nuevo():
 
 
 # ---------------------------------- EDITAR TEMA (vista para cargar los datos en una página) ---------------------
-@temas.route('/cursos/temas/editar/<string:id>')
+@temas.route('/temas/editar/<string:id>')
 @login_required
 def tema_editar(id):
     con = get_db_connection()
@@ -88,7 +88,7 @@ def tema_editar(id):
         return redirect(url_for('temas.temas_buscar'))
 
 
-@temas.route('/cursos/temas/editar/<string:id>', methods=['POST', 'GET'])
+@temas.route('/temas/editar/<string:id>', methods=['POST', 'GET'])
 @login_required
 def tema_actualizar(id):
     if request.method == 'POST':
