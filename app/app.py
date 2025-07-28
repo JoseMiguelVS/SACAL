@@ -47,7 +47,8 @@ app.register_blueprint(resumen_semanal)
 app.register_blueprint(perfil)
 
 # Configuración
-app.config['UPLOAD_FOLDER'] = './static/img/uploads/'
+# app.config['UPLOAD_FOLDER'] = './static/img/uploads/'
+app.config['UPLOAD_FOLDER'] = '/tmp'
 ruta_comprobantes = app.config['UPLOAD_FOLDER']
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 

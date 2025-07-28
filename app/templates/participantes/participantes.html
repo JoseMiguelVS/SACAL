@@ -332,32 +332,6 @@
                             </div>
                         </div>
 
-                        <!-- Forma de pago -->
-                        <div class="input-group justify-content-center">
-                            <div class="col-md-6 mb-3">
-                                <select name="id_forma" id="id_forma" class="form-select" required>
-                                    <option value="" selected disabled>Seleccione la forma de pago</option>
-                                    {% for forma in formas %}
-                                    <option value="{{ forma[0] }}">{{ forma[1] }}</option>
-                                    {% endfor %}
-                                </select>
-                                <label for="id_forma" class="input-label">Forma de pago</label>
-                            </div>
-                        </div>
-
-                        <!-- Cuenta destino -->
-                        <div class="input-group justify-content-center">
-                            <div class="col-md-6 mb-3">
-                                <select name="id_cuenta" id="id_cuenta" class="form-select" required>
-                                    <option value="" selected disabled>Selecciona una cuenta</option>
-                                    {% for cuenta in cuentas %}
-                                    <option value="{{ cuenta[0] }}">{{ cuenta[1] }}</option>
-                                    {% endfor %}
-                                </select>
-                                <label for="id_cuenta" class="input-label">Cuenta destino</label>
-                            </div>
-                        </div>
-
                         <!-- Paquete -->
                         <div class="input-group justify-content-center">
                             <div class="col-md-6 mb-3">
@@ -507,6 +481,32 @@
                     <input type="hidden" name="nombre_participante" value="{{ p.nombre_participante }}">
                     <input type="hidden" name="apellidos_participante" value="{{ p.apellidos_participante }}">
                     <input type="hidden" name="clave_participante" value="{{ p.clave_participante }}">
+
+                    <!-- Forma de pago -->
+                    <div class="input-group justify-content-center">
+                        <div class="col-md-6 mb-3">
+                            <select name="id_forma" id="id_forma" class="form-select" required>
+                                <option value="" selected disabled>Seleccione la forma de pago</option>
+                                {% for forma in formas %}
+                                <option value="{{ forma[0] }}">{{ forma[1] }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="id_forma" class="input-label">Forma de pago</label>
+                        </div>
+                    </div>
+
+                    <!-- Cuenta destino -->
+                    <div class="input-group justify-content-center">
+                        <div class="col-md-6 mb-3">
+                            <select name="id_cuenta" id="id_cuenta" class="form-select" required>
+                                <option value="" selected disabled>Selecciona una cuenta</option>
+                                {% for cuenta in cuentas %}
+                                <option value="{{ cuenta[0] }}">{{ cuenta[1] }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="id_cuenta" class="input-label">Cuenta destino</label>
+                        </div>
+                    </div>
 
                     <!-- Zona drag and drop -->
                     <div class="drop-zone" id="drop-zone-{{ p.id_participante }}">

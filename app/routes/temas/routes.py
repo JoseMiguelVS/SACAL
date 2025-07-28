@@ -20,7 +20,7 @@ def temas_buscar():
         params_count = (f"{search_query}%",)
         params_lim = (f"{search_query}%",)
     else:
-        sql_count = 'SELECT COUNT(*) FROM detalles_temas'
+        sql_count = 'SELECT COUNT(*) FROM detalles_temas WHERE nombre_tema ILIKE %s'
         sql_lim = 'SELECT * FROM detalles_temas ORDER BY id_tema DESC LIMIT %s OFFSET %s;'
         params_count = ()
         params_lim = ()
@@ -30,11 +30,11 @@ def temas_buscar():
         return render_template('temas/temas.html',
                                 tipos = lista_tiposCur(),
                                 temas = paginado[0],
-                                page=paginado[1],
-                                per_page=paginado[2],
-                                total_items=paginado[3],
-                                total_pages=paginado[4],
-                                search_query=search_query)
+                                page = paginado[1],
+                                per_page = paginado[2],
+                                total_items = paginado[3],
+                                total_pages = paginado[4],
+                                search_query = search_query)
     
 # ---------------------- AGREGAR TEMA ----------------------
 @temas.route("/cursos/temas/agregar/nuevo", methods=['POST'])

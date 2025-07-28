@@ -207,8 +207,6 @@ def participante_nuevo():
         num_telefono = re.sub(r'\D', '', request.form['num_telefono'])
         clave_participante = request.form['clave_participante']
         nombre_empleado = request.form['nombre_empleado']
-        cuenta_destino = request.form['id_cuenta']
-        forma_pago = request.form['id_forma']
         paquete = request.form['paquete']
         sesion = request.form['id_sesion']
         equipos = request.form['equipos']
@@ -230,11 +228,11 @@ def participante_nuevo():
         # 1. Insertar participante
         sql = '''
             INSERT INTO participantes 
-            (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino, equipos, forma_pago)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, equipos)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id_participante
         '''
-        valores = (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, cuenta_destino, equipos, forma_pago )
+        valores = (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, equipos )
         cur.execute(sql, valores)
 
         # 2. Obtener el ID recién creado
@@ -252,8 +250,8 @@ def participante_nuevo():
         valores3 = (participante_id, constancia_generada, constancia_enviada, asistencia_id)
         cur.execute(sql3, valores3)
 
-        sql4 = "INSERT INTO pagos (ingresos, participante, validacion_pago, forma_pago,concepto_factura) VALUES (%s, %s, %s, %s, %s)"
-        valores4 = (precio_paquete, participante_id, forma_pago,'1','3')
+        sql4 = "INSERT INTO pagos (ingresos, participante, validacion_pago, concepto_factura) VALUES (%s, %s, %s, %s)"
+        valores4 = (precio_paquete, participante_id,'1','3')
         cur.execute(sql4, valores4)
 
         # 4. Guardar cambios y cerrar conexión
@@ -367,6 +365,8 @@ def participante_comprobante(id):
     nombre_participante = request.form['nombre_participante'].strip()
     apellidos_participante = request.form['apellidos_participante'].strip()
     clave_participante = request.form['clave_participante'].strip()
+    cuenta_destino = request.form['id_cuenta']
+    forma_pago = request.form['id_forma']
     creado = datetime.now()
 
     imagenes = request.files.getlist('fotos')
@@ -374,6 +374,13 @@ def participante_comprobante(id):
 
     con = get_db_connection()
     cur = con.cursor()
+
+    sql1 = '''
+                UPDATE pagos SET cuenta_destino = %s, forma_pago = %s WHERE id_participantes = %s
+           '''
+    valores1 = (cuenta_destino, forma_pago, id)
+
+    cur.execute(sql1, valores1)
 
     for imagen in imagenes:
         if imagen and allowed_file(imagen.filename):
@@ -392,10 +399,6 @@ def participante_comprobante(id):
                 VALUES (%s, %s, %s)
             '''
             cur.execute(sql, (id, nombre_archivo, creado))
-
-            sql2 =  '''
-                        INSERT INTO pagos ()
-                    '''
 
     con.commit()
     cur.close()
