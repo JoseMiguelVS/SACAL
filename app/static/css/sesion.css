@@ -41,3 +41,14 @@
     color: #ffffff;
     cursor: pointer;
 }
+
+.boton-sesion {
+    color: #e56411;
+    border-color: #e56411;
+}
+
+.boton-sesion:hover {
+    color: #fff;
+    background-color: #e56411;
+    border-color: #e56411;
+}
