@@ -127,6 +127,7 @@
                 <thead class="table-light small">
                     <tr>
                         <th>Clave</th>
+                        <th>Telefono</th>
                         <th>Nombre</th>
                         <th>Apellidos</th>
                         <th>Paquete</th>
@@ -150,6 +151,8 @@
                     {% if p.estado == True %}
                     <tr data-id="{{ p.id_participante }}">
                         <td><input type="text" name="clave_participante" value="{{ p.clave_participante }}"
+                                onchange="guardarFila(this)"></td>
+                        <td><input type="text" name="num_telefono" value="{{ p.num_telefono }}"
                                 onchange="guardarFila(this)"></td>
                         <td><input type="text" name="nombre_participante" value="{{ p.nombre_participante }} "
                                 onchange="guardarFila(this)"></td>

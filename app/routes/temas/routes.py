@@ -4,7 +4,7 @@ from psycopg2.extras import RealDictCursor
 
 from app.utils.listas import lista_tiposCur
 
-from ..utils.utils import get_db_connection, paginador2
+from ..utils.utils import get_db_connection, paginador2, paginador3
 
 temas = Blueprint('temas',__name__)
 
@@ -12,7 +12,7 @@ temas = Blueprint('temas',__name__)
 @temas.route('/cursos/temas')
 @login_required
 def temas_buscar():
-    search_query = request.args.get('buscar','',type = str).strip()
+    search_query = request.args.get('buscar', '', type = str)
 
     if search_query:
         sql_count = 'SELECT COUNT(*) FROM detalles_temas WHERE nombre_tema ILIKE %s; '
@@ -20,12 +20,12 @@ def temas_buscar():
         params_count = (f"{search_query}%",)
         params_lim = (f"{search_query}%",)
     else:
-        sql_count = 'SELECT COUNT(*) FROM detalles_temas WHERE nombre_tema ILIKE %s'
+        sql_count = 'SELECT COUNT(*) FROM detalles_temas'
         sql_lim = 'SELECT * FROM detalles_temas ORDER BY id_tema DESC LIMIT %s OFFSET %s;'
         params_count = ()
         params_lim = ()
 
-        paginado = paginador2(sql_count, sql_lim, params_count, params_lim, 1, 5)
+        paginado = paginador3(sql_count, sql_lim, params_count, params_lim, 1, 5)
 
         return render_template('temas/temas.html',
                                 tipos = lista_tiposCur(),

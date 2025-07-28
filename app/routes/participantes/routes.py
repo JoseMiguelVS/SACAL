@@ -275,6 +275,7 @@ def actualizar_participante(id):
     sql_participante = '''
         UPDATE participantes SET
             clave_participante = %s,
+            num_telefono = %s,
             nombre_participante = %s,
             apellidos_participante = %s,
             nombre_paquete = %s,
@@ -292,6 +293,7 @@ def actualizar_participante(id):
     valores = (
         datos['clave_participante'],
         datos['nombre_participante'],
+        datos['num_telefono'],
         datos['apellidos_participante'],
         datos['nombre_paquete'],
         datos['fecha_pago'] or None,
