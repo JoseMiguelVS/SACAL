@@ -23,6 +23,7 @@
     <!-- Estilos locales -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos1.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/docs.css') }}" />
+    <link rel="icon" href="{{ url_for('static', filename='images/conecta.png') }}" type="image/png">
 
     <!-- jQuery (requerido por Select2) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -49,8 +50,6 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     {% endfor %} {% endif %} {% endwith %}
-
-    <link rel="icon" href="{{ url_for('static', filename='images/conecta.png') }}" type="image/png">
 
     <!-- Loader oculto -->
     <div id="loader" style="display: none;">
