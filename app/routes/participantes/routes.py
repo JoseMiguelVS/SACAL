@@ -12,6 +12,7 @@ from ..utils.utils import allowed_file, get_db_connection, my_random_string, pag
 
 from supabase import create_client
 import io
+import urllib.parse
 
 SUPABASE_URL = "https://ipecmsarkhzdzkkanxvj.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwZWNtc2Fya2h6ZHpra2FueHZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MjY4ODAsImV4cCI6MjA2OTMwMjg4MH0.dy4dSDzoTifaRTU-wQnl6oju1iiYdxHN-p0kBbYU1lI"
@@ -396,17 +397,13 @@ def participante_comprobante(id):
     con = get_db_connection()
     cur = con.cursor()
 
-    sql1 = '''
-                UPDATE pagos SET forma_pago = %s WHERE participante = %s
-           '''
-    valores1 = (forma_pago, id)
-    cur.execute(sql1, valores1)
+    # Actualiza pagos
+    sql1 = '''UPDATE pagos SET forma_pago = %s WHERE participante = %s'''
+    cur.execute(sql1, (forma_pago, id))
 
-    sql2 = '''
-                UPDATE participantes SET cuenta_destino = %s, forma_pago = %s WHERE id_participante = %s
-           '''
-    valores2 = (cuenta_destino, forma_pago, id)
-    cur.execute(sql2, valores2)
+    # Actualiza participante
+    sql2 = '''UPDATE participantes SET cuenta_destino = %s, forma_pago = %s WHERE id_participante = %s'''
+    cur.execute(sql2, (cuenta_destino, forma_pago, id))
 
     for imagen in imagenes:
         if imagen and allowed_file(imagen.filename):
@@ -414,24 +411,29 @@ def participante_comprobante(id):
             nombre_archivo = f"{nombre_participante}_{apellidos_participante}_{clave_participante}_{creado.strftime('%Y-%m-%d')}_{cadena_aleatoria}_{secure_filename(imagen.filename)}"
             file_path = os.path.join(ruta, nombre_archivo)
 
-            # Leer imagen como binario
             imagen_bytes = imagen.read()
+
+            # Construir path remoto
             path_remoto = f"{clave_participante}/{nombre_archivo}"
 
-            # Subir a Supabase Storage
+            # ✅ Codificar path para Supabase
+            path_remoto_encoded = urllib.parse.quote(path_remoto, safe='/')
+
+            # Subir a Supabase
             supabase.storage.from_(BUCKET_NAME).upload(
-                path_remoto,
+                path_remoto_encoded,
                 imagen_bytes,
                 file_options={"content-type": imagen.content_type}
             )
 
-        cur.execute(
-                    '''
-                    INSERT INTO comprobantes_pago (participante_id, comprobante_img, fecha_creacion)
-                    VALUES (%s, %s, %s)
-                    ''',
-                        (id, path_remoto, creado)
-                    )
+            # Registrar en DB
+            cur.execute(
+                '''
+                INSERT INTO comprobantes_pago (participante_id, comprobante_img, fecha_creacion)
+                VALUES (%s, %s, %s)
+                ''',
+                (id, path_remoto, creado)
+            )
 
     con.commit()
     cur.close()
