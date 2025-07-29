@@ -397,7 +397,7 @@ def participante_comprobante(id):
     cur = con.cursor()
 
     sql1 = '''
-                UPDATE pagos SET cuenta_destino = %s, forma_pago = %s WHERE id_participante = %s
+                UPDATE pagos SET cuenta_destino = %s, forma_pago = %s WHERE participante = %s
            '''
     valores1 = (cuenta_destino, forma_pago, id)
 
