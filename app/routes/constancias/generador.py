@@ -115,7 +115,7 @@ def generar_constancia(participante, qr_path=None):
             draw_centrado(c, texto_fecha, 120, "Montserrat-Bold", 10)   
 
             if qr_path:
-                c.drawImage(qr_path, x=250, y=25, width=90, height=90)
+                c.drawImage(qr_path, x=250, y=25, width=90, height=90, mask='auto')
 
         case 'empresarial':
             texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
@@ -136,7 +136,7 @@ def generar_constancia(participante, qr_path=None):
             draw_centrado(c, texto_fecha, 150, "Montserrat-Bold", 10)
 
             if qr_path:
-                c.drawImage(qr_path, x=250, y=25, width=90, height=90)
+                c.drawImage(qr_path, x=250, y=25, width=90, height=90, mask='auto')
 
         case 'psicologia':
 
@@ -158,7 +158,7 @@ def generar_constancia(participante, qr_path=None):
             draw_centrado(c, texto_fecha, 120, "Montserrat-Bold", 10)
 
             if qr_path:
-                c.drawImage(qr_path, x=50, y=25, width=150, height=150)
+                c.drawImage(qr_path, x=50, y=25, width=150, height=150, mask='auto')
 
         case 'especializacion':
             # definir textos
@@ -175,7 +175,7 @@ def generar_constancia(participante, qr_path=None):
             draw_centrado(c, fecha_txt, 215, "Montserrat-Bold", 10)
 
             if qr_path:
-                c.drawImage(qr_path, x=175, y=80, width=90, height=90)
+                c.drawImage(qr_path, x=175, y=80, width=90, height=90, mask='auto')
 
     c.showPage()
         

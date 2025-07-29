@@ -10,6 +10,15 @@ from app.utils.listas import lista_cuentas, lista_cursos, lista_equipos, lista_f
 
 from ..utils.utils import allowed_file, get_db_connection, my_random_string, paginador3
 
+from supabase import create_client
+import io
+
+SUPABASE_URL = "https://ipecmsarkhzdzkkanxvj.supabase.co"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlwZWNtc2Fya2h6ZHpra2FueHZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3MjY4ODAsImV4cCI6MjA2OTMwMjg4MH0.dy4dSDzoTifaRTU-wQnl6oju1iiYdxHN-p0kBbYU1lI"
+BUCKET_NAME = "tickets"
+
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
 participantes = Blueprint('participantes', __name__) 
 
 #---------------------------------------------------------------PARTICIPANTES--------------------------------------------------------------------------
@@ -390,17 +399,22 @@ def participante_comprobante(id):
             nombre_archivo = f"{nombre_participante}_{apellidos_participante}_{clave_participante}_{creado.strftime('%Y-%m-%d')}_{cadena_aleatoria}_{secure_filename(imagen.filename)}"
             file_path = os.path.join(ruta, nombre_archivo)
 
-            if os.path.exists(file_path):
-                flash(f'Ya existe un archivo llamado {nombre_archivo}.')
-                continue
+            # Leer imagen como binario
+            imagen_bytes = imagen.read()
+            path_remoto = f"{clave_participante}/{nombre_archivo}"
 
-            imagen.save(file_path)
+            # Subir a Supabase Storage
+            supabase.storage.from_(BUCKET_NAME).upload(path_remoto, imagen_bytes, file_options={"content-type": imagen.content_type}, upsert=True)
 
-            sql = '''
-                INSERT INTO comprobantes_pago (participante_id, comprobante_img, fecha_creacion)
-                VALUES (%s, %s, %s)
-            '''
-            cur.execute(sql, (id, nombre_archivo, creado))
+
+        cur.execute(
+                    '''
+                    INSERT INTO comprobantes_pago (participante_id, comprobante_img, fecha_creacion)
+                    VALUES (%s, %s, %s)
+                    ''',
+                        (id, path_remoto, creado)
+                    )
+
 
     con.commit()
     cur.close()

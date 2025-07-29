@@ -4,7 +4,7 @@ from datetime import datetime
 from psycopg2.extras import RealDictCursor
 
 from ..constancias.generador import generar_constancia
-from ..constancias.qr import generar_qr
+from ..constancias.qr import generar_qr_memoria
 from app.utils.listas import lista_categorias, lista_cuentas, lista_cursos, lista_equipos, lista_meses, lista_paquetes, lista_ponente, lista_privilegios, lista_semanas, lista_sesiones
 
 from ..utils.utils import get_db_connection, paginador1, paginador2, paginador3
@@ -191,8 +191,9 @@ def constancias_generar():
                 return "Constancia no encontrada", 404
 
         # Generar QR y PDF
-        qr_path = generar_qr(participante)
-        pdf_path = generar_constancia(participante, qr_path)
+        qr_buffer = generar_qr_memoria(participante)  # <- Devuelve BytesIO
+        generar_constancia(participante, qr_path=qr_buffer)  # <- Ya no necesitas una ruta en disco
+
 
         # Actualizar campo constancia_generada
         with con.cursor() as cur:

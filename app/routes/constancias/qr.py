@@ -1,8 +1,9 @@
 from datetime import datetime
 import qrcode
 import os
+from io import BytesIO
 
-def generar_qr(participante):
+def generar_qr_memoria(participante):
     nombre_curso = participante['nombre_curso']
     fecha = participante['fecha']
     nombre_mes = participante['nombre_mes']
@@ -68,15 +69,13 @@ PUEDE COMUNICARSE AL TELÉFONO DE OFICINAS ARRIBA INDICADO PROPORCIONANDO
 EL NÚMERO DE FOLIO Y NOMBRE DEL PARTICIPANTE QUE TOMÓ EL CURSO.    
     """
 
-    qr_folder = 'static/qr'
-    os.makedirs(qr_folder, exist_ok=True)
-
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
-    qr.add_data(contenido_qr.strip())
+    qr.add_data(contenido_qr)
     qr.make(fit=True)
     img = qr.make_image(fill='black', back_color='white')
 
-    qr_path = os.path.join(qr_folder, f'{clave}.png')
-    img.save(qr_path)
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    buffer.seek(0)
 
-    return qr_path
+    return buffer
