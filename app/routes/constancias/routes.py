@@ -67,27 +67,21 @@ def constancias_filtros():
     fecha_raw = request.args.get('fecha', '', type=str)  # Usar directamente el valor completo
 
     fecha = ''
-    inicio = ''
-    fin = ''
     if fecha_raw:
         partes = fecha_raw.split('/')
-        if len(partes) == 4:
+        if len(partes) == 1:
             fecha = partes[0]
-            inicio = partes[1]
-            fin = partes[2]
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas_constancias
                 WHERE (%s = '' OR nombre_mes ILIKE %s)
                     AND (%s = '' OR semana ILIKE %s)
                     AND (%s = '' OR fecha ILIKE %s)
-                    AND (%s = '' OR horario_inicio::text = %s AND horario_fin::text = %s)
                 AND constancia_enviada = False '''
 
     sql_lim = '''SELECT * FROM asistencias_detalladas_constancias
             WHERE (%s = '' OR nombre_mes ILIKE %s)
                 AND (%s = '' OR semana ILIKE %s)
                 AND (%s = '' OR fecha ILIKE %s)
-                AND (%s = '' OR horario_inicio::text = %s AND horario_fin::text = %s)
                 AND constancia_enviada = False
             ORDER BY nombre_participante DESC
             LIMIT %s OFFSET %s'''
@@ -98,7 +92,6 @@ def constancias_filtros():
             nombre_mes, nombre_mes, 
             semana, semana, 
             fecha, fecha,
-            inicio, inicio, fin
             # search_query, search_query, search_query
         ],
         1, 25
@@ -257,14 +250,10 @@ def constancias_actualizar(id):
 
     sql2 = '''
         UPDATE sesiones_curso SET
-            horario_inicio = %s,
-            horario_fin = %s,
             fecha = %s,
         WHERE id_sesion = %s
     '''
     valores2 = (
-        datos['horario_inicio'],
-        datos['horario_fin'],
         datos['fecha'],
         id
     )
@@ -362,27 +351,21 @@ def constancias_hechas_filtros():
     fecha_raw = request.args.get('fecha', '', type=str)  # Usar directamente el valor completo
 
     fecha = ''
-    inicio = ''
-    fin = ''
     if fecha_raw:
         partes = fecha_raw.split('/')
-        if len(partes) == 4:
+        if len(partes) == 1:
             fecha = partes[0]
-            inicio = partes[1]
-            fin = partes[2]
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas_constancias
                 WHERE (%s = '' OR nombre_mes ILIKE %s)
                     AND (%s = '' OR semana ILIKE %s)
                     AND (%s = '' OR fecha ILIKE %s)
-                    AND (%s = '' OR horario_inicio::text = %s AND horario_fin::text = %s)
                 AND constancia_enviada = True '''
 
     sql_lim = '''SELECT * FROM asistencias_detalladas_constancias
             WHERE (%s = '' OR nombre_mes ILIKE %s)
                 AND (%s = '' OR semana ILIKE %s)
                 AND (%s = '' OR fecha ILIKE %s)
-                AND (%s = '' OR horario_inicio::text = %s AND horario_fin::text = %s)
                 AND constancia_enviada = True
             ORDER BY nombre_participante DESC
             LIMIT %s OFFSET %s'''
@@ -393,7 +376,6 @@ def constancias_hechas_filtros():
             nombre_mes, nombre_mes, 
             semana, semana, 
             fecha, fecha,
-            inicio, inicio, fin
             # search_query, search_query, search_query
         ],
         1, 25

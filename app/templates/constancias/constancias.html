@@ -30,9 +30,7 @@
     <section class="container mb-4">
         <!-- Filtros principales -->
         <form method="get" action="{{ url_for('constancias.constancias_filtros') }}" id="filtroForm">
-
             <div class="row g-3 align-items-end">
-
                 <!-- Mes -->
                 <div class="col-sm-3">
                     <label for="filtroMes" class="form-label">Mes</label>
@@ -71,9 +69,9 @@
                         {% set fecha_actual = request.args.get('fecha', '') %}
                         {% for sesion in sesiones %}
                         {% if sesion.6 == mes_sel and sesion.5 == semana_sel or sesion.1 == equipo_sel %}
-                        {% set valor = sesion.1 ~ '/' ~ sesion.2 ~ '/' ~ sesion.3 ~ '/' ~ sesion.7 %}
+                        {% set valor = sesion.1 ~ '/' ~ sesion.2 %}
                         <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
-                            {{ sesion.1 }} || {{ sesion.2 }} | {{ sesion.3 }} || {{ sesion.7 }}
+                            {{ sesion.1 }} || {{ sesion.2 }}
                         </option>
                         {% endif %}
                         {% endfor %}
