@@ -400,13 +400,13 @@ def participante_comprobante(id):
                 UPDATE pagos SET forma_pago = %s WHERE participante = %s
            '''
     valores1 = (forma_pago, id)
+    cur.execute(sql1, valores1)
 
     sql2 = '''
                 UPDATE participantes SET cuenta_destino = %s, forma_pago = %s WHERE id_participante = %s
            '''
     valores2 = (cuenta_destino, forma_pago, id)
-
-    cur.execute(sql1, valores1, sql2, valores2)
+    cur.execute(sql2, valores2)
 
     for imagen in imagenes:
         if imagen and allowed_file(imagen.filename):
@@ -420,7 +420,6 @@ def participante_comprobante(id):
 
             # Subir a Supabase Storage
             supabase.storage.from_(BUCKET_NAME).upload(path_remoto, imagen_bytes, file_options={"content-type": imagen.content_type}, upsert=True)
-
 
         cur.execute(
                     '''
