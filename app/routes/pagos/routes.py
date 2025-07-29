@@ -120,6 +120,7 @@ def pagos_filtros():
 @pagos.route("/pagos/comprobantes/<string:id>")
 @login_required
 def pagos_comprobantes(id):
+    supabase_url="https://ipecmsarkhzdzkkanxvj.supabase.co/storage/v1/object/public/tickets"
     with get_db_connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute('SELECT * FROM detalles_pagos2 WHERE id_pago = %s',(id,))
@@ -127,7 +128,7 @@ def pagos_comprobantes(id):
     if pagos is None:
         flash('El particiante no existe o ha sido eliminado.')
         return redirect(url_for('pagos.pagos_buscar'))
-    return render_template('pagos/pagos_detalles.html', pagos = pagos)
+    return render_template('pagos/pagos_detalles.html', pagos = pagos, url = supabase_url)
 
 @pagos.route("/pagos/comprobantes/editar/<string:id>", methods=['POST'])
 @login_required

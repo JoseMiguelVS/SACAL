@@ -28,6 +28,15 @@ def participantes_buscar():
     search_query = request.args.get('buscar', '', type=str).strip()
     search_query_sql = f"%{search_query}%"
 
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT clave_participante FROM participantes ORDER BY id DESC LIMIT 1")
+    ultima_clave = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    clave_anterior = ultima_clave[0] if ultima_clave else ''
+
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
                    WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
                    AND grabacion = False
@@ -42,6 +51,7 @@ def participantes_buscar():
     paginado = paginador3(sql_count, sql_lim, [search_query_sql, search_query_sql], 1, 50)
 
     return render_template('participantes/participantes.html',
+                           clave_anterior=clave_anterior,
                            formas = lista_formaPago(),
                            equipos=lista_equipos(),
                            cursos=lista_cursos(),
@@ -414,7 +424,6 @@ def participante_comprobante(id):
                     ''',
                         (id, path_remoto, creado)
                     )
-
 
     con.commit()
     cur.close()

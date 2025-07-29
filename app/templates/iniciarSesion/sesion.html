@@ -19,14 +19,14 @@
       <h2 class="text-center mb-4">Iniciar Sesión</h2>
 
       {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-          {% for category, message in messages %}
-          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-circle me-2"></i><strong>{{ message }}</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-          </div>
-          {% endfor %}
-        {% endif %}
+      {% if messages %}
+      {% for category, message in messages %}
+      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i><strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+      </div>
+      {% endfor %}
+      {% endif %}
       {% endwith %}
 
       <main class="form-signin text-center">
@@ -34,14 +34,16 @@
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <div class="form-group">
             <label for="nombre_usuario">Nombre de usuario</label>
-            <input type="text" class="form-control {% if 'usuario' in get_flashed_messages()|join %}is-invalid{% endif %}" 
-                   id="nombre_usuario" placeholder="Nombre" name="nombre_usuario" required>
+            <input type="text"
+              class="form-control {% if 'usuario' in get_flashed_messages()|join %}is-invalid{% endif %}"
+              id="nombre_usuario" placeholder="Nombre" name="nombre_usuario" required>
           </div>
 
           <div class="form-group">
             <label for="contrasenia">Contraseña</label>
-            <input type="password" class="form-control {% if 'contraseña' in get_flashed_messages()|join %}is-invalid{% endif %}" 
-                   id="contrasenia" placeholder="Contraseña" name="contrasenia" required>
+            <input type="password"
+              class="form-control {% if 'contraseña' in get_flashed_messages()|join %}is-invalid{% endif %}"
+              id="contrasenia" placeholder="Contraseña" name="contrasenia" required>
           </div>
 
           <div class="form-check mt-2 text-start">
@@ -64,4 +66,5 @@
 
   {% endblock %}
 </body>
+
 </html>

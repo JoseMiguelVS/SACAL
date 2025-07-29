@@ -69,7 +69,7 @@
             <!-- Sesión -->
             <div class="col-sm-4">
                 <label for="filtroSesion" class="form-label">Sesión</label>
-                <select id="filtroSesion" name="fecha" style="max-width: 360px; min-width: 360px"
+                <select id="filtroSesion" name="fecha" style="max-width: 360px;"
                     class="form-select form-select-sm filtro-auto ">
                     <option value="">Todas</option>
                     {% set equipo_sel = request.args.get('equipos', '') %}
@@ -197,7 +197,7 @@
                                     la forma de pago</option>
                                 {% if formas %}
                                 {% for forma in formas %}
-                                <option value="{{ forma.0 }}" {% if forma.1|string==p.forma_pago|string %} selected {%
+                                <option value="{{ forma.0 }}" {% if forma.0|string==p.forma_pago|string %} selected {%
                                     endif %}>{{ forma.1 }}</option>
                                 {% endfor %}
                                 {% else %}
@@ -302,8 +302,12 @@
                         <div class="input-group justify-content-center">
                             <div class="col-md-6">
                                 <input type="text" id="clave_participante" name="clave_participante" class="input-field"
-                                    placeholder="" required>
+                                    placeholder="Ej: {{ clave_anterior }}" required>
                                 <label for="clave_participante" class="input-label">Clave de participante</label>
+                                {% if clave_anterior %}
+                                <small class="text-muted">Última clave registrada: <strong>{{ clave_anterior
+                                        }}</strong></small>
+                                {% endif %}
                             </div>
                         </div>
 

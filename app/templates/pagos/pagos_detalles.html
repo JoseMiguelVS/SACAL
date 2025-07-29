@@ -6,13 +6,13 @@
     <div class="row justify-content-center align-items-start">
         <!-- Columna de Imágenes -->
         <div class="col-12 col-md-6 col-lg-5 mb-3">
-            <div class="d-flex gap-2 bg-secondary p-2 rounded overflow-auto">
+            <div class="d-flex gap-2 bg-secondary p-2 rounded overflow-auto flex-wrap">
                 {% if not pagos.comprobantes %}
                 <img src="{{ url_for('static', filename='img/sin_comprobante.png') }}" alt="Sin comprobante"
                     class="img-fluid rounded" style="max-height: 200px" />
                 {% else %} {% for imagen in pagos.comprobantes.split(',') %}
-                <img src="{{ url_for('static', filename='img/uploads/' + imagen.strip()) }}" alt="Comprobante de pago"
-                    class="img-fluid rounded" style="max-height: 400px" />
+                <img src="{{ url ~ '/' ~ imagen.strip().lstrip('/') }}" class="img-fluid rounded shadow"
+                    alt="Comprobante de pago" style="max-height: 200px;" />
                 {% endfor %} {% endif %}
             </div>
         </div>
