@@ -1,17 +1,30 @@
-from flask import Blueprint, render_template, request, redirect, send_file, url_for, flash
+from flask import Blueprint, render_template, request
 from flask_login import login_required
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from psycopg2.extras import RealDictCursor
-
-from app.utils.listas import lista_categorias, lista_meses, lista_semanas
-
-from ..utils.utils import get_db_connection, paginador3
-
 from collections import defaultdict
+from ..utils.utils import get_db_connection
+from app.utils.listas import lista_categorias, lista_meses 
 
-resumen_semanal = Blueprint('resumen_semanal', __name__) 
+resumen_semanal = Blueprint('resumen_semanal', __name__)
 
-#--------------------------------------------MAIN--------------------------------------------
+def lista_semanas(year=None):
+    if year is None:
+        year = date.today().year
+    d = date(year, 1, 1)
+    d -= timedelta(days=d.weekday())  # lunes igual o anterior al 1ro enero
+    semanas = []
+    semana_id = 1
+    while d.year <= year:
+        inicio = d
+        fin = d + timedelta(days=6)
+        if inicio.year > year:
+            break
+        texto = f"{inicio.day:02d} {inicio.strftime('%b')} - {fin.day:02d} {fin.strftime('%b')}"
+        semanas.append((semana_id, texto))
+        semana_id += 1
+        d += timedelta(weeks=1)
+    return semanas
 
 @resumen_semanal.route('/resumen', methods=['GET'])
 @login_required
@@ -19,65 +32,73 @@ def resumen():
     mes = request.args.get('mes', '', type=str)
     semana = request.args.get('semana', '', type=str)
 
-    mes_pattern = f"%{mes}%"
-    semana_pattern = f"%{semana}%"
-
-    sql = ''' 
-            SELECT * FROM resumen_semanal
-            WHERE (%s = '' OR nombre_mes ILIKE %s)
-            AND (%s = '' OR semana ILIKE %s)
-          '''
-
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
-    cur.execute(sql, (mes, mes_pattern, semana, semana_pattern))
+
+    sql = '''SELECT * FROM resumen_semanal'''
+    cur.execute(sql)
     resumen_datos = cur.fetchall()
     cur.close()
     conn.close()
 
-    # Resto igual
-    from collections import defaultdict
+    # Procesar fechas y agregar mes y semana en cada fila
+    for fila in resumen_datos:
+        fecha_str = fila.get('fecha_registro') or fila.get('fecha_sesion')
+        if fecha_str:
+            fecha = datetime.strptime(str(fecha_str), "%Y-%m-%d")
+            fila['nombre_mes'] = fecha.strftime('%B').capitalize()
+            semana_inicio = fecha - timedelta(days=fecha.weekday())
+            semana_fin = semana_inicio + timedelta(days=6)
+            fila['semana'] = f"{semana_inicio.day:02d} {semana_inicio.strftime('%b')} - {semana_fin.day:02d} {semana_fin.strftime('%b')}"
+        else:
+            fila['nombre_mes'] = ''
+            fila['semana'] = ''
+
+    # Filtrar por mes y semana en Python
+    if mes:
+        resumen_datos = [f for f in resumen_datos if mes.lower() in f['nombre_mes'].lower()]
+    if semana:
+        resumen_datos = [f for f in resumen_datos if semana.lower() in f['semana'].lower()]
+
+    # Agrupar datos
     agrupado = defaultdict(list)
     for fila in resumen_datos:
         clave = f"{fila['semana']}_{fila['nombre_ponente']}_{fila['nombre_curso']}"
         agrupado[clave].append(fila)
 
-        # Calcular totales
-    suma_total = sum(float(fila['total_generado']) for fila in resumen_datos)
-    publicidad_total = sum(float(fila['publicidad']) for fila in resumen_datos)
-    honorarios = sum(float(fila['honorarios']) for fila in resumen_datos)
-    gasto_semanal = sum(float(fila['gastos']) for fila in resumen_datos)
-    iva = sum(float(fila['iva']) for fila in resumen_datos)
+    # Calcular totales
+    suma_total = sum(float(fila.get('total_generado') or 0) for fila in resumen_datos)
+    publicidad_total = sum(float(fila.get('publicidad') or 0) for fila in resumen_datos)
+    honorarios = sum(float(fila.get('honorarios') or 0) for fila in resumen_datos)
+    gasto_semanal = sum(float(fila.get('gastos') or 0) for fila in resumen_datos)
+    iva = sum(float(fila.get('iva') or 0) for fila in resumen_datos)
+    sueldos = sum(float(fila.get('sueldos') or 0) for fila in resumen_datos)
 
-    # Si tienes columna 'sueldos', cámbiala; si no, puedes poner un valor fijo o quitarlo
-    sueldos = sum(f.get("sueldos", 0) for f in resumen_datos)
-
-    # Gasto total
     total_gastos = publicidad_total + honorarios + iva + sueldos
-
-    # Meta y cálculo adicional
     meta = 100000.0
     porcentaje = (suma_total / meta) * 100 if meta > 0 else 0
     ingreso_faltante = meta - suma_total if suma_total < meta else 0
 
+    semanas = lista_semanas()
+    meses = lista_meses()
 
     return render_template(
-    'resumen/resumen.html',
-    datos=resumen_datos,
-    agrupado=agrupado,
-    mes=mes,
-    semana=semana,
-    categorias=lista_categorias(),
-    semanas=lista_semanas(),
-    meses=lista_meses(),
-    suma_total=suma_total,
-    publicidad_total=publicidad_total,
-    honorarios=honorarios,
-    iva=iva,
-    sueldos=sueldos,
-    total_gastos=total_gastos,
-    meta=meta,
-    porcentaje=porcentaje,
-    ingreso_faltante=ingreso_faltante,
-    gasto_semanal=gasto_semanal
-)
+        'resumen/resumen.html',
+        datos=resumen_datos,
+        agrupado=agrupado,
+        mes=mes,
+        semana=semana,
+        categorias=lista_categorias(),
+        semanas=semanas,
+        meses=meses,
+        suma_total=suma_total,
+        publicidad_total=publicidad_total,
+        honorarios=honorarios,
+        iva=iva,
+        sueldos=sueldos,
+        total_gastos=total_gastos,
+        meta=meta,
+        porcentaje=porcentaje,
+        ingreso_faltante=ingreso_faltante,
+        gasto_semanal=gasto_semanal
+    )

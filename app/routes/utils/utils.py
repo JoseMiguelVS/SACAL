@@ -13,6 +13,38 @@ import psycopg2
 import unicodedata
 import re
 
+from datetime import date, timedelta
+
+def lista_semanas_resumen(year=None):
+    """
+    Genera una lista de semanas para un año dado.
+    Cada semana es una tupla (id, texto), donde texto es "DD MMM - DD MMM".
+    Si no se especifica año, usa el actual.
+    """
+    if year is None:
+        year = date.today().year
+
+    # Encontrar el primer lunes del año (o el lunes antes del 1ro de enero)
+    d = date(year, 1, 1)
+    # Ajustamos a el lunes más cercano igual o anterior al 1 de enero
+    d -= timedelta(days=d.weekday())
+
+    semanas = []
+    semana_id = 1
+
+    while d.year <= year:
+        inicio = d
+        fin = d + timedelta(days=6)
+        if inicio.year > year:
+            break
+        texto = f"{inicio.day:02d} {inicio.strftime('%b')} - {fin.day:02d} {fin.strftime('%b')}"
+        semanas.append((semana_id, texto))
+        semana_id += 1
+        d += timedelta(weeks=1)
+
+    return semanas
+
+
 def sanitize_filename(filename):
     # Eliminar acentos y caracteres no ASCII
     filename = unicodedata.normalize('NFKD', filename).encode('ascii', 'ignore').decode('ascii')
