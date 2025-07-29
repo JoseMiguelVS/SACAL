@@ -46,11 +46,19 @@ app.register_blueprint(pagos)
 app.register_blueprint(resumen_semanal)
 app.register_blueprint(perfil)
 
-# Configuración
-# app.config['UPLOAD_FOLDER'] = './static/img/uploads/'
+# Carpeta temporal para almacenar comprobantes antes de subirlos a Supabase
 app.config['UPLOAD_FOLDER'] = '/tmp'
-ruta_comprobantes = app.config['UPLOAD_FOLDER']
+
+# Tipos de archivos permitidos para subir
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+# Ruta para acceder fácilmente al folder en otras partes del código
+ruta_comprobantes = app.config['UPLOAD_FOLDER']
+
+# Función para validar extensión permitida
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # -------------------------- Vistas --------------------------
 @app.route('/loguear', methods=['GET', 'POST'])

@@ -419,7 +419,11 @@ def participante_comprobante(id):
             path_remoto = f"{clave_participante}/{nombre_archivo}"
 
             # Subir a Supabase Storage
-            supabase.storage.from_(BUCKET_NAME).upload(path_remoto, imagen_bytes, file_options={"content-type": imagen.content_type}, upsert=True)
+            supabase.storage.from_(BUCKET_NAME).upload(
+                path_remoto,
+                imagen_bytes,
+                file_options={"content-type": imagen.content_type}
+            )
 
         cur.execute(
                     '''
