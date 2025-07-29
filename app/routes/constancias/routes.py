@@ -185,11 +185,9 @@ def constancias_generar():
             if not participante:
                 return "Constancia no encontrada", 404
 
-        # Generar QR y PDF en memoria
-        qr_buffer = generar_qr_memoria(participante)
-        pdf_buffer = generar_constancia(participante, qr_path=qr_buffer)  # <- Retorna BytesIO
+        qr_buffer = generar_qr_memoria(participante)  # Retorna BytesIO
+        pdf_buffer = generar_constancia(participante, qr_path=qr_buffer)  # Ahora también BytesIO
 
-        # Actualizar campo constancia_generada
         with con.cursor() as cur:
             cur.execute("""
                 UPDATE constancias
@@ -198,7 +196,6 @@ def constancias_generar():
             """, (id,))
         con.commit()
 
-    # Devolver PDF generado desde memoria
     pdf_buffer.seek(0)
     return send_file(
         pdf_buffer,
@@ -206,7 +203,6 @@ def constancias_generar():
         as_attachment=True,
         download_name='constancia.pdf'
     )
-
 
 #--------------------------------------------------------------EDITAR PARTICIPANTE----------------------------------------------------------------------------
         

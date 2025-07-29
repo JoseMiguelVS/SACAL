@@ -3,6 +3,7 @@ import io
 import os
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter, landscape, portrait
+from reportlab.lib.utils import ImageReader  # <-- Import agregado
 from PyPDF2 import PdfWriter, PdfReader
 os.makedirs('static/constancias', exist_ok=True)
 
@@ -77,7 +78,6 @@ def generar_constancia(participante, qr_path=None):
 
     c = canvas.Canvas(packet, pagesize=psz)
 
-
     nombre = participante['nombre_participante'].upper()
     apellidos = participante['apellidos_participante'].upper()
     curso = participante['nombre_curso']
@@ -112,10 +112,11 @@ def generar_constancia(participante, qr_path=None):
 
             draw_centrado(c, texto_duracion, 150, "Montserrat-Bold", 10)
             draw_centrado(c, realizado, 135, "Montserrat-Bold", 10)
-            draw_centrado(c, texto_fecha, 120, "Montserrat-Bold", 10)   
+            draw_centrado(c, texto_fecha, 120, "Montserrat-Bold", 10)
 
             if qr_path:
-                c.drawImage(qr_path, x=250, y=25, width=90, height=90, mask='auto')
+                img = ImageReader(qr_path)  # <--- Cambio aquí
+                c.drawImage(img, x=250, y=25, width=90, height=90, mask='auto')
 
         case 'empresarial':
             texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
@@ -136,7 +137,8 @@ def generar_constancia(participante, qr_path=None):
             draw_centrado(c, texto_fecha, 150, "Montserrat-Bold", 10)
 
             if qr_path:
-                c.drawImage(qr_path, x=250, y=25, width=90, height=90, mask='auto')
+                img = ImageReader(qr_path)
+                c.drawImage(img, x=250, y=25, width=90, height=90, mask='auto')
 
         case 'psicologia':
 
@@ -158,7 +160,8 @@ def generar_constancia(participante, qr_path=None):
             draw_centrado(c, texto_fecha, 120, "Montserrat-Bold", 10)
 
             if qr_path:
-                c.drawImage(qr_path, x=50, y=25, width=150, height=150, mask='auto')
+                img = ImageReader(qr_path)
+                c.drawImage(img, x=50, y=25, width=150, height=150, mask='auto')
 
         case 'especializacion':
             # definir textos
@@ -175,7 +178,8 @@ def generar_constancia(participante, qr_path=None):
             draw_centrado(c, fecha_txt, 215, "Montserrat-Bold", 10)
 
             if qr_path:
-                c.drawImage(qr_path, x=175, y=80, width=90, height=90, mask='auto')
+                img = ImageReader(qr_path)
+                c.drawImage(img, x=175, y=80, width=90, height=90, mask='auto')
 
     c.showPage()
         
@@ -202,6 +206,7 @@ def generar_constancia(participante, qr_path=None):
     packet.seek(0)
 
     new_pdf = PdfReader(packet)
+    
     if nombre_tipo == 'especializacion':
         plantilla_path = {
             'especializacion ing': "static/pdf/especializacion_ing.pdf",
@@ -215,7 +220,6 @@ def generar_constancia(participante, qr_path=None):
             'empresarial': "static/pdf/empresarial.pdf"
         }.get(nombre_tipo, "static/pdf/publico.pdf")
 
-    # Mejora: cerrar el archivo PDF al usarlo
     with open(plantilla_path, "rb") as f:
         existing_pdf = PdfReader(f)
         output = PdfWriter()
@@ -227,9 +231,8 @@ def generar_constancia(participante, qr_path=None):
                 base_page.merge_page(overlay_page)
             output.add_page(base_page)
 
-        constancia_path = f'static/constancias/{clave}-E.pdf' if nombre_tipo in ('especializacion', 'mini especializacion') else f'static/constancias/{clave}.pdf'
+        output_stream = io.BytesIO()
+        output.write(output_stream)
+        output_stream.seek(0)
 
-        with open(constancia_path, "wb") as outputStream:
-            output.write(outputStream)
-
-    return constancia_path
+    return output_stream

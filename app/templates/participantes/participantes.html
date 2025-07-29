@@ -81,7 +81,7 @@
                     {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.7 %}
                     <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
                         {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.7 }}
-                    </option>
+                    </option> 
                     {% endif %}
                     {% endfor %}
                 </select>
