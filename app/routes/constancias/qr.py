@@ -11,28 +11,14 @@ def generar_qr_memoria(participante):
     curp_ponente = participante['curp_ponente']
     cedula_ponente = participante['cedula_ponente']
     certificaciones = participante['certificaciones']
-    horario_inicio = participante['horario_inicio']
-    horario_fin = participante['horario_fin']
     clave = participante['clave_participante']
     nombre_participante = participante['nombre_participante']
     folio_constancia = participante['folio_constancia']
+    duracion_curso = participante['duracion_curso']
     current_year = datetime.now().year
 
     # Extraer día
     dia = fecha.day if isinstance(fecha, datetime) else int(str(fecha)[8:10])
-
-    # Asegurar que los horarios sean strings
-    horario_inicio = str(horario_inicio)
-    horario_fin = str(horario_fin)
-
-    # Calcular duración
-    formato = "%H:%M:%S"
-    try:
-        inicio = datetime.strptime(horario_inicio, formato)
-        fin = datetime.strptime(horario_fin, formato)
-        duracion_horas = (fin - inicio).seconds // 3600
-    except Exception:
-        duracion_horas = 0
 
     # Contenido QR con formato del reverso
     contenido_qr = f"""
@@ -42,7 +28,7 @@ INFORMACION DE PARTICIPANTE:
     FOLIO: {clave}
     NOMBRE DEL PARTICIPANTE: {nombre_participante.upper()}
     CURSO: {nombre_curso.upper()}
-    CON UNA DURACIÓN DE {duracion_horas} HORAS,
+    CON UNA DURACIÓN DE {duracion_curso} HORAS,
     EL {dia} DE {nombre_mes.upper()} DE {current_year}.
     REALIZADO ONLINE EN VIVO,
 
