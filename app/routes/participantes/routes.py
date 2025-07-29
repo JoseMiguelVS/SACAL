@@ -397,11 +397,16 @@ def participante_comprobante(id):
     cur = con.cursor()
 
     sql1 = '''
-                UPDATE pagos SET cuenta_destino = %s, forma_pago = %s WHERE participante = %s
+                UPDATE pagos SET forma_pago = %s WHERE participante = %s
            '''
-    valores1 = (cuenta_destino, forma_pago, id)
+    valores1 = (forma_pago, id)
 
-    cur.execute(sql1, valores1)
+    sql2 = '''
+                UPDATE participantes SET cuenta_destino = %s, forma_pago = %s WHERE id_participante = %s
+           '''
+    valores2 = (cuenta_destino, forma_pago, id)
+
+    cur.execute(sql1, valores1, sql2, valores2)
 
     for imagen in imagenes:
         if imagen and allowed_file(imagen.filename):
