@@ -30,7 +30,7 @@ def participantes_buscar():
 
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT clave_participante FROM participantes ORDER BY id DESC LIMIT 1")
+    cur.execute("SELECT clave_participante FROM participantes ORDER BY id_participante DESC LIMIT 1")
     ultima_clave = cur.fetchone()
     cur.close()
     conn.close()
