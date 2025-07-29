@@ -95,7 +95,7 @@ def participantes_filtros():
                     AND (%s = '' OR semanas ILIKE %s)
                     AND (%s = '' OR fecha ILIKE %s)
                     AND (%s = '' OR cursos ILIKE %s)
-                    AND grabacion    = False ''' 
+                    AND grabacion = False ''' 
 
     sql_lim = '''SELECT * FROM asistencias_detalladas
                 WHERE (%s = '' OR meses ILIKE %s)
@@ -103,7 +103,7 @@ def participantes_filtros():
                     AND (%s = '' OR semanas ILIKE %s)
                     AND (%s = '' OR fecha ILIKE %s)
                     AND (%s = '' OR cursos ILIKE %s)
-                    AND grabacion    = False
+                    AND grabacion = False
                 ORDER BY nombre_participante DESC
                 LIMIT %s OFFSET %s'''
 
@@ -397,7 +397,7 @@ def participante_comprobante(id):
     cur = con.cursor()
 
     sql1 = '''
-                UPDATE pagos SET cuenta_destino = %s, forma_pago = %s WHERE id_participantes = %s
+                UPDATE pagos SET cuenta_destino = %s, forma_pago = %s WHERE id_participante = %s
            '''
     valores1 = (cuenta_destino, forma_pago, id)
 
