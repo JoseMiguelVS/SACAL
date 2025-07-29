@@ -233,6 +233,7 @@ def participante_nuevo():
         estado = True
         constancia_generada = False
         constancia_enviada = False
+        fecha_registro = datetime.now()
 
         nombre_paquete = ''
         precio_paquete = ''
@@ -248,11 +249,11 @@ def participante_nuevo():
         # 1. Insertar participante
         sql = '''
             INSERT INTO participantes 
-            (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, equipos)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, equipos, fecha_registro)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id_participante
         '''
-        valores = (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, equipos )
+        valores = (nombre_participante,apellidos_participante, num_telefono, clave_participante, nombre_paquete, nombre_empleado, estado, equipos, fecha_registro)
         cur.execute(sql, valores)
 
         # 2. Obtener el ID recién creado

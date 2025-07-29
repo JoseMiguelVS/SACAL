@@ -38,8 +38,6 @@
                 <tr align="center">
                     <th>Curso</th>
                     <th>Fecha </th>
-                    <th>Hora de inicio </th>
-                    <th>Hora de fin </th>
                     <th>Mes</th>
                     <th>Semana</th>
                     <th>Editar</th>
@@ -51,8 +49,6 @@
                 <tr align="center">
                     <td>{{ sesion.cursos }}</td>
                     <td>{{ sesion.fecha.strftime('%d/%m/%Y') }}</td>
-                    <td>{{ sesion.horario_inicio.strftime('%I:%M %p') }}</td>
-                    <td>{{ sesion.horario_fin.strftime('%I:%M %p') }}</td>
                     <td>{{ sesion.nombre_mes }}</td>
                     <td>{{ sesion.semana }}</td>
                     <td>
@@ -173,16 +169,6 @@
                             <label for="fecha" class="form-label">Fecha</label>
                             <input type="date" class="form-control" name="fecha" id="fecha" value="{{ sesiones[6] }}"
                                 required>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="horario_inicio" class="form-label">Hora de inicio</label>
-                            <input type="time" class="form-control" name="horario_inicio" id="horario_inicio"
-                                value="{{ sesiones[1] }}" required>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="horario_fin" class="form-label">Hora de fin</label>
-                            <input type="time" class="form-control" name="horario_fin" id="horario_fin"
-                                value="{{ sesiones[4] }}" required>
                         </div>
                     </div>
 

@@ -39,8 +39,6 @@
                 <tr align="center">
                     <th>Curso</th>
                     <th>Fecha</th>
-                    <th>Hora inicio</th>
-                    <th>Hora fin</th>
                     <th>Mes</th>
                     <th>Semana</th>
                     <th>Restaurar</th>
@@ -53,8 +51,6 @@
                 <tr align="center">
                     <td>{{ sesion.cursos }}</td>
                     <td>{{ sesion.fecha.strftime('%d/%m/%Y') }}</td>
-                    <td>{{ sesion.horario_inicio.strftime('%I:%M %p') }}</td>
-                    <td>{{ sesion.horario_fin.strftime('%I:%M %p') }}</td>
                     <td>{{ sesion.nombre_mes }}</td>
                     <td>{{ sesion.semana }}</td>
                     <td>

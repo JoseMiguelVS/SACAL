@@ -34,16 +34,6 @@ def sesiones_buscar():
                 sesion['fecha'] = datetime.strptime(sesion['fecha'], "%Y-%m-%d")
             except ValueError:
                 pass
-        if isinstance(sesion['horario_inicio'], str):
-            try:
-                sesion['horario_inicio'] = datetime.strptime(sesion['horario_inicio'], "%H:%M:%S")
-            except ValueError:
-                pass
-        if isinstance(sesion['horario_fin'], str):
-            try:
-                sesion['horario_fin'] = datetime.strptime(sesion['horario_fin'], "%H:%M:%S")
-            except ValueError:
-                pass
 
     return render_template('sesiones/sesiones.html',
                            cursos = lista_cursos(), 
@@ -77,8 +67,6 @@ def sesion_nuevo():
     if request.method == 'POST':
         # Campos base
         fecha = request.form['fecha']
-        horario_inicio = request.form['horario_inicio']
-        horario_fin = request.form['horario_fin']
         categoria = request.form['id_categoria']
         mes = request.form['id_mes']
         semana = request.form['id_semana']
@@ -94,11 +82,11 @@ def sesion_nuevo():
         # Insertar sesión principal
         sql_sesion = '''
             INSERT INTO sesiones_curso 
-            (fecha, horario_inicio, horario_fin, categoria, mes, semana, estado)
+            (fecha, categoria, mes, semana, estado)
             VALUES (%s, %s, %s, %s, %s, %s, %s)
             RETURNING id_sesion
         '''
-        valores_sesion = (fecha, horario_inicio, horario_fin, categoria, mes, semana, estado)
+        valores_sesion = (fecha, categoria, mes, semana, estado)
         cur.execute(sql_sesion, valores_sesion)
         sesion_id = cur.fetchone()['id_sesion']
 
@@ -183,8 +171,6 @@ def sesion_editar(id):
 def sesion_actualizar(id):
     # Campos generales
     fecha = request.form['fecha']
-    horario_inicio = request.form['horario_inicio']
-    horario_fin = request.form['horario_fin']
     categoria = request.form['id_categoria']
     mes = request.form['id_mes']
     semana = request.form['id_semana']
@@ -204,9 +190,9 @@ def sesion_actualizar(id):
         # Actualiza sesión
         cur.execute("""
             UPDATE sesiones_curso 
-            SET fecha = %s, horario_inicio = %s, horario_fin = %s, categoria = %s, mes = %s, semana = %s 
+            SET fecha = %s, categoria = %s, mes = %s, semana = %s 
             WHERE id_sesion = %s
-        """, (fecha, horario_inicio, horario_fin, categoria, mes, semana, id))
+        """, (fecha, categoria, mes, semana, id))
 
         # Elimina los registros anteriores de cursos/ponentes
         cur.execute("DELETE FROM cursos_sesion WHERE sesion_id = %s", (id,))
@@ -273,16 +259,6 @@ def sesiones_papelera():
         if isinstance(sesion['fecha'], str):
             try:
                 sesion['fecha'] = datetime.strptime(sesion['fecha'], "%Y-%m-%d")
-            except ValueError:
-                pass
-        if isinstance(sesion['horario_inicio'], str):
-            try:
-                sesion['horario_inicio'] = datetime.strptime(sesion['horario_inicio'], "%H:%M:%S")
-            except ValueError:
-                pass
-        if isinstance(sesion['horario_fin'], str):
-            try:
-                sesion['horario_fin'] = datetime.strptime(sesion['horario_fin'], "%H:%M:%S")
             except ValueError:
                 pass
 
