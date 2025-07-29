@@ -91,12 +91,12 @@ def generar_constancia(participante, qr_path=None):
     tema = participante['nombre_tema'].lower()
     current_year = datetime.now().year
 
-    nombre_completo = f'{nombre.upper()} {apellidos.upper()}'
+    nombre_completo = f'{nombre.upper()}{apellidos.upper()}'
     curso_com = f"\"{curso.upper()}\""
 
     match nombre_tipo.lower():
         case 'publico en general':
-
+            
             if duracion_curso == '8':
                     participacion = "POR SU PARTICIPACIÓN EN EL CURSO-TALLER NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO-TALLER INTERNACIONAL"
             else:
