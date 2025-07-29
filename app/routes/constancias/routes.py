@@ -128,7 +128,7 @@ def constancias_detalles(id):
      with get_db_connection() as con:
         with con.cursor(cursor_factory=RealDictCursor) as cur:
             # Asegúrate de usar parámetros para evitar inyección SQL
-            cur.execute('SELECT * FROM datos_constancias WHERE id_participante = %s',(id,))
+            cur.execute('SELECT * FROM datos_constancias1 WHERE id_participante = %s',(id,))
             participantes = cur.fetchone()
         if participantes is None:
             flash('El participante no exite o ha sido eliminado.')
@@ -168,6 +168,9 @@ def folio_constancia():
 ))
 
 # ------------------------------------FOLIO DEL PARTICIPANTE------------------------------------
+from flask import send_file
+from io import BytesIO
+
 @constancias.route("/constancias/folio/generar")
 @login_required 
 def constancias_generar():
@@ -181,19 +184,17 @@ def constancias_generar():
 
     with get_db_connection() as con:
         with con.cursor(cursor_factory=RealDictCursor) as cur:
-            # Obtener datos
             cur.execute("""
-                SELECT * FROM datos_constancias 
+                SELECT * FROM datos_constancias1
                 WHERE id_participante = %s AND nombre_curso = %s AND fecha = %s
             """, (id, curso, fecha))
             participante = cur.fetchone()
             if not participante:
                 return "Constancia no encontrada", 404
 
-        # Generar QR y PDF
-        qr_buffer = generar_qr_memoria(participante)  # <- Devuelve BytesIO
-        generar_constancia(participante, qr_path=qr_buffer)  # <- Ya no necesitas una ruta en disco
-
+        # Generar QR y PDF en memoria
+        qr_buffer = generar_qr_memoria(participante)
+        pdf_buffer = generar_constancia(participante, qr_path=qr_buffer)  # <- Retorna BytesIO
 
         # Actualizar campo constancia_generada
         with con.cursor() as cur:
@@ -204,7 +205,15 @@ def constancias_generar():
             """, (id,))
         con.commit()
 
-    return send_file(pdf_path, as_attachment=True)
+    # Devolver PDF generado desde memoria
+    pdf_buffer.seek(0)
+    return send_file(
+        pdf_buffer,
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name='constancia.pdf'
+    )
+
 
 #--------------------------------------------------------------EDITAR PARTICIPANTE----------------------------------------------------------------------------
         
