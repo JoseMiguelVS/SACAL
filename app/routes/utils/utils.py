@@ -7,11 +7,22 @@ from flask import Flask, request
 from dotenv import load_dotenv
 load_dotenv()
 
-
-#--------------------------------CONEXION BD------------------------
 import os
 import psycopg2
 
+import unicodedata
+import re
+
+def sanitize_filename(filename):
+    # Eliminar acentos y caracteres no ASCII
+    filename = unicodedata.normalize('NFKD', filename).encode('ascii', 'ignore').decode('ascii')
+    # Reemplazar espacios con guiones bajos
+    filename = filename.replace(' ', '_')
+    # Quitar cualquier carácter no alfanumérico excepto guion o punto
+    filename = re.sub(r'[^A-Za-z0-9._/-]', '', filename)
+    return filename
+
+#--------------------------------CONEXION BD------------------------
 def get_db_connection():
     try:
         conn = psycopg2.connect(

@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 
 from app.utils.listas import lista_cuentas, lista_cursos, lista_equipos, lista_formaPago, lista_meses, lista_paquetes, lista_sesiones, lista_semanas
 
-from ..utils.utils import allowed_file, get_db_connection, my_random_string, paginador3
+from ..utils.utils import allowed_file, get_db_connection, my_random_string, paginador3, sanitize_filename
 
 from supabase import create_client
 import io
@@ -409,22 +409,20 @@ def participante_comprobante(id):
         if imagen and allowed_file(imagen.filename):
             cadena_aleatoria = my_random_string()
             nombre_archivo = f"{nombre_participante}_{apellidos_participante}_{clave_participante}_{creado.strftime('%Y-%m-%d')}_{cadena_aleatoria}_{secure_filename(imagen.filename)}"
-            file_path = os.path.join(ruta, nombre_archivo)
 
+            # Limpia el nombre del archivo completo
+            nombre_archivo = sanitize_filename(nombre_archivo)
             imagen_bytes = imagen.read()
 
-            # Construir path remoto
             path_remoto = f"{clave_participante}/{nombre_archivo}"
-
-            # ✅ Codificar path para Supabase
-            path_remoto_encoded = urllib.parse.quote(path_remoto, safe='/')
 
             # Subir a Supabase
             supabase.storage.from_(BUCKET_NAME).upload(
-                path_remoto_encoded,
+                path_remoto,
                 imagen_bytes,
                 file_options={"content-type": imagen.content_type}
             )
+
 
             # Registrar en DB
             cur.execute(
