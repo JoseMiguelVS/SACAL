@@ -206,19 +206,19 @@ def generar_constancia(participante, qr_path=None):
     packet.seek(0)
 
     new_pdf = PdfReader(packet)
-    
+
     if nombre_tipo == 'especializacion':
         plantilla_path = {
-            'especializacion ing': "static/pdf/especializacion_ing.pdf",
-            'especializacion lic': "static/pdf/especializacion_lic.pdf",
-            'mini especializacion ing': "static/pdf/especializacion_ing.pdf",
-        }.get(tema.lower(), "static/pdf/especializacion_lic.pdf")
+            'especializacion ing': "app/static/pdf/especializacion_ing.pdf",
+            'especializacion lic': "app/static/pdf/especializacion_lic.pdf",
+            'mini especializacion ing': "app/static/pdf/especializacion_ing.pdf",
+        }.get(tema.lower(), "app/static/pdf/especializacion_lic.pdf")
         
     else:
         plantilla_path = {
-            'psicologia': "static/pdf/psicologia.pdf",
-            'empresarial': "static/pdf/empresarial.pdf"
-        }.get(nombre_tipo, "static/pdf/publico.pdf")
+            'psicologia': "app/static/pdf/psicologia.pdf",
+            'empresarial': "app/static/pdf/empresarial.pdf",
+        }.get(nombre_tipo, "app/static/pdf/publico.pdf")
 
     with open(plantilla_path, "rb") as f:
         existing_pdf = PdfReader(f)
