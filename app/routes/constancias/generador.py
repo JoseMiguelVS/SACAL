@@ -138,24 +138,23 @@ def generar_constancia(participante, qr_path=None):
                 img = ImageReader(qr_path)
                 c.drawImage(img, x=175, y=80, width=90, height=90, mask='auto')
 
-    c.showPage()
+    c.showPage()  # ← Cierra la primera página
+
+    # Generar reverso como segunda página
+    c.setFont("Montserrat-Bold", 11)
+    c.setFillColor(HexColor("#CF1111"))
 
     if nombre_tipo == 'especializacion':
-            # Aquí editas la segunda página, puedes usar las mismas funciones o texto libre
-        c.setFont("Montserrat-Bold", 11)
-        c.setFillColor(HexColor("#CF1111"))
-        c.drawString(212, 715, f"{folio_constancia}")  # Ajusta según el margen izquierdo deseado
+        c.drawString(212, 715, f"{folio_constancia}")
         c.setFillColor(HexColor("#000000"))
         c.drawString(212, 695, nombre_completo)
     else:
-            # Aquí editas la segunda página, puedes usar las mismas funciones o texto libre
-        c.setFont("Montserrat-Bold", 11)
-        c.setFillColor(HexColor("#CF1111"))
-        c.drawString(255, 643, f"{folio_constancia}")  # Ajusta según el margen izquierdo deseado
+        c.drawString(255, 543, f"{folio_constancia}")
         c.setFillColor(HexColor("#000000"))
-        c.drawString(255, 623, nombre_completo)
+        c.drawString(255, 523, nombre_completo)
 
-    c.showPage()  # <-- Mueve esto aquí para asegurar el cierre correcto de la página
+    c.showPage()  # ← Cierra segunda página correctamente
+    # <-- Mueve esto aquí para asegurar el cierre correcto de la página
 
     c.save()
     packet.seek(0)
