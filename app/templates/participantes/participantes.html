@@ -288,6 +288,13 @@
                         {% endif %}
                         <input type="hidden" name="fecha" value="{{ fecha_raw }}" required>
 
+                        {% set categoria_sesion = '' %}
+                        {% for sesion in sesiones %}
+                        {% if partesSesiones and partesSesiones[0] == sesion[0]|string %}
+                        {% set categoria_sesion = sesion[7] %}
+                        {% endif %}
+                        {% endfor %}
+
                         {% set partes_equipo = request.args.get('equipos', '').split(',') %}
                         {% if partes_equipo | length == 2 %}
                         <input type="hidden" name="equipos" id="equipos" value="{{ partes_equipo[0] }}" required>
@@ -343,17 +350,13 @@
 
                         <select name="paquete" id="paquete" class="form-select" required>
                             <option value="" selected disabled>Selecciona un paquete</option>
-                            {% if paquetes and sesiones %}
-                            {% set mostrados = [] %}
+                            {% if paquetes and categoria_sesion %}
                             {% for paquete in paquetes %}
-                            {% for sesion in sesiones %}
-                            {% if paquete[4] and paquete[7] == sesion[7] and paquete[0] not in mostrados %}
+                            {% if paquete[4] and paquete[7] == categoria_sesion %}
                             <option value="{{ paquete[0] }},{{ paquete[2] }}">
                                 {{ paquete[1] }} — ${{ paquete[2] }}
                             </option>
-                            {% set _ = mostrados.append(paquete[0]) %}
                             {% endif %}
-                            {% endfor %}
                             {% endfor %}
                             {% else %}
                             <option disabled>No hay paquetes disponibles</option>
