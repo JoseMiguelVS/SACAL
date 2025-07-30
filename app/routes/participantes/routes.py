@@ -91,12 +91,12 @@ def participantes_filtros():
             equipo = partesEquipos[1]
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
-                WHERE (%s = '' OR meses ILIKE %s)
-                    AND (%s = '' OR nombre_equipo ILIKE %s)
-                    AND (%s = '' OR semanas ILIKE %s)
-                    AND (%s = '' OR fecha ILIKE %s)
-                    AND (%s = '' OR cursos ILIKE %s)
-                    AND grabacion = False ''' 
+                    WHERE (%s = '' OR meses ILIKE %s)
+                        AND (%s = '' OR nombre_equipo ILIKE %s)
+                        AND (%s = '' OR semanas ILIKE %s)
+                        AND (%s = '' OR fecha ILIKE %s)
+                        AND (%s = '' OR cursos ILIKE %s)
+                        AND grabacion = False ''' 
 
     sql_lim = '''SELECT * FROM asistencias_detalladas
                 WHERE (%s = '' OR meses ILIKE %s)

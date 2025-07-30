@@ -69,14 +69,10 @@ def generar_constancia(participante, qr_path=None):
     packet = io.BytesIO()
     nombre_tipo = participante['nombre_tipo'].lower()
 
-    # Selección de orientación: retrato para especialización
-    if nombre_tipo in ('especializacion', 'mini especializacion'):
-        psz = portrait(letter)
-    else:
-        psz = landscape(letter)
+    # Selección de orientación
+    psz = portrait(letter) if nombre_tipo in ('especializacion', 'mini especializacion') else landscape(letter)
 
-    width, height = letter
-    c = canvas.Canvas(packet, pagesize=letter)
+    c = canvas.Canvas(packet, pagesize=psz)
 
     nombre = participante['nombre_participante'].upper()
     apellidos = participante['apellidos_participante'].upper()
@@ -91,87 +87,48 @@ def generar_constancia(participante, qr_path=None):
     tema = participante['nombre_tema'].lower()
     current_year = datetime.now().year
 
-    nombre_completo = f'{nombre.upper()}{apellidos.upper()}'
+    nombre_completo = f'{nombre}{apellidos}'
     curso_com = f"\"{curso.upper()}\""
 
-    match nombre_tipo.lower():
-        case 'publico en general':
-            
+    match nombre_tipo:
+        case 'publico en general' | 'empresarial' | 'psicologia':
             if duracion_curso == '8':
-                    participacion = "POR SU PARTICIPACIÓN EN EL CURSO-TALLER NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO-TALLER INTERNACIONAL"
+                participacion = f"POR SU PARTICIPACIÓN EN EL CURSO-TALLER {'NACIONAL' if es_nacional else 'INTERNACIONAL'}"
             else:
-                    participacion = "POR SU PARTICIPACIÓN EN EL CURSO NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO INTERNACIONAL"
+                participacion = f"POR SU PARTICIPACIÓN EN EL CURSO {'NACIONAL' if es_nacional else 'INTERNACIONAL'}"
 
             texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
             realizado = "REALIZADO ONLINE EN VIVO,"
             texto_fecha = f"EL {dia} DE {nombre_mes.upper()} DE {current_year}."
 
-            centro_nombre = draw_centrado(c, nombre_completo, 270, font="Montserrat-Bold", size=18, return_center=True)
-            draw_centrado(c, participacion, 230, "Montserrat-Bold", 14)
-            draw_texto_centrado_multilinea(c, curso_com, 200, "Metropolis-Black", 25, 500, x_centro=centro_nombre)
+            y_base = 270 if nombre_tipo != 'empresarial' else 300
+            centro_nombre = draw_centrado(c, nombre_completo, y_base, font="Montserrat-Bold", size=18, return_center=True)
 
-            draw_centrado(c, texto_duracion, 150, "Montserrat-Bold", 10)
-            draw_centrado(c, realizado, 135, "Montserrat-Bold", 10)
-            draw_centrado(c, texto_fecha, 120, "Montserrat-Bold", 10)
+            draw_centrado(c, participacion, y_base - 40, "Montserrat-Bold", 14)
 
-            if qr_path:
-                img = ImageReader(qr_path)  # <--- Cambio aquí
-                c.drawImage(img, x=250, y=25, width=90, height=90, mask='auto')
+            # Ajustar fuente del curso si es largo
+            curso_lineas = curso_com.count(" ") // 5 + 1
+            font_size = 25 if curso_lineas <= 2 else 18
+            draw_texto_centrado_multilinea(c, curso_com, y_base - 70, "Metropolis-Black", font_size, 500, x_centro=centro_nombre)
 
-        case 'empresarial':
-            texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
-            realizado = "REALIZADO ONLINE EN VIVO,"
-            texto_fecha = f"EL {dia} DE {nombre_mes.upper()} DE {current_year}."
-
-            if duracion_curso == '8':
-                participacion = "POR SU PARTICIPACIÓN EN EL CURSO-TALLER NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO-TALLER INTERNACIONAL"
-            else:
-                participacion = "POR SU PARTICIPACIÓN EN EL CURSO NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO INTERNACIONAL"
-
-            centro_nombre = draw_centrado(c, nombre_completo, 300, font="Montserrat-Bold", size=18, return_center=True)
-            draw_centrado(c, participacion, 260, "Montserrat-Bold", 14)
-            draw_texto_centrado_multilinea(c, curso_com, 230, "Metropolis-Black", 25, 500, x_centro=centro_nombre)
-
-            draw_centrado(c, texto_duracion, 180, "Montserrat-Bold", 10)
-            draw_centrado(c, realizado, 165, "Montserrat-Bold", 10)
-            draw_centrado(c, texto_fecha, 150, "Montserrat-Bold", 10)
+            draw_centrado(c, texto_duracion, y_base - 120, "Montserrat-Bold", 10)
+            draw_centrado(c, realizado, y_base - 135, "Montserrat-Bold", 10)
+            draw_centrado(c, texto_fecha, y_base - 150, "Montserrat-Bold", 10)
 
             if qr_path:
                 img = ImageReader(qr_path)
-                c.drawImage(img, x=250, y=25, width=90, height=90, mask='auto')
-
-        case 'psicologia':
-
-            if duracion_curso == '8':
-                participacion = "POR SU PARTICIPACIÓN EN EL CURSO-TALLER NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO-TALLER INTERNACIONAL"
-            else:
-                participacion = "POR SU PARTICIPACIÓN EN EL CURSO NACIONAL" if es_nacional else "POR SU PARTICIPACIÓN EN EL CURSO INTERNACIONAL"
-
-            texto_duracion = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
-            realizado = "REALIZADO ONLINE EN VIVO,"
-            texto_fecha = f"EL {dia} DE {nombre_mes.upper()} DE {current_year}."
-
-            centro_nombre = draw_centrado(c, nombre_completo, 270, font="Montserrat-Bold", size=18, return_center=True)
-            draw_centrado(c, participacion, 230, "Montserrat-Bold", 14)
-            draw_texto_centrado_multilinea(c, curso_com, 200, "Metropolis-Black", 25, 500, x_centro=centro_nombre)
-
-            draw_centrado(c, texto_duracion, 150, "Montserrat-Bold", 10)
-            draw_centrado(c, realizado, 135, "Montserrat-Bold", 10)
-            draw_centrado(c, texto_fecha, 120, "Montserrat-Bold", 10)
-
-            if qr_path:
-                img = ImageReader(qr_path)
-                c.drawImage(img, x=50, y=25, width=150, height=150, mask='auto')
+                c.drawImage(img, x=250 if nombre_tipo != 'psicologia' else 50, y=25, width=90 if nombre_tipo != 'psicologia' else 150, height=90 if nombre_tipo != 'psicologia' else 150, mask='auto')
 
         case 'especializacion':
-            # definir textos
             dur_txt = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
             realz = "REALIZADO ONLINE EN VIVO,"
             fecha_txt = f"{nombre_mes.upper()} DE {current_year}."
 
             centro = draw_centrado(c, nombre_completo, 372, font="Montserrat-Bold", size=18, return_center=True)
             c.setFillColor(HexColor("#003366"))
-            draw_texto_centrado_multilinea(c, curso_com, 280, "Metropolis-Black", 20, 500, x_centro=centro)
+            curso_lineas = curso_com.count(" ") // 5 + 1
+            font_size = 20 if curso_lineas <= 2 else 16
+            draw_texto_centrado_multilinea(c, curso_com, 280, "Metropolis-Black", font_size, 500, x_centro=centro)
             c.setFillColor(HexColor("#000000"))
             draw_centrado(c, dur_txt,   235, "Montserrat-Bold", 10) 
             draw_centrado(c, realz,     225, "Montserrat-Bold", 10)
@@ -181,30 +138,25 @@ def generar_constancia(participante, qr_path=None):
                 img = ImageReader(qr_path)
                 c.drawImage(img, x=175, y=80, width=90, height=90, mask='auto')
 
+    # Cambiar de página para el reverso
     c.showPage()
-        
+
+    # REVERSO
+    c.setFont("Montserrat-Bold", 11)
+    c.setFillColor(HexColor("#CF1111"))
     if nombre_tipo == 'especializacion':
-            # Aquí editas la segunda página, puedes usar las mismas funciones o texto libre
-        c.setFont("Montserrat-Bold", 11)
-        c.setFillColor(HexColor("#CF1111"))
-        c.drawString(212, 715, f"{folio_constancia}")  # Ajusta según el margen izquierdo deseado
+        c.drawString(212, 715, f"{folio_constancia}")
         c.setFillColor(HexColor("#000000"))
         c.drawString(212, 695, nombre_completo)
-        # c.drawString(205, 685, apellidos)
-    
     else:
-            # Aquí editas la segunda página, puedes usar las mismas funciones o texto libre
-        c.setFont("Montserrat-Bold", 11)
-        c.setFillColor(HexColor("#CF1111"))
-        c.drawString(255, 643, f"{folio_constancia}")  # Ajusta según el margen izquierdo deseado
+        c.drawString(255, 643, f"{folio_constancia}")
         c.setFillColor(HexColor("#000000"))
         c.drawString(255, 623, nombre_completo)
-
-    c.showPage()  # <-- Mueve esto aquí para asegurar el cierre correcto de la página
 
     c.save()
     packet.seek(0)
 
+    # Combinar con plantilla
     new_pdf = PdfReader(packet)
 
     if nombre_tipo == 'especializacion':
@@ -213,7 +165,6 @@ def generar_constancia(participante, qr_path=None):
             'especializacion lic': "app/static/pdf/especializacion_lic.pdf",
             'mini especializacion ing': "app/static/pdf/especializacion_ing.pdf",
         }.get(tema.lower(), "app/static/pdf/especializacion_lic.pdf")
-        
     else:
         plantilla_path = {
             'psicologia': "app/static/pdf/psicologia.pdf",
@@ -235,4 +186,7 @@ def generar_constancia(participante, qr_path=None):
         output.write(output_stream)
         output_stream.seek(0)
 
-    return output_stream
+    # Determinar el nombre del archivo de salida
+    nombre_archivo = f"{clave}-E.pdf" if nombre_tipo == "especializacion" else f"{clave}.pdf"
+
+    return output_stream, nombre_archivo

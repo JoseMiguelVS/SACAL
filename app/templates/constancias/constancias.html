@@ -32,6 +32,7 @@
         <form method="get" action="{{ url_for('constancias.constancias_filtros') }}" id="filtroForm">
             <div class="row g-3 align-items-end">
                 <!-- Mes -->
+                <!-- Mes -->
                 <div class="col-sm-3">
                     <label for="filtroMes" class="form-label">Mes</label>
                     <select id="filtroMes" name="mes" class="form-select form-select-sm filtro-auto">
@@ -63,15 +64,16 @@
                     <select id="filtroSesion" name="fecha" style="max-width: 360px; min-width: 360px"
                         class="form-select form-select-sm filtro-auto">
                         <option value="">Todas</option>
-                        {% set equipo_sel = request.args.get('equipos', '') %}
                         {% set mes_sel = request.args.get('mes', '') %}
                         {% set semana_sel = request.args.get('semana', '') %}
                         {% set fecha_actual = request.args.get('fecha', '') %}
                         {% for sesion in sesiones %}
-                        {% if sesion.6 == mes_sel and sesion.5 == semana_sel or sesion.1 == equipo_sel %}
-                        {% set valor = sesion.1 ~ '/' ~ sesion.2 %}
+                        {% set cumple_mes = (mes_sel == '' or sesion.4 == mes_sel) %}
+                        {% set cumple_semana = (semana_sel == '' or sesion.3 == semana_sel) %}
+                        {% if cumple_mes and cumple_semana %}
+                        {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.5 %}
                         <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
-                            {{ sesion.1 }} || {{ sesion.2 }}
+                            {{ sesion.1 }} · {{ sesion.5 }}
                         </option>
                         {% endif %}
                         {% endfor %}

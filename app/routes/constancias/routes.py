@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, request, redirect, send_file, url_
 from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
+from flask import send_file
+from io import BytesIO
 
 from ..constancias.generador import generar_constancia
 from ..constancias.qr import generar_qr_memoria
@@ -64,13 +66,13 @@ def constancias_filtros():
     # search_query = request.args.get('buscar', '', type=str)
     nombre_mes = request.args.get('mes', '', type=str)
     semana = request.args.get('semana', '', type=str)
-    fecha_raw = request.args.get('fecha', '', type=str)  # Usar directamente el valor completo
+    fecha_raw = request.args.get('fecha', '', type=str)
 
     fecha = ''
     if fecha_raw:
         partes = fecha_raw.split('/')
-        if len(partes) == 1:
-            fecha = partes[0]
+        if len(partes) == 3:
+            fecha = partes[1]  # parte central es la fecha
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas_constancias
                 WHERE (%s = '' OR nombre_mes ILIKE %s)
@@ -161,9 +163,6 @@ def folio_constancia():
 ))
 
 # ------------------------------------FOLIO DEL PARTICIPANTE------------------------------------
-from flask import send_file
-from io import BytesIO
-
 @constancias.route("/constancias/folio/generar")
 @login_required 
 def constancias_generar():
@@ -185,8 +184,8 @@ def constancias_generar():
             if not participante:
                 return "Constancia no encontrada", 404
 
-        qr_buffer = generar_qr_memoria(participante)  # Retorna BytesIO
-        pdf_buffer = generar_constancia(participante, qr_path=qr_buffer)  # Ahora también BytesIO
+        qr_buffer = generar_qr_memoria(participante)
+        pdf_buffer, nombre_archivo = generar_constancia(participante, qr_path=qr_buffer)
 
         with con.cursor() as cur:
             cur.execute("""
@@ -201,7 +200,7 @@ def constancias_generar():
         pdf_buffer,
         mimetype='application/pdf',
         as_attachment=True,
-        download_name='constancia.pdf'
+        download_name=nombre_archivo
     )
 
 #--------------------------------------------------------------EDITAR PARTICIPANTE----------------------------------------------------------------------------

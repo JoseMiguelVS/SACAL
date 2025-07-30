@@ -77,13 +77,15 @@
                     {% set semana_sel = request.args.get('semana', '') %}
                     {% set fecha_actual = request.args.get('fecha', '') %}
                     {% for sesion in sesiones %}
-                    {% if sesion.6 == mes_sel and sesion.5 == semana_sel or sesion.1 == equipo_sel %}
-                    {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.7 %}
+                    {% if (mes_sel == '' or sesion.4 == mes_sel) and
+                    (semana_sel == '' or sesion.3 == semana_sel) %}
+                    {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.5 %}
                     <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
-                        {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.7 }}
-                    </option> 
+                        {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.5 }}
+                    </option>
                     {% endif %}
                     {% endfor %}
+
                 </select>
             </div>
 
