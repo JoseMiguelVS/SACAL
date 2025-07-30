@@ -79,15 +79,15 @@ def loguear():
             login_user(user)
             return redirect(url_for('index'))
 
-        return redirect(url_for('login'))
+        return redirect(url_for('loguear'))
 
-    return render_template('login.html')
+    return render_template('iniciarSesion/sesion.html')
 
 
 @app.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('login'))
+    return redirect(url_for('loguear'))
 
 @app.route("/")
 def login():
