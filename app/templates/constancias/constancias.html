@@ -184,7 +184,7 @@
                                     endif %}>
                             </td>
                             <td class="text-nowrap">
-                                <input type="date" name="fecha_envio" value="{{ p.fecha_envio | default('', true) }}">
+                                <input type="date" name="fecha_envio" value="{{ p.fecha_envio | default('', true) }}" required>
                             </td>
                             <td class="text-nowrap">
                                 <button type="submit" class="botones-guardar">Guardar</button>
