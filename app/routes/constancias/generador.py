@@ -179,16 +179,22 @@ def generar_constancia(participante, qr_path=None):
         existing_pdf = PdfReader(f)
         output = PdfWriter()
 
-        for i in range(len(existing_pdf.pages)):
-            base_page = existing_pdf.pages[i]
-            if i < len(new_pdf.pages):
-                overlay_page = new_pdf.pages[i]
-                base_page.merge_page(overlay_page)
-            output.add_page(base_page)
+        max_pages = max(len(existing_pdf.pages), len(new_pdf.pages))
 
-        output_stream = io.BytesIO()
-        output.write(output_stream)
-        output_stream.seek(0)
+        for i in range(max_pages):
+            if i < len(existing_pdf.pages):
+                base_page = existing_pdf.pages[i]
+                if i < len(new_pdf.pages):
+                    overlay_page = new_pdf.pages[i]
+                    base_page.merge_page(overlay_page)
+                output.add_page(base_page)
+            else:
+                # Plantilla no tiene esta página, agregamos del PDF generado
+                output.add_page(new_pdf.pages[i])
+
+    output_stream = io.BytesIO()
+    output.write(output_stream)
+    output_stream.seek(0)
 
     # Determinar el nombre del archivo de salida
     nombre_archivo = f"{clave}-E.pdf" if nombre_tipo == "especializacion" else f"{clave}.pdf"
