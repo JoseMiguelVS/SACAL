@@ -313,8 +313,8 @@ def actualizar_participante(id):
     '''
     valores = (
         datos['clave_participante'],
-        datos['nombre_participante'],
         datos['num_telefono'],
+        datos['nombre_participante'],
         datos['apellidos_participante'],
         datos['nombre_paquete'],
         datos['fecha_pago'] or None,
