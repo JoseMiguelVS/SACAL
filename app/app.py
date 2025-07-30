@@ -27,6 +27,7 @@ app.secret_key = 'secret'
 
 # Login
 login_manager = LoginManager(app)
+login_manager.login_view = 'loguear'
 
 @login_manager.user_loader
 def load_user(idusuarios):
@@ -104,7 +105,11 @@ def index():
     cursor.execute("SELECT COUNT(*) FROM participantes")
     total_participantes = cursor.fetchone()[0]
 
-    cursor.execute("SELECT COUNT(*) FROM asistencias_detalladas_constancias WHERE constancia_enviada = False")
+    cursor.execute('''
+        SELECT COUNT(*) 
+        FROM asistencias_detalladas_constancias 
+        WHERE constancia_enviada = False AND (validacion_pago = %s OR validacion_pago = %s)
+    ''', ('1', '2'))
     constancias_pendientes = cursor.fetchone()[0]
 
     cursor.execute("SELECT COUNT(*) FROM ponentes")
@@ -119,6 +124,9 @@ def index():
         total_ponentes=total_ponentes
     )
 
+@app.errorhandler(401)
+def unauthorized_error(error):
+    return render_template('401.html'), 401
 # -------------------------- Desarrollo local --------------------------
 if __name__ == '__main__':
     csrf.init_app(app)

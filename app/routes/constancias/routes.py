@@ -34,7 +34,12 @@ def constancias_buscar():
     # Ejecutar el conteo de constancias no enviadas
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('SELECT COUNT(*) FROM asistencias_detalladas_constancias WHERE constancia_enviada = False')
+    cur.execute('''
+        SELECT COUNT(*) 
+        FROM asistencias_detalladas_constancias 
+        WHERE constancia_enviada = False AND (validacion_pago = %s OR validacion_pago = %s)
+    ''', ('1', '2'))    
+
     constancias_por_enviar = cur.fetchone()[0]
     cur.close()
     conn.close()
@@ -243,18 +248,7 @@ def constancias_actualizar(id):
         id
     )
 
-    sql2 = '''
-        UPDATE sesiones_curso SET
-            fecha = %s,
-        WHERE id_sesion = %s
-    '''
-    valores2 = (
-        datos['fecha'],
-        id
-    )
-
     cur.execute(sql, valores)
-    cur.execute(sql2, valores2)
     con.commit()
     cur.close()
     con.close()

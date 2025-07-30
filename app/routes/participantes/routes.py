@@ -281,7 +281,11 @@ def participante_nuevo():
         con.close()
 
         flash('Participante y asistencia registrados correctamente.')
-        return redirect(url_for('participantes.participantes_buscar'))
+        return redirect(url_for('participantes.participantes_buscar',
+                                mes=request.form.get('mes', ''),
+                                semana=request.form.get('semana', ''),
+                                fecha=request.form.get('fecha', ''),
+                                equipos=request.form.get('equipos', '')))
     
 #---------------------------------------------------------------------------------------------------------------
 @participantes.route('/participantes/actualizar/<int:id>', methods=['POST'])
