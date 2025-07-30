@@ -350,9 +350,9 @@
 
                         <select name="paquete" id="paquete" class="form-select" required>
                             <option value="" selected disabled>Selecciona un paquete</option>
-                            {% if paquetes and categoria_sesion %}
+                            {% if paquetes %}
                             {% for paquete in paquetes %}
-                            {% if paquete[4] and paquete[7] == categoria_sesion %}
+                            {% if paquete[4] %}
                             <option value="{{ paquete[0] }},{{ paquete[2] }}">
                                 {{ paquete[1] }} — ${{ paquete[2] }}
                             </option>
