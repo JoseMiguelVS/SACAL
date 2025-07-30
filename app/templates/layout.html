@@ -25,11 +25,15 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/docs.css') }}" />
     <link rel="icon" href="{{ url_for('static', filename='images/conecta.png') }}" type="image/png">
 
-    <!-- jQuery (requerido por Select2) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- jQuery: debe ir antes que Select2 -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <!-- Select2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 
     <!-- Librerías JS necesarias -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
@@ -221,13 +225,10 @@
 
     <script>
         $(document).ready(function () {
-            $('.select-buscable').select2({
-                width: '100%',  // Se ajusta al tamaño del contenedor
-                placeholder: 'Selecciona una opción',
-                allowClear: true
-            });
+            $('select.form-select').select2();
         });
     </script>
+
 
 </body>
 
