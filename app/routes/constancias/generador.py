@@ -87,7 +87,7 @@ def generar_constancia(participante, qr_path=None):
     tema = participante['nombre_tema'].lower()
     current_year = datetime.now().year
 
-    nombre_completo = f'{nombre}{apellidos}'
+    nombre_completo = f'{nombre} {apellidos}'
     curso_com = f"\"{curso.upper()}\""
 
     match nombre_tipo:
@@ -138,10 +138,9 @@ def generar_constancia(participante, qr_path=None):
                 img = ImageReader(qr_path)
                 c.drawImage(img, x=175, y=80, width=90, height=90, mask='auto')
 
-    # Cambiar de página para el reverso
-    c.showPage()
+    c.showPage()  # Terminar la primera página
 
-    # REVERSO
+    # Segunda página (reverso)
     c.setFont("Montserrat-Bold", 11)
     c.setFillColor(HexColor("#CF1111"))
     if nombre_tipo == 'especializacion':
@@ -153,7 +152,9 @@ def generar_constancia(participante, qr_path=None):
         c.setFillColor(HexColor("#000000"))
         c.drawString(255, 623, nombre_completo)
 
-    c.save()
+    c.showPage()  # Terminar la segunda página
+
+    c.save()     # Guardar PDF al final
     packet.seek(0)
 
     # Combinar con plantilla
