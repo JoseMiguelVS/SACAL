@@ -138,23 +138,26 @@ def generar_constancia(participante, qr_path=None):
                 img = ImageReader(qr_path)
                 c.drawImage(img, x=175, y=80, width=90, height=90, mask='auto')
 
-    c.showPage()  # Terminar la primera página
+    c.showPage()
 
-    # Segunda página (reverso)
-    c.setFont("Montserrat-Bold", 11)
-    c.setFillColor(HexColor("#CF1111"))
     if nombre_tipo == 'especializacion':
-        c.drawString(212, 715, f"{folio_constancia}")
+            # Aquí editas la segunda página, puedes usar las mismas funciones o texto libre
+        c.setFont("Montserrat-Bold", 11)
+        c.setFillColor(HexColor("#CF1111"))
+        c.drawString(212, 715, f"{folio_constancia}")  # Ajusta según el margen izquierdo deseado
         c.setFillColor(HexColor("#000000"))
         c.drawString(212, 695, nombre_completo)
     else:
-        c.drawString(255, 643, f"{folio_constancia}")
+            # Aquí editas la segunda página, puedes usar las mismas funciones o texto libre
+        c.setFont("Montserrat-Bold", 11)
+        c.setFillColor(HexColor("#CF1111"))
+        c.drawString(255, 643, f"{folio_constancia}")  # Ajusta según el margen izquierdo deseado
         c.setFillColor(HexColor("#000000"))
         c.drawString(255, 623, nombre_completo)
 
-    c.showPage()  # Terminar la segunda página
+    c.showPage()  # <-- Mueve esto aquí para asegurar el cierre correcto de la página
 
-    c.save()     # Guardar PDF al final
+    c.save()
     packet.seek(0)
 
     # Combinar con plantilla
