@@ -38,7 +38,6 @@ def draw_texto_centrado_multilinea(c, texto, y_inicial, font_name="Helvetica", f
     Dibuja texto centrado horizontalmente. Si se pasa x_centro, alinea usando ese centro en lugar del centro de la hoja.
     """
     c.setFont(font_name, font_size)
-    page_width = c._pagesize[0]  # Ancho, no altura
 
     palabras = texto.strip().split()
     lineas = []
@@ -61,7 +60,7 @@ def draw_texto_centrado_multilinea(c, texto, y_inicial, font_name="Helvetica", f
         if x_centro:
             x = x_centro - (text_width / 2)
         else:
-            x = (page_width - text_width) / 2
+            x = (page_height - text_width) / 2
         c.drawString(x, y, linea)
         y -= font_size + line_spacing
 
@@ -76,7 +75,8 @@ def generar_constancia(participante, qr_path=None):
     else:
         psz = landscape(letter)
 
-    c = canvas.Canvas(packet, pagesize=psz)
+    width, height = letter
+    c = canvas.Canvas(packet, pagesize=letter)
 
     nombre = participante['nombre_participante'].upper()
     apellidos = participante['apellidos_participante'].upper()
