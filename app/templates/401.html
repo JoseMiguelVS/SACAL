@@ -11,6 +11,8 @@
     <div class="text-center">
         <h1 class="display-4 text-danger">401</h1>
         <p class="lead">No estás autorizado para ver esta página.</p>
+        <img src="{{ url_for('static', filename='img/401_error.png') }}" height=""  width="
+    " alt="Aqui deberia ir una imagen">
         <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Iniciar sesión</a>
     </div>
 </body>
