@@ -1,5 +1,5 @@
 {% extends './layout.html' %} {% block body %}
-<main class="w-100 d-flex flex-column">
+<main class="w-100 d-flex flex-column"> 
     <h2 class="text-center mb-4">Resumen generales</h2>
 
     {% with messages = get_flashed_messages() %} {% if messages %} {% for
@@ -15,14 +15,14 @@
         <form method="get" action="{{ url_for('pagos.pagos_filtros') }}"
             class="d-flex flex-wrap align-items-center gap-2" id="filtroForm">
 
-            <select name="mes" class="form-select">
+            <select name="mes" class="form-select filtro-auto">
                 <option value="">Todos</option>
                 {% for id, nombre in meses %}
                 <option value="{{ nombre }}" {% if mes==nombre %}selected{% endif %}>{{ nombre }}</option>
                 {% endfor %}
             </select>
 
-            <select name="semana" class="form-select">
+            <select name="semana" class="form-select filtro-auto">
                 <option value="">Todas</option>
                 {% for id, texto in semanas %}
                 <option value="{{ texto }}" {% if semana==texto %}selected{% endif %}>{{ texto }}</option>

@@ -347,18 +347,27 @@
                                 <select name="paquete" id="paquete" class="form-select" required>
                                     <option value="" selected disabled>Selecciona un paquete</option>
                                     {% if paquetes and sesiones %}
-                                    {% set categorias_validas = sesiones | selectattr('4') | map(attribute='9') | list
-                                    %}
+                                    {% set categorias_validas = [] %}
+                                    {% for s in sesiones %}
+                                    {% if s[4] %}
+                                    {% set _ = categorias_validas.append(s[9]) %}
+                                    {% endif %}
+                                    {% endfor %}
                                     {% set mostrados = [] %}
                                     {% for paquete in paquetes %}
-                                    {% if paquete[4] and paquete[3] in categorias_validas and paquete[0] not in
-                                    mostrados %}
+                                    {% if paquete|length > 4 and paquete[4] and paquete[3] in categorias_validas and
+                                    paquete[0] not in mostrados %}
                                     <option value="{{ paquete[0] }},{{ paquete[2] }}">
+                                        <p>Sesiones: {{ sesiones }}</p>
+                                        <p>Paquetes: {{ paquetes }}</p>
+                                        <p>Categorías válidas: {{ categorias_validas }}</p>
+
                                         {{ paquete[1] }} — ${{ paquete[2] }}
                                     </option>
                                     {% set _ = mostrados.append(paquete[0]) %}
                                     {% endif %}
                                     {% endfor %}
+
                                     {% else %}
                                     <option disabled>No hay paquetes disponibles</option>
                                     {% endif %}
