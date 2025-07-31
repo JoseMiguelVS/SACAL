@@ -29,8 +29,8 @@ def lista_semanas(year=None):
 @resumen_semanal.route('/resumen', methods=['GET'])
 @login_required
 def resumen():
-    mes = request.args.get('mes', '', type=str)
-    semana = request.args.get('semana', '', type=str)
+    fecha_inicio_str = request.args.get('fecha_inicio', '', type=str)
+    fecha_fin_str = request.args.get('fecha_fin', '', type=str)
 
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
@@ -50,15 +50,28 @@ def resumen():
             semana_inicio = fecha - timedelta(days=fecha.weekday())
             semana_fin = semana_inicio + timedelta(days=6)
             fila['semana'] = f"{semana_inicio.day:02d} {semana_inicio.strftime('%b')} - {semana_fin.day:02d} {semana_fin.strftime('%b')}"
+            fila['fecha_obj'] = fecha
         else:
             fila['nombre_mes'] = ''
             fila['semana'] = ''
+            fila['fecha_obj'] = None
 
-    # Filtrar por mes y semana en Python
-    if mes:
-        resumen_datos = [f for f in resumen_datos if mes.lower() in f['nombre_mes'].lower()]
-    if semana:
-        resumen_datos = [f for f in resumen_datos if semana.lower() in f['semana'].lower()]
+    # Convertir fechas de entrada
+    fecha_inicio = None
+    fecha_fin = None
+    try:
+        if fecha_inicio_str:
+            fecha_inicio = datetime.strptime(fecha_inicio_str, "%Y-%m-%d")
+        if fecha_fin_str:
+            fecha_fin = datetime.strptime(fecha_fin_str, "%Y-%m-%d")
+    except ValueError:
+        flash("Fechas inválidas", "warning")
+
+    # Filtrar por rango de fechas
+    if fecha_inicio:
+        resumen_datos = [f for f in resumen_datos if f['fecha_obj'] and f['fecha_obj'] >= fecha_inicio]
+    if fecha_fin:
+        resumen_datos = [f for f in resumen_datos if f['fecha_obj'] and f['fecha_obj'] <= fecha_fin]
 
     # Agrupar datos
     agrupado = defaultdict(list)
@@ -86,8 +99,8 @@ def resumen():
         'resumen/resumen.html',
         datos=resumen_datos,
         agrupado=agrupado,
-        mes=mes,
-        semana=semana,
+        fecha_inicio=fecha_inicio_str,
+        fecha_fin=fecha_fin_str,
         categorias=lista_categorias(),
         semanas=semanas,
         meses=meses,
@@ -102,3 +115,4 @@ def resumen():
         ingreso_faltante=ingreso_faltante,
         gasto_semanal=gasto_semanal
     )
+

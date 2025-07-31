@@ -20,20 +20,6 @@
 
         <h2 class="mb-4 text-center">Editar sesión</h2>
 
-        <!-- Fecha y horario -->
-        <div class="row mb-3">
-            <div class="col-md-4">
-                <label for="horario_inicio" class="form-label">Hora de inicio</label>
-                <input type="time" class="form-control" name="horario_inicio" id="horario_inicio"
-                    value="{{ sesiones[1] }}" required>
-            </div>
-            <div class="col-md-4">
-                <label for="horario_fin" class="form-label">Hora de fin</label>
-                <input type="time" class="form-control" name="horario_fin" id="horario_fin" value="{{ sesiones[4] }}"
-                    required>
-            </div>
-        </div>
-
         <!-- Categoría -->
         <div class="mb-3">
             <label for="id_categoria" class="form-label">Categoría</label>
@@ -98,30 +84,61 @@
                     </select>
                 </div>
 
-                <div class="col-md-4">
-                    <label for="fecha" class="form-label">Fecha</label>
-                    <input type="date" class="form-control" name="fecha_curso[]"
-                        value="{{ cp.fecha_curso|date('Y-m-d') }}" required>
+                <div id="cursos-container" class="mb-3">
+                    {% for cp in cursos_sesion %}
+                    <div class="row align-items-end mb-2 curso-group">
+                        <!-- Curso -->
+                        <div class="col-md-4 mb-2">
+                            <label class="form-label">Curso:</label>
+                            <select name="cursos[]" class="form-select" required
+                                style="max-width: 360px; min-width: 360px;">
+                                <option value="">Curso</option>
+                                {% for curso in cursos %}
+                                <option value="{{ curso.0 }}" {% if curso.0==cp.curso_id %}selected{% endif %}>{{
+                                    curso.1 }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Ponente -->
+                        <div class="col-md-4 mb-2">
+                            <label class="form-label">Ponente:</label>
+                            <select name="ponentes[]" class="form-select" required
+                                style="max-width: 360px; min-width: 360px;">
+                                <option value="">Ponente</option>
+                                {% for ponente in ponentes %}
+                                <option value="{{ ponente.0 }}" {% if ponente.0==cp.ponente_id %}selected{% endif %}>{{
+                                    ponente.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Fecha -->
+                        <div class="col-md-4 mb-2">
+                            <label class="form-label">Fecha:</label>
+                            <input type="date" class="form-control" name="fecha_curso[]" value="{{ cp.fecha_curso }}"
+                                required>
+                        </div>
+
+
+                        <!-- Botón eliminar (visible si hay más de uno) -->
+                        <div class="col-md-2 mb-2 text-center {% if loop.length == 1 %}d-none{% endif %}">
+                            <button type="button" class="btn btn-danger btn-sm eliminar-curso">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
 
 
-                <!-- Botón eliminar (visible si hay más de uno) -->
-                <div class="col-md-2 mb-2 text-center {% if loop.length == 1 %}d-none{% endif %}">
-                    <button type="button" class="btn btn-danger btn-sm eliminar-curso">
-                        <i class="fas fa-trash-alt"></i>
+                <!-- Botón agregar -->
+                <div class="mb-4">
+                    <button type="button" id="agregar-curso" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-plus"></i> Agregar otro curso
                     </button>
                 </div>
-            </div>
-            {% endfor %}
-        </div>
-
-
-        <!-- Botón agregar -->
-        <div class="mb-4">
-            <button type="button" id="agregar-curso" class="btn btn-outline-secondary btn-sm">
-                <i class="fas fa-plus"></i> Agregar otro curso
-            </button>
-        </div>
     </form>
 
     <!-- Botones de acción -->

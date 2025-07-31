@@ -108,6 +108,8 @@ def sesion_nuevo():
     return redirect(url_for('sesiones.sesiones_agregar'))
 
 #------------------------------------EDITAR SESION-------------------------------
+from datetime import datetime
+
 @sesiones.route('/participantes/sesiones/editar/<string:id>')
 @login_required 
 def sesion_editar(id):
@@ -131,16 +133,20 @@ def sesion_editar(id):
         JOIN ponentes p ON p.id_ponentes = ce.ponente_id
         WHERE ce.sesion_id = %s;
         """, (id,))
-    cursos_ponentes = [
-        {
+    
+    cursos_ponentes = []
+    for row in cur.fetchall():
+        fecha_curso = row[4]
+        # ✅ Convertir a string ISO si no es None
+        fecha_curso_str = fecha_curso.strftime('%Y-%m-%d') if isinstance(fecha_curso, datetime) else ''
+        
+        cursos_ponentes.append({
             'curso_id': row[0],
             'curso_nombre': row[1],
             'ponente_id': row[2],
             'ponente_nombre': row[3],
-            'fecha_curso': row[4]  # ✅ Incluido
-        }
-        for row in cur.fetchall()
-    ]
+            'fecha_curso': fecha_curso_str
+        })
 
     # Listas para selects
     cur.execute("SELECT id_curso, nombre_curso FROM cursos;")
@@ -170,8 +176,6 @@ def sesion_editar(id):
         semanas=semanas,
         meses=meses
     )
-
-
 
 @sesiones.route("/participantes/sesiones/editar/<string:id>", methods=["POST"])
 @login_required

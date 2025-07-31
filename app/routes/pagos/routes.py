@@ -52,69 +52,60 @@ def pagos_buscar():
 @pagos.route("/pagos/filtros")
 @login_required
 def pagos_filtros():
-    mes = request.args.get('mes', '', type=str)
-    semana = request.args.get('semana', '', type=str)
+    fecha_inicio = request.args.get('fecha_inicio', '', type=str)
+    fecha_fin = request.args.get('fecha_fin', '', type=str)
     page = request.args.get('page', 1, type=int)
     per_page = 20
 
     # -------------------- PAGOS --------------------
     sql_count = '''
         SELECT COUNT(*) FROM detalles_pagos
-        WHERE (%s = '' OR meses ILIKE %s)
-        AND (%s = '' OR semanas ILIKE %s)
+        WHERE (%s = '' OR fecha_pago >= %s)
+        AND (%s = '' OR fecha_pago <= %s)
     '''
     
     sql_lim = '''
         SELECT * FROM detalles_pagos
-        WHERE (%s = '' OR meses ILIKE %s)
-        AND (%s = '' OR semanas ILIKE %s)
+        WHERE (%s = '' OR fecha_pago >= %s)
+        AND (%s = '' OR fecha_pago <= %s)
         ORDER BY id_pago DESC
         LIMIT %s OFFSET %s
     '''
 
     paginado = paginador3(
         sql_count, sql_lim,
-        [mes, mes, semana, semana],
+        [fecha_inicio, fecha_inicio, fecha_fin, fecha_fin],
         page, per_page
     )
 
     # -------------------- GASTOS --------------------
     sql_countG = '''
         SELECT COUNT(*) FROM detalles_gastos
-        WHERE (%s = '' OR mes ILIKE %s)
-        AND (%s = '' OR semana ILIKE %s)
+        WHERE (%s = '' OR fecha >= %s)
+        AND (%s = '' OR fecha <= %s)
     '''
 
     sql_limG = '''
         SELECT * FROM detalles_gastos
-        WHERE (%s = '' OR mes ILIKE %s)
-        AND (%s = '' OR semana ILIKE %s)
+        WHERE (%s = '' OR fecha >= %s)
+        AND (%s = '' OR fecha <= %s)
         ORDER BY fecha DESC
         LIMIT %s OFFSET %s
     '''
 
-    # Ejecutar paginador con los valores adecuados
     paginado_gastos = paginador3(
         sql_countG, sql_limG,
-        [
-         mes, mes, 
-         semana, semana
-        ],
+        [fecha_inicio, fecha_inicio, fecha_fin, fecha_fin],
         1, 10
     )
 
-    # Renderizar plantilla
-    return render_template('pagos/pagos.html',
-                        pagos=paginado[0],
-                        page=paginado[1],
-                        per_page=paginado[2],
-                        total_items=paginado[3],
-                        total_pages=paginado[4],
-                        gastos=paginado_gastos[0],
-                        concepto=lista_conceptos(),
-                        gasto=lista_gastos(),
-                        meses=lista_meses(),
-                        semanas=lista_semanas())
+    return render_template(
+        'pagos/tu_template.html',
+        paginado=paginado,
+        paginado_gastos=paginado_gastos,
+        fecha_inicio=fecha_inicio,
+        fecha_fin=fecha_fin
+    )
 
 # -----------------------------COMPROBANTES-----------------------------
 @pagos.route("/pagos/comprobantes/<string:id>")
@@ -194,8 +185,6 @@ def pagos_detalles(id):
 @login_required
 def pagos_nuevo():
     if request.method == 'POST':
-        mes_filtro = request.form['mes_filtro']
-        semana_filtro = request.form['semana_filtro']
         monto_gasto = request.form['gasto']
         concepto_gasto = request.form['conceptos']
         mes = request.form['mes']
@@ -207,10 +196,10 @@ def pagos_nuevo():
 
         sql = '''
                     INSERT INTO gastos
-                        (fecha, monto_gasto, concepto_gasto, mes, semana)
-                        VALUES (%s, %s, %s, %s, %s)
+                        (fecha, monto_gasto, concepto_gasto)
+                        VALUES (%s, %s, %s)
               '''
-        valores = (fecha, monto_gasto, concepto_gasto, mes, semana)
+        valores = (fecha, monto_gasto, concepto_gasto)
         cur.execute(sql, valores)
 
         con.commit()
@@ -218,7 +207,7 @@ def pagos_nuevo():
         con.close()
 
         flash("Gasto registrado correctamente.")
-        return redirect(url_for('pagos.pagos_filtros', mes = mes_filtro, semana = semana_filtro))
+        return redirect(url_for('pagos.pagos_filtros'))
     
     return redirect(url_for('pagos.pagos_buscar'))
 

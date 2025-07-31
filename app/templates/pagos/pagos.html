@@ -34,36 +34,33 @@
         <form method="get" action="{{ url_for('pagos.pagos_filtros') }}" class="d-flex flex-wrap align-items-end gap-3"
             id="filtroForm">
 
-            <!-- Mes -->
-            <div class="d-flex flex-column ml-2">
-                <label for="filtroMes" class="form-label mb-1">Mes</label>
-                <select id="filtroMes" name="mes" class="form-select form-select-sm filtro-auto">
-                    <option value="">Todos</option>
-                    {% for mes in meses %}
-                    <option value="{{ mes[1] }}" {% if request.args.get('mes')==mes[1] %}selected{% endif %}>{{ mes[1]
-                        }}</option>
-                    {% endfor %}
-                </select>
+            <!-- Fecha inicio -->
+            <div class="d-flex flex-column">
+                <label for="fechaInicio" class="form-label mb-1">Fecha inicio</label>
+                <input type="date" id="fechaInicio" name="fecha_inicio" class="form-control form-control-sm"
+                    value="{{ request.args.get('fecha_inicio', '') }}">
             </div>
 
-            <!-- Semana -->
-            <div class="d-flex flex-column ml-2">
-                <label for="filtroSemana" class="form-label mb-1">Semana</label>
-                <select id="filtroSemana" name="semana" class="form-select form-select-sm filtro-auto">
-                    <option value="">Todas</option>
-                    {% for semana in semanas %}
-                    <option value="{{ semana[1] }}" {% if request.args.get('semana')==semana[1] %}selected{% endif %}>{{
-                        semana[1] }}</option>
-                    {% endfor %}
-                </select>
+            <!-- Fecha fin -->
+            <div class="d-flex flex-column">
+                <label for="fechaFin" class="form-label mb-1">Fecha fin</label>
+                <input type="date" id="fechaFin" name="fecha_fin" class="form-control form-control-sm"
+                    value="{{ request.args.get('fecha_fin', '') }}">
             </div>
+
+            <!-- Botón filtrar -->
+            <div>
+                <button type="submit" class="btn btn-sm btn-primary">Filtrar</button>
+            </div>
+
         </form>
 
         <!-- Botón Limpiar -->
         <div>
-            <a href="{{ url_for('pagos.pagos_buscar') }}" class="botones ml-2">Limpiar</a>
+            <a href="{{ url_for('pagos.pagos_buscar') }}" class="btn btn-sm btn-secondary ml-2">Limpiar</a>
         </div>
     </section>
+
 
 
     <section class="table-responsive tables_participantes table-sm">

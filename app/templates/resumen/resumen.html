@@ -15,25 +15,23 @@
         <form method="get" action="{{ url_for('resumen_semanal.resumen') }}"
             class="d-flex flex-wrap align-items-center gap-2" id="filtroForm">
 
-            <select name="mes" class="form-select filtro-auto">
-                <option value="">Todos</option>
-                {% for id, nombre in meses %}
-                <option value="{{ nombre }}" {% if mes==nombre %}selected{% endif %}>{{ nombre }}</option>
-                {% endfor %}
-            </select>
+            <!-- Fecha inicio -->
+            <div class="d-flex flex-column">
+                <label for="fechaInicio" class="form-label mb-1">Fecha inicio</label>
+                <input type="date" id="fechaInicio" name="fecha_inicio" class="form-control form-control-sm"
+                    value="{{ request.args.get('fecha_inicio', '') }}">
+            </div>
 
-            <select name="semana" class="form-select filtro-auto">
-                <option value="">Todas</option>
-                {% for id, texto in semanas %}
-                <option value="{{ texto }}" {% if semana==texto %}selected{% endif %}>{{ texto }}</option>
-                {% endfor %}
-            </select>
-
+            <!-- Fecha fin -->
+            <div class="d-flex flex-column">
+                <label for="fechaFin" class="form-label mb-1">Fecha fin</label>
+                <input type="date" id="fechaFin" name="fecha_fin" class="form-control form-control-sm"
+                    value="{{ request.args.get('fecha_fin', '') }}">
+            </div>
         </form>
 
         <!-- Limpiar -->
         <a href="{{ url_for('resumen_semanal.resumen') }}" class="botones ml-2">Limpiar</a>
-        </form>
     </section>
 
     <section class="tables_participantes table">
