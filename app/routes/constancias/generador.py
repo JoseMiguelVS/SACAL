@@ -124,9 +124,13 @@ def generar_constancia(participante, qr_path=None):
 
         if qr_path:
             img = ImageReader(qr_path)
-            c.drawImage(img, x=250 if nombre_tipo != 'psicologia' else 50, y=25,
-                        width=90 if nombre_tipo != 'psicologia' else 150,
-                        height=90 if nombre_tipo != 'psicologia' else 150, mask='auto')
+
+            if nombre_tipo == 'psicologia':
+                c.drawImage(img, x=50, y=25, width=125, height=125, mask='auto')
+            elif nombre_tipo == 'empresarial':
+                c.drawImage(img, x=200, y=25, width=100, height=100, mask='auto')
+            elif nombre_tipo == 'publico en general':
+                c.drawImage(img, x=250, y=25, width=90, height=90, mask='auto')
 
     elif nombre_tipo == 'especializacion':
         dur_txt = f"CON UNA DURACIÓN DE {duracion_curso} HORAS,"
