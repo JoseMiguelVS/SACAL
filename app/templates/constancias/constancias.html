@@ -205,7 +205,7 @@
                         </td>
                         <td>
                             {% set modal_id = 'staticBackdrop-' ~ p.id_participante ~ '-' ~ p.nombre_curso|replace(' ',
-                            '_')|replace(':', '')|replace(',', '')|replace('.', '') ~ '-' ~ p.fecha %}
+                            '_')|replace(':', '')|replace(',', '')|replace('.', '') ~ '-' ~ p.fecha_curso %}
                             <button class="botones-guardar" data-bs-toggle="modal" data-bs-target="#{{ modal_id }}">
                                 <li class="fas fa-download" style="font-size: 18px;"></li>
                             </button>
@@ -323,7 +323,7 @@
     {% set modal_id = 'staticBackdrop-' ~ p.id_participante ~ '-' ~ p.nombre_curso|replace(' ',
     '_')|replace(':', '')|replace(',', '')|replace('.', '') ~ '-' ~ p.fecha_curso %}
     <form method="post"
-        action="{{ url_for('constancias.folio_constancia') }}?id={{ p.id_participante }}&curso={{ p.nombre_curso }}&fecha={{ p.fecha_curso }}">
+        action="{{ url_for('constancias.folio_constancia') }}?id={{ p.id_participante }}&curso={{ p.nombre_curso }}&fecha_curso={{ p.fecha_curso }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="modal fade" id="{{ modal_id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
             aria-hidden="true">
@@ -357,7 +357,7 @@
             const folio = document.querySelector(`#${modal_id} input[name='folio_constancia']`).value;
             form.append("folio_constancia", folio);
 
-            fetch(`/constancias/folio/?id=${id}&curso=${encodeURIComponent(curso)}&fecha=${fecha_curso}`, {
+            fetch(`/constancias/folio/?id=${id}&curso=${encodeURIComponent(curso)}&fecha_curso=${fecha_curso}`, {
                 method: "POST",
                 body: form,
                 headers: {
