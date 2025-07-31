@@ -48,7 +48,13 @@
                 {% if sesiones %} {% for sesion in sesiones %} {% if sesion.estado == True %}
                 <tr align="center">
                     <td>{{ sesion.cursos }}</td>
-                    <td>{{ sesion.fecha_curso.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                        {% if sesion.fecha_curso %}
+                        {{ sesion.fecha_curso.strftime('%d/%m/%Y') }}
+                        {% else %}
+                        Sin fecha
+                        {% endif %}
+                    </td>
                     <td>{{ sesion.nombre_mes }}</td>
                     <td>{{ sesion.semana }}</td>
                     <td>
