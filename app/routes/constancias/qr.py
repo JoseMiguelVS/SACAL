@@ -24,6 +24,7 @@ def generar_qr_memoria(participante):
     contenido_qr = f"""
 INFORMACION DE CONSTANCIA:
     Folio: {folio_constancia}
+    
 INFORMACION DE PARTICIPANTE:
     FOLIO: {clave}
     NOMBRE DEL PARTICIPANTE: {nombre_participante.upper()}

@@ -154,7 +154,6 @@ def generar_constancia(participante, qr_path=None):
         c.drawString(255, 523, nombre_completo)
 
     c.showPage()  # ← Cierra segunda página correctamente
-    # <-- Mueve esto aquí para asegurar el cierre correcto de la página
 
     c.save()
     packet.seek(0)
