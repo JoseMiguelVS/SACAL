@@ -65,7 +65,7 @@ def cursos_nuevo():
             cur.close()
             con.close()
             flash('Error: el curso ya existe. Intente con otro')
-            return redirect(url_for('cursos.curso_buscar'))
+            return redirect(url_for('cursos.cursos_buscar'))
         else:
             sql = '''INSERT INTO cursos 
                      (nombre_curso, codigo_curso, tema_curso, duracion_curso, es_nacional, estado, fecha_creacion, fecha_modificacion, categoria_id) 

@@ -5,7 +5,7 @@ from io import BytesIO
 
 def generar_qr_memoria(participante):
     nombre_curso = participante['nombre_curso']
-    fecha = participante['fecha']
+    fecha_curso = participante['fecha_curso']
     nombre_mes = participante['nombre_mes']
     nombre_ponente = participante['nombre_ponente']
     curp_ponente = participante['curp_ponente']
@@ -18,7 +18,7 @@ def generar_qr_memoria(participante):
     current_year = datetime.now().year
 
     # Extraer día
-    dia = fecha.day if isinstance(fecha, datetime) else int(str(fecha)[8:10])
+    dia = fecha_curso.day if isinstance(fecha_curso, datetime) else int(str(fecha_curso)[8:10])
 
     # Contenido QR con formato del reverso
     contenido_qr = f"""

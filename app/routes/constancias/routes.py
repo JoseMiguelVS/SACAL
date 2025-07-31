@@ -14,7 +14,6 @@ from ..utils.utils import get_db_connection, paginador1, paginador2, paginador3
 constancias = Blueprint('constancias', __name__) 
 
 #-----------------------------------------PRINCIPAL-------------------------------------------------
-
 @constancias.route("/constancias")
 @login_required
 def constancias_buscar():
@@ -64,7 +63,6 @@ def constancias_buscar():
                            search_query=search_query,
                            constancias_por_enviar=constancias_por_enviar)
 
-
 @constancias.route("/constancias/filtros") 
 @login_required
 def constancias_filtros():
@@ -73,7 +71,7 @@ def constancias_filtros():
     semana = request.args.get('semana', '', type=str)
     fecha_raw = request.args.get('fecha', '', type=str)
 
-    fecha = ''
+    fecha_curso = ''
     if fecha_raw:
         partes = fecha_raw.split('/')
         if len(partes) == 3:
@@ -82,13 +80,13 @@ def constancias_filtros():
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas_constancias
                 WHERE (%s = '' OR nombre_mes ILIKE %s)
                     AND (%s = '' OR semana ILIKE %s)
-                    AND (%s = '' OR fecha ILIKE %s)
+                    AND (%s = '' OR fecha_curso ILIKE %s)
                 AND constancia_enviada = False '''
 
     sql_lim = '''SELECT * FROM asistencias_detalladas_constancias
             WHERE (%s = '' OR nombre_mes ILIKE %s)
                 AND (%s = '' OR semana ILIKE %s)
-                AND (%s = '' OR fecha ILIKE %s)
+                AND (%s = '' OR fecha_curso ILIKE %s)
                 AND constancia_enviada = False
             ORDER BY nombre_participante DESC
             LIMIT %s OFFSET %s'''
@@ -121,7 +119,6 @@ def constancias_filtros():
                            total_pages=paginado[4])
 
 #------------------------------------------------------DETALLES-----------------------------------------------------
-
 @constancias.route("/constancias/detalles/<int:id>")
 @login_required
 def constancias_detalles(id):
@@ -137,16 +134,15 @@ def constancias_detalles(id):
                                participantes = participantes)
      
 #----------------------------------------------------------GENERADOR DE CONSTANCIAS-------------------------------------------------------------
-
 @constancias.route('/constancias/folio/', methods=["POST"])
 @login_required
 def folio_constancia():
     folio = request.form.get("folio_constancia")
     id = request.args.get("id")
     curso = request.args.get("curso")
-    fecha = request.args.get("fecha")  # formato ISO: 'YYYY-MM-DD'
+    fecha_curso = request.args.get("fecha_curso")  # formato ISO: 'YYYY-MM-DD'
 
-    if not id or not curso or not fecha or not folio:
+    if not id or not curso or not fecha_curso or not folio:
         flash('Datos incompletos', 'Error')
         return redirect(url_for('constancias.constancias_buscar'))
 
@@ -164,7 +160,7 @@ def folio_constancia():
     'constancias.constancias_generar',
     id=id,
     curso=curso,
-    fecha=fecha
+    fecha_curso=fecha_curso
 ))
 
 # ------------------------------------FOLIO DEL PARTICIPANTE------------------------------------
@@ -173,9 +169,9 @@ def folio_constancia():
 def constancias_generar():
     id = request.args.get("id")
     curso = request.args.get("curso")
-    fecha = request.args.get("fecha")  # formato ISO: 'YYYY-MM-DD'
+    fecha_curso = request.args.get("fecha_curso")  # formato ISO: 'YYYY-MM-DD'
 
-    if not id or not curso or not fecha:
+    if not id or not curso or not fecha_curso:
         flash('Datos incompletos')
         return redirect(url_for('constancias.constancias_buscar'))
 
@@ -183,8 +179,8 @@ def constancias_generar():
         with con.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute("""
                 SELECT * FROM datos_constancias1
-                WHERE id_participante = %s AND nombre_curso = %s AND fecha = %s
-            """, (id, curso, fecha))
+                WHERE id_participante = %s AND nombre_curso = %s AND fecha_curso = %s
+            """, (id, curso, fecha_curso))
             participante = cur.fetchone()
             if not participante:
                 return "Constancia no encontrada", 404
@@ -209,16 +205,15 @@ def constancias_generar():
     )
 
 #--------------------------------------------------------------EDITAR PARTICIPANTE----------------------------------------------------------------------------
-        
 @constancias.route("/constancias/participantes")
 @login_required
 def constancias_editar():
     id = request.args.get("id")
     curso = request.args.get("curso")
-    fecha = request.args.get("fecha")
+    fecha_curso = request.args.get("fecha_curso")
     con = get_db_connection()
     cur = con.cursor()
-    cur.execute('SELECT * FROM asistencias_detalladas_constancias WHERE id_participante = %s AND nombre_curso = %s AND fecha = %s', (id, curso, fecha))
+    cur.execute('SELECT * FROM asistencias_detalladas_constancias WHERE id_participante = %s AND nombre_curso = %s AND fecha_curso = %s', (id, curso, fecha_curso))
     participante = cur.fetchall()
     con.commit()
     cur.close()
@@ -339,7 +334,7 @@ def constancias_hechas_filtros():
     semana = request.args.get('semana', '', type=str)
     fecha_raw = request.args.get('fecha', '', type=str)  # Usar directamente el valor completo
 
-    fecha = ''
+    fecha_curso = ''
     if fecha_raw:
         partes = fecha_raw.split('/')
         if len(partes) == 1:
@@ -348,13 +343,13 @@ def constancias_hechas_filtros():
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas_constancias
                 WHERE (%s = '' OR nombre_mes ILIKE %s)
                     AND (%s = '' OR semana ILIKE %s)
-                    AND (%s = '' OR fecha ILIKE %s)
+                    AND (%s = '' OR fecha_curso ILIKE %s)
                 AND constancia_enviada = True '''
 
     sql_lim = '''SELECT * FROM asistencias_detalladas_constancias
             WHERE (%s = '' OR nombre_mes ILIKE %s)
                 AND (%s = '' OR semana ILIKE %s)
-                AND (%s = '' OR fecha ILIKE %s)
+                AND (%s = '' OR fecha_curso ILIKE %s)
                 AND constancia_enviada = True
             ORDER BY nombre_participante DESC
             LIMIT %s OFFSET %s'''
@@ -364,7 +359,7 @@ def constancias_hechas_filtros():
         [
             nombre_mes, nombre_mes, 
             semana, semana, 
-            fecha, fecha,
+            fecha_curso, fecha_curso,
             # search_query, search_query, search_query
         ],
         1, 25

@@ -66,7 +66,6 @@ def sesiones_agregar():
 def sesion_nuevo():
     if request.method == 'POST':
         # Campos base
-        fecha = request.form['fecha']
         categoria = request.form['id_categoria']
         mes = request.form['id_mes']
         semana = request.form['id_semana']
@@ -75,6 +74,7 @@ def sesion_nuevo():
         # Campos dinámicos
         cursos = request.form.getlist('cursos[]')
         ponentes = request.form.getlist('ponentes[]')
+        fechas_curso = request.form.getlist('fecha_curso[]')
 
         con = get_db_connection()
         cur = con.cursor(cursor_factory=RealDictCursor)
@@ -82,21 +82,21 @@ def sesion_nuevo():
         # Insertar sesión principal
         sql_sesion = '''
             INSERT INTO sesiones_curso 
-            (fecha, categoria, mes, semana, estado)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            (categoria, mes, semana, estado)
+            VALUES (%s, %s, %s, %s)
             RETURNING id_sesion
         '''
-        valores_sesion = (fecha, categoria, mes, semana, estado)
+        valores_sesion = (categoria, mes, semana, estado)
         cur.execute(sql_sesion, valores_sesion)
         sesion_id = cur.fetchone()['id_sesion']
 
         # Insertar cursos y ponentes
         sql_relacion = '''
-            INSERT INTO cursos_sesion (sesion_id, curso_id, ponente_id)
-            VALUES (%s, %s, %s)
+            INSERT INTO cursos_sesion (sesion_id, curso_id, ponente_id, fecha_curso)
+            VALUES (%s, %s, %s, %s)
         '''
-        for curso_id, ponente_id in zip(cursos, ponentes):
-            cur.execute(sql_relacion, (sesion_id, curso_id, ponente_id))
+        for curso_id, ponente_id in zip(cursos, ponentes, fechas_curso):
+            cur.execute(sql_relacion, (sesion_id, curso_id, ponente_id, fechas_curso))
 
         con.commit()
         cur.close()
@@ -106,7 +106,6 @@ def sesion_nuevo():
         return redirect(url_for('sesiones.sesiones_buscar'))
 
     return redirect(url_for('sesiones.sesiones_agregar'))
-
 
 #------------------------------------EDITAR SESION-------------------------------
 @sesiones.route('/participantes/sesiones/editar/<string:id>')

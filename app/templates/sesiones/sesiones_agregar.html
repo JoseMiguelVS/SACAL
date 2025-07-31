@@ -6,22 +6,6 @@
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
         <div class="mb-3">
-            <label for="fecha" class="form-label">Fecha del curso:</label>
-            <input type="date" id="fecha" name="fecha" class="form-control" required>
-        </div>
-
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label for="horario_inicio" class="form-label">Hora de inicio:</label>
-                <input type="time" id="horario_inicio" name="horario_inicio" class="form-control" required>
-            </div>
-            <div class="col-md-6 mb-3">
-                <label for="horario_fin" class="form-label">Hora de fin:</label>
-                <input type="time" id="horario_fin" name="horario_fin" class="form-control" required>
-            </div>
-        </div>
-
-        <div class="mb-3">
             <div class="input-group">
 
                 <select name="id_categoria" id="id_categoria" class="form-select" required>
@@ -65,7 +49,8 @@
                 <!-- Curso -->
                 <div class="col-md-5 mb-2">
                     <label class="form-label">Cursos de sesión:</label>
-                    <select name="cursos[]" class="form-select select-buscable" required style="max-width: 360px; min-width: 360px;">
+                    <select name="cursos[]" class="form-select select-buscable" required
+                        style="max-width: 360px;">
                         <option value="">Curso</option>
                         {% for curso in cursos %}
                         <option value="{{ curso.0 }}">{{ curso.1 }}</option>
@@ -76,12 +61,18 @@
                 <!-- Ponente -->
                 <div class="col-md-5 mb-2">
                     <label class="form-label">Ponente:</label>
-                    <select name="ponentes[]" class="form-select select-buscable" required style="max-width: 360px; min-width: 360px;">
+                    <select name="ponentes[]" class="form-select select-buscable" required
+                        style="max-width: 360px;">
                         <option value="">Ponente</option>
                         {% for ponente in ponentes %}
                         <option value="{{ ponente.0 }}">{{ ponente.1 }}</option>
                         {% endfor %}
                     </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="fecha" class="form-label">Fecha del curso:</label>
+                    <input type="date" id="fecha_curso" name="fecha_curso[]" class="form-control" required>
                 </div>
 
                 <!-- Botón eliminar -->
