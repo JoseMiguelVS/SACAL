@@ -179,15 +179,27 @@ def generar_constancia(participante, qr_path=None):
 
         max_pages = max(len(existing_pdf.pages), len(new_pdf.pages))
 
+        # for i in range(max_pages):
+        #     if i < len(existing_pdf.pages):
+        #         base_page = existing_pdf.pages[i]
+        #         if i < len(new_pdf.pages):
+        #             overlay_page = new_pdf.pages[i]
+        #             base_page.merge_page(overlay_page)
+        #         output.add_page(base_page)
+        #     else:
+        #         # Plantilla no tiene esta página, agregamos del PDF generado
+        #         output.add_page(new_pdf.pages[i])
         for i in range(max_pages):
             if i < len(existing_pdf.pages):
                 base_page = existing_pdf.pages[i]
                 if i < len(new_pdf.pages):
                     overlay_page = new_pdf.pages[i]
-                    base_page.merge_page(overlay_page)
-                output.add_page(base_page)
+                    # ← AQUÍ CAMBIAMOS EL ORDEN
+                    overlay_page.merge_page(base_page) 
+                    output.add_page(overlay_page)
+                else:
+                    output.add_page(base_page)
             else:
-                # Plantilla no tiene esta página, agregamos del PDF generado
                 output.add_page(new_pdf.pages[i])
 
     output_stream = io.BytesIO()
