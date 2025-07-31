@@ -334,22 +334,29 @@ def actualizar_participante(id):
     )
     cur.execute(sql_participante, valores)
 
-    # ------------------- Calcula ingreso_factura con IVA 16% -------------------
+    # ------------------- Determina ingreso_factura o ingresos -------------------
     try:
         ingresos = float(datos['ingresos'])
-        ingreso_factura = round(ingresos * 1.16, 2)
     except (KeyError, ValueError):
-        ingreso_factura = None  # o puedes manejar un valor por defecto
+        ingresos = 0.0
+
+    if datos['factura_pago']:
+        ingreso_factura = round(ingresos * 1.16, 2)
+        ingreso_original = 0  # ya no se usa ingresos sin IVA
+    else:
+        ingreso_factura = None
+        ingreso_original = ingresos  # restaura el ingreso original
 
     # ------------------- Actualiza tabla pagos -------------------
     sql_pago = '''
         UPDATE pagos 
-        SET ingreso_factura = %s, fecha_pago = %s, ingresos = '0'
+        SET ingreso_factura = %s, fecha_pago = %s, ingresos = %s
         WHERE participante = %s
     '''
     cur.execute(sql_pago, (
         ingreso_factura,
         datos['fecha_pago'] or None,
+        ingreso_original,
         id
     ))
 
@@ -359,6 +366,7 @@ def actualizar_participante(id):
     con.close()
 
     return jsonify({'alert': 'Participante actualizado correctamente'})
+
 
 @participantes.route('/participantes/actualizar/sesion/<string:id>', methods=['POST'])
 @login_required

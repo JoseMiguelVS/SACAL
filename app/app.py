@@ -131,5 +131,5 @@ def unauthorized_error(error):
 if __name__ == '__main__':
     csrf.init_app(app)
     app.register_error_handler(404, lambda error: render_template('404.html'))
-    app.register_error_handler(401, lambda error: redirect(url_for('login')))
+    app.register_error_handler(401, lambda error: redirect(url_for('401.html')))
     app.run(debug=True, port=5000)
