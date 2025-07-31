@@ -35,10 +35,9 @@ def draw_centrado(c, texto, y, font="Helvetica", size=12, return_center=False):
 # -------------------------------------------
 def draw_texto_centrado_multilinea(c, texto, y_inicial, font_name="Helvetica", font_size=12, max_width=700, line_spacing=5, x_centro=None):
     """
-    Dibuja texto centrado horizontalmente. Si se pasa x_centro, alinea usando ese centro en lugar del centro de la hoja.
+    Dibuja texto centrado horizontalmente. Reduce el tamaño de fuente gradualmente después de 50 caracteres,
+    cada 15 caracteres hasta un máximo de 100 caracteres.
     """
-    c.setFont(font_name, font_size)
-
     palabras = texto.strip().split()
     lineas = []
     linea_actual = ""
@@ -53,16 +52,31 @@ def draw_texto_centrado_multilinea(c, texto, y_inicial, font_name="Helvetica", f
     if linea_actual:
         lineas.append(linea_actual)
 
-    page_height = c._pagesize[1]
+    page_width = c._pagesize[0]
     y = y_inicial
+
     for linea in lineas:
-        text_width = c.stringWidth(linea, font_name, font_size)
+        longitud = len(linea)
+        # Ajuste dinámico del tamaño de fuente
+        if longitud <= 50:
+            tamaño_ajustado = font_size
+        elif longitud <= 100:
+            pasos = (longitud - 50) // 15 + 1
+            tamaño_ajustado = max(font_size - pasos, 6)  # mínimo tamaño de fuente: 6
+        else:
+            tamaño_ajustado = 6
+
+        c.setFont(font_name, tamaño_ajustado)
+        text_width = c.stringWidth(linea, font_name, tamaño_ajustado)
+
         if x_centro:
             x = x_centro - (text_width / 2)
         else:
-            x = (page_height - text_width) / 2
+            x = (page_width - text_width) / 2
+
         c.drawString(x, y, linea)
-        y -= font_size + line_spacing
+        y -= tamaño_ajustado + line_spacing
+
 
 # -------------------------------------------
 def generar_constancia(participante, qr_path=None):
