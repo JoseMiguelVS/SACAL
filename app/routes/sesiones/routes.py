@@ -16,8 +16,8 @@ def sesiones_buscar():
     search_query = request.args.get('buscar','', type = str).strip()
 
     if search_query:
-        sql_count = 'SELECT COUNT (*) FROM detalles_sesiones WHERE estado = true AND fecha ILIKE %s;'
-        sql_lim = 'SELECT * FROM detalles_sesiones WHERE estado = true AND fecha ILIKE %s ORDER BY id_sesion DESC LIMIT %s OFFSET %s;'
+        sql_count = 'SELECT COUNT (*) FROM detalles_sesiones WHERE estado = true AND fecha_curso ILIKE %s;'
+        sql_lim = 'SELECT * FROM detalles_sesiones WHERE estado = true AND fecha_curso ILIKE %s ORDER BY id_sesion DESC LIMIT %s OFFSET %s;'
         params_count = (f"%{search_query}%",)
         params_lim = (f"%{search_query}%",)
     else:
@@ -29,9 +29,9 @@ def sesiones_buscar():
     paginado = paginador2(sql_count, sql_lim, params_count, params_lim, 1, 5)
 
     for sesion in paginado[0]:
-        if isinstance(sesion['fecha'], str):
+        if isinstance(sesion['fecha_curso'], str):
             try:
-                sesion['fecha'] = datetime.strptime(sesion['fecha'], "%Y-%m-%d")
+                sesion['fecha_curso'] = datetime.strptime(sesion['fecha_curso'], "%Y-%m-%d")
             except ValueError:
                 pass
 
