@@ -95,7 +95,7 @@ def sesion_nuevo():
             INSERT INTO cursos_sesion (sesion_id, curso_id, ponente_id, fecha_curso)
             VALUES (%s, %s, %s, %s)
         '''
-        for curso_id, ponente_id in zip(cursos, ponentes, fechas_curso):
+        for curso_id, ponente_id, fechas_curso in zip(cursos, ponentes, fechas_curso):
             cur.execute(sql_relacion, (sesion_id, curso_id, ponente_id, fechas_curso))
 
         con.commit()
@@ -113,6 +113,7 @@ def sesion_nuevo():
 def sesion_editar(id):
     con = get_db_connection()
     cur = con.cursor()
+
     # Obtener datos generales de la sesión
     cur.execute("SELECT * FROM sesiones_curso WHERE id_sesion = %s;", (id,))
     sesion = cur.fetchone()
@@ -120,17 +121,24 @@ def sesion_editar(id):
     # Obtener cursos y ponentes de la sesión
     cur.execute(
         """
-            SELECT ce.curso_id,
-                c.nombre_curso,
-                ce.ponente_id,
-                p.nombre_ponente
-            FROM cursos_sesion ce
-            JOIN cursos c ON c.id_curso = ce.curso_id
-            JOIN ponentes p ON p.id_ponentes = ce.ponente_id
-            WHERE ce.sesion_id = %s;
+        SELECT ce.curso_id,
+               c.nombre_curso,
+               ce.ponente_id,
+               p.nombre_ponente,
+               ce.fecha_curso
+        FROM cursos_sesion ce
+        JOIN cursos c ON c.id_curso = ce.curso_id
+        JOIN ponentes p ON p.id_ponentes = ce.ponente_id
+        WHERE ce.sesion_id = %s;
         """, (id,))
     cursos_ponentes = [
-        {'curso_id': row[0], 'curso_nombre': row[1], 'ponente_id': row[2], 'ponente_nombre': row[3]}
+        {
+            'curso_id': row[0],
+            'curso_nombre': row[1],
+            'ponente_id': row[2],
+            'ponente_nombre': row[3],
+            'fecha_curso': row[4]  # ✅ Incluido
+        }
         for row in cur.fetchall()
     ]
 
@@ -153,7 +161,6 @@ def sesion_editar(id):
     cur.close()
     con.close()
 
-    # Pasar al template
     return render_template('sesiones/sesiones_editar.html',
         sesiones=sesion,
         cursos_sesion=cursos_ponentes,
@@ -165,11 +172,11 @@ def sesion_editar(id):
     )
 
 
+
 @sesiones.route("/participantes/sesiones/editar/<string:id>", methods=["POST"])
 @login_required
 def sesion_actualizar(id):
     # Campos generales
-    fecha = request.form['fecha']
     categoria = request.form['id_categoria']
     mes = request.form['id_mes']
     semana = request.form['id_semana']
@@ -177,8 +184,9 @@ def sesion_actualizar(id):
     # Listas de cursos y ponentes
     cursos = request.form.getlist('cursos[]')
     ponentes = request.form.getlist('ponentes[]')
+    fecha_curso = request.form.getlist('fecha_curso[]')
 
-    if len(cursos) != len(ponentes):
+    if len(cursos) != len(ponentes) != len(fecha_curso):
         flash("Error: La cantidad de cursos y ponentes no coincide", "Error")
         return redirect(url_for("sesiones.sesiones_buscar"))
 
@@ -189,20 +197,20 @@ def sesion_actualizar(id):
         # Actualiza sesión
         cur.execute("""
             UPDATE sesiones_curso 
-            SET fecha = %s, categoria = %s, mes = %s, semana = %s 
+            SET categoria = %s, mes = %s, semana = %s 
             WHERE id_sesion = %s
-        """, (fecha, categoria, mes, semana, id))
+        """, (categoria, mes, semana, id))
 
         # Elimina los registros anteriores de cursos/ponentes
         cur.execute("DELETE FROM cursos_sesion WHERE sesion_id = %s", (id,))
 
         # Inserta nuevas combinaciones
         insert_sql = """
-            INSERT INTO cursos_sesion (sesion_id, curso_id, ponente_id)
-            VALUES (%s, %s, %s)
+            INSERT INTO cursos_sesion (sesion_id, curso_id, ponente_id, fecha_curso)
+            VALUES (%s, %s, %s; %s)
         """
-        for curso, ponente in zip(cursos, ponentes):
-            cur.execute(insert_sql, (id, curso, ponente))
+        for curso, ponente, fecha_curso in zip(cursos, ponentes, fecha_curso):
+            cur.execute(insert_sql, (id, curso, ponente, fecha_curso))
 
         con.commit()
         flash("Sesión actualizada correctamente", "success")
