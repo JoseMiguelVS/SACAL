@@ -33,33 +33,9 @@ def resumen():
     fecha_inicio_str = request.args.get('fecha_inicio', '', type=str)
     fecha_fin_str = request.args.get('fecha_fin', '', type=str)
 
-    conn = get_db_connection()
-    cur = conn.cursor(cursor_factory=RealDictCursor)
-
-    sql = '''SELECT * FROM resumen_semanal'''
-    cur.execute(sql)
-    resumen_datos = cur.fetchall()
-    cur.close()
-    conn.close()
-
-    # Procesar fechas y agregar mes y semana en cada fila
-    for fila in resumen_datos:
-        fecha_str = fila.get('fecha_registro') or fila.get('fecha_sesion')
-        if fecha_str:
-            fecha = datetime.strptime(str(fecha_str), "%Y-%m-%d")
-            fila['nombre_mes'] = fecha.strftime('%B').capitalize()
-            semana_inicio = fecha - timedelta(days=fecha.weekday())
-            semana_fin = semana_inicio + timedelta(days=6)
-            fila['semana'] = f"{semana_inicio.day:02d} {semana_inicio.strftime('%b')} - {semana_fin.day:02d} {semana_fin.strftime('%b')}"
-            fila['fecha_obj'] = fecha
-        else:
-            fila['nombre_mes'] = ''
-            fila['semana'] = ''
-            fila['fecha_obj'] = None
-
-    # Convertir fechas de entrada
     fecha_inicio = None
     fecha_fin = None
+
     try:
         if fecha_inicio_str:
             fecha_inicio = datetime.strptime(fecha_inicio_str, "%Y-%m-%d")
@@ -68,33 +44,61 @@ def resumen():
     except ValueError:
         flash("Fechas inválidas", "warning")
 
-    # Filtrar por rango de fechas
-    if fecha_inicio:
-        resumen_datos = [f for f in resumen_datos if f['fecha_obj'] and f['fecha_obj'] >= fecha_inicio]
-    if fecha_fin:
-        resumen_datos = [f for f in resumen_datos if f['fecha_obj'] and f['fecha_obj'] <= fecha_fin]
+    conn = get_db_connection()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
 
-    # Agrupar datos
+    # Armar la consulta dinámica
+    sql = "SELECT * FROM resumen_por_fecha"
+    condiciones = []
+    valores = []
+
+    if fecha_inicio:
+        condiciones.append("fecha_registro >= %s")
+        valores.append(fecha_inicio)
+
+    if fecha_fin:
+        condiciones.append("fecha_registro <= %s")
+        valores.append(fecha_fin)
+
+    if condiciones:
+        sql += " WHERE " + " AND ".join(condiciones)
+
+    sql += " ORDER BY fecha_registro DESC"
+
+    cur.execute(sql, tuple(valores))
+    resumen_datos = cur.fetchall()
+    cur.close()
+    conn.close()
+
+    # Procesar datos
+    for fila in resumen_datos:
+        fecha_str = fila.get('fecha_registro')
+        if fecha_str:
+            fecha = datetime.strptime(str(fecha_str), "%Y-%m-%d")
+            fila['nombre_mes'] = fecha.strftime('%B').capitalize()
+            fila['fecha_obj'] = fecha
+        else:
+            fila['nombre_mes'] = ''
+            fila['fecha_obj'] = None
+
+    # Agrupar por fecha, ponente y curso
     agrupado = defaultdict(list)
     for fila in resumen_datos:
-        clave = f"{fila['semana']}_{fila['nombre_ponente']}_{fila['nombre_curso']}"
+        clave = f"{fila['fecha_registro']}_{fila['nombre_ponente']}_{fila['nombre_curso']}"
         agrupado[clave].append(fila)
 
     # Calcular totales
     suma_total = sum(float(fila.get('total_generado') or 0) for fila in resumen_datos)
     publicidad_total = sum(float(fila.get('publicidad') or 0) for fila in resumen_datos)
     honorarios = sum(float(fila.get('honorarios') or 0) for fila in resumen_datos)
-    gasto_semanal = sum(float(fila.get('gastos') or 0) for fila in resumen_datos)
+    gasto_total = sum(float(fila.get('gastos') or 0) for fila in resumen_datos)
     iva = sum(float(fila.get('iva') or 0) for fila in resumen_datos)
-    sueldos = sum(float(fila.get('sueldos') or 0) for fila in resumen_datos)
+    sueldos = sum(float(fila.get('gasto_ponente') or 0) for fila in resumen_datos)
 
     total_gastos = publicidad_total + honorarios + iva + sueldos
     meta = 100000.0
     porcentaje = (suma_total / meta) * 100 if meta > 0 else 0
     ingreso_faltante = meta - suma_total if suma_total < meta else 0
-
-    semanas = lista_semanas()
-    meses = lista_meses()
 
     return render_template(
         'resumen/resumen.html',
@@ -103,8 +107,7 @@ def resumen():
         fecha_inicio=fecha_inicio_str,
         fecha_fin=fecha_fin_str,
         categorias=lista_categorias(),
-        semanas=semanas,
-        meses=meses,
+        meses=lista_meses(),
         suma_total=suma_total,
         publicidad_total=publicidad_total,
         honorarios=honorarios,
@@ -114,6 +117,5 @@ def resumen():
         meta=meta,
         porcentaje=porcentaje,
         ingreso_faltante=ingreso_faltante,
-        gasto_semanal=gasto_semanal
+        gasto_semanal=gasto_total
     )
-

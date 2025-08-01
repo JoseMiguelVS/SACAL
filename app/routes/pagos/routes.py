@@ -100,12 +100,20 @@ def pagos_filtros():
     )
 
     return render_template(
-        'pagos/pagos.html',
-        paginado=paginado,
-        paginado_gastos=paginado_gastos,
-        fecha_inicio=fecha_inicio,
-        fecha_fin=fecha_fin
-    )
+    'pagos/pagos.html',
+    pagos=paginado[0],
+    page=paginado[1],
+    per_page=paginado[2],
+    total_items=paginado[3],
+    total_pages=paginado[4],
+    gastos=paginado_gastos[0],  # Cambiado de 'paginado_gastos' a lista plana
+    fecha_inicio=fecha_inicio,
+    fecha_fin=fecha_fin,
+    concepto=lista_conceptos(),     # Si también los usas
+    gasto=lista_gastos(),           # Igual
+    meses=lista_meses(),            # Igual
+    semanas=lista_semanas()         # Igual
+)
 
 # -----------------------------COMPROBANTES-----------------------------
 @pagos.route("/pagos/comprobantes/<string:id>")
