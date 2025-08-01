@@ -48,7 +48,7 @@ def resumen():
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
     # Armar la consulta dinámica
-    sql = "SELECT * FROM resumen_por_fecha"
+    sql = "SELECT * FROM resumen_semanal"
     condiciones = []
     valores = []
 
