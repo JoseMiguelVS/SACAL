@@ -39,57 +39,54 @@ def ponente_agregar():
 def ponente_nuevo():
     if request.method == 'POST':
         nombre_ponente = request.form['nombre_ponente']
-        if allowed_pontname(nombre_ponente):
-            cedula_ponente = request.form['cedula_ponente']
-            fecha_creacion = datetime.now()
-            fecha_modificacion = datetime.now()
-            estado = True
+        cedula_ponente = request.form['cedula_ponente']
+        fecha_creacion = datetime.now()
+        fecha_modificacion = datetime.now()
+        estado = True
 
-            conn = get_db_connection()
-            cur = conn.cursor(cursor_factory=RealDictCursor)
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
 
-            # Validar si el CURP ya existe
-            sql_validar = "SELECT COUNT(*) FROM ponentes WHERE nombre_ponente = %s"
-            cur.execute(sql_validar, (nombre_ponente,))
-            existe = cur.fetchone()['count']
-            if existe:
-                cur.close()
-                conn.close()
-                flash('Error: El ponente ya se encuentra registrado. Intente con otro')
-                return redirect(url_for('ponentes.ponente_agregar'))
-
-            # Insertar el ponente
-            sql = '''
-                INSERT INTO ponentes (nombre_ponente, cedula_ponente, estado, fecha_creacion, fecha_modificacion)
-                VALUES (%s, %s, %s, %s, %s) RETURNING id_ponentes
-            '''
-            cur.execute(sql, (nombre_ponente, cedula_ponente, estado, fecha_creacion, fecha_modificacion))
-            id_ponente = cur.fetchone()['id_ponentes']
-
-            # Obtener certificaciones del formulario
-            certificados = request.form.getlist('id_tipoCer[]')
-            folios = request.form.getlist('folio[]')
-
-            # Insertar certificaciones
-            for tipo_cer, folio in zip(certificados, folios):
-                if tipo_cer and folio:
-                    sql_cert = '''
-                        INSERT INTO certificaciones (ponente_id, tipocer_id, folio)
-                        VALUES (%s, %s, %s)
-                    '''
-                    cur.execute(sql_cert, (id_ponente, tipo_cer, folio))
-
-            conn.commit()
+        # Validar si el ponente ya existe
+        sql_validar = "SELECT COUNT(*) FROM ponentes WHERE nombre_ponente = %s"
+        cur.execute(sql_validar, (nombre_ponente,))
+        existe = cur.fetchone()['count']
+        if existe:
             cur.close()
             conn.close()
-
-            flash('Ponente agregado correctamente con certificaciones')
-            return redirect(url_for('ponentes.ponentes_buscar'))
-        else:
-            flash('Error: El curp no cuenta con las características válidas')
+            flash('Error: El ponente ya se encuentra registrado. Intente con otro')
             return redirect(url_for('ponentes.ponente_agregar'))
 
+        # Insertar el ponente
+        sql = '''
+            INSERT INTO ponentes (nombre_ponente, cedula_ponente, estado, fecha_creacion, fecha_modificacion)
+            VALUES (%s, %s, %s, %s, %s) RETURNING id_ponentes
+        '''
+        cur.execute(sql, (nombre_ponente, cedula_ponente, estado, fecha_creacion, fecha_modificacion))
+        id_ponente = cur.fetchone()['id_ponentes']
+
+        # Obtener certificaciones del formulario
+        certificados = request.form.getlist('id_tipoCer[]')
+        folios = request.form.getlist('folio[]')
+
+        # Insertar certificaciones
+        for tipo_cer, folio in zip(certificados, folios):
+            if tipo_cer and folio:
+                sql_cert = '''
+                    INSERT INTO certificaciones (ponente_id, tipocer_id, folio)
+                    VALUES (%s, %s, %s)
+                '''
+                cur.execute(sql_cert, (id_ponente, tipo_cer, folio))
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        flash('Ponente agregado correctamente con certificaciones')
+        return redirect(url_for('ponentes.ponentes_buscar'))
+
     return redirect(url_for('ponentes.ponente_agregar'))
+
 
 
 @ponentes.route('/ponentes/detalles/<int:id>')
