@@ -38,9 +38,8 @@ def ponente_agregar():
 @login_required
 def ponente_nuevo():
     if request.method == 'POST':
-        curp_ponente = request.form['curp_ponente']
-        if allowed_pontname(curp_ponente):
-            nombre_ponente = request.form['nombre_ponente']
+        nombre_ponente = request.form['nombre_ponente']
+        if allowed_pontname(nombre_ponente):
             cedula_ponente = request.form['cedula_ponente']
             fecha_creacion = datetime.now()
             fecha_modificacion = datetime.now()
@@ -50,21 +49,21 @@ def ponente_nuevo():
             cur = conn.cursor(cursor_factory=RealDictCursor)
 
             # Validar si el CURP ya existe
-            sql_validar = "SELECT COUNT(*) FROM ponentes WHERE curp_ponente = %s"
-            cur.execute(sql_validar, (curp_ponente,))
+            sql_validar = "SELECT COUNT(*) FROM ponentes WHERE nombre_ponente = %s"
+            cur.execute(sql_validar, (nombre_ponente,))
             existe = cur.fetchone()['count']
             if existe:
                 cur.close()
                 conn.close()
-                flash('Error: El curp del ponente ya se encuentra registrado. Intente con otro')
+                flash('Error: El ponente ya se encuentra registrado. Intente con otro')
                 return redirect(url_for('ponentes.ponente_agregar'))
 
             # Insertar el ponente
             sql = '''
-                INSERT INTO ponentes (nombre_ponente, curp_ponente, cedula_ponente, estado, fecha_creacion, fecha_modificacion)
-                VALUES (%s, %s, %s, %s, %s, %s) RETURNING id_ponentes
+                INSERT INTO ponentes (nombre_ponente, cedula_ponente, estado, fecha_creacion, fecha_modificacion)
+                VALUES (%s, %s, %s, %s, %s) RETURNING id_ponentes
             '''
-            cur.execute(sql, (nombre_ponente, curp_ponente, cedula_ponente, estado, fecha_creacion, fecha_modificacion))
+            cur.execute(sql, (nombre_ponente, cedula_ponente, estado, fecha_creacion, fecha_modificacion))
             id_ponente = cur.fetchone()['id_ponentes']
 
             # Obtener certificaciones del formulario
@@ -109,7 +108,6 @@ def ponente_detalles(id):
             # Tomar solo una vez los datos del ponente (ya que están repetidos)
             ponente = {
                 'nombre_ponente': rows[0]['nombre_ponente'],
-                'curp_ponente': rows[0]['curp_ponente'],
                 'cedula_ponente': rows[0]['cedula_ponente'],
                 'fecha_creacion': rows[0]['fecha_creacion'],
                 'fecha_modificacion': rows[0]['fecha_modificacion'],
@@ -160,7 +158,6 @@ def ponente_editar(id):
 @login_required
 def ponente_actualizar(id):
     nombre_ponente = request.form['nombre_ponente']
-    curp_ponente = request.form['curp_ponente']
     cedula_ponente = request.form['cedula_ponente']
     fecha_modificacion = datetime.now()
 
@@ -170,9 +167,9 @@ def ponente_actualizar(id):
     # Actualizar datos del ponente
     cur.execute('''
         UPDATE ponentes 
-        SET nombre_ponente = %s, curp_ponente = %s, cedula_ponente = %s, fecha_modificacion = %s 
+        SET nombre_ponente = %s, cedula_ponente = %s, fecha_modificacion = %s 
         WHERE id_ponentes = %s
-    ''', (nombre_ponente, curp_ponente, cedula_ponente, fecha_modificacion, id))
+    ''', (nombre_ponente, cedula_ponente, fecha_modificacion, id))
 
     # Eliminar certificaciones anteriores
     cur.execute('DELETE FROM certificaciones WHERE ponente_id = %s', (id,))
@@ -204,7 +201,7 @@ def ponente_eliminar(id):
     fecha_modificacion = datetime.now()
     conn = get_db_connection()
     cur = conn.cursor()
-    sql = "UPDATE ponentes SET estado = %s,fecha_modificacion = %s WHERE id_ponentes = %s"
+    sql = "UPDATE ponentes SET estado = %s, fecha_modificacion = %s WHERE id_ponentes = %s"
     valores = (estado, fecha_modificacion, id)
     cur.execute(sql, valores)
     conn.commit()

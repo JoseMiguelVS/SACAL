@@ -34,7 +34,6 @@
                         <thead>
                                 <tr align="center">
                                         <th>Nombre ponente</th>
-                                        <th>CURP</th>
                                         <th>Cedula</th>
                                         <th>Restaurar</th>
                                 </tr>
@@ -45,7 +44,6 @@
                                 {% if ponente.estado == false %}
                                 <tr align="center">
                                         <td>{{ponente.nombre_ponente}}</td>
-                                        <td>{{ponente.curp_ponente}}</td>
                                         <td>{{ponente.cedula_ponente}}</td>
                                         <td>
                                                 <button class="botones-restaurar" type="button" data-bs-toggle="modal"
