@@ -1,9 +1,9 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, flash, render_template, request
 from flask_login import login_required
 from datetime import datetime, timedelta, date
 from psycopg2.extras import RealDictCursor
 from collections import defaultdict
-from ..utils.utils import get_db_connection
+from ..utils.utils import get_db_connection, rol_admin_required
 from app.utils.listas import lista_categorias, lista_meses
 
 resumen_semanal = Blueprint('resumen_semanal', __name__)
@@ -28,6 +28,7 @@ def lista_semanas(year=None):
 
 @resumen_semanal.route('/resumen', methods=['GET'])
 @login_required
+@rol_admin_required
 def resumen():
     fecha_inicio_str = request.args.get('fecha_inicio', '', type=str)
     fecha_fin_str = request.args.get('fecha_fin', '', type=str)

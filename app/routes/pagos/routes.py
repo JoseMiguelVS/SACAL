@@ -5,7 +5,7 @@ from psycopg2.extras import RealDictCursor
 
 from app.utils.listas import lista_conceptos, lista_gastos, lista_meses, lista_semanas
 
-from ..utils.utils import get_db_connection, paginador3
+from ..utils.utils import get_db_connection, paginador3, rol_admin_required
 
 # Blueprint
 pagos = Blueprint('pagos', __name__)
@@ -100,7 +100,7 @@ def pagos_filtros():
     )
 
     return render_template(
-        'pagos/tu_template.html',
+        'pagos/pagos.html',
         paginado=paginado,
         paginado_gastos=paginado_gastos,
         fecha_inicio=fecha_inicio,
@@ -110,6 +110,7 @@ def pagos_filtros():
 # -----------------------------COMPROBANTES-----------------------------
 @pagos.route("/pagos/comprobantes/<string:id>")
 @login_required
+@rol_admin_required
 def pagos_comprobantes(id):
     supabase_url="https://ipecmsarkhzdzkkanxvj.supabase.co/storage/v1/object/public/tickets"
     with get_db_connection() as conn:
@@ -123,6 +124,7 @@ def pagos_comprobantes(id):
 
 @pagos.route("/pagos/comprobantes/editar/<string:id>", methods=['POST'])
 @login_required
+@rol_admin_required
 def pagos_actualizar(id):
     if request.method == 'POST':
         clave_rastreo = request.form['clave_rastreo']
@@ -142,6 +144,7 @@ def pagos_actualizar(id):
 #----------------------------------------------DEVOLUCION----------------------------------------------
 @pagos.route("/pagos/devolucion/<string:id>", methods=['POST'])
 @login_required
+@rol_admin_required
 def pagos_devolucion(id):
     devolucion = request.form.get('devolucion', '0')
 
@@ -170,6 +173,7 @@ def pagos_devolucion(id):
 # -----------------------------------DETALLES DE PAGOS-----------------------------------
 @pagos.route("/pagos/detalles/<int:id>")
 @login_required
+@rol_admin_required
 def pagos_detalles(id):
     with get_db_connection() as con:
         with con.cursor(cursor_factory=RealDictCursor) as cur:
@@ -183,6 +187,7 @@ def pagos_detalles(id):
 # ----------------------------------------AGREGAR----------------------------------------
 @pagos.route("/pagos/agregar/gasto", methods = ("GET", "POST"))
 @login_required
+@rol_admin_required
 def pagos_nuevo():
     if request.method == 'POST':
         monto_gasto = request.form['gasto']
@@ -214,6 +219,7 @@ def pagos_nuevo():
 #-----------------------------------------AGREGAR FACTURA-----------------------------------------
 @pagos.route("/pagos/agregar/factura/<string:id>", methods=["POST"])
 @login_required
+@rol_admin_required
 def factura_nueva(id):
     if request.method == 'POST':
         ingreso_factura = request.form['ingreso_factura']

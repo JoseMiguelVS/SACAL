@@ -2,6 +2,9 @@ import os
 import uuid
 import psycopg2
 import re
+from flask import redirect, url_for, flash
+from flask_login import current_user
+from functools import wraps
 from psycopg2.extras import RealDictCursor
 from flask import Flask, request
 from dotenv import load_dotenv
@@ -67,7 +70,6 @@ def get_db_connection():
     except psycopg2.Error as error:
         print(f"Error de conexión: {error}")
         return None
-
 
 #-----------------------------EMPLEADOS / USUARIOS
 def allowed_username(nombre_usuario):
@@ -242,3 +244,12 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def rol_admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if current_user.rol != 1:  # Asumiendo que el rol "1" es el de administrador
+            flash('No tienes permisos para acceder a esta sección.')
+            return redirect(url_for('index'))  # O redirige a donde desees
+        return f(*args, **kwargs)
+    return decorated_function

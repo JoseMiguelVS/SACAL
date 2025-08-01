@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash
 
 from app.utils.listas import lista_rol
 
-from ..utils.utils import get_db_connection, paginador1, allowed_username
+from ..utils.utils import get_db_connection, paginador1, allowed_username, rol_admin_required
 
 # Definir Blueprint
 empleados = Blueprint('empleados', __name__)
@@ -15,6 +15,7 @@ empleados = Blueprint('empleados', __name__)
 #--------------------------------BUSCAR EMPLEADO / CONSULTA INICIAL--------------------------------------
 @empleados.route("/empleados")
 @login_required
+@rol_admin_required
 def empleadosBuscar():
     search_query = request.args.get('buscar', '', type=str)
     sql_count ='SELECT COUNT(*) FROM empleados WHERE estado = true AND (nombre_usuario ILIKE %s OR correo_empleado ILIKE %s);'
@@ -33,12 +34,14 @@ def empleadosBuscar():
 
 @empleados.route("/empleados/agregar")
 @login_required
+@rol_admin_required
 def empleado_agregar():
     titulo = "Agregar empleado"
     return render_template('empleados/empleados_agregar.html',titulo = titulo, roles=lista_rol())
 
 @empleados.route("/empleados/agregar/nuevo", methods=('GET', 'POST'))
 @login_required
+@rol_admin_required
 def empleado_nuevo():
     if request.method == 'POST':
         nombre_usuario= request.form['nombre_usuario']
@@ -83,6 +86,7 @@ def empleado_nuevo():
 
 @empleados.route('/empleados/detalles/<int:id>')
 @login_required
+@rol_admin_required
 def empleado_detalles(id):
     with get_db_connection() as con:
         with con.cursor(cursor_factory=RealDictCursor) as cur:
@@ -97,6 +101,7 @@ def empleado_detalles(id):
 #-----------------------------------------EDITAR EMPLEADO----------------------------------
 @empleados.route('/empleados/editar/<string:id>')
 @login_required
+@rol_admin_required
 def empleado_editar(id):
     con = get_db_connection()
     cur = con.cursor()
@@ -110,6 +115,7 @@ def empleado_editar(id):
 
 @empleados.route('/empleados/editar/<string:id>',methods=['POST'])
 @login_required
+@rol_admin_required
 def empleado_actualizar(id):
     if request.method == 'POST':
         nombre_usuario = request.form['nombre_usuario']
@@ -133,6 +139,7 @@ def empleado_actualizar(id):
 
 @empleados.route('/empleados/editar/contraseña/<string:id>', methods = ['POST'])
 @login_required
+@rol_admin_required
 def empleado_actualizarContraseña(id):
     if request.method  == 'POST':
         contrasenia_empleado = request.form['contrasenia_empleado']
@@ -155,6 +162,7 @@ def empleado_actualizarContraseña(id):
 
 @empleados.route('/empleados/eliminar/<string:id>')
 @login_required
+@rol_admin_required
 def empleado_eliminar(id):
     estado = False
     fecha_modificacion = datetime.now()
@@ -172,6 +180,7 @@ def empleado_eliminar(id):
 
 @empleados.route("/empleados/papelera")
 @login_required
+@rol_admin_required
 def empleados_papelera():
     search_query = request.args.get('buscar', '', type=str)
     sql_count ='SELECT COUNT(*) FROM empleados WHERE estado = False AND (nombre_usuario ILIKE %s OR correo_empleado ILIKE %s);'
@@ -189,6 +198,7 @@ def empleados_papelera():
 
 @empleados.route('/empleados/papelera/detalles/<int:id>')
 @login_required
+@rol_admin_required
 def empleado_detallesPapelera(id):
     with get_db_connection() as con:
         with con.cursor(cursor_factory=RealDictCursor) as cur:
@@ -204,6 +214,7 @@ def empleado_detallesPapelera(id):
 
 @empleados.route('/empleados/papelera/restaurar/<string:id>')
 @login_required
+@rol_admin_required
 def empleados_restaurar(id):
     estado = True
     fecha_modificacion = datetime.now()
