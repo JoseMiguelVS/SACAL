@@ -53,17 +53,17 @@ def resumen():
     valores = []
 
     if fecha_inicio:
-        condiciones.append("fecha_registro >= %s")
+        condiciones.append("fecha >= %s")
         valores.append(fecha_inicio)
 
     if fecha_fin:
-        condiciones.append("fecha_registro <= %s")
+        condiciones.append("fecha <= %s")
         valores.append(fecha_fin)
 
     if condiciones:
         sql += " WHERE " + " AND ".join(condiciones)
 
-    sql += " ORDER BY fecha_registro DESC"
+    sql += " ORDER BY fecha DESC"
 
     cur.execute(sql, tuple(valores))
     resumen_datos = cur.fetchall()
@@ -72,7 +72,7 @@ def resumen():
 
     # Procesar datos
     for fila in resumen_datos:
-        fecha_str = fila.get('fecha_registro')
+        fecha_str = fila.get('fecha')
         if fecha_str:
             fecha = datetime.strptime(str(fecha_str), "%Y-%m-%d")
             fila['nombre_mes'] = fecha.strftime('%B').capitalize()
