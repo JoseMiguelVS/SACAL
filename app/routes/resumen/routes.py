@@ -84,7 +84,7 @@ def resumen():
     # Agrupar por fecha, ponente y curso
     agrupado = defaultdict(list)
     for fila in resumen_datos:
-        clave = f"{fila['fecha_registro']}_{fila['nombre_ponente']}_{fila['nombre_curso']}"
+        clave = f"{fila['fecha']}_{fila['nombre_ponente']}_{fila['nombre_curso']}"
         agrupado[clave].append(fila)
 
     # Calcular totales
