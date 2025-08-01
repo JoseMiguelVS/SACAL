@@ -226,26 +226,6 @@
                     <div class="modal-body px-4">
                         <!-- Tokens y filtros ocultos -->
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        {% set mes_sel = request.args.get('mes', '') %}
-                        {% set semana_sel = request.args.get('semana', '') %}
-                        <input type="hidden" name="mes_filtro" value="{{ mes_sel }}">
-                        <input type="hidden" name="semana_filtro" value="{{ semana_sel }}">
-
-                        {% if meses %}
-                        {% for m in meses %}
-                        {% if mes_sel == m[1] %}
-                        <input type="hidden" name="mes" value="{{ m[0] }}">
-                        {% endif %}
-                        {% endfor %}
-                        {% endif %}
-
-                        {% if semanas %}
-                        {% for s in semanas %}
-                        {% if semana_sel == s[1] %}
-                        <input type="hidden" name="semana" value="{{ s[0] }}">
-                        {% endif %}
-                        {% endfor %}
-                        {% endif %}
 
                         <!-- Campos del formulario -->
                         <div class="input-group">

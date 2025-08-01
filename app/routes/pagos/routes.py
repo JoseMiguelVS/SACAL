@@ -200,8 +200,6 @@ def pagos_nuevo():
     if request.method == 'POST':
         monto_gasto = request.form['gasto']
         concepto_gasto = request.form['conceptos']
-        mes = request.form['mes']
-        semana = request.form['semana']
         fecha = datetime.now().date()
 
         con = get_db_connection()
