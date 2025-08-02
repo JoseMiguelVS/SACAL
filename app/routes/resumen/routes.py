@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, date
 from psycopg2.extras import RealDictCursor
 from collections import defaultdict
 from ..utils.utils import get_db_connection, rol_admin_required
-from app.utils.listas import lista_categorias, lista_meses
+from .utils.listas import lista_categorias, lista_meses
 
 resumen_semanal = Blueprint('resumen_semanal', __name__)
 

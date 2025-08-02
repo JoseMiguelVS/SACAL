@@ -7,7 +7,7 @@ from io import BytesIO
 
 from ..constancias.generador import generar_constancia
 from ..constancias.qr import generar_qr_memoria
-from app.utils.listas import lista_categorias, lista_cuentas, lista_cursos, lista_equipos, lista_meses, lista_paquetes, lista_ponente, lista_privilegios, lista_semanas, lista_sesiones
+from .utils.listas import lista_categorias, lista_cuentas, lista_cursos, lista_equipos, lista_meses, lista_paquetes, lista_ponente, lista_privilegios, lista_semanas, lista_sesiones
 
 from ..utils.utils import get_db_connection, paginador1, paginador2, paginador3
 

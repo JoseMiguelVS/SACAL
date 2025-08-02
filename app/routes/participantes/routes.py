@@ -6,7 +6,7 @@ from datetime import datetime
 from psycopg2.extras import RealDictCursor
 from werkzeug.utils import secure_filename
 
-from app.utils.listas import lista_cuentas, lista_cursos, lista_equipos, lista_formaPago, lista_meses, lista_paquetes, lista_sesiones, lista_semanas
+from .utils.listas import lista_cuentas, lista_cursos, lista_equipos, lista_formaPago, lista_meses, lista_paquetes, lista_sesiones, lista_semanas
 
 from ..utils.utils import allowed_file, get_db_connection, my_random_string, paginador3, sanitize_filename
 

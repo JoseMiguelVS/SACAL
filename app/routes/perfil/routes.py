@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from psycopg2.extras import RealDictCursor
 
-from app.routes.utils.utils import get_db_connection
+from .routes.utils.utils import get_db_connection
 
 perfil = Blueprint('perfil', __name__)
 

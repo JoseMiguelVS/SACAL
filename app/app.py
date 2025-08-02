@@ -2,23 +2,23 @@ from flask import Flask, current_app, render_template, url_for, redirect, reques
 from flask_login import LoginManager, login_user, logout_user, login_required
 from flask_wtf.csrf import CSRFProtect
 
-from app.models.ModelUser import ModuleUser
-from app.models.entities.user import User
-from app.routes.utils.utils import get_db_connection
+from .models.ModelUser import ModuleUser
+from .models.entities.user import User
+from .routes.utils.utils import get_db_connection
 
 # Importa tus Blueprints
-from app.routes.empleados.routes import empleados
-from app.routes.ponentes.routes import ponentes
-from app.routes.categorias.routes import categorias
-from app.routes.paquetes.routes import paquetes
-from app.routes.cursos.routes import cursos
-from app.routes.participantes.routes import participantes
-from app.routes.sesiones.routes import sesiones
-from app.routes.constancias.routes import constancias
-from app.routes.temas.routes import temas
-from app.routes.pagos.routes import pagos
-from app.routes.resumen.routes import resumen_semanal
-from app.routes.perfil.routes import perfil
+from .routes.empleados.routes import empleados
+from .routes.ponentes.routes import ponentes
+from .routes.categorias.routes import categorias
+from .routes.paquetes.routes import paquetes
+from .routes.cursos.routes import cursos
+from .routes.participantes.routes import participantes
+from .routes.sesiones.routes import sesiones
+from .routes.constancias.routes import constancias
+from .routes.temas.routes import temas
+from .routes.pagos.routes import pagos
+from .routes.resumen.routes import resumen_semanal
+from .routes.perfil.routes import perfil
 
 # -------------------------- Inicialización --------------------------
 app = Flask(__name__)

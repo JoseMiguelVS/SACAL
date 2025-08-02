@@ -2,7 +2,7 @@ from flask import Blueprint,render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from psycopg2.extras import RealDictCursor
 
-from app.utils.listas import lista_tiposCur
+from .utils.listas import lista_tiposCur
 
 from ..utils.utils import get_db_connection, paginador2
 

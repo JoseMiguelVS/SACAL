@@ -3,7 +3,7 @@ from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
 
-from app.utils.listas import lista_conceptos, lista_gastos, lista_meses, lista_semanas
+from .utils.listas import lista_conceptos, lista_gastos, lista_meses, lista_semanas
 
 from ..utils.utils import get_db_connection, paginador3, rol_admin_required
 
