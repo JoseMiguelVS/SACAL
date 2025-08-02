@@ -3,9 +3,9 @@ from flask_login import login_required
 from datetime import datetime
 from psycopg2.extras import RealDictCursor
 
-from .utils.listas import lista_conceptos, lista_gastos, lista_meses, lista_semanas
+from app.utils.listas import lista_conceptos, lista_gastos, lista_meses, lista_semanas
 
-from ..utils.utils import get_db_connection, paginador3, rol_admin_required
+from ..utils.utils import get_db_connection, paginador3
 
 # Blueprint
 pagos = Blueprint('pagos', __name__)
@@ -100,25 +100,16 @@ def pagos_filtros():
     )
 
     return render_template(
-    'pagos/pagos.html',
-    pagos=paginado[0],
-    page=paginado[1],
-    per_page=paginado[2],
-    total_items=paginado[3],
-    total_pages=paginado[4],
-    gastos=paginado_gastos[0],  # Cambiado de 'paginado_gastos' a lista plana
-    fecha_inicio=fecha_inicio,
-    fecha_fin=fecha_fin,
-    concepto=lista_conceptos(),     # Si también los usas
-    gasto=lista_gastos(),           # Igual
-    meses=lista_meses(),            # Igual
-    semanas=lista_semanas()         # Igual
-)
+        'pagos/tu_template.html',
+        paginado=paginado,
+        paginado_gastos=paginado_gastos,
+        fecha_inicio=fecha_inicio,
+        fecha_fin=fecha_fin
+    )
 
 # -----------------------------COMPROBANTES-----------------------------
 @pagos.route("/pagos/comprobantes/<string:id>")
 @login_required
-@rol_admin_required
 def pagos_comprobantes(id):
     supabase_url="https://ipecmsarkhzdzkkanxvj.supabase.co/storage/v1/object/public/tickets"
     with get_db_connection() as conn:
@@ -132,7 +123,6 @@ def pagos_comprobantes(id):
 
 @pagos.route("/pagos/comprobantes/editar/<string:id>", methods=['POST'])
 @login_required
-@rol_admin_required
 def pagos_actualizar(id):
     if request.method == 'POST':
         clave_rastreo = request.form['clave_rastreo']
@@ -152,7 +142,6 @@ def pagos_actualizar(id):
 #----------------------------------------------DEVOLUCION----------------------------------------------
 @pagos.route("/pagos/devolucion/<string:id>", methods=['POST'])
 @login_required
-@rol_admin_required
 def pagos_devolucion(id):
     devolucion = request.form.get('devolucion', '0')
 
@@ -181,7 +170,6 @@ def pagos_devolucion(id):
 # -----------------------------------DETALLES DE PAGOS-----------------------------------
 @pagos.route("/pagos/detalles/<int:id>")
 @login_required
-@rol_admin_required
 def pagos_detalles(id):
     with get_db_connection() as con:
         with con.cursor(cursor_factory=RealDictCursor) as cur:
@@ -195,11 +183,12 @@ def pagos_detalles(id):
 # ----------------------------------------AGREGAR----------------------------------------
 @pagos.route("/pagos/agregar/gasto", methods = ("GET", "POST"))
 @login_required
-@rol_admin_required
 def pagos_nuevo():
     if request.method == 'POST':
         monto_gasto = request.form['gasto']
         concepto_gasto = request.form['conceptos']
+        mes = request.form['mes']
+        semana = request.form['semana']
         fecha = datetime.now().date()
 
         con = get_db_connection()
@@ -225,7 +214,6 @@ def pagos_nuevo():
 #-----------------------------------------AGREGAR FACTURA-----------------------------------------
 @pagos.route("/pagos/agregar/factura/<string:id>", methods=["POST"])
 @login_required
-@rol_admin_required
 def factura_nueva(id):
     if request.method == 'POST':
         ingreso_factura = request.form['ingreso_factura']

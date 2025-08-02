@@ -1,4 +1,4 @@
-from .routes.utils.utils import get_db_connection
+from app.routes.utils.utils import get_db_connection
 
 #---------------------- FUNCIÓN GENÉRICA -------------------------
 def listar_tabla(nombre_tabla: str, campo_orden: str):
