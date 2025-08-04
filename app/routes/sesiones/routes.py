@@ -138,14 +138,14 @@ def sesion_editar(id):
     for row in cur.fetchall():
         fecha_curso = row[4]
         # ✅ Convertir a string ISO si no es None
-        fecha_curso_str = fecha_curso.strftime('%Y-%m-%d') if isinstance(fecha_curso, datetime) else ''
+        # fecha_curso = fecha_curso.strftime('%Y-%m-%d') if isinstance(fecha_curso, datetime) else ''
         
         cursos_ponentes.append({
             'curso_id': row[0],
             'curso_nombre': row[1],
             'ponente_id': row[2],
             'ponente_nombre': row[3],
-            'fecha_curso': fecha_curso_str
+            'fecha_curso': fecha_curso
         })
 
     # Listas para selects
