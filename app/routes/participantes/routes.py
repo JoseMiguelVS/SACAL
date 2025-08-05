@@ -286,7 +286,9 @@ def participante_nuevo():
                                 semana=request.form.get('semana', ''),
                                 fecha=request.form.get('fecha', ''),
                                 equipos=request.form.get('equipos', '')))
-    
+
+def to_bool(value):
+    return value in [1, '1', True, 'true', 'True']
 #---------------------------------------------------------------------------------------------------------------
 @participantes.route('/participantes/actualizar/<int:id>', methods=['POST'])
 @login_required
@@ -295,78 +297,75 @@ def actualizar_participante(id):
 
     con = get_db_connection()
     cur = con.cursor()
+    ingresos = datos.get('ingresos')
+    factura_pago = to_bool(datos.get('factura_pago'))
+    confirmacion_grupo = to_bool(datos.get('confirmacion_grupo'))
+    materiales = to_bool(datos.get('materiales'))
+    grabaciones = to_bool(datos.get('grabaciones'))
+    evaluacion_dc3 = to_bool(datos.get('evaluacion_dc3'))
 
-    # ------------------- Actualiza los datos del participante -------------------
-    sql_participante = '''
-        UPDATE participantes SET
-            clave_participante = %s,
-            num_telefono = %s,
-            nombre_participante = %s,
-            apellidos_participante = %s,
-            nombre_paquete = %s,
-            fecha_pago = %s,
-            factura_pago = %s,
-            forma_pago = %s,
-            cuenta_destino = %s,
-            confirmacion_grupo = %s,
-            materiales = %s,
-            grabaciones = %s,
-            evaluacion_dc3 = %s,
-            observaciones = %s
-        WHERE id_participante = %s
-    '''
-    valores = (
-        datos['clave_participante'],
-        datos['num_telefono'],
-        datos['nombre_participante'],
-        datos['apellidos_participante'],
-        datos['nombre_paquete'],
-        datos['fecha_pago'] or None,
-        datos['factura_pago'],
-        datos['id_forma'],
-        datos['cuenta_destino'],
-        datos['confirmacion_grupo'],
-        datos['materiales'],
-        datos['grabaciones'],
-        datos['evaluacion_dc3'],
-        datos['observaciones'],
-        id
-    )
-    cur.execute(sql_participante, valores)
-
-    # ------------------- Determina ingreso_factura o ingresos -------------------
     try:
-        ingresos = float(datos['ingresos'])
-    except (KeyError, ValueError):
-        ingresos = 0.0
+        # ------------------- Actualiza los datos del participante -------------------
+        sql_participante = '''
+            UPDATE participantes SET
+                clave_participante = %s,
+                num_telefono = %s,
+                nombre_participante = %s,
+                apellidos_participante = %s,
+                nombre_paquete = %s,
+                fecha_pago = %s,
+                factura_pago = %s,
+                forma_pago = %s,
+                cuenta_destino = %s,
+                confirmacion_grupo = %s,
+                materiales = %s,
+                grabaciones = %s,
+                evaluacion_dc3 = %s,
+                observaciones = %s
+            WHERE id_participante = %s
+        '''
+        valores = (
+            datos['clave_participante'],
+            datos['num_telefono'],
+            datos['nombre_participante'],
+            datos['apellidos_participante'],
+            datos['nombre_paquete'],
+            datos['fecha_pago'] or None,
+            factura_pago,
+            datos['id_forma'],
+            datos['cuenta_destino'],
+            confirmacion_grupo,
+            materiales,
+            grabaciones,
+            evaluacion_dc3,
+            datos['observaciones'],
+            id
+        )
+        cur.execute(sql_participante, valores)
 
-    if datos['factura_pago']:
-        ingreso_factura = round(ingresos * 1.16, 2)
-        ingreso_original = 0  # ya no se usa ingresos sin IVA
-    else:
-        ingreso_factura = None
-        ingreso_original = ingresos  # restaura el ingreso original
+        # ------------------- Actualiza tabla pagos -------------------
+        sql_pago = '''
+            UPDATE pagos
+            SET ingresos = %s,
+                fecha_pago = %s
+            WHERE participante = %s
+        '''
+        cur.execute(sql_pago, (
+            ingresos,
+            datos['fecha_pago'] or None,
+            id
+        ))
 
-    # ------------------- Actualiza tabla pagos -------------------
-    sql_pago = '''
-        UPDATE pagos 
-        SET ingreso_factura = %s, fecha_pago = %s, ingresos = %s
-        WHERE participante = %s
-    '''
-    cur.execute(sql_pago, (
-        ingreso_factura,
-        datos['fecha_pago'] or None,
-        ingreso_original,
-        id
-    ))
+        con.commit()
+        return jsonify({'alert': 'Participante actualizado correctamente'})
 
-    # ------------------- Finaliza conexión -------------------
-    con.commit()
-    cur.close()
-    con.close()
-
-    return jsonify({'alert': 'Participante actualizado correctamente'})
-
+    except Exception as e:
+        con.rollback()
+        print(f'Error al actualizar participante: {e}')  # <-- AGREGA ESTO
+        return jsonify({'alert': f'Error al actualizar participante: {e}'}), 500
+    finally:
+        cur.close()
+        con.close()
 
 @participantes.route('/participantes/actualizar/sesion/<string:id>', methods=['POST'])
 @login_required

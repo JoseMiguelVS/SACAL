@@ -259,7 +259,6 @@
         </div>
     </div>
 
-
     {% if pagos %} {% for p in pagos %}
     <div class="modal fade" id="modalAgregar-{{p.id_pago}}" data-bs-backdrop="static" data-bs-keyboard="false"
         tabindex="-1" aria-labelledby="modalAgregarFacturaLabel" aria-hidden="true">
@@ -276,7 +275,7 @@
                     <div class="input-group">
                         <div class="mb-2">
                             <input type="number" name="ingreso_factura" id="ingreso_factura" class="input-field"
-                                value="{{p.ingresos or 0 * 1.16 | round(2)}}" placeholder="0.00">
+                                step="0.01" value="{{ ((p.ingresos or 0) * 1.16) | round(2) }}" placeholder="0.00">
                             <label for="" class="input-label">Ingreso factura</label>
                         </div>
                     </div>
@@ -306,7 +305,7 @@
             <form action="{{url_for('pagos.pagos_devolucion', id=p.id_pago)}}" method="post" class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalEditarLabel-{{p.nombre_participante}}">
-                        Agregar Factura
+                        Agregar devolucion
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
@@ -314,17 +313,16 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <div class="mb-2">
                         <label class="form-label">Monto de devolucion</label>
-                        {% if p.ingresos or p.ingresos_factura %}
+                        {% if p.ingresos or p.ingreso_factura %}
                         {% if p.ingresos != 0 %}
                         <input type="number" name="devolucion" id="devolucion" class="form-control"
-                            value="{{ (p.ingresos or 0 - (p.ingresos or 0 * 0.16)) | round(2) }}"
-                            placeholder="{{ (p.ingresos or 0 - (p.ingresos or 0 * 0.16)) | round(2) }}">
+                            value="{{ ((p.ingresos or 0) - ((p.ingresos or 0) * 0.16)) | round(2) }}"
+                            placeholder="{{ ((p.ingresos or 0) - ((p.ingresos or 0) * 0.16)) | round(2) }}">
                         {% else %}
                         <input type="number" name="devolucion" id="devolucion" class="form-control"
-                            value="{{ (p.ingreso_factura or 0 - (p.ingreso_factura or 0 * 0.16)) | round(2) }}"
-                            placeholder="{{ (p.ingreso_factura or 0 - (p.ingreso_factura or 0 * 0.16)) | round(2) }}">
+                            value="{{ ((p.ingreso_factura or 0) - ((p.ingreso_factura or 0) * 0.16)) | round(2) }}"
+                            placeholder="{{ ((p.ingreso_factura or 0) - ((p.ingreso_factura or 0) * 0.16)) | round(2) }}">
                         {% endif %} {% endif %}
-
                     </div>
                 </div>
                 <div class="modal-footer">

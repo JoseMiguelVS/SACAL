@@ -510,7 +510,8 @@
                                 <option value="" disabled {% if not p.cuenta_pago %}selected{% endif %}>Selecciona una
                                     cuenta</option>
                                 {% for cuenta in cuentas %}
-                                <option value="{{ cuenta[0] }}" {% if p.cuenta_pago==cuenta[0] %}selected{% endif %}>{{
+                                <option value="{{ cuenta[0] }}" {% if p.cuenta_destino==cuenta[1] %}selected{% endif %}>
+                                    {{
                                     cuenta[1] }}</option>
                                 {% endfor %}
                             </select>
@@ -594,31 +595,35 @@
         const id = fila.dataset.id;
         const datos = {};
 
-        // Recolectar todos los valores del formulario (input y select)
-        fila.querySelectorAll('input, select').forEach(el => {
+        fila.querySelectorAll('input, select, textarea').forEach(el => {
             if (el.type === 'checkbox') {
-                datos[el.name] = el.checked;
+                datos[el.name] = el.checked ? 1 : 0;
             } else {
                 datos[el.name] = el.value;
             }
         });
 
-        // Obtener ingreso base (desde el input oculto o visible)
-        const ingresos = parseFloat(datos['ingresos']) || 0;
+        // Solo convierte a número si existe
+        if ('ingresos' in datos) {
+            datos['ingresos'] = parseFloat(datos['ingresos']) || 0;
+        }
 
-        // Enviar datos al backend
+        console.log('Datos enviados:', datos);
+
         fetch(`/participantes/actualizar/${id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token() }}'  // solo si usas Flask-WTF
+                'X-CSRFToken': '{{ csrf_token() }}' // si usas Flask-WTF
             },
             body: JSON.stringify(datos)
         })
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
             .then(data => {
                 console.log(data.alert);
-                // Aquí puedes usar Toast, alert(), o cambiar color de fila para indicar éxito
             })
             .catch(error => {
                 console.error('Error al guardar:', error);

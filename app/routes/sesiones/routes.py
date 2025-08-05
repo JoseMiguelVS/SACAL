@@ -123,11 +123,12 @@ def sesion_editar(id):
     # Obtener cursos y ponentes de la sesión
     cur.execute(
         """
-        SELECT ce.curso_id,
-               c.nombre_curso,
-               ce.ponente_id,
-               p.nombre_ponente,
-               ce.fecha_curso
+        SELECT ce.id_cursoesp,
+            ce.curso_id,
+            c.nombre_curso,
+            ce.ponente_id,
+            p.nombre_ponente,
+            ce.fecha_curso
         FROM cursos_sesion ce
         JOIN cursos c ON c.id_curso = ce.curso_id
         JOIN ponentes p ON p.id_ponentes = ce.ponente_id
@@ -136,17 +137,21 @@ def sesion_editar(id):
     
     cursos_ponentes = []
     for row in cur.fetchall():
-        fecha_curso = row[4]
-        # ✅ Convertir a string ISO si no es None
-        # fecha_curso = fecha_curso.strftime('%Y-%m-%d') if isinstance(fecha_curso, datetime) else ''
-        
+        fecha_curso = row[5]  # índice 5 es fecha_curso
+
+        # Si quieres formatear fecha:
+        # if fecha_curso:
+        #     fecha_curso = fecha_curso.strftime('%Y-%m-%d')
+
         cursos_ponentes.append({
-            'curso_id': row[0],
-            'curso_nombre': row[1],
-            'ponente_id': row[2],
-            'ponente_nombre': row[3],
+            'id_cursoesp': row[0],      # ID de la fila para update
+            'curso_id': row[1],
+            'curso_nombre': row[2],
+            'ponente_id': row[3],
+            'ponente_nombre': row[4],
             'fecha_curso': fecha_curso
-        })
+    })
+
 
     # Listas para selects
     cur.execute("SELECT id_curso, nombre_curso FROM cursos;")
@@ -185,36 +190,41 @@ def sesion_actualizar(id):
     mes = request.form['id_mes']
     semana = request.form['id_semana']
 
-    # Listas de cursos y ponentes
+    # Listas de cursos, ponentes, fechas e ids de cursos_sesion
+    ids = request.form.getlist('id_cursos_sesion[]')      # ids existentes o vacío para nuevos
     cursos = request.form.getlist('cursos[]')
     ponentes = request.form.getlist('ponentes[]')
-    fecha_curso = request.form.getlist('fecha_curso[]')
+    fechas = request.form.getlist('fecha_curso[]')
 
-    if len(cursos) != len(ponentes) != len(fecha_curso):
-        flash("Error: La cantidad de cursos y ponentes no coincide", "Error")
+    # Validar que las listas tengan la misma longitud
+    if not (len(ids) == len(cursos) == len(ponentes) == len(fechas)):
+        flash("Error: La cantidad de datos enviados no coincide", "Error")
         return redirect(url_for("sesiones.sesiones_buscar"))
 
     con = get_db_connection()
     cur = con.cursor()
 
     try:
-        # Actualiza sesión
+        # Actualiza datos generales de la sesión
         cur.execute("""
             UPDATE sesiones_curso 
             SET categoria = %s, mes = %s, semana = %s 
             WHERE id_sesion = %s
         """, (categoria, mes, semana, id))
 
-        # Elimina los registros anteriores de cursos/ponentes
-        cur.execute("DELETE FROM cursos_sesion WHERE sesion_id = %s", (id,))
-
-        # Inserta nuevas combinaciones
-        insert_sql = """
-            INSERT INTO cursos_sesion (sesion_id, curso_id, ponente_id, fecha_curso)
-            VALUES (%s, %s, %s; %s)
-        """
-        for curso, ponente, fecha_curso in zip(cursos, ponentes, fecha_curso):
-            cur.execute(insert_sql, (id, curso, ponente, fecha_curso))
+        # Recorre cada fila enviada
+        for id_curso_sesion, curso, ponente, fecha in zip(ids, cursos, ponentes, fechas):
+            if id_curso_sesion:  # Update fila existente
+                cur.execute("""
+                    UPDATE cursos_sesion
+                    SET curso_id = %s, ponente_id = %s, fecha_curso = %s
+                    WHERE id_cursoesp = %s
+                """, (curso, ponente, fecha, id_curso_sesion))
+            else:  # Insert fila nueva
+                cur.execute("""
+                    INSERT INTO cursos_sesion (sesion_id, curso_id, ponente_id, fecha_curso)
+                    VALUES (%s, %s, %s, %s)
+                """, (id, curso, ponente, fecha))
 
         con.commit()
         flash("Sesión actualizada correctamente", "success")
@@ -228,7 +238,6 @@ def sesion_actualizar(id):
         con.close()
 
     return redirect(url_for("sesiones.sesiones_buscar"))
-
 
 #-----------------------------------CANCELAR SESION---------------------------------
 @sesiones.route("/participantes/sesiones/cancelar/<string:id>")
