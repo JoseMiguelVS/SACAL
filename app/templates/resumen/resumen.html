@@ -73,7 +73,7 @@
                         <td>${{ f.precio_paquete | float | round(3) }}</td>
                         <td>{{ f.total_promesas }}</td>
                         <td>{{ f.total_pagados }}</td>
-                        <td>{{ f.total_pagados * f.precio_paquete }}</td>
+                        <td>{{ f.total_pagados * (f.precio_paquete or 0) }}</td>
                         <td>${{ f.total_generado | float | round(3) }}</td>
                         <td>$-{{ f.publicidad | float | round(3) }}</td>
                         <td>$-{{ f.gasto_ponente | float | round(3) }}</td>
