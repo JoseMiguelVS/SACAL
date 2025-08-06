@@ -134,4 +134,4 @@ Este proyecto es de uso privado para fines educativos y administrativos.
 
 Desarrollado por: Jose Miguel Vazquez Sanchez  
 Estudiante de Desarrollo de Software Multiplataforma  
-Contacto: [josemiguelvazquezsanchez682@gmail.com]
+Contacto: josemiguelvazquezsanchez682@gmail.com
