@@ -26,10 +26,13 @@ def pagos_buscar():
         WHERE (clave_participante ILIKE %s OR nombre_participante ILIKE %s)
     '''
     sql_lim = '''
-        SELECT * FROM detalles_pagos 
-        WHERE (clave_participante ILIKE %s OR nombre_participante ILIKE %s) 
-        ORDER BY id_pago DESC 
+        SELECT dp.*, pa.factura_pago
+        FROM detalles_pagos dp
+        JOIN participantes pa ON dp.clave_participante = pa.clave_participante
+        WHERE (dp.clave_participante ILIKE %s OR dp.nombre_participante ILIKE %s)
+        ORDER BY dp.id_pago DESC
         LIMIT %s OFFSET %s
+
     '''
     paginado = paginador3(sql_count, sql_lim, 
                           [
@@ -45,7 +48,7 @@ def pagos_buscar():
                            per_page=paginado[2],
                            total_items=paginado[3],
                            total_pages=paginado[4],
-                           concepto=lista_conceptos(),
+                           conceptos=lista_conceptos(),
                            gasto=lista_gastos(),
                            search_query=search_query)
 
@@ -217,7 +220,7 @@ def pagos_nuevo():
 def factura_nueva(id):
     if request.method == 'POST':
         ingreso_factura = request.form['ingreso_factura']
-        concepto_factura = request.form['conceptos']
+        concepto_factura = request.form['concepto_factura']
 
         con = get_db_connection()
         cur = con.cursor(cursor_factory=RealDictCursor)

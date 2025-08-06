@@ -76,13 +76,11 @@ def participantes_filtros():
     semana = request.args.get('semana', '', type=str)
     fecha_raw = request.args.get('fecha', '', type=str)
 
-    fecha = ''
     cursos = ''
     equipo = ''
     if fecha_raw:
         partes = fecha_raw.split('/')
         if len(partes) == 3:
-            fecha = partes[1]
             cursos = partes[2]
 
     if equipos:
@@ -94,7 +92,6 @@ def participantes_filtros():
                     WHERE (%s = '' OR meses ILIKE %s)
                         AND (%s = '' OR nombre_equipo ILIKE %s)
                         AND (%s = '' OR semanas ILIKE %s)
-                        AND (%s = '' OR fecha ILIKE %s)
                         AND (%s = '' OR cursos ILIKE %s)
                         AND grabacion = False ''' 
 
@@ -102,7 +99,6 @@ def participantes_filtros():
                 WHERE (%s = '' OR meses ILIKE %s)
                     AND (%s = '' OR nombre_equipo ILIKE %s)
                     AND (%s = '' OR semanas ILIKE %s)
-                    AND (%s = '' OR fecha ILIKE %s)
                     AND (%s = '' OR cursos ILIKE %s)
                     AND grabacion = False
                 ORDER BY nombre_participante DESC
@@ -114,7 +110,6 @@ def participantes_filtros():
             mes, mes,
             equipo, equipo,
             semana, semana,
-            fecha, fecha,
             cursos, cursos,
         ],
         1, 50   
@@ -344,17 +339,30 @@ def actualizar_participante(id):
         cur.execute(sql_participante, valores)
 
         # ------------------- Actualiza tabla pagos -------------------
-        sql_pago = '''
-            UPDATE pagos
-            SET ingresos = %s,
-                fecha_pago = %s
-            WHERE participante = %s
-        '''
-        cur.execute(sql_pago, (
-            ingresos,
-            datos['fecha_pago'] or None,
-            id
-        ))
+        if 'ingresos' in datos:
+            ingresos = float(datos['ingresos'])
+            sql_pago = '''
+                UPDATE pagos
+                SET ingresos = %s,
+                    fecha_pago = %s
+                WHERE participante = %s
+            '''
+            cur.execute(sql_pago, (
+                ingresos,
+                datos['fecha_pago'] or None,
+                id
+            ))
+        else:
+            sql_pago = '''
+                UPDATE pagos
+                SET fecha_pago = %s
+                WHERE participante = %s
+            '''
+            cur.execute(sql_pago, (
+                datos['fecha_pago'] or None,
+                id
+            ))
+
 
         con.commit()
         return jsonify({'alert': 'Participante actualizado correctamente'})
@@ -417,16 +425,20 @@ def participante_comprobante(id):
     sql2 = '''UPDATE participantes SET cuenta_destino = %s, forma_pago = %s WHERE id_participante = %s'''
     cur.execute(sql2, (cuenta_destino, forma_pago, id))
 
+    # Sanitizar clave para carpeta
+    clave_segura = sanitize_filename(clave_participante)
+
     for imagen in imagenes:
         if imagen and allowed_file(imagen.filename):
             cadena_aleatoria = my_random_string()
-            nombre_archivo = f"{nombre_participante}_{apellidos_participante}_{clave_participante}_{creado.strftime('%Y-%m-%d')}_{cadena_aleatoria}_{secure_filename(imagen.filename)}"
 
-            # Limpia el nombre del archivo completo
+            # Crear nombre seguro para el archivo
+            nombre_archivo = f"{nombre_participante}_{apellidos_participante}_{clave_participante}_{creado.strftime('%Y-%m-%d')}_{cadena_aleatoria}_{secure_filename(imagen.filename)}"
             nombre_archivo = sanitize_filename(nombre_archivo)
+
             imagen_bytes = imagen.read()
 
-            path_remoto = f"{clave_participante}/{nombre_archivo}"
+            path_remoto = f"{clave_segura}/{nombre_archivo}"
 
             # Subir a Supabase
             supabase.storage.from_(BUCKET_NAME).upload(
@@ -434,7 +446,6 @@ def participante_comprobante(id):
                 imagen_bytes,
                 file_options={"content-type": imagen.content_type}
             )
-
 
             # Registrar en DB
             cur.execute(

@@ -263,7 +263,7 @@
     <div class="modal fade" id="modalAgregar-{{p.id_pago}}" data-bs-backdrop="static" data-bs-keyboard="false"
         tabindex="-1" aria-labelledby="modalAgregarFacturaLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <form action="{{url_for('pagos.factura_nueva', id=p.id_pago)}}" method="post" class="modal-content">
+            <form action="{{ url_for('pagos.factura_nueva', id=p.id_pago) }}" method="post" class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalEditarLabel-{{p.nombre_participante}}">
                         Agregar Factura
@@ -272,25 +272,34 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                    <div class="input-group">
-                        <div class="mb-2">
-                            <input type="number" name="ingreso_factura" id="ingreso_factura" class="input-field"
-                                step="0.01" value="{{ ((p.ingresos or 0) * 1.16) | round(2) }}" placeholder="0.00">
-                            <label for="" class="input-label">Ingreso factura</label>
-                        </div>
-                    </div>
-                    <!-- Checkboxes -->
-                    <div class="mb-2">
-                        <label><input type="checkbox" id="persona_fisica"> Persona Física</label>
-                        <label><input type="checkbox" id="persona_moral"> Persona Moral</label>
+
+                    <!-- Select de concepto -->
+                    <div class="mb-3">
+                        <label for="concepto_factura-{{p.id_pago}}" class="form-label">Concepto de Factura</label>
+                        <select class="form-select concepto-select" name="concepto_factura"
+                            id="concepto_factura-{{p.id_pago}}" required>
+                            <option value="" disabled selected>Selecciona un concepto</option>
+                            {% if conceptos %}
+                            {% for con in conceptos %}
+                            <option value="{{ con[0] }}" data-iva="{{ con[2] }}">
+                                {{ con[1] }}
+                            </option>
+                            {% endfor %}
+                            {% else %}
+                            <option value="">No hay conceptos</option>
+                            {% endif %}
+                        </select>
                     </div>
 
-                    <!-- Campo de concepto de factura -->
+                    <!-- Campo de ingreso con IVA -->
                     <div class="mb-2">
-                        <label for="concepto_factura" class="form-label">Concepto de la factura</label>
-                        <input type="text" class="form-control" id="concepto_factura" name="concepto_factura" disabled>
+                        <input type="number" name="ingreso_factura" id="ingreso_factura-{{p.id_pago}}"
+                            class="input-field" step="0.01" value="{{ p.ingresos or 0 }}" placeholder="0.00"
+                            data-base="{{ p.ingresos or 0 }}">
+                        <label for="ingreso_factura-{{p.id_pago}}" class="input-label">Ingreso factura</label>
                     </div>
                 </div>
+
                 <div class="modal-footer">
                     <button type="button" class="botones-cancelar" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="botones-guardar">Guardar</button>
@@ -298,6 +307,7 @@
             </form>
         </div>
     </div>
+
 
     <div class="modal fade" id="modalEditarDevolucion-{{ p.id_pago }}" data-bs-backdrop="static"
         data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalEditarDevolucionLabel" aria-hidden="true">
@@ -332,38 +342,34 @@
             </form>
         </div>
     </div>
+    {% endfor %} {% endif %}
 
-    <!-- Script -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const chkFisica = document.getElementById("persona_fisica");
-            const chkMoral = document.getElementById("persona_moral");
-            const conceptoInput = document.getElementById("concepto_factura");
+            document.querySelectorAll("select[id^='concepto_factura']").forEach(select => {
+                select.addEventListener("change", function () {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const iva = parseFloat(selectedOption.dataset.iva || 0);
+                    const idPago = this.id.split("-")[1];
+                    const ingresoInput = document.getElementById(`ingreso_factura-${idPago}`);
 
-            // Nombre del participante desde backend (usa Jinja o algo similar)
-            const nombreParticipante = "{{ p.nombre_participante }}";
+                    if (!ingresoInput) {
+                        console.warn(`No se encontró input para ingreso_factura-${idPago}`);
+                        return;
+                    }
 
-            function actualizarConcepto() {
-                if (chkFisica.checked) {
-                    chkMoral.checked = false;
-                    conceptoInput.value = nombreParticipante;
-                    conceptoInput.disabled = true;
-                } else if (chkMoral.checked) {
-                    chkFisica.checked = false;
-                    conceptoInput.value = "";
-                    conceptoInput.disabled = false;
-                    conceptoInput.placeholder = "Nombre de la empresa";
-                } else {
-                    conceptoInput.value = "";
-                    conceptoInput.disabled = true;
-                }
-            }
+                    const baseStr = ingresoInput.dataset.base;
+                    const base = parseFloat(baseStr);
 
-            chkFisica.addEventListener("change", actualizarConcepto);
-            chkMoral.addEventListener("change", actualizarConcepto);
+                    console.log('IVA:', iva, 'Base:', base, 'idPago:', idPago);
+
+                    if (!isNaN(base) && !isNaN(iva)) {
+                        ingresoInput.value = (base * (1 + iva)).toFixed(2);
+                    }
+                });
+            });
         });
     </script>
-    {% endfor %} {% endif %}
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {

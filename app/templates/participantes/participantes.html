@@ -37,7 +37,6 @@
 
     <!-- FILTROS CENTRADOS ABAJO -->
     <section class="container mb-4">
-
         <!-- Filtros principales (Mes, Semana, Sesión, Equipo) -->
         <form method="get" action="{{ url_for('participantes.participantes_filtros') }}" class="row g-3 align-items-end"
             id="filtroForm">
@@ -187,7 +186,6 @@
                                 onchange="guardarFila(this)"></td>
 
                         <td>
-                            <input type="hidden" name="ingresos" value="{{ p.ingresos }}">
                             <input type="checkbox" name="factura_pago" onchange="guardarFila(this)" {% if p.factura_pago
                                 %}checked{% endif %}>
                         </td>
@@ -300,10 +298,9 @@
                         <input type="hidden" name="equipos" id="equipos" value="{{ partes_equipo[0] }}" required>
                         <p><strong>Equipo:</strong> {{ partes_equipo[1] }}</p>
                         {% endif %}
+                        <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
+                        <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
                     </div>
-
-                    <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
-                    <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
 
                     <div class="row justify-content-center g-3">
 
@@ -313,10 +310,6 @@
                                 <input type="text" id="clave_participante" name="clave_participante" class="input-field"
                                     placeholder="Ej: {{ clave_anterior }}" required>
                                 <label for="clave_participante" class="input-label">Clave de participante</label>
-                                {% if clave_anterior %}
-                                <small class="text-muted">Última clave registrada: <strong>{{ clave_anterior
-                                        }}</strong></small>
-                                {% endif %}
                             </div>
                         </div>
 
@@ -368,7 +361,7 @@
 
                 <div class="modal-footer">
                     <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="botones-guardar">Guardar</button>
+                    <button type="submit" id="btnGuardarModal" class="botones-guardar">Guardar</button>
                 </div>
             </form>
         </div>
@@ -580,6 +573,35 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        const filtroMes = document.getElementById("filtroMes");
+        const filtroSemana = document.getElementById("filtroSemana");
+        const filtroSesion = document.getElementById("filtroSesion");
+        const filtroEquipo = document.getElementById("filtroEquipo");
+        const btnGuardar = document.getElementById("btnGuardarModal"); // Asegúrate que este id exista
+
+        function validarFiltros() {
+            const hayFiltros =
+                filtroMes.value !== "" ||
+                filtroSemana.value !== "" ||
+                filtroSesion.value !== "" ||
+                filtroEquipo.value !== "";
+
+            btnGuardar.disabled = !hayFiltros;
+        }
+
+        // Ejecutar validación al cargar
+        validarFiltros();
+
+        // Validar cada vez que cambie un filtro
+        [filtroMes, filtroSemana, filtroSesion, filtroEquipo].forEach(filtro => {
+            filtro.addEventListener("change", validarFiltros);
+        });
+    });
+</script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
         const inputBuscar = document.querySelector("input[name='buscar']");
         const form = document.getElementById("formBuscar");
 
@@ -592,45 +614,38 @@
 <script>
     function guardarFila(elemento) {
         const fila = elemento.closest('tr');
-        const id = fila.dataset.id;
+        const id = fila.dataset.id || fila.getAttribute('data-id');
         const datos = {};
 
-        fila.querySelectorAll('input, select, textarea').forEach(el => {
-            if (el.type === 'checkbox') {
-                datos[el.name] = el.checked ? 1 : 0;
+        // Recolecta todos los campos de la fila
+        fila.querySelectorAll('input, select').forEach(input => {
+            if (input.type === 'checkbox') {
+                datos[input.name] = input.checked ? 1 : 0;
             } else {
-                datos[el.name] = el.value;
+                datos[input.name] = input.value;
             }
         });
-
-        // Solo convierte a número si existe
-        if ('ingresos' in datos) {
-            datos['ingresos'] = parseFloat(datos['ingresos']) || 0;
-        }
-
-        console.log('Datos enviados:', datos);
 
         fetch(`/participantes/actualizar/${id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token() }}' // si usas Flask-WTF
+                'X-CSRFToken': '{{ csrf_token() }}'
             },
             body: JSON.stringify(datos)
         })
-            .then(res => {
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                return res.json();
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return response.json();
             })
             .then(data => {
-                console.log(data.alert);
+                console.log('Actualizado:', data);
             })
             .catch(error => {
                 console.error('Error al guardar:', error);
                 alert('Error al guardar los cambios');
             });
     }
-
 </script>
 
 <script>
