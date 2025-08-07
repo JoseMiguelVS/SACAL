@@ -185,18 +185,17 @@ def sesion_editar(id):
 @sesiones.route("/participantes/sesiones/editar/<string:id>", methods=["POST"])
 @login_required
 def sesion_actualizar(id):
-    # Campos generales
     categoria = request.form['id_categoria']
     mes = request.form['id_mes']
     semana = request.form['id_semana']
 
-    # Listas de cursos, ponentes, fechas e ids de cursos_sesion
-    ids = request.form.getlist('id_cursos_sesion[]')      # ids existentes o vacío para nuevos
+    # Listas de datos enviados desde el formulario
+    ids = request.form.getlist('id_cursos_sesion[]')  # String IDs (algunos vacíos)
     cursos = request.form.getlist('cursos[]')
     ponentes = request.form.getlist('ponentes[]')
     fechas = request.form.getlist('fecha_curso[]')
 
-    # Validar que las listas tengan la misma longitud
+    # Validar longitudes
     if not (len(ids) == len(cursos) == len(ponentes) == len(fechas)):
         flash("Error: La cantidad de datos enviados no coincide", "Error")
         return redirect(url_for("sesiones.sesiones_buscar"))
@@ -205,22 +204,38 @@ def sesion_actualizar(id):
     cur = con.cursor()
 
     try:
-        # Actualiza datos generales de la sesión
+        # 1. Obtener IDs originales de cursos de la sesión
+        cur.execute("SELECT id_cursoesp FROM cursos_sesion WHERE sesion_id = %s", (id,))
+        ids_originales = set(str(row[0]) for row in cur.fetchall())  # Convertir a str para comparar
+
+        # 2. Filtrar IDs válidos que el usuario mantuvo
+        ids_actualizados = set(i.strip() for i in ids if i.strip().isdigit())
+
+        # 3. Determinar IDs eliminados (presentes antes, pero no enviados ahora)
+        ids_eliminados = ids_originales - ids_actualizados
+
+        # 4. Eliminar de la base de datos
+        for id_eliminar in ids_eliminados:
+            cur.execute("DELETE FROM cursos_sesion WHERE id_cursoesp = %s", (id_eliminar,))
+
+        # 5. Actualizar sesión general
         cur.execute("""
             UPDATE sesiones_curso 
             SET categoria = %s, mes = %s, semana = %s 
             WHERE id_sesion = %s
         """, (categoria, mes, semana, id))
 
-        # Recorre cada fila enviada
+        # 6. Insertar o actualizar cursos
         for id_curso_sesion, curso, ponente, fecha in zip(ids, cursos, ponentes, fechas):
-            if id_curso_sesion:  # Update fila existente
+            if id_curso_sesion and id_curso_sesion.strip().isdigit():
+                # Actualizar
                 cur.execute("""
                     UPDATE cursos_sesion
                     SET curso_id = %s, ponente_id = %s, fecha_curso = %s
                     WHERE id_cursoesp = %s
                 """, (curso, ponente, fecha, id_curso_sesion))
-            else:  # Insert fila nueva
+            else:
+                # Insertar nuevo
                 cur.execute("""
                     INSERT INTO cursos_sesion (sesion_id, curso_id, ponente_id, fecha_curso)
                     VALUES (%s, %s, %s, %s)

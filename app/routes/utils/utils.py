@@ -57,23 +57,23 @@ def sanitize_filename(filename):
     return filename
 
 #--------------------------------CONEXION BD------------------------
-def get_db_connection():
-    try:
-        conn = psycopg2.connect(
-            host=os.environ.get('db_host'),
-            dbname=os.environ.get('db_name'),
-            user=os.environ.get('db_username'),
-            password=os.environ.get('db_password')
-        )
-        return conn
-    except psycopg2.Error as error:
-        print(f"Error de conexión: {error}")
-        return None
-    
-# DATABASE_URL = "postgresql://sacal_user:fkCuAuxYUAyzAg8OPB0HcDxyMFJI35qm@dpg-d1t6h049c44c73d6jmj0-a.oregon-postgres.render.com/sacal"
 # def get_db_connection():
-#     conn = psycopg2.connect(DATABASE_URL)
-#     return conn
+#     try:
+#         conn = psycopg2.connect(
+#             host=os.environ.get('db_host'),
+#             dbname=os.environ.get('db_name'),
+#             user=os.environ.get('db_username'),
+#             password=os.environ.get('db_password')
+#         )
+#         return conn
+#     except psycopg2.Error as error:
+#         print(f"Error de conexión: {error}")
+#         return None
+    
+DATABASE_URL = "postgresql://sacal_user:fkCuAuxYUAyzAg8OPB0HcDxyMFJI35qm@dpg-d1t6h049c44c73d6jmj0-a.oregon-postgres.render.com/sacal"
+def get_db_connection():
+    conn = psycopg2.connect(DATABASE_URL)
+    return conn
 
 #-----------------------------EMPLEADOS / USUARIOS
 def allowed_username(nombre_usuario):
@@ -111,16 +111,6 @@ def allowed_paquename(nombre_paquete):
     pattern = re.compile(r'^[a-zA-Z0-9]+$')
     # Comprueba si el nombre de usuario coincide con el patrón
     if pattern.match(nombre_paquete):
-        return True
-    else:
-        return False
-    
-#------------------------------CURSOS--------------------------------------
-def allowed_paquename(nombre_curso):
-    # Define el patrón de la expresión regular para letras y números sin espacios ni caracteres especiales
-    pattern = re.compile(r'^[a-zA-Z0-9]+$')
-    # Comprueba si el nombre de usuario coincide con el patrón
-    if pattern.match(nombre_curso):
         return True
     else:
         return False
