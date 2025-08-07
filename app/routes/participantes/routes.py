@@ -378,27 +378,29 @@ def actualizar_participante(id):
 @participantes.route('/participantes/actualizar/sesion/<string:id>', methods=['POST'])
 @login_required
 def participante_actualizar(id):
-    if request.method == 'POST':
-        sesion = request.form['sesion']
-        grabacion = request.form['grabacion']
+    sesion = request.form['sesion']
+    grabacion = request.form.get('grabacion')  # None si no existe
 
-        grabacion_new = ''
-        if grabacion == 'on':
-            grabacion_new = 'True'
+    grabacion_new = True if grabacion == 'on' else False
 
-        con = get_db_connection()
-        cur = con.cursor()
-        sql = "UPDATE asistencias SET sesion = %s WHERE participante = %s"
-        valores = (sesion, id)
-        cur.execute(sql,valores)
+    con = get_db_connection()
+    cur = con.cursor()
 
-        sql2 = "UPDATE participantes SET grabacion = %s WHERE id_participante = %s"
-        valores2 = (grabacion_new, id)
-        cur.execute(sql2,valores2)
-        con.commit()
-        cur.close()
-        con.close()
-        flash("Participante cambiado de sesion")
+    cur.execute(
+        "UPDATE asistencias SET sesion = %s WHERE participante = %s",
+        (sesion, id)
+    )
+
+    cur.execute(
+        "UPDATE participantes SET grabacion = %s WHERE id_participante = %s",
+        (grabacion_new, id)
+    )
+
+    con.commit()
+    cur.close()
+    con.close()
+
+    flash("Participante cambiado de sesión")
     return redirect(url_for('participantes.participantes_buscar'))
 
 @participantes.route('/participantes/comprobante/<string:id>', methods=['POST'])
