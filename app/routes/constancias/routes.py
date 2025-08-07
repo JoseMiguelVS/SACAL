@@ -80,13 +80,11 @@ def constancias_filtros():
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas_constancias
                 WHERE (%s = '' OR nombre_mes ILIKE %s)
                     AND (%s = '' OR semana ILIKE %s)
-                    AND (%s = '' OR fecha_curso ILIKE %s)
                 AND constancia_enviada = False '''
 
     sql_lim = '''SELECT * FROM asistencias_detalladas_constancias
             WHERE (%s = '' OR nombre_mes ILIKE %s)
                 AND (%s = '' OR semana ILIKE %s)
-                AND (%s = '' OR fecha_curso ILIKE %s)
                 AND constancia_enviada = False
             ORDER BY nombre_participante DESC
             LIMIT %s OFFSET %s'''
@@ -96,7 +94,6 @@ def constancias_filtros():
         [
             nombre_mes, nombre_mes, 
             semana, semana, 
-            fecha, fecha,
             # search_query, search_query, search_query
         ],
         1, 25
@@ -210,10 +207,9 @@ def constancias_generar():
 def constancias_editar():
     id = request.args.get("id")
     curso = request.args.get("curso")
-    fecha_curso = request.args.get("fecha_curso")
     con = get_db_connection()
     cur = con.cursor()
-    cur.execute('SELECT * FROM asistencias_detalladas_constancias WHERE id_participante = %s AND nombre_curso = %s AND fecha_curso = %s', (id, curso, fecha_curso))
+    cur.execute('SELECT * FROM asistencias_detalladas_constancias WHERE id_participante = %s AND nombre_curso = %s', (id, curso))
     participante = cur.fetchall()
     con.commit()
     cur.close()
@@ -234,12 +230,14 @@ def constancias_actualizar(id):
     sql = '''
         UPDATE participantes SET
             clave_participante = %s,
-            nombre_participante = %s
+            nombre_participante = %s,
+            apellidos_participante = %s
         WHERE id_participante = %s
     '''
     valores = (
         datos['clave_participante'],
         datos['nombre_participante'],
+        datos['apellidos_participante'],
         id
     )
 
@@ -343,13 +341,11 @@ def constancias_hechas_filtros():
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas_constancias
                 WHERE (%s = '' OR nombre_mes ILIKE %s)
                     AND (%s = '' OR semana ILIKE %s)
-                    AND (%s = '' OR fecha_curso ILIKE %s)
                 AND constancia_enviada = True '''
 
     sql_lim = '''SELECT * FROM asistencias_detalladas_constancias
             WHERE (%s = '' OR nombre_mes ILIKE %s)
                 AND (%s = '' OR semana ILIKE %s)
-                AND (%s = '' OR fecha_curso ILIKE %s)
                 AND constancia_enviada = True
             ORDER BY nombre_participante DESC
             LIMIT %s OFFSET %s'''
@@ -359,7 +355,6 @@ def constancias_hechas_filtros():
         [
             nombre_mes, nombre_mes, 
             semana, semana, 
-            fecha_curso, fecha_curso,
             # search_query, search_query, search_query
         ],
         1, 25
