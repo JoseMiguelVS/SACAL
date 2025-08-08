@@ -15,96 +15,104 @@
     {% endfor %} {% endif %} {% endwith %}
 
     <!-- NUEVO + BUSCADOR -->
-
     <section class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-        <!-- Botón "Nuevo" alineado a la izquierda -->
-        <button type="button" class="botones m-2" data-bs-toggle="modal" data-bs-target="#modalAgregarParticipante">
-            <i class="fa fa-plus"></i> Nuevo
-        </button>
-
         <!-- Buscador por clave a la derecha -->
-        <form id="formBuscar" method="get" action="{{ url_for('participantes.participantes_grabaciones') }}"
+        <form id="formBuscar" method="get" action="{{ url_for('participantes.participantes_grabaciones_buscar') }}"
             class="d-flex flex-grow-1 justify-content-end">
-            <div class="input-group" style="max-width: 300px;">
-                <input class="form-control" type="text" name="buscar" value="{{ search_query }}" placeholder="Buscar..."
-                    aria-label="Buscar participante por clave o nombre" required
+            <div class="input-group mr-2" style="max-width: 300px;">
+                <input class="form-control mr-2" type="text" name="buscar" value="{{ search_query }}"
+                    placeholder="Buscar..." aria-label="Buscar participante por clave o nombre" required
                     onchange="document.getElementById('formBuscar').submit()" />
                 <button type="submit" class="botones-ver ms-2" aria-label="Buscar">
                     <i class="fas fa-search"></i>
                 </button>
             </div>
         </form>
-
     </section>
 
     <!-- FILTROS CENTRADOS ABAJO -->
-
-    <section class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
-        <form method="get" action="{{ url_for('participantes.participantes_grabaciones') }}"
-            class="d-flex flex-wrap align-items-center gap-2" id="filtroForm">
+    <section class="container mb-4">
+        <!-- Filtros principales (Mes, Semana, Sesión, Equipo) -->
+        <form method="get" action="{{ url_for('participantes.participantes_grabaciones_filtros') }}"
+            class="row g-3 align-items-end" id="filtroForm">
 
             <!-- Mes -->
-            <label for="filtroMes" class="form-label mb-1">Mes</label>
-            <select id="filtroMes" name="mes" class="form-select-sm filtro-auto">
-                <option value="">Todos</option>
-                {% for mes in meses %}
-                <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>{{ mes.1 }}
-                </option>
-                {% endfor %}
-            </select>
+            <div class="col-sm-3">
+                <label for="filtroMes" class="form-label">Mes</label>
+                <select id="filtroMes" name="mes" class="form-select form-select-sm filtro-auto">
+                    <option value="">Todos</option>
+                    {% for mes in meses %}
+                    <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>{{ mes.1 }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
 
             <!-- Semana -->
-            <label for="filtroSemana" class="form-label mb-1">Semana</label>
-            <select id="filtroSemana" name="semana" class="form-select-sm filtro-auto">
-                <option value="">Todas</option>
-                {% for semana in semanas %}
-                <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>{{
-                    semana.1 }}</option>
-                {% endfor %}
-            </select>
+            <div class="col-sm-3">
+                <label for="filtroSemana" class="form-label">Semana</label>
+                <select id="filtroSemana" name="semana" class="form-select form-select-sm filtro-auto">
+                    <option value="">Todas</option>
+                    {% for semana in semanas %}
+                    <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>{{
+                        semana.1 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
 
             <!-- Sesión -->
-            <label for="filtroSesion" class="form-label mb-1">Sesión</label>
-            <select id="filtroSesion" name="fecha" style="max-width: 400px; min-width: 400px"
-                class="form-select-sm filtro-auto">
-                <option value="">Todas</option>
-                {% set equipo_sel = request.args.get('equipos', '') %}
-                {% set mes_sel = request.args.get('mes', '') %}
-                {% set semana_sel = request.args.get('semana', '') %}
-                {% set fecha_actual = request.args.get('fecha', '') %}
-                {% for sesion in sesiones %}
-                {% if sesion.6 == mes_sel and sesion.5 == semana_sel or sesion.1 == equipo_sel %}
-                {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.7 %}
-                <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
-                    {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.7 }}
-                </option>
-                {% endif %}
-                {% endfor %}
-            </select>
+            <div class="col-sm-4">
+                <label for="filtroSesion" class="form-label">Sesión</label>
+                <select id="filtroSesion" name="fecha" style="max-width: 360px;"
+                    class="form-select form-select-sm filtro-auto ">
+                    <option value="">Todas</option>
+                    {% set equipo_sel = request.args.get('equipos', '') %}
+                    {% set mes_sel = request.args.get('mes', '') %}
+                    {% set semana_sel = request.args.get('semana', '') %}
+                    {% set fecha_actual = request.args.get('fecha', '') %}
+                    {% for sesion in sesiones %}
+                    {% if (mes_sel == '' or sesion.4 == mes_sel) and
+                    (semana_sel == '' or sesion.3 == semana_sel) %}
+                    {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.5 %}
+                    <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
+                        {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.5 }}
+                    </option>
+                    {% endif %}
+                    {% endfor %}
+
+                </select>
+            </div>
 
             <!-- Equipo -->
-            <label for="filtroEquipo" class="form-label mb-1">Equipo</label>
-            <select id="filtroEquipo" name="equipos" class="form-select-sm filtro-auto">
-                <option value="">Todos</option>
-                {% for equipo in equipos %}
-                {% set valorEquipo = equipo.0 ~ ',' ~ equipo.1 %}
-                <option value="{{ valorEquipo }}" {% if request.args.get('equipos', '' ).split(',')[-1]==equipo.1
-                    %}selected{% endif %}>
-                    {{ equipo.1 }}
-                </option>
-                {% endfor %}
-            </select>
+            <div class="col-sm-2">
+                <label for="filtroEquipo" class="form-label">Equipo</label>
+                <select id="filtroEquipo" name="equipos" class="form-select form-select-sm filtro-auto">
+                    <option value="">Todos</option>
+                    {% for equipo in equipos %}
+                    {% set valorEquipo = equipo.0 ~ ',' ~ equipo.1 %}
+                    <option value="{{ valorEquipo }}" {% if request.args.get('equipos', '' ).split(',')[-1]==equipo.1
+                        %}selected{% endif %}>
+                        {{ equipo.1 }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-            <!-- Limpiar -->
-            <a href="{{ url_for('participantes.participantes_grabaciones') }}"
-                class="btn btn-outline-secondary btn-sm">Limpiar</a>
+            <!-- Segunda fila: Limpiar + Grabaciones -->
+            <div class="col-12 d-flex align-items-center gap-4 mt-2">
 
+                <!-- Botón limpiar -->
+                <a href="{{ url_for('participantes.participantes_grabaciones_buscar') }}"
+                    class="btn btn-outline-secondary btn-sm">Limpiar</a>
+
+                <!-- Switch grabaciones -->
+                <div class="form-check form-switch ml-1">
+                    <input class="form-check-input" name="grabacion" type="checkbox" id="flexSwitchCheckDefault">
+                    <label class="form-check-label" for="flexSwitchCheckDefault">Grabaciones</label>
+                </div>
+
+            </div>
         </form>
-
-        <div class="form-check form-switch">
-            <input class="form-check-input" name="grabacion" type="checkbox" id="flexSwitchCheckDefault">
-            <label class="form-check-label" for="flexSwitchCheckDefault">Grabaciones</label>
-        </div>
 
     </section>
 
@@ -115,18 +123,20 @@
                 <thead class="table-light small">
                     <tr>
                         <th>Clave</th>
+                        <th>Telefono</th>
                         <th>Nombre</th>
                         <th>Apellidos</th>
                         <th>Paquete</th>
-                        <th>Pago <br>validado</th>
-                        <th>Fecha del pago</th>
+                        <th>Pago<br>validado</th>
+                        <th>Fecha del<br>pago</th>
                         <th>Factura</th>
                         <th>Forma pago</th>
+                        <th>Cuenta<br>Destino</th>
                         <th>Promotor</th>
                         <th>WhatsApp</th>
                         <th>Materiales</th>
                         <th>Grabaciones</th>
-                        <th>Evaluación <br>recibida</th>
+                        <th>Evaluación<br>recibida</th>
                         <th>Observaciones</th>
                         <th>Acciones</th>
                     </tr>
@@ -137,6 +147,8 @@
                     {% if p.estado == True %}
                     <tr data-id="{{ p.id_participante }}">
                         <td><input type="text" name="clave_participante" value="{{ p.clave_participante }}"
+                                onchange="guardarFila(this)"></td>
+                        <td><input type="text" name="num_telefono" value="{{ p.num_telefono }}"
                                 onchange="guardarFila(this)"></td>
                         <td><input type="text" name="nombre_participante" value="{{ p.nombre_participante }} "
                                 onchange="guardarFila(this)"></td>
@@ -156,11 +168,38 @@
                                 {% endif %}
                             </select>
                         </td>
-                        <td>{{ p.validacion_pago }}</td>
+                        <td>
+                            {% if p.validacion_pago == 3 %}
+                            Validado
+                            {% elif p.validacion_pago == 2 %}
+                            Pendiente
+                            {% else %}
+                            No encontrado
+                            {% endif %}
+                        </td>
                         <td><input type="date" name="fecha_pago" value="{{ p.fecha_pago }}"
                                 onchange="guardarFila(this)"></td>
-                        <td><input type="checkbox" name="factura_pago" onchange="guardarFila(this)" {% if p.factura_pago
-                                %}checked{% endif %}></td>
+
+                        <td>
+                            <input type="checkbox" name="factura_pago" onchange="guardarFila(this)" {% if p.factura_pago
+                                %}checked{% endif %}>
+                        </td>
+
+                        <td>
+                            <!-- Forma de pago -->
+                            <select name="id_forma" id="id_forma" required onchange="guardarFila(this)">
+                                <option value="" disabled {% if not p.forma_pago %} selected {% endif %}>Seleccione
+                                    la forma de pago</option>
+                                {% if formas %}
+                                {% for forma in formas %}
+                                <option value="{{ forma.0 }}" {% if forma.0|string==p.forma_pago|string %} selected {%
+                                    endif %}>{{ forma.1 }}</option>
+                                {% endfor %}
+                                {% else %}
+                                <option disabled>Aun no hay registros</option>
+                                {% endif %}
+                            </select>
+                        </td>
                         <td>
                             <select name="cuenta_destino" id="cuenta_destino" onchange="guardarFila(this)">
                                 <option value="" disabled {% if not p.cuenta_destino %}selected{% endif %}>Cuenta
@@ -193,7 +232,13 @@
                             <button type="button" class="botones-editar" data-bs-toggle="modal"
                                 data-bs-target="#modalEditar-{{p.id_participante}}"
                                 aria-label="Editar participante {{ p.nombre_participante }}">
-                                <i class="fa fa-edit" style="font-size: 18px"></i>
+                                <i class="fa fa-edit" style="font-size: 14px"></i>
+                            </button>
+
+                            <button type="button" class="botones-editar" data-bs-toggle="modal"
+                                data-bs-target="#modalComprobante-{{p.id_participante}}"
+                                aria-label="Editar participante {{ p.nombre_participante }}">
+                                <i class="fas fa-receipt" style="font-size: 14px"></i>
                             </button>
                         </td>
                         <!-- <td><button onclick="guardarCambios(this)">Guardar</button></td> -->
@@ -369,48 +414,6 @@
                 {% endif %}
         </ul>
     </nav>
-
-    {% if participantes %} {% for p in participantes %}
-    <div class="modal fade" id="modalEditar-{{ p.id_participante }}" data-bs-backdrop="static" data-bs-keyboard="false"
-        tabindex="-1" aria-labelledby="modalEditarLabel-{{ p.id_participante }}" aria-hidden="true">
-        <div class="modal-dialog">
-            <form method="post" action="{{ url_for('participantes.participante_actualizar', id = p.id_participante) }}"
-                class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="idEditarLabel-{{ p.id_participante }}">Editar Participante</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                    <div class="mb-2">
-                        <label for="sesion" class="form-label">Sesion</label>
-                        <select name="sesion" id="sesion-{{ p.id_participante }}" class="form-select" required>
-                            <option value="" disabled>Sesion</option>
-                            {% set mes_sel = request.args.get('mes', '') %}
-                            {% set semana_sel = request.args.get('semana', '') %}
-                            {% if sesiones %} {% for sesion in sesiones %}
-                            {% if mes_sel == sesion.6 and semana_sel == sesion.5 %}
-                            <option value="{{ sesion.0 }} " {% if sesion.7==p.cursos %} selected {% endif %}>
-                                {{ sesion.7 }}
-                            </option>
-                            {% endif %} {% endfor %} {% else %}
-                            <option disabled>Aun no hay registros</option>
-                            {% endif %}
-                        </select>
-                    </div>
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" name="grabacion" type="checkbox" id="flexSwitchCheckDefault">
-                        <label class="form-check-label" for="flexSwitchCheckDefault">En vivo</label>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="botones-cancelar" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="botones-guardar">Guardar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    {% endfor %} {% endif %}
 
 </main>
 

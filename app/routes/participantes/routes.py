@@ -68,6 +68,51 @@ def participantes_buscar():
                            total_pages=paginado[4],
                            search_query=search_query)
 
+@participantes.route("/participantes/grabaciones")
+@login_required
+def participantes_grabaciones_buscar():
+    search_query = request.args.get('buscar', '', type=str).strip()
+    search_query_sql = f"%{search_query}%"
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT clave_participante FROM participantes ORDER BY id_participante DESC LIMIT 1")
+    ultima_clave = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    clave_anterior = ultima_clave[0] if ultima_clave else ''
+
+    sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
+                   WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
+                   AND grabacion = True
+                   '''
+
+    sql_lim = '''SELECT * FROM asistencias_detalladas
+                 WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
+                 AND grabacion = True
+                 ORDER BY nombre_participante DESC
+                 LIMIT %s OFFSET %s'''
+
+    paginado = paginador3(sql_count, sql_lim, [search_query_sql, search_query_sql], 1, 50)
+
+    return render_template('participantes/participantes_grabaciones.html',
+                           clave_anterior=clave_anterior,
+                           formas = lista_formaPago(),
+                           equipos=lista_equipos(),
+                           cursos=lista_cursos(),
+                           sesiones=lista_sesiones(),
+                           paquetes=lista_paquetes(),
+                           cuentas=lista_cuentas(),
+                           meses=lista_meses(),
+                           semanas=lista_semanas(),
+                           participantes=paginado[0],
+                           page=paginado[1],
+                           per_page=paginado[2],
+                           total_items=paginado[3],
+                           total_pages=paginado[4],
+                           search_query=search_query)
+
 @participantes.route("/participantes/filtros")
 @login_required
 def participantes_filtros():
@@ -130,45 +175,39 @@ def participantes_filtros():
                            total_items=paginado[3],
                            total_pages=paginado[4])
 
-@participantes.route("/participantes/grabaciones")
+@participantes.route("/participantes/grabaciones/filtros")
 @login_required
-def participantes_grabaciones():
-    search_query = request.args.get('buscar', '', type=str)
+def participantes_grabaciones_filtros():
     equipos = request.args.get('equipos', '', type=str)
     mes = request.args.get('mes', '', type=str)
     semana = request.args.get('semana', '', type=str)
     fecha_raw = request.args.get('fecha', '', type=str)
 
-    fecha = ''
     cursos = ''
     equipo = ''
     if fecha_raw:
         partes = fecha_raw.split('/')
         if len(partes) == 3:
-            fecha = partes[1]
             cursos = partes[2]
+
     if equipos:
         partesEquipos = equipos.split(',')
         if len(partesEquipos) == 2:
             equipo = partesEquipos[1]
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
-                WHERE (%s = '' OR meses ILIKE %s)
-                    AND (%s = '' OR nombre_equipo ILIKE %s)
-                    AND (%s = '' OR semanas ILIKE %s)
-                    AND (%s = '' OR fecha ILIKE %s)
-                    AND (%s = '' OR cursos ILIKE %s)
-                    AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)
-                    AND grabaciones = 'True' ''' 
+                    WHERE (%s = '' OR meses ILIKE %s)
+                        AND (%s = '' OR nombre_equipo ILIKE %s)
+                        AND (%s = '' OR semanas ILIKE %s)
+                        AND (%s = '' OR cursos ILIKE %s)
+                        AND grabacion = True ''' 
 
     sql_lim = '''SELECT * FROM asistencias_detalladas
                 WHERE (%s = '' OR meses ILIKE %s)
                     AND (%s = '' OR nombre_equipo ILIKE %s)
                     AND (%s = '' OR semanas ILIKE %s)
-                    AND (%s = '' OR fecha ILIKE %s)
                     AND (%s = '' OR cursos ILIKE %s)
-                    AND (%s = '' OR nombre_participante ILIKE %s OR clave_participante ILIKE %s)
-                    AND grabaciones = 'True'
+                    AND grabacion = True
                 ORDER BY nombre_participante DESC
                 LIMIT %s OFFSET %s'''
 
@@ -178,11 +217,9 @@ def participantes_grabaciones():
             mes, mes,
             equipo, equipo,
             semana, semana,
-            fecha, fecha,
             cursos, cursos,
-            search_query, search_query, search_query  # nombre y clave usan el mismo valor
         ],
-        1, 50
+        1, 50   
     )
 
     return render_template('participantes/participantes_grabaciones.html',

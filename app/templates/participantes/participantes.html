@@ -71,13 +71,15 @@
                 <select id="filtroSesion" name="fecha" style="max-width: 360px;"
                     class="form-select form-select-sm filtro-auto ">
                     <option value="">Todas</option>
+                    {% set categoria = 2 %}
                     {% set equipo_sel = request.args.get('equipos', '') %}
                     {% set mes_sel = request.args.get('mes', '') %}
                     {% set semana_sel = request.args.get('semana', '') %}
                     {% set fecha_actual = request.args.get('fecha', '') %}
                     {% for sesion in sesiones %}
                     {% if (mes_sel == '' or sesion.4 == mes_sel) and
-                    (semana_sel == '' or sesion.3 == semana_sel) %}
+                    (semana_sel == '' or sesion.3 == semana_sel) and 
+                    (sesion.7 == categoria) %}
                     {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.5 %}
                     <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
                         {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.5 }}
@@ -565,7 +567,7 @@
 <script>
     document.getElementById('flexSwitchCheckDefault').addEventListener('change', function () {
         if (this.checked) {
-            window.location.href = '{{ url_for("participantes.participantes_grabaciones") }}';
+            window.location.href = '{{ url_for("participantes.participantes_grabaciones_buscar") }}';
             this.checked = true;
         }
     });
@@ -598,7 +600,6 @@
         });
     });
 </script>
-
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
