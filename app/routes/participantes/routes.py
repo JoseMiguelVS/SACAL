@@ -38,7 +38,7 @@ ids_para_actualizar =[
 
 if ids_para_actualizar:
     cur.execute('''
-        UPDATE detalles_sesiones
+        UPDATE sesiones_curso
         SET categoria = 3
         WHERE id_sesion = ANY(%s);
     ''', (ids_para_actualizar,))
