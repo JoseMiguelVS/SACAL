@@ -19,7 +19,8 @@ from app.routes.temas.routes import temas
 from app.routes.pagos.routes import pagos
 from app.routes.resumen.routes import resumen_semanal
 from app.routes.perfil.routes import perfil
-
+import app.routes.participantes.routesE as participantes_especializaciones
+import app.routes.participantes.routesG as participantes_grabaciones
 # -------------------------- Inicialización --------------------------
 app = Flask(__name__)
 csrf = CSRFProtect(app)

@@ -9,6 +9,7 @@ from werkzeug.utils import secure_filename
 from app.utils.listas import lista_cuentas, lista_cursos, lista_equipos, lista_formaPago, lista_meses, lista_paquetes, lista_sesiones, lista_semanas
 
 from ..utils.utils import allowed_file, get_db_connection, my_random_string, paginador3, sanitize_filename
+from .routes import participantes
 
 from supabase import create_client
 import io
@@ -19,8 +20,6 @@ SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 BUCKET_NAME = "tickets"
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-
-participantes = Blueprint('participantes', __name__) 
 
 con = get_db_connection()
 cur = con.cursor()
@@ -48,9 +47,9 @@ cur.close()
 con.close()
 
 #---------------------------------------------------------------PARTICIPANTES--------------------------------------------------------------------------
-@participantes.route("/participantes")
+@participantes.route("/participantes/grabaciones")
 @login_required
-def participantes_buscar():
+def participantes_grabaciones_buscar():
     search_query = request.args.get('buscar', '', type=str).strip()
     search_query_sql = f"%{search_query}%"
 
@@ -65,18 +64,18 @@ def participantes_buscar():
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
                    WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
-                   AND nombre_categoria = 'En vivo'
+                   AND nombre_categoria = 'Grabación'
                    '''
 
     sql_lim = '''SELECT * FROM asistencias_detalladas
                  WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
-                 AND nombre_categoria = 'En vivo'
-                 ORDER BY id_participante DESC
+                 AND nombre_categoria = 'Grabación'
+                 ORDER BY nombre_participante DESC
                  LIMIT %s OFFSET %s'''
 
     paginado = paginador3(sql_count, sql_lim, [search_query_sql, search_query_sql], 1, 50)
 
-    return render_template('participantes/participantes.html',
+    return render_template('participantes/participantes_grabaciones.html',
                            clave_anterior=clave_anterior,
                            formas = lista_formaPago(),
                            equipos=lista_equipos(),
@@ -92,11 +91,10 @@ def participantes_buscar():
                            total_items=paginado[3],
                            total_pages=paginado[4],
                            search_query=search_query)
-    
 
-@participantes.route("/participantes/filtros")
+@participantes.route("/participantes/grabaciones/filtros")
 @login_required
-def participantes_filtros():
+def participantes_grabaciones_filtros():
     equipos = request.args.get('equipos', '', type=str)
     mes = request.args.get('mes', '', type=str)
     semana = request.args.get('semana', '', type=str)
@@ -119,14 +117,14 @@ def participantes_filtros():
                         AND (%s = '' OR nombre_equipo ILIKE %s)
                         AND (%s = '' OR semanas ILIKE %s)
                         AND (%s = '' OR cursos ILIKE %s)
-                        AND nombre_categoria = 'En vivo' ''' 
+                        AND nombre_categoria = 'Grabaciones' ''' 
 
     sql_lim = '''SELECT * FROM asistencias_detalladas
                 WHERE (%s = '' OR meses ILIKE %s)
                     AND (%s = '' OR nombre_equipo ILIKE %s)
                     AND (%s = '' OR semanas ILIKE %s)
                     AND (%s = '' OR cursos ILIKE %s)
-                    AND nombre_categoria = 'En vivo'
+                    AND nombre_categoria = 'Grabaciones'
                 ORDER BY nombre_participante DESC
                 LIMIT %s OFFSET %s'''
 
@@ -140,12 +138,27 @@ def participantes_filtros():
         ],
         1, 50   
     )
-    
+
+    return render_template('participantes/participantes_grabaciones.html',
+                           formas =lista_formaPago(),
+                           equipos=lista_equipos(),
+                           meses=lista_meses(),
+                           cursos=lista_cursos(),
+                           semanas=lista_semanas(),
+                           sesiones=lista_sesiones(),
+                           paquetes=lista_paquetes(),
+                           cuentas=lista_cuentas(),
+                           participantes=paginado[0],
+                           page=paginado[1],
+                           per_page=paginado[2],
+                           total_items=paginado[3],
+                           total_pages=paginado[4])
+
 #-----------------------------------------------------------------------------------------
 
-@participantes.route("/participantes/agregar")
+@participantes.route("/participantesG/agregar")
 @login_required
-def participante_agregar():
+def participante_agregarG():
     return render_template('participantes/participantes_agregar.html',
                            formas = lista_formaPago(),
                            cursos = lista_cursos(),
@@ -153,9 +166,9 @@ def participante_agregar():
                            cuentas = lista_cuentas(),
                            paquetes = lista_paquetes())
 
-@participantes.route('/participantes/agregar/nuevo', methods=('GET', 'POST'))
+@participantes.route('/participantesG/agregar/nuevo', methods=('GET', 'POST'))
 @login_required
-def participante_nuevo():
+def participante_nuevoG():
 
     if request.method == 'POST':
         nombre_participante = request.form['nombre_participante']
@@ -217,7 +230,7 @@ def participante_nuevo():
         con.close()
 
         flash('Participante y asistencia registrados correctamente.')
-        return redirect(url_for('participantes.participantes_buscar',
+        return redirect(url_for('participantes.participantes_grabaciones_buscar',
                                 mes=request.form.get('mes', ''),
                                 semana=request.form.get('semana', ''),
                                 fecha=request.form.get('fecha', ''),
@@ -226,9 +239,9 @@ def participante_nuevo():
 def to_bool(value):
     return value in [1, '1', True, 'true', 'True']
 #---------------------------------------------------------------------------------------------------------------
-@participantes.route('/participantes/actualizar/<int:id>', methods=['POST'])
+@participantes.route('/participantesG/actualizar/<int:id>', methods=['POST'])
 @login_required
-def actualizar_participante(id):
+def actualizar_participanteG(id):
     datos = request.get_json()
 
     con = get_db_connection()
@@ -251,7 +264,6 @@ def actualizar_participante(id):
                 nombre_paquete = %s,
                 fecha_pago = %s,
                 factura_pago = %s,
-                forma_pago = %s,
                 cuenta_destino = %s,
                 confirmacion_grupo = %s,
                 materiales = %s,
@@ -268,7 +280,6 @@ def actualizar_participante(id):
             datos['nombre_paquete'],
             datos['fecha_pago'] or None,
             factura_pago,
-            datos['id_forma'],
             datos['cuenta_destino'],
             confirmacion_grupo,
             materiales,
@@ -316,9 +327,9 @@ def actualizar_participante(id):
         cur.close()
         con.close()
 
-@participantes.route('/participantes/actualizar/sesion/<string:id>', methods=['POST'])
+@participantes.route('/participantesG/actualizar/sesion/<string:id>', methods=['POST'])
 @login_required
-def participante_actualizar(id):
+def participante_actualizarG(id):
     sesion = request.form['sesion']
     grabacion = request.form.get('grabacion')  # None si no existe
 
@@ -342,11 +353,11 @@ def participante_actualizar(id):
     con.close()
 
     flash("Participante cambiado de sesión")
-    return redirect(url_for('participantes.participantes_buscar'))
+    return redirect(url_for('participantes.participantes_grabaciones_buscar'))
 
-@participantes.route('/participantes/comprobante/<string:id>', methods=['POST'])
+@participantes.route('/participantesG/comprobante/<string:id>', methods=['POST'])
 @login_required
-def participante_comprobante(id):
+def participante_comprobanteG(id):
     nombre_participante = request.form['nombre_participante'].strip()
     apellidos_participante = request.form['apellidos_participante'].strip()
     clave_participante = request.form['clave_participante'].strip()
@@ -404,4 +415,4 @@ def participante_comprobante(id):
     con.close()
 
     flash('Comprobantes subidos correctamente')
-    return redirect(url_for('participantes.participantes_buscar'))
+    return redirect(url_for('participantes.participantes_grabaciones_buscar'))

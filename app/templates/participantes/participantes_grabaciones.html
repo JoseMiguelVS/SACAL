@@ -66,13 +66,15 @@
                 <select id="filtroSesion" name="fecha" style="max-width: 360px;"
                     class="form-select form-select-sm filtro-auto ">
                     <option value="">Todas</option>
+                    {% set categoria = 3 %}
                     {% set equipo_sel = request.args.get('equipos', '') %}
                     {% set mes_sel = request.args.get('mes', '') %}
                     {% set semana_sel = request.args.get('semana', '') %}
                     {% set fecha_actual = request.args.get('fecha', '') %}
                     {% for sesion in sesiones %}
                     {% if (mes_sel == '' or sesion.4 == mes_sel) and
-                    (semana_sel == '' or sesion.3 == semana_sel) %}
+                    (semana_sel == '' or sesion.3 == semana_sel) and
+                    (sesion.7 == categoria) %}
                     {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.5 %}
                     <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
                         {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.5 }}
@@ -130,7 +132,7 @@
                         <th>Pago<br>validado</th>
                         <th>Fecha del<br>pago</th>
                         <th>Factura</th>
-                        <th>Forma pago</th>
+                        <th>Curso</th>
                         <th>Cuenta<br>Destino</th>
                         <th>Promotor</th>
                         <th>WhatsApp</th>
@@ -185,21 +187,10 @@
                                 %}checked{% endif %}>
                         </td>
 
-                        <td>
-                            <!-- Forma de pago -->
-                            <select name="id_forma" id="id_forma" required onchange="guardarFila(this)">
-                                <option value="" disabled {% if not p.forma_pago %} selected {% endif %}>Seleccione
-                                    la forma de pago</option>
-                                {% if formas %}
-                                {% for forma in formas %}
-                                <option value="{{ forma.0 }}" {% if forma.0|string==p.forma_pago|string %} selected {%
-                                    endif %}>{{ forma.1 }}</option>
-                                {% endfor %}
-                                {% else %}
-                                <option disabled>Aun no hay registros</option>
-                                {% endif %}
-                            </select>
+                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            {{ p.cursos }}
                         </td>
+
                         <td>
                             <select name="cuenta_destino" id="cuenta_destino" onchange="guardarFila(this)">
                                 <option value="" disabled {% if not p.cuenta_destino %}selected{% endif %}>Cuenta
@@ -259,7 +250,7 @@
     <div class="modal fade" id="modalAgregarParticipante" data-bs-backdrop="static" data-bs-keyboard="false"
         tabindex="-1" aria-labelledby="modalAgregarParticipanteLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
-            <form action="{{ url_for('participantes.participante_nuevo') }}" method="post" class="modal-content">
+            <form action="{{ url_for('participantes.participante_nuevoG') }}" method="post" class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalAgregarParticipanteLabel">Agregar Participante</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -291,79 +282,130 @@
                     <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
 
 
-                    <div class="row g-3">
-                        <!-- Clave -->
-                        <div class="col-md-6">
-                            <label for="clave_participante" class="form-label">Clave</label>
-                            <input type="text" id="clave_participante" name="clave_participante" class="form-control"
-                                placeholder="Clave" required>
+                    <div class="modal-body">
+
+                        <div>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="nombre_empleado" value="{{ current_user.id_empleado }}">
+
+                            {# Extraer partes de la fecha solo si existen #}
+                            {% set fecha_raw = request.args.get('fecha', '') %}
+                            {% set partesSesiones = fecha_raw.split('/') if fecha_raw else [] %}
+
+                            {% if partesSesiones|length == 3 %}
+                            <input type="hidden" name="id_sesion" id="id_sesion" value="{{ partesSesiones[0] }}"
+                                required>
+                            <p><strong>Sesión:</strong> {{ partesSesiones[1] }}, {{ partesSesiones[2] }}</p>
+                            {% endif %}
+                            <input type="hidden" name="fecha" value="{{ fecha_raw }}" required>
+
+                            {% set categoria_sesion = '' %}
+                            {% for sesion in sesiones %}
+                            {% if partesSesiones and partesSesiones[0] == sesion[0]|string %}
+                            {% set categoria_sesion = sesion[7] %}
+                            {% endif %}
+                            {% endfor %}
+
+                            {% set partes_equipo = request.args.get('equipos', '').split(',') %}
+                            {% if partes_equipo | length == 2 %}
+                            <input type="hidden" name="equipos" id="equipos" value="{{ partes_equipo[0] }}" required>
+                            <p><strong>Equipo:</strong> {{ partes_equipo[1] }}</p>
+                            {% endif %}
+                            <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
+                            <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
                         </div>
 
-                        <!-- Teléfono -->
-                        <div class="col-md-6">
-                            <label for="num_telefono" class="form-label">Número de teléfono</label>
-                            <input type="text" id="num_telefono" name="num_telefono" class="form-control"
-                                placeholder="Teléfono" required>
-                        </div>
+                        <div class="row justify-content-center g-3">
 
-                        <!-- Nombre -->
-                        <div class="col-md-6">
-                            <label for="nombre_participante" class="form-label">Nombre</label>
-                            <input type="text" id="nombre_participante" name="nombre_participante" class="form-control"
-                                placeholder="Nombre" required>
-                        </div>
+                            <!-- Clave -->
+                            <div class="input-group justify-content-center">
+                                <div class="col-md-6">
+                                    <input type="text" id="clave_participante" name="clave_participante"
+                                        class="input-field" placeholder="Ej: {{ clave_anterior }}" required>
+                                    <label for="clave_participante" class="input-label">Clave de participante</label>
+                                </div>
+                            </div>
 
-                        <!-- Apellidos -->
-                        <div class="col-md-6">
-                            <label for="apellidos_participante" class="form-label">Apellidos</label>
-                            <input type="text" id="apellidos_participante" name="apellidos_participante"
-                                class="form-control" placeholder="Apellidos" required>
-                        </div>
+                            <!-- Teléfono -->
+                            <div class="input-group justify-content-center">
+                                <div class="col-md-6">
+                                    <input type="text" id="num_telefono" name="num_telefono" class="input-field"
+                                        placeholder="" required>
+                                    <label for="num_telefono" class="input-label">Número de teléfono</label>
+                                </div>
+                            </div>
 
-                        <!-- Cuenta destino -->
-                        <div class="col-md-6">
-                            <label for="id_cuenta" class="form-label">Cuenta destino</label>
-                            <select name="id_cuenta" id="id_cuenta" class="form-select" required>
-                                <option value="" selected disabled>Selecciona una cuenta</option>
-                                {% if cuentas %}
-                                {% for cuenta in cuentas %}
-                                <option value="{{ cuenta.0 }}">{{ cuenta.1 }}</option>
-                                {% endfor %}
-                                {% else %}
-                                <option disabled>Aún no hay registros</option>
-                                {% endif %}
-                            </select>
-                        </div>
+                            <!-- Nombre -->
+                            <div class="input-group justify-content-center">
+                                <div class="col-md-6">
+                                    <input type="text" id="nombre_participante" name="nombre_participante"
+                                        class="input-field" placeholder="" required>
+                                    <label for="nombre_participante" class="input-label">Nombre del participante</label>
+                                </div>
+                            </div>
 
-                        <!-- Paquete -->
-                        <div class="col-md-6">
-                            <label for="paquete" class="form-label">Paquete</label>
-                            <select name="paquete" id="paquete" class="form-select" required>
-                                <option value="" selected disabled>Selecciona un paquete</option>
-                                {% if paquetes and sesiones %}
-                                {% set categorias_validas = sesiones | selectattr('4') | map(attribute='9') | list %}
-                                {% set mostrados = [] %}
-                                {% for paquete in paquetes %}
-                                {% if paquete[4] and paquete[3] in categorias_validas and paquete[0] not in mostrados %}
-                                <option value="{{ paquete[0] }}, {{ paquete[2] }}">{{ paquete[1] }} Precio: ${{
-                                    paquete[2] }}
-                                </option>
-                                {% set _ = mostrados.append(paquete[0]) %}
-                                {% endif %}
-                                {% endfor %}
-                                {% else %}
-                                <option disabled>No hay paquetes disponibles</option>
-                                {% endif %}
-                            </select>
-                        </div>
+                            <!-- Apellidos -->
+                            <div class="input-group justify-content-center">
+                                <div class="col-md-6">
+                                    <input type="text" id="apellidos_participante" name="apellidos_participante"
+                                        class="input-field" placeholder="" required>
+                                    <label for="apellidos_participante" class="input-label">Apellidos del
+                                        participante</label>
+                                </div>
+                            </div>
 
+                            <div class="input-group justify-content-center">
+                                <select name="paquete" id="paquete" class="form-select" required
+                                    style="max-width: 360px;">
+                                    <option value="" selected disabled>Selecciona un paquete</option>
+                                    {% if paquetes %}
+                                    {% set espe = 'En vivo' %}
+                                    {% for paquete in paquetes %}
+                                    {% if paquete[3] == espe %}
+                                    <option value="{{ paquete[0] }},{{ paquete[2] }}">
+                                        {{ paquete[1] }} — ${{ paquete[2] }}
+                                    </option>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% else %}
+                                    <option disabled>No hay paquetes disponibles</option>
+                                    {% endif %}
+                                </select>
+                            </div>
+
+                            <div class="input-group justify-content-center">
+                                <div class="col-sm-4">
+                                    <select id="sesion" name="sesion" style="max-width: 360px;" class="form-select"
+                                        required>
+                                        <option value="">Seleccione una grabacion</option>
+                                        {% set categoria = 3 %}
+                                        {% set equipo_sel = request.args.get('equipos', '') %}
+                                        {% set mes_sel = request.args.get('mes', '') %}
+                                        {% set semana_sel = request.args.get('semana', '') %}
+                                        {% set fecha_actual = request.args.get('fecha', '') %}
+                                        {% for sesion in sesiones %}
+                                        {% if (mes_sel == '' or sesion.4 == mes_sel) and
+                                        (semana_sel == '' or sesion.3 == semana_sel) and
+                                        (sesion.7 == categoria) %}
+                                        {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.5 %}
+                                        <option value="{{ sesion.0 }}" {% if fecha_actual==valor %}selected{% endif %}>
+                                            {{ sesion.1 }} || {{ sesion.5 }}
+                                        </option>
+                                        {% endif %}
+                                        {% endfor %}
+
+                                    </select>
+                                </div>
+
+                            </div>
+
+                        </div>
                     </div>
-                </div>
 
-                <div class="modal-footer">
-                    <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="botones-guardar">Guardar</button>
-                </div>
+                    <div class="modal-footer">
+                        <button type="button" class="botones" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="botones-guardar">Guardar</button>
+                    </div>
             </form>
         </div>
     </div>
@@ -420,7 +462,7 @@
 <script>
     document.getElementById('flexSwitchCheckDefault').addEventListener('change', function () {
         if (this.checked) {
-            window.location.href = '{{ url_for("participantes.participantes_buscar") }}';
+            window.location.href = '{{ url_for("participantes.participantes_grabaciones_buscar") }}';
             this.checked = false;
         }
     });
@@ -451,7 +493,7 @@
             }
         });
 
-        fetch(`/participantes/actualizar/${id}`, {
+        fetch(`/participantesG/actualizar/${id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
