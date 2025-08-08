@@ -379,7 +379,7 @@
             </li>
 
 
-            {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
+            {% if page < total_pages %} <li class="page-item"><a class="page-link"
                     href="{{url_for('participantes.participantes_especializacion_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
                 </li>
                 {% if page != total_pages and page != total_pages-1 %}
