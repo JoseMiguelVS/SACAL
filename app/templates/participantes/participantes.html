@@ -2,7 +2,7 @@
 <main class="w-100 d-flex flex-column" style="margin: -1px; padding: 0;">
 
     <!-- TÍTULO -->
-    <h2 class="text-center mb-4">Participantes</h2>
+    <h2 class="text-center mb-4">Participantes en vivo</h2>
 
     <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
     {% with messages = get_flashed_messages() %} {% if messages %} {% for
@@ -350,9 +350,10 @@
 
                         <select name="paquete" id="paquete" class="form-select" required>
                             <option value="" selected disabled>Selecciona un paquete</option>
+                            {% set espe = '2' %}
                             {% if paquetes %}
                             {% for paquete in paquetes %}
-                            {% if paquete[4] %}
+                            {% if paquete[4] and paquete[3] == espe %}
                             <option value="{{ paquete[0] }},{{ paquete[2] }}">
                                 {{ paquete[1] }} — ${{ paquete[2] }}
                             </option>

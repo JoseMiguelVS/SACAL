@@ -16,6 +16,9 @@
 
     <!-- NUEVO + BUSCADOR -->
     <section class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <button type="button" class="botones m-2" data-bs-toggle="modal" data-bs-target="#modalAgregarParticipante">
+            <i class="fa fa-plus mr-2"></i> Nuevo
+        </button>
         <!-- Buscador por clave a la derecha -->
         <form id="formBuscar" method="get" action="{{ url_for('participantes.participantes_grabaciones_buscar') }}"
             class="d-flex flex-grow-1 justify-content-end">
@@ -60,31 +63,6 @@
                 </select>
             </div>
 
-            <!-- Sesión -->
-            <div class="col-sm-4">
-                <label for="filtroSesion" class="form-label">Sesión</label>
-                <select id="filtroSesion" name="fecha" style="max-width: 360px;"
-                    class="form-select form-select-sm filtro-auto ">
-                    <option value="">Todas</option>
-                    {% set categoria = 3 %}
-                    {% set equipo_sel = request.args.get('equipos', '') %}
-                    {% set mes_sel = request.args.get('mes', '') %}
-                    {% set semana_sel = request.args.get('semana', '') %}
-                    {% set fecha_actual = request.args.get('fecha', '') %}
-                    {% for sesion in sesiones %}
-                    {% if (mes_sel == '' or sesion.4 == mes_sel) and
-                    (semana_sel == '' or sesion.3 == semana_sel) and
-                    (sesion.7 == categoria) %}
-                    {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.5 %}
-                    <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
-                        {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.5 }}
-                    </option>
-                    {% endif %}
-                    {% endfor %}
-
-                </select>
-            </div>
-
             <!-- Equipo -->
             <div class="col-sm-2">
                 <label for="filtroEquipo" class="form-label">Equipo</label>
@@ -107,10 +85,14 @@
                 <a href="{{ url_for('participantes.participantes_grabaciones_buscar') }}"
                     class="btn btn-outline-secondary btn-sm">Limpiar</a>
 
+                <!-- Botón limpiar -->
+                <a href="{{ url_for('participantes.participantes_especializacion_buscar') }}"
+                    class="botones-guardar btn-sm">Especializaciones</a>
+
                 <!-- Switch grabaciones -->
                 <div class="form-check form-switch ml-1">
                     <input class="form-check-input" name="grabacion" type="checkbox" id="flexSwitchCheckDefault">
-                    <label class="form-check-label" for="flexSwitchCheckDefault">Grabaciones</label>
+                    <label class="form-check-label" for="flexSwitchCheckDefault">En vivos</label>
                 </div>
 
             </div>
@@ -292,27 +274,15 @@
                             {% set fecha_raw = request.args.get('fecha', '') %}
                             {% set partesSesiones = fecha_raw.split('/') if fecha_raw else [] %}
 
-                            {% if partesSesiones|length == 3 %}
-                            <input type="hidden" name="id_sesion" id="id_sesion" value="{{ partesSesiones[0] }}"
-                                required>
-                            <p><strong>Sesión:</strong> {{ partesSesiones[1] }}, {{ partesSesiones[2] }}</p>
-                            {% endif %}
+
                             <input type="hidden" name="fecha" value="{{ fecha_raw }}" required>
-
-                            {% set categoria_sesion = '' %}
-                            {% for sesion in sesiones %}
-                            {% if partesSesiones and partesSesiones[0] == sesion[0]|string %}
-                            {% set categoria_sesion = sesion[7] %}
-                            {% endif %}
-                            {% endfor %}
-
                             {% set partes_equipo = request.args.get('equipos', '').split(',') %}
                             {% if partes_equipo | length == 2 %}
                             <input type="hidden" name="equipos" id="equipos" value="{{ partes_equipo[0] }}" required>
                             <p><strong>Equipo:</strong> {{ partes_equipo[1] }}</p>
                             {% endif %}
-                            <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
-                            <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
+                            <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}" required>
+                            <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}" required>
                         </div>
 
                         <div class="row justify-content-center g-3">
@@ -359,9 +329,9 @@
                                     style="max-width: 360px;">
                                     <option value="" selected disabled>Selecciona un paquete</option>
                                     {% if paquetes %}
-                                    {% set espe = 'En vivo' %}
+                                    {% set espe = 2 %}
                                     {% for paquete in paquetes %}
-                                    {% if paquete[3] == espe %}
+                                    {% if (paquete[4]) and (paquete[3] == espe) %}
                                     <option value="{{ paquete[0] }},{{ paquete[2] }}">
                                         {{ paquete[1] }} — ${{ paquete[2] }}
                                     </option>
@@ -375,8 +345,8 @@
 
                             <div class="input-group justify-content-center">
                                 <div class="col-sm-4">
-                                    <select id="sesion" name="sesion" style="max-width: 360px;" class="form-select"
-                                        required>
+                                    <select id="id_sesion" name="id_sesion" style="max-width: 360px;"
+                                        class="form-select" required>
                                         <option value="">Seleccione una grabacion</option>
                                         {% set categoria = 3 %}
                                         {% set equipo_sel = request.args.get('equipos', '') %}
@@ -387,7 +357,6 @@
                                         {% if (mes_sel == '' or sesion.4 == mes_sel) and
                                         (semana_sel == '' or sesion.3 == semana_sel) and
                                         (sesion.7 == categoria) %}
-                                        {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.5 %}
                                         <option value="{{ sesion.0 }}" {% if fecha_actual==valor %}selected{% endif %}>
                                             {{ sesion.1 }} || {{ sesion.5 }}
                                         </option>
@@ -462,7 +431,7 @@
 <script>
     document.getElementById('flexSwitchCheckDefault').addEventListener('change', function () {
         if (this.checked) {
-            window.location.href = '{{ url_for("participantes.participantes_grabaciones_buscar") }}';
+            window.location.href = '{{ url_for("participantes.participantes_buscar") }}';
             this.checked = false;
         }
     });

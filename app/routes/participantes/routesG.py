@@ -64,12 +64,12 @@ def participantes_grabaciones_buscar():
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
                    WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
-                   AND nombre_categoria = 'Grabación'
+                   AND nombre_categoria = 'Grabaciones'
                    '''
 
     sql_lim = '''SELECT * FROM asistencias_detalladas
                  WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
-                 AND nombre_categoria = 'Grabación'
+                 AND nombre_categoria = 'Grabaciones'
                  ORDER BY nombre_participante DESC
                  LIMIT %s OFFSET %s'''
 

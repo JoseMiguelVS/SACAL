@@ -231,7 +231,7 @@ def participante_nuevoE():
         con.close()
 
         flash('Participante y asistencia registrados correctamente.')
-        return redirect(url_for('participantes.participantes_especializaciones_buscar',
+        return redirect(url_for('participantes.participantes_especializacion_buscar',
                                 mes=request.form.get('mes', ''),
                                 semana=request.form.get('semana', ''),
                                 fecha=request.form.get('fecha', ''),
