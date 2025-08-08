@@ -385,39 +385,39 @@
             {% if page > 1 %}
             <li class="page-item">
                 <a class="page-link bg-warning"
-                    href="{{url_for('participantes.participantes_grabaciones')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                    href="{{url_for('participantes.participantes_grabaciones_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
                     aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
             {% if page != 1 and page != 2 %}
             <li class="page-item"><a class="page-link bg-warning"
-                    href="{{url_for('participantes.participantes_grabaciones')}}">1</a></li>
+                    href="{{url_for('participantes.participantes_grabaciones_buscar')}}">1</a></li>
             {% if page != 3 %}
             <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
             {% endif %}
             {% endif %}
             <li class="page-item"><a class="page-link bg-warning"
-                    href="{{url_for('participantes.participantes_grabaciones')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+                    href="{{url_for('participantes.participantes_grabaciones_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
             </li>
             {% endif %}
 
             <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
 
             {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
-                    href="{{url_for('participantes.participantes_grabaciones')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+                    href="{{url_for('participantes.participantes_grabaciones_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
                 </li>
                 {% if page != total_pages and page != total_pages-1 %}
                 {% if page != total_pages-2 %}
                 <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
                 {% endif %}
                 <li class="page-item"><a class="page-link bg-warning"
-                        href="{{url_for('participantes.participantes_grabaciones')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                        href="{{url_for('participantes.participantes_grabaciones_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
                 </li>
                 {% endif %}
                 <li class="page-item">
                     <a class="page-link bg-warning"
-                        href="{{url_for('participantes.participantes_grabaciones')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                        href="{{url_for('participantes.participantes_grabaciones_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
                         aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>

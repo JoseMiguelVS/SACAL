@@ -87,9 +87,9 @@
                 <a href="{{ url_for('participantes.participantes_especializacion_buscar') }}"
                     class="btn btn-outline-secondary btn-sm">Limpiar</a>
 
-                    <!-- Botón limpiar -->
-                <a href="{{ url_for('participantes.participantes_buscar') }}"
-                    class="botones-guardar btn-sm">En vivos</a>
+                <!-- Botón limpiar -->
+                <a href="{{ url_for('participantes.participantes_buscar') }}" class="botones-guardar btn-sm">En
+                    vivos</a>
 
                 <!-- Switch grabaciones -->
                 <div class="form-check form-switch ml-1">
@@ -318,7 +318,8 @@
                         </div>
 
                         <div class="input-group justify-content-center">
-                            <select id="id_sesion" name="id_sesion" style="max-width: 360px;" class="form-select" required>
+                            <select id="id_sesion" name="id_sesion" style="max-width: 360px;" class="form-select"
+                                required>
                                 <option value="">Seleccione una especializacion</option>
                                 {% set categoria = 1 %}
                                 {% set equipo_sel = request.args.get('equipos', '') %}
@@ -355,21 +356,21 @@
             {% if page > 1 %}
             <li class="page-item">
                 <a class="page-link"
-                    href="{{url_for('participantes.participantes_especializaciones_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                    href="{{url_for('participantes.participantes_especializacion_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
                     aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
             {% if page != 1 and page != 2 %}
             <li class="page-item"><a class="page-link"
-                    href="{{url_for('participantes.participantes_especializaciones_buscar')}}">1</a>
+                    href="{{url_for('participantes.participantes_especializacion_buscar')}}">1</a>
             </li>
             {% if page != 3 %}
             <li class="page-item"><a class="page-link disabled">...</a></li>
             {% endif %}
             {% endif %}
             <li class="page-item"><a class="page-link"
-                    href="{{url_for('participantes.participantes_especializaciones_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+                    href="{{url_for('participantes.participantes_especializacion_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
             </li>
             {% endif %}
 
@@ -379,19 +380,19 @@
 
 
             {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
-                    href="{{url_for('participantes.participantes_especializaciones_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+                    href="{{url_for('participantes.participantes_especializacion_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
                 </li>
                 {% if page != total_pages and page != total_pages-1 %}
                 {% if page != total_pages-2 %}
                 <li class="page-item"><a class="page-link disabled">...</a></li>
                 {% endif %}
                 <li class="page-item"><a class="page-link"
-                        href="{{url_for('participantes.participantes_especializaciones_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                        href="{{url_for('participantes.participantes_especializacion_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
                 </li>
                 {% endif %}
                 <li class="page-item">
                     <a class="page-link"
-                        href="{{url_for('participantes.participantes_especializaciones_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                        href="{{url_for('participantes.participantes_especializacion_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
                         aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>

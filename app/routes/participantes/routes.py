@@ -221,7 +221,7 @@ def participante_nuevo():
                                 mes=request.form.get('mes', ''),
                                 semana=request.form.get('semana', ''),
                                 fecha=request.form.get('fecha', ''),
-                                equipos=request.form.get('equipos', '')))
+                                equipos=equipos))
 
 def to_bool(value):
     return value in [1, '1', True, 'true', 'True']
