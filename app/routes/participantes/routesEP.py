@@ -48,11 +48,25 @@ con.close()
 
 #---------------------------------------------------------------PARTICIPANTES--------------------------------------------------------------------------
     
-@participantes.route("/participantes/especializaciones")
+@participantes.route("/participantes/especializaciones_pasadas")
 @login_required
-def participantes_especializacion_buscar():
+def participantes_especializacionP_buscar():
     search_query = request.args.get('buscar', '', type=str).strip()
     search_query_sql = f"%{search_query}%"
+
+    fecha_inicio_str = request.args.get('fecha_inicio', '', type=str)
+    fecha_fin_str = request.args.get('fecha_fin', '', type=str)
+
+    fecha_inicio = None
+    fecha_fin = None
+
+    try:
+        if fecha_inicio_str:
+            fecha_inicio = datetime.strptime(fecha_inicio_str, "%Y-%m-%d")
+        if fecha_fin_str:
+            fecha_fin = datetime.strptime(fecha_fin_str, "%Y-%m-%d")
+    except ValueError:
+        flash("Fechas inválidas", "warning")
 
     conn = get_db_connection()
     cur = conn.cursor()
@@ -63,27 +77,37 @@ def participantes_especializacion_buscar():
 
     clave_anterior = ultima_clave[0] if ultima_clave else ''
 
-    sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
-                   WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
-                   AND nombre_categoria = 'Especializacion'
-                   '''
+    # Condiciones dinámicas
+    condiciones = ["(v.nombre_participante ILIKE %s OR v.clave_participante ILIKE %s)",
+                   "v.nombre_categoria = 'Especializacion'"]
+    valores = [search_query_sql, search_query_sql]
 
-    sql_lim = '''SELECT v.*, p.fecha_registro
+    if fecha_inicio:
+        condiciones.append("p.fecha_registro >= %s")
+        valores.append(fecha_inicio)
+    if fecha_fin:
+        condiciones.append("p.fecha_registro <= %s")
+        valores.append(fecha_fin)
+
+    where_sql = " AND ".join(condiciones)
+
+    sql_count = f'''SELECT COUNT(*) 
                     FROM asistencias_detalladas v
-                    JOIN participantes p 
-                        ON v.id_participante = p.id_participante
-                    WHERE (v.nombre_participante ILIKE %s 
-                        OR v.clave_participante ILIKE %s)
-                    AND v.nombre_categoria = 'Especializacion'
-                    ORDER BY v.id_participante DESC
-                    LIMIT %s OFFSET %s;
-                '''
+                    JOIN participantes p ON v.id_participante = p.id_participante
+                    WHERE {where_sql}'''
 
-    paginado = paginador3(sql_count, sql_lim, [search_query_sql, search_query_sql], 1, 50)
+    sql_lim = f'''SELECT v.*, p.fecha_registro
+                  FROM asistencias_detalladas v
+                  JOIN participantes p ON v.id_participante = p.id_participante
+                  WHERE {where_sql}
+                  ORDER BY v.id_participante DESC
+                  LIMIT %s OFFSET %s'''
 
-    return render_template('participantes/participantes_especializaciones.html',
+    paginado = paginador3(sql_count, sql_lim, valores, 1, 50)
+
+    return render_template('participantes/participantes_especializaciones_pasadas.html',
                            clave_anterior=clave_anterior,
-                           formas = lista_formaPago(),
+                           formas=lista_formaPago(),
                            equipos=lista_equipos(),
                            cursos=lista_cursos(),
                            sesiones=lista_sesiones(),
@@ -98,13 +122,28 @@ def participantes_especializacion_buscar():
                            total_pages=paginado[4],
                            search_query=search_query)
     
-@participantes.route("/participantes/especializaciones/filtros")
+
+    
+@participantes.route("/participantes/especializaciones_pasadas/filtros")
 @login_required
-def participantes_especializaciones_filtros():
+def participantes_especializacionesP_filtros():
     equipos = request.args.get('equipos', '', type=str)
     mes = request.args.get('mes', '', type=str)
     semana = request.args.get('semana', '', type=str)
     fecha_raw = request.args.get('fecha', '', type=str)
+
+    fecha_inicio_str = request.args.get('fecha_inicio', '', type=str)
+    fecha_fin_str = request.args.get('fecha_fin', '', type=str)
+
+    fecha_inicio = None
+    fecha_fin = None
+    try:
+        if fecha_inicio_str:
+            fecha_inicio = datetime.strptime(fecha_inicio_str, "%Y-%m-%d")
+        if fecha_fin_str:
+            fecha_fin = datetime.strptime(fecha_fin_str, "%Y-%m-%d")
+    except ValueError:
+        flash("Fechas inválidas", "warning")
 
     cursos = ''
     equipo = ''
@@ -118,35 +157,45 @@ def participantes_especializaciones_filtros():
         if len(partesEquipos) == 2:
             equipo = partesEquipos[1]
 
-    sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
-                    WHERE (%s = '' OR meses ILIKE %s)
-                        AND (%s = '' OR nombre_equipo ILIKE %s)
-                        AND (%s = '' OR semanas ILIKE %s)
-                        AND (%s = '' OR cursos ILIKE %s)
-                        AND nombre_categoria = 'Especializacion' ''' 
+    condiciones = [
+        "(%s = '' OR v.meses ILIKE %s)",
+        "(%s = '' OR v.nombre_equipo ILIKE %s)",
+        "(%s = '' OR v.semanas ILIKE %s)",
+        "(%s = '' OR v.cursos ILIKE %s)",
+        "v.nombre_categoria = 'Especializacion'"
+    ]
+    valores = [
+        mes, mes,
+        equipo, equipo,
+        semana, semana,
+        cursos, cursos
+    ]
 
-    sql_lim = '''SELECT * FROM asistencias_detalladas
-                WHERE (%s = '' OR meses ILIKE %s)
-                    AND (%s = '' OR nombre_equipo ILIKE %s)
-                    AND (%s = '' OR semanas ILIKE %s)
-                    AND (%s = '' OR cursos ILIKE %s)
-                    AND nombre_categoria = 'Especializacion'
-                ORDER BY nombre_participante DESC
-                LIMIT %s OFFSET %s'''
+    if fecha_inicio:
+        condiciones.append("p.fecha_registro >= %s")
+        valores.append(fecha_inicio)
+    if fecha_fin:
+        condiciones.append("p.fecha_registro <= %s")
+        valores.append(fecha_fin)
 
-    paginado = paginador3(
-        sql_count, sql_lim,
-        [
-            mes, mes,
-            equipo, equipo,
-            semana, semana,
-            cursos, cursos,
-        ],
-        1, 50   
-    )
+    where_sql = " AND ".join(condiciones)
 
-    return render_template('participantes/participantes_especializaciones.html',
-                           formas =lista_formaPago(),
+    sql_count = f'''SELECT COUNT(*) 
+                    FROM asistencias_detalladas v
+                    JOIN participantes p ON v.id_participante = p.id_participante
+                    WHERE {where_sql}'''
+
+    sql_lim = f'''SELECT v.*, p.fecha_registro
+                  FROM asistencias_detalladas v
+                  JOIN participantes p ON v.id_participante = p.id_participante
+                  WHERE {where_sql}
+                  ORDER BY v.nombre_participante DESC
+                  LIMIT %s OFFSET %s'''
+
+    paginado = paginador3(sql_count, sql_lim, valores, 1, 50)
+
+    return render_template('participantes/participantes_especializaciones_pasadas.html',
+                           formas=lista_formaPago(),
                            equipos=lista_equipos(),
                            meses=lista_meses(),
                            cursos=lista_cursos(),
@@ -160,11 +209,12 @@ def participantes_especializaciones_filtros():
                            total_items=paginado[3],
                            total_pages=paginado[4])
 
+
 #-----------------------------------------------------------------------------------------
 
-@participantes.route("/participantesE/agregar")
+@participantes.route("/participantesEP/agregar")
 @login_required
-def participante_agregarE():
+def participante_agregarEP():
     return render_template('participantes/participantes_agregar.html',
                            formas = lista_formaPago(),
                            cursos = lista_cursos(),
@@ -172,9 +222,9 @@ def participante_agregarE():
                            cuentas = lista_cuentas(),
                            paquetes = lista_paquetes())
 
-@participantes.route('/participantesE/agregar/nuevo', methods=('GET', 'POST'))
+@participantes.route('/participantesEP/agregar/nuevo', methods=('GET', 'POST'))
 @login_required
-def participante_nuevoE():
+def participante_nuevoEP():
 
     if request.method == 'POST':
         nombre_participante = request.form['nombre_participante']
@@ -236,7 +286,7 @@ def participante_nuevoE():
         con.close()
 
         flash('Participante y asistencia registrados correctamente.')
-        return redirect(url_for('participantes.participantes_especializacion_buscar',
+        return redirect(url_for('participantes.participantes_especializacionP_buscar',
                                 mes=request.form.get('mes', ''),
                                 semana=request.form.get('semana', ''),
                                 fecha=request.form.get('fecha', ''),
@@ -245,9 +295,9 @@ def participante_nuevoE():
 def to_bool(value):
     return value in [1, '1', True, 'true', 'True']
 #---------------------------------------------------------------------------------------------------------------
-@participantes.route('/participantesE/actualizar/<int:id>', methods=['POST'])
+@participantes.route('/participantesEP/actualizar/<int:id>', methods=['POST'])
 @login_required
-def actualizar_participanteE(id):
+def actualizar_participanteEP(id):
     datos = request.get_json()
 
     con = get_db_connection()
@@ -333,9 +383,9 @@ def actualizar_participanteE(id):
         cur.close()
         con.close()
 
-@participantes.route('/participantesE/actualizar/sesion/<string:id>', methods=['POST'])
+@participantes.route('/participantesEP/actualizar/sesion/<string:id>', methods=['POST'])
 @login_required
-def participante_actualizarE(id):
+def participante_actualizarEP(id):
     sesion = request.form['sesion']
     grabacion = request.form.get('grabacion')  # None si no existe
 
@@ -359,11 +409,11 @@ def participante_actualizarE(id):
     con.close()
 
     flash("Participante cambiado de sesión")
-    return redirect(url_for('participantes.participantes_especializacion_buscar'))
+    return redirect(url_for('participantes.participantes_especializacionP_buscar'))
 
-@participantes.route('/participantesE/comprobante/<string:id>', methods=['POST'])
+@participantes.route('/participantesEP/comprobante/<string:id>', methods=['POST'])
 @login_required
-def participante_comprobanteE(id):
+def participante_comprobanteEP(id):
     nombre_participante = request.form['nombre_participante'].strip()
     apellidos_participante = request.form['apellidos_participante'].strip()
     clave_participante = request.form['clave_participante'].strip()
@@ -421,4 +471,4 @@ def participante_comprobanteE(id):
     con.close()
 
     flash('Comprobantes subidos correctamente')
-    return redirect(url_for('participantes.participantes_especializacion_buscar'))
+    return redirect(url_for('participantes.participantes_especializacionP_buscar'))

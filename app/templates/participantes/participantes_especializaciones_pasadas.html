@@ -2,7 +2,7 @@
 <main class="w-100 d-flex flex-column" style="margin: -1px; padding: 0;">
 
     <!-- TÍTULO -->
-    <h2 class="text-center mb-4">Participantes en En vivo</h2>
+    <h2 class="text-center mb-4">Participantes en Especializaciones Pasadas</h2>
 
     <!-- -----------------Alertas de registro, editado, borrado y restaurado---------------------------- -->
     {% with messages = get_flashed_messages() %} {% if messages %} {% for
@@ -22,7 +22,7 @@
         </button>
 
         <!-- Buscador por clave a la derecha -->
-        <form id="formBuscar" method="get" action="{{ url_for('participantes.participantes_buscar') }}"
+        <form id="formBuscar" method="get" action="{{ url_for('participantes.participantes_especializacionP_buscar') }}"
             class="d-flex flex-grow-1 justify-content-end">
             <div class="input-group mr-2" style="max-width: 300px;">
                 <input class="form-control mr-2" type="text" name="buscar" value="{{ search_query }}"
@@ -35,60 +35,10 @@
         </form>
     </section>
 
-    <!-- FILTROS CENTRADOS ABAJO -->
     <section class="container mb-4">
-        <!-- Filtros principales (Mes, Semana, Sesión, Equipo) -->
-        <form method="get" action="{{ url_for('participantes.participantes_filtros') }}" class="row g-3 align-items-end"
-            id="filtroForm">
-
-            <!-- Mes -->
-            <div class="col-sm-3">
-                <label for="filtroMes" class="form-label">Mes</label>
-                <select id="filtroMes" name="mes" class="form-select form-select-sm filtro-auto">
-                    <option value="">Todos</option>
-                    {% for mes in meses %}
-                    <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>{{ mes.1 }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <!-- Semana -->
-            <div class="col-sm-3">
-                <label for="filtroSemana" class="form-label">Semana</label>
-                <select id="filtroSemana" name="semana" class="form-select form-select-sm filtro-auto">
-                    <option value="">Todas</option>
-                    {% for semana in semanas %}
-                    <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>{{
-                        semana.1 }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <!-- Sesión -->
-            <div class="col-sm-4">
-                <label for="filtroSesion" class="form-label">Sesión</label>
-                <select id="filtroSesion" name="fecha" style="max-width: 360px;"
-                    class="form-select form-select-sm filtro-auto ">
-                    <option value="">Todas</option>
-                    {% set categoria = 2 %}
-                    {% set equipo_sel = request.args.get('equipos', '') %}
-                    {% set mes_sel = request.args.get('mes', '') %}
-                    {% set semana_sel = request.args.get('semana', '') %}
-                    {% set fecha_actual = request.args.get('fecha', '') %}
-                    {% for sesion in sesiones %}
-                    {% if (mes_sel == '' or sesion.4 == mes_sel) and
-                    (semana_sel == '' or sesion.3 == semana_sel) and 
-                    (sesion.7 == categoria) %}
-                    {% set valor = sesion.0 ~ '/' ~ sesion.1 ~ '/' ~ sesion.5 %}
-                    <option value="{{ valor }}" {% if fecha_actual==valor %}selected{% endif %}>
-                        {{ sesion.0 }} · {{ sesion.1 }} || {{ sesion.5 }}
-                    </option>
-                    {% endif %}
-                    {% endfor %}
-
-                </select>
-            </div>
+        <!-- Filtros principales (Mes, Semana, Sesión, Equipo, Fechas) -->
+        <form method="get" action="{{ url_for('participantes.participantes_especializacionesP_filtros') }}"
+            class="row g-3 align-items-end" id="filtroForm">
 
             <!-- Equipo -->
             <div class="col-sm-2">
@@ -105,28 +55,40 @@
                 </select>
             </div>
 
+            <!-- Fecha inicio -->
+            <div class="col-sm-2">
+                <label for="fecha_inicio" class="form-label">Fecha inicio</label>
+                <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control form-control-sm"
+                    value="{{ request.args.get('fecha_inicio', '') }}">
+            </div>
+
+            <!-- Fecha fin -->
+            <div class="col-sm-2">
+                <label for="fecha_fin" class="form-label">Fecha fin</label>
+                <input type="date" id="fecha_fin" name="fecha_fin" class="form-control form-control-sm filtro-auto"
+                    value="{{ request.args.get('fecha_fin', '') }}">
+            </div>
+
             <!-- Segunda fila: Limpiar + Grabaciones -->
             <div class="col-12 d-flex align-items-center gap-4 mt-2">
-
                 <!-- Botón limpiar -->
-                <a href="{{ url_for('participantes.participantes_buscar') }}"
+                <a href="{{ url_for('participantes.participantes_especializacionP_buscar') }}"
                     class="btn btn-outline-secondary btn-sm">Limpiar</a>
 
-                <!-- Botón limpiar -->
-                <a href="{{ url_for('participantes.participantes_especializacion_buscar') }}"
-                    class="botones-guardar btn-sm">Especializaciones</a>
+                <!-- Botón en vivos -->
+                <a href="{{ url_for('participantes.participantes_buscar') }}" class="botones-guardar btn-sm">En
+                    vivos</a>
 
                 <!-- Switch grabaciones -->
                 <div class="form-check form-switch ml-1">
-                    <input class="form-check-input" name="grabacion" type="checkbox" id="flexSwitchCheckDefault">
+                    <input class="form-check-input" name="grabacion" type="checkbox" id="flexSwitchCheckDefault" {% if
+                        request.args.get('grabacion') %}checked{% endif %}>
                     <label class="form-check-label" for="flexSwitchCheckDefault">Grabaciones</label>
                 </div>
-                
-
             </div>
         </form>
-
     </section>
+
 
     <!-- TABLA DE PARTICIPANTES -->
     <section class="tables_participantes table">
@@ -142,7 +104,7 @@
                         <th>Pago<br>validado</th>
                         <th>Fecha del<br>pago</th>
                         <th>Factura</th>
-                        <th>Forma pago</th>
+                        <th>Especializacion</th>
                         <th>Cuenta<br>Destino</th>
                         <th>Promotor</th>
                         <th>WhatsApp</th>
@@ -197,21 +159,10 @@
                                 %}checked{% endif %}>
                         </td>
 
-                        <td>
-                            <!-- Forma de pago -->
-                            <select name="id_forma" id="id_forma" required onchange="guardarFila(this)">
-                                <option value="" disabled {% if not p.forma_pago %} selected {% endif %}>Seleccione
-                                    la forma de pago</option>
-                                {% if formas %}
-                                {% for forma in formas %}
-                                <option value="{{ forma.0 }}" {% if forma.0|string==p.forma_pago|string %} selected {%
-                                    endif %}>{{ forma.1 }}</option>
-                                {% endfor %}
-                                {% else %}
-                                <option disabled>Aun no hay registros</option>
-                                {% endif %}
-                            </select>
+                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            {{ p.cursos }}
                         </td>
+
                         <td>
                             <select name="cuenta_destino" id="cuenta_destino" onchange="guardarFila(this)">
                                 <option value="" disabled {% if not p.cuenta_destino %}selected{% endif %}>Cuenta
@@ -271,7 +222,7 @@
     <div class="modal fade" id="modalAgregarParticipante" data-bs-backdrop="static" data-bs-keyboard="false"
         tabindex="-1" aria-labelledby="modalAgregarParticipanteLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <form action="{{ url_for('participantes.participante_nuevo') }}" method="post" class="modal-content">
+            <form action="{{ url_for('participantes.participante_nuevoEP') }}" method="post" class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalAgregarParticipanteLabel">Agregar Participante</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -286,19 +237,7 @@
                         {# Extraer partes de la fecha solo si existen #}
                         {% set fecha_raw = request.args.get('fecha', '') %}
                         {% set partesSesiones = fecha_raw.split('/') if fecha_raw else [] %}
-
-                        {% if partesSesiones|length == 3 %}
-                        <input type="hidden" name="id_sesion" id="id_sesion" value="{{ partesSesiones[0] }}" required>
-                        <p><strong>Sesión:</strong> {{ partesSesiones[1] }}, {{ partesSesiones[2] }}</p>
-                        {% endif %}
                         <input type="hidden" name="fecha" value="{{ fecha_raw }}" required>
-
-                        {% set categoria_sesion = '' %}
-                        {% for sesion in sesiones %}
-                        {% if partesSesiones and partesSesiones[0] == sesion[0]|string %}
-                        {% set categoria_sesion = sesion[7] %}
-                        {% endif %}
-                        {% endfor %}
 
                         {% set partes_equipo = request.args.get('equipos', '').split(',') %}
                         {% if partes_equipo | length == 2 %}
@@ -348,21 +287,42 @@
                             </div>
                         </div>
 
-                        <select name="paquete" id="paquete" class="form-select" required>
-                            <option value="" selected disabled>Selecciona un paquete</option>
-                            {% set espe = '2' %}
-                            {% if paquetes %}
-                            {% for paquete in paquetes %}
-                            {% if paquete[4] and paquete[3] == espe %}
-                            <option value="{{ paquete[0] }},{{ paquete[2] }}">
-                                {{ paquete[1] }} — ${{ paquete[2] }}
-                            </option>
-                            {% endif %}
-                            {% endfor %}
-                            {% else %}
-                            <option disabled>No hay paquetes disponibles</option>
-                            {% endif %}
-                        </select>
+                        <div class="input-group justify-content-center">
+                            <select name="paquete" id="paquete" class="form-select" required style="max-width: 360px;">
+                                <option value="" selected disabled>Selecciona un paquete</option>
+                                {% if paquetes %}
+                                {% set espe = 1 %}
+                                {% for paquete in paquetes %}
+                                {% if paquete[4] and (paquete[3] == espe) %}
+                                <option value="{{ paquete[0] }},{{ paquete[2] }}">
+                                    {{ paquete[1] }} — ${{ paquete[2] }}
+                                </option>
+                                {% endif %}
+                                {% endfor %}
+                                {% else %}
+                                <option disabled>No hay paquetes disponibles</option>
+                                {% endif %}
+                            </select>
+                        </div>
+
+                        <div class="input-group justify-content-center">
+                            <select id="id_sesion" name="id_sesion" style="max-width: 360px;" class="form-select"
+                                required>
+                                <option value="">Seleccione una especialización</option>
+                                {% set categoria = 1 %}
+                                {% set fecha_actual = request.args.get('fecha', '') %}
+                                {% for sesion in sesiones %}
+                                {% if sesion.7 == categoria %}
+                                <option value="{{ sesion.0 }}" {% if fecha_actual==sesion.0|string %}selected{% endif
+                                    %}>
+                                    {{ sesion.1 }} || {{ sesion.5 }}
+                                </option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+
+
+                        </div>
 
                     </div>
                 </div>
@@ -381,20 +341,21 @@
             {% if page > 1 %}
             <li class="page-item">
                 <a class="page-link"
-                    href="{{url_for('participantes.participantes_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                    href="{{url_for('participantes.participantes_especializacionP_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
                     aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
             {% if page != 1 and page != 2 %}
-            <li class="page-item"><a class="page-link" href="{{url_for('participantes.participantes_buscar')}}">1</a>
+            <li class="page-item"><a class="page-link"
+                    href="{{url_for('participantes.participantes_especializacionP_buscar')}}">1</a>
             </li>
             {% if page != 3 %}
             <li class="page-item"><a class="page-link disabled">...</a></li>
             {% endif %}
             {% endif %}
             <li class="page-item"><a class="page-link"
-                    href="{{url_for('participantes.participantes_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+                    href="{{url_for('participantes.participantes_especializacionP_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
             </li>
             {% endif %}
 
@@ -403,20 +364,20 @@
             </li>
 
 
-            {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
-                    href="{{url_for('participantes.participantes_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+            {% if page < total_pages %} <li class="page-item"><a class="page-link"
+                    href="{{url_for('participantes.participantes_especializacionP_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
                 </li>
                 {% if page != total_pages and page != total_pages-1 %}
                 {% if page != total_pages-2 %}
                 <li class="page-item"><a class="page-link disabled">...</a></li>
                 {% endif %}
                 <li class="page-item"><a class="page-link"
-                        href="{{url_for('participantes.participantes_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                        href="{{url_for('participantes.participantes_especializacionP_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
                 </li>
                 {% endif %}
                 <li class="page-item">
                     <a class="page-link"
-                        href="{{url_for('participantes.participantes_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                        href="{{url_for('participantes.participantes_especializacionP_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
                         aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
@@ -429,10 +390,12 @@
     <div class="modal fade" id="modalEditar-{{ p.id_participante }}" data-bs-backdrop="static" data-bs-keyboard="false"
         tabindex="-1" aria-labelledby="modalEditarLabel-{{ p.id_participante }}" aria-hidden="true">
         <div class="modal-dialog">
-            <form method="post" action="{{ url_for('participantes.participante_actualizar', id = p.id_participante) }}"
+            <form method="post"
+                action="{{ url_for('participantes.participante_actualizarEP', id = p.id_participante) }}"
                 class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="idEditarLabel-{{ p.id_participante }}">Editar Participante</h5>
+                    <h5 class="modal-title" id="idEditarLabel-{{ p.id_participante }}">Editar Sesion de Participante
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
@@ -441,14 +404,14 @@
                         <div class="mb-2">
                             <select name="sesion" id="sesion-{{ p.id_participante }}" class="form-select" required>
                                 <option value="" disabled>Sesion</option>
-                                {% set mes_sel = request.args.get('mes', '') %}
-                                {% set semana_sel = request.args.get('semana', '') %}
-                                {% if sesiones %} {% for sesion in sesiones %}
-                                {% if mes_sel == sesion.4 and semana_sel == sesion.3 %}
+                                {% set categoria = 1 %}
+                                {% if sesiones %}
+                                {% for sesion in sesiones %} {% if sesion.7 == categoria %}
                                 <option value="{{ sesion.0 }} " {% if sesion.5==p.cursos %} selected {% endif %}>
                                     {{ sesion.5 }}
                                 </option>
-                                {% endif %} {% endfor %} {% else %}
+                                {% endif %}
+                                {% endfor %} {% else %}
                                 <option disabled>Aun no hay registros</option>
                                 {% endif %}
                             </select>
@@ -476,7 +439,7 @@
         data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalComprobanteLabel-{{ p.id_participante }}"
         aria-hidden="true">
         <div class="modal-dialog">
-            <form method="post" action="{{ url_for('participantes.participante_comprobante', id=p.id_participante) }}"
+            <form method="post" action="{{ url_for('participantes.participante_comprobanteEP', id=p.id_participante) }}"
                 class="modal-content" enctype="multipart/form-data">
                 <div class="modal-header">
                     <h5 class="modal-title" id="idEditarLabel-{{ p.id_participante }}">Registrar Comprobante de
@@ -633,7 +596,7 @@
             }
         });
 
-        fetch(`/participantes/actualizar/${id}`, {
+        fetch(`/participantesEP/actualizar/${id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -686,9 +649,9 @@
 
             // Cambiar la ruta de acción según haya filtros
             if (hayFiltros) {
-                formBuscar.action = "{{ url_for('participantes.participantes_filtros') }}";
+                formBuscar.action = "{{ url_for('participantes.participantes_especializacionesP_filtros') }}";
             } else {
-                formBuscar.action = "{{ url_for('participantes.participantes_buscar') }}";
+                formBuscar.action = "{{ url_for('participantes.participantes_especializacionP_buscar') }}";
             }
         });
     });

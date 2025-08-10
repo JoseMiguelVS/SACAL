@@ -35,33 +35,9 @@
 
     <!-- FILTROS CENTRADOS ABAJO -->
     <section class="container mb-4">
-        <!-- Filtros principales (Mes, Semana, Sesión, Equipo) -->
+        <!-- Filtros principales (Mes, Semana, Sesión, Equipo, Fechas) -->
         <form method="get" action="{{ url_for('participantes.participantes_grabaciones_filtros') }}"
             class="row g-3 align-items-end" id="filtroForm">
-
-            <!-- Mes -->
-            <div class="col-sm-3">
-                <label for="filtroMes" class="form-label">Mes</label>
-                <select id="filtroMes" name="mes" class="form-select form-select-sm filtro-auto">
-                    <option value="">Todos</option>
-                    {% for mes in meses %}
-                    <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>{{ mes.1 }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <!-- Semana -->
-            <div class="col-sm-3">
-                <label for="filtroSemana" class="form-label">Semana</label>
-                <select id="filtroSemana" name="semana" class="form-select form-select-sm filtro-auto">
-                    <option value="">Todas</option>
-                    {% for semana in semanas %}
-                    <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>{{
-                        semana.1 }}</option>
-                    {% endfor %}
-                </select>
-            </div>
 
             <!-- Equipo -->
             <div class="col-sm-2">
@@ -78,27 +54,40 @@
                 </select>
             </div>
 
+            <!-- Fecha inicio -->
+            <div class="col-sm-2">
+                <label for="fecha_inicio" class="form-label">Fecha inicio</label>
+                <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control form-control-sm"
+                    value="{{ request.args.get('fecha_inicio', '') }}">
+            </div>
+
+            <!-- Fecha fin -->
+            <div class="col-sm-2">
+                <label for="fecha_fin" class="form-label">Fecha fin</label>
+                <input type="date" id="fecha_fin" name="fecha_fin" class="form-control form-control-sm filtro-auto"
+                    value="{{ request.args.get('fecha_fin', '') }}">
+            </div>
+
             <!-- Segunda fila: Limpiar + Grabaciones -->
             <div class="col-12 d-flex align-items-center gap-4 mt-2">
-
                 <!-- Botón limpiar -->
                 <a href="{{ url_for('participantes.participantes_grabaciones_buscar') }}"
                     class="btn btn-outline-secondary btn-sm">Limpiar</a>
 
-                <!-- Botón limpiar -->
+                <!-- Botón especializaciones -->
                 <a href="{{ url_for('participantes.participantes_especializacion_buscar') }}"
                     class="botones-guardar btn-sm">Especializaciones</a>
 
                 <!-- Switch grabaciones -->
                 <div class="form-check form-switch ml-1">
-                    <input class="form-check-input" name="grabacion" type="checkbox" id="flexSwitchCheckDefault">
+                    <input class="form-check-input" name="grabacion" type="checkbox" id="flexSwitchCheckDefault" {% if
+                        request.args.get('grabacion') %}checked{% endif %}>
                     <label class="form-check-label" for="flexSwitchCheckDefault">En vivos</label>
                 </div>
-
             </div>
         </form>
-
     </section>
+
 
     <!-- TABLA DE PARTICIPANTES -->
     <section class="tables_participantes table">

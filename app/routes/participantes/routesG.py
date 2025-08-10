@@ -53,6 +53,19 @@ def participantes_grabaciones_buscar():
     search_query = request.args.get('buscar', '', type=str).strip()
     search_query_sql = f"%{search_query}%"
 
+    fecha_inicio_str = request.args.get('fecha_inicio', '', type=str)
+    fecha_fin_str = request.args.get('fecha_fin', '', type=str)
+
+    fecha_inicio = None
+    fecha_fin = None
+    try:
+        if fecha_inicio_str:
+            fecha_inicio = datetime.strptime(fecha_inicio_str, "%Y-%m-%d")
+        if fecha_fin_str:
+            fecha_fin = datetime.strptime(fecha_fin_str, "%Y-%m-%d")
+    except ValueError:
+        flash("Fechas inválidas", "warning")
+
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("SELECT clave_participante FROM participantes ORDER BY id_participante DESC LIMIT 1")
@@ -62,22 +75,43 @@ def participantes_grabaciones_buscar():
 
     clave_anterior = ultima_clave[0] if ultima_clave else ''
 
-    sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
-                   WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
-                   AND nombre_categoria = 'Grabaciones'
-                   '''
+    # Condiciones dinámicas
+    condiciones = [
+        "(v.nombre_participante ILIKE %s OR v.clave_participante ILIKE %s)",
+        "v.nombre_categoria = 'Grabaciones'"
+    ]
+    valores = [search_query_sql, search_query_sql]
 
-    sql_lim = '''SELECT * FROM asistencias_detalladas
-                 WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
-                 AND nombre_categoria = 'Grabaciones'
-                 ORDER BY nombre_participante DESC
-                 LIMIT %s OFFSET %s'''
+    if fecha_inicio:
+        condiciones.append("p.fecha_registro >= %s")
+        valores.append(fecha_inicio)
+    if fecha_fin:
+        condiciones.append("p.fecha_registro <= %s")
+        valores.append(fecha_fin)
 
-    paginado = paginador3(sql_count, sql_lim, [search_query_sql, search_query_sql], 1, 50)
+    where_sql = " AND ".join(condiciones)
+
+    sql_count = f'''
+        SELECT COUNT(*) 
+        FROM asistencias_detalladas v
+        JOIN participantes p ON v.id_participante = p.id_participante
+        WHERE {where_sql}
+    '''
+
+    sql_lim = f'''
+        SELECT v.*, p.fecha_registro
+        FROM asistencias_detalladas v
+        JOIN participantes p ON v.id_participante = p.id_participante
+        WHERE {where_sql}
+        ORDER BY v.nombre_participante DESC
+        LIMIT %s OFFSET %s
+    '''
+
+    paginado = paginador3(sql_count, sql_lim, valores, 1, 50)
 
     return render_template('participantes/participantes_grabaciones.html',
                            clave_anterior=clave_anterior,
-                           formas = lista_formaPago(),
+                           formas=lista_formaPago(),
                            equipos=lista_equipos(),
                            cursos=lista_cursos(),
                            sesiones=lista_sesiones(),
@@ -100,6 +134,19 @@ def participantes_grabaciones_filtros():
     semana = request.args.get('semana', '', type=str)
     fecha_raw = request.args.get('fecha', '', type=str)
 
+    fecha_inicio_str = request.args.get('fecha_inicio', '', type=str)
+    fecha_fin_str = request.args.get('fecha_fin', '', type=str)
+
+    fecha_inicio = None
+    fecha_fin = None
+    try:
+        if fecha_inicio_str:
+            fecha_inicio = datetime.strptime(fecha_inicio_str, "%Y-%m-%d")
+        if fecha_fin_str:
+            fecha_fin = datetime.strptime(fecha_fin_str, "%Y-%m-%d")
+    except ValueError:
+        flash("Fechas inválidas", "warning")
+
     cursos = ''
     equipo = ''
     if fecha_raw:
@@ -112,35 +159,49 @@ def participantes_grabaciones_filtros():
         if len(partesEquipos) == 2:
             equipo = partesEquipos[1]
 
-    sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas
-                    WHERE (%s = '' OR meses ILIKE %s)
-                        AND (%s = '' OR nombre_equipo ILIKE %s)
-                        AND (%s = '' OR semanas ILIKE %s)
-                        AND (%s = '' OR cursos ILIKE %s)
-                        AND nombre_categoria = 'Grabaciones' ''' 
+    condiciones = [
+        "(%s = '' OR v.meses ILIKE %s)",
+        "(%s = '' OR v.nombre_equipo ILIKE %s)",
+        "(%s = '' OR v.semanas ILIKE %s)",
+        "(%s = '' OR v.cursos ILIKE %s)",
+        "v.nombre_categoria = 'Grabaciones'"
+    ]
+    valores = [
+        mes, mes,
+        equipo, equipo,
+        semana, semana,
+        cursos, cursos
+    ]
 
-    sql_lim = '''SELECT * FROM asistencias_detalladas
-                WHERE (%s = '' OR meses ILIKE %s)
-                    AND (%s = '' OR nombre_equipo ILIKE %s)
-                    AND (%s = '' OR semanas ILIKE %s)
-                    AND (%s = '' OR cursos ILIKE %s)
-                    AND nombre_categoria = 'Grabaciones'
-                ORDER BY nombre_participante DESC
-                LIMIT %s OFFSET %s'''
+    if fecha_inicio:
+        condiciones.append("p.fecha_registro >= %s")
+        valores.append(fecha_inicio)
+    if fecha_fin:
+        condiciones.append("p.fecha_registro <= %s")
+        valores.append(fecha_fin)
 
-    paginado = paginador3(
-        sql_count, sql_lim,
-        [
-            mes, mes,
-            equipo, equipo,
-            semana, semana,
-            cursos, cursos,
-        ],
-        1, 50   
-    )
+    where_sql = " AND ".join(condiciones)
+
+    sql_count = f'''
+        SELECT COUNT(*) 
+        FROM asistencias_detalladas v
+        JOIN participantes p ON v.id_participante = p.id_participante
+        WHERE {where_sql}
+    '''
+
+    sql_lim = f'''
+        SELECT v.*, p.fecha_registro
+        FROM asistencias_detalladas v
+        JOIN participantes p ON v.id_participante = p.id_participante
+        WHERE {where_sql}
+        ORDER BY v.nombre_participante DESC
+        LIMIT %s OFFSET %s
+    '''
+
+    paginado = paginador3(sql_count, sql_lim, valores, 1, 50)
 
     return render_template('participantes/participantes_grabaciones.html',
-                           formas =lista_formaPago(),
+                           formas=lista_formaPago(),
                            equipos=lista_equipos(),
                            meses=lista_meses(),
                            cursos=lista_cursos(),
@@ -153,6 +214,7 @@ def participantes_grabaciones_filtros():
                            per_page=paginado[2],
                            total_items=paginado[3],
                            total_pages=paginado[4])
+
 
 #-----------------------------------------------------------------------------------------
 

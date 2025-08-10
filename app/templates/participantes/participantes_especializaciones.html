@@ -94,7 +94,7 @@
                 <!-- Switch grabaciones -->
                 <div class="form-check form-switch ml-1">
                     <input class="form-check-input" name="grabacion" type="checkbox" id="flexSwitchCheckDefault">
-                    <label class="form-check-label" for="flexSwitchCheckDefault">Grabaciones</label>
+                    <label class="form-check-label" for="flexSwitchCheckDefault">Pasadas</label>
                 </div>
 
             </div>
@@ -408,7 +408,8 @@
             <form method="post" action="{{ url_for('participantes.participante_actualizarE', id = p.id_participante) }}"
                 class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="idEditarLabel-{{ p.id_participante }}">Editar Participante</h5>
+                    <h5 class="modal-title" id="idEditarLabel-{{ p.id_participante }}">Editar Sesion de Participante
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
@@ -417,14 +418,14 @@
                         <div class="mb-2">
                             <select name="sesion" id="sesion-{{ p.id_participante }}" class="form-select" required>
                                 <option value="" disabled>Sesion</option>
-                                {% set mes_sel = request.args.get('mes', '') %}
-                                {% set semana_sel = request.args.get('semana', '') %}
-                                {% if sesiones %} {% for sesion in sesiones %}
-                                {% if mes_sel == sesion.4 and semana_sel == sesion.3 %}
+                                {% set categoria = 1 %}
+                                {% if sesiones %}
+                                {% for sesion in sesiones %} {% if sesion.7 == categoria %}
                                 <option value="{{ sesion.0 }} " {% if sesion.5==p.cursos %} selected {% endif %}>
                                     {{ sesion.5 }}
                                 </option>
-                                {% endif %} {% endfor %} {% else %}
+                                {% endif %}
+                                {% endfor %} {% else %}
                                 <option disabled>Aun no hay registros</option>
                                 {% endif %}
                             </select>
@@ -549,7 +550,7 @@
 <script>
     document.getElementById('flexSwitchCheckDefault').addEventListener('change', function () {
         if (this.checked) {
-            window.location.href = '{{ url_for("participantes.participantes_grabaciones_buscar") }}';
+            window.location.href = '{{ url_for("participantes.participantes_especializacionP_buscar") }}';
             this.checked = true;
         }
     });
