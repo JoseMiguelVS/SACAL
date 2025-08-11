@@ -14,6 +14,17 @@
     </div>
     {% endfor %} {% endif %} {% endwith %}
 
+    <section class="container mb-4 d-flex justify-content-center gap-3">
+        <!-- Botón en vivos -->
+        <a href="{{ url_for('participantes.participantes_buscar') }}" class="botones-guardar btn-sm">En vivos</a>
+
+        <a href="{{ url_for('participantes.participantes_grabaciones_buscar') }}"
+            class="botones-guardar btn-sm">Grabaciones</a>
+
+        <a href="{{ url_for('participantes.participantes_especializacionP_buscar') }}"
+            class="botones-guardar btn-sm">Especializacion Pasadas</a>
+    </section>
+
     <!-- NUEVO + BUSCADOR -->
     <section class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
         <!-- Botón "Nuevo" alineado a la izquierda -->
@@ -86,17 +97,6 @@
                 <!-- Botón limpiar -->
                 <a href="{{ url_for('participantes.participantes_especializacion_buscar') }}"
                     class="btn btn-outline-secondary btn-sm">Limpiar</a>
-
-                <!-- Botón limpiar -->
-                <a href="{{ url_for('participantes.participantes_buscar') }}" class="botones-guardar btn-sm">En
-                    vivos</a>
-
-                <!-- Switch grabaciones -->
-                <div class="form-check form-switch ml-1">
-                    <input class="form-check-input" name="grabacion" type="checkbox" id="flexSwitchCheckDefault">
-                    <label class="form-check-label" for="flexSwitchCheckDefault">Pasadas</label>
-                </div>
-
             </div>
         </form>
 
