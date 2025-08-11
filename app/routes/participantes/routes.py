@@ -26,7 +26,7 @@ con = get_db_connection()
 cur = con.cursor()
 cur.execute('''
             SELECT id_sesion, fecha_curso, categoria
-	        FROM public.detalles_sesiones;
+	        FROM detalles_sesiones;
             ''')
 sesiones = cur.fetchall()
 

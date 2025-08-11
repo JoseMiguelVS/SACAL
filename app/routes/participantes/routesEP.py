@@ -23,25 +23,28 @@ supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 con = get_db_connection()
 cur = con.cursor()
+
 cur.execute('''
-            SELECT id_sesion, fecha_curso, categoria
-	        FROM public.detalles_sesiones;
-            ''')
+    SELECT id_sesion, fecha_curso, categoria
+    FROM public.detalles_sesiones;
+''')
 sesiones = cur.fetchall()
 
 hoy = date.today()
-ids_para_actualizar =[
+
+# Filtrar solo los que tienen categoria 1 y fecha pasada
+ids_para_actualizar = [
     s[0] for s in sesiones
-    if s[2] == 2 and s[1] < hoy
+    if s[2] == 1 and s[1] < hoy
 ]
 
 if ids_para_actualizar:
     cur.execute('''
-        UPDATE detalles_sesiones
-        SET categoria = 3
-        WHERE id_sesion = ANY(%s);
-    ''', (ids_para_actualizar,))
-    
+                    UPDATE public.sesiones_curso
+                    SET categoria = 6
+                    WHERE id_sesion = ANY(%s);
+                ''', (ids_para_actualizar,))
+
 con.commit()
 cur.close()
 con.close()
@@ -59,7 +62,6 @@ def participantes_especializacionP_buscar():
 
     fecha_inicio = None
     fecha_fin = None
-
     try:
         if fecha_inicio_str:
             fecha_inicio = datetime.strptime(fecha_inicio_str, "%Y-%m-%d")
@@ -77,9 +79,11 @@ def participantes_especializacionP_buscar():
 
     clave_anterior = ultima_clave[0] if ultima_clave else ''
 
-    # Condiciones dinámicas
-    condiciones = ["(v.nombre_participante ILIKE %s OR v.clave_participante ILIKE %s)",
-                   "v.nombre_categoria = 'Especializacion'"]
+    # Construcción dinámica del WHERE
+    condiciones = [
+        "(v.nombre_participante ILIKE %s OR v.clave_participante ILIKE %s)",
+        "v.nombre_categoria = 'Esp. Pasadas'"
+    ]
     valores = [search_query_sql, search_query_sql]
 
     if fecha_inicio:
@@ -91,45 +95,47 @@ def participantes_especializacionP_buscar():
 
     where_sql = " AND ".join(condiciones)
 
-    sql_count = f'''SELECT COUNT(*) 
-                    FROM asistencias_detalladas v
-                    JOIN participantes p ON v.id_participante = p.id_participante
-                    WHERE {where_sql}'''
+    sql_count = f"""
+        SELECT COUNT(*) 
+        FROM asistencias_detalladas v
+        JOIN participantes p ON v.id_participante = p.id_participante
+        WHERE {where_sql}
+    """
 
-    sql_lim = f'''SELECT v.*, p.fecha_registro
-                  FROM asistencias_detalladas v
-                  JOIN participantes p ON v.id_participante = p.id_participante
-                  WHERE {where_sql}
-                  ORDER BY v.id_participante DESC
-                  LIMIT %s OFFSET %s'''
+    sql_lim = f"""
+        SELECT v.*, p.fecha_registro
+        FROM asistencias_detalladas v
+        JOIN participantes p ON v.id_participante = p.id_participante
+        WHERE {where_sql}
+        ORDER BY v.id_participante DESC
+        LIMIT %s OFFSET %s
+    """
 
-    paginado = paginador3(sql_count, sql_lim, valores, 1, 50)
+    paginado = paginador3(sql_count, sql_lim, tuple(valores), 1, 50)
 
-    return render_template('participantes/participantes_especializaciones_pasadas.html',
-                           clave_anterior=clave_anterior,
-                           formas=lista_formaPago(),
-                           equipos=lista_equipos(),
-                           cursos=lista_cursos(),
-                           sesiones=lista_sesiones(),
-                           paquetes=lista_paquetes(),
-                           cuentas=lista_cuentas(),
-                           meses=lista_meses(),
-                           semanas=lista_semanas(),
-                           participantes=paginado[0],
-                           page=paginado[1],
-                           per_page=paginado[2],
-                           total_items=paginado[3],
-                           total_pages=paginado[4],
-                           search_query=search_query)
-    
-
+    return render_template(
+        'participantes/participantes_especializaciones_pasadas.html',
+        clave_anterior=clave_anterior,
+        formas=lista_formaPago(),
+        equipos=lista_equipos(),
+        cursos=lista_cursos(),
+        sesiones=lista_sesiones(),
+        paquetes=lista_paquetes(),
+        cuentas=lista_cuentas(),
+        meses=lista_meses(),
+        semanas=lista_semanas(),
+        participantes=paginado[0],
+        page=paginado[1],
+        per_page=paginado[2],
+        total_items=paginado[3],
+        total_pages=paginado[4],
+        search_query=search_query
+    )
     
 @participantes.route("/participantes/especializaciones_pasadas/filtros")
 @login_required
 def participantes_especializacionesP_filtros():
     equipos = request.args.get('equipos', '', type=str)
-    mes = request.args.get('mes', '', type=str)
-    semana = request.args.get('semana', '', type=str)
     fecha_raw = request.args.get('fecha', '', type=str)
 
     fecha_inicio_str = request.args.get('fecha_inicio', '', type=str)
@@ -157,19 +163,13 @@ def participantes_especializacionesP_filtros():
         if len(partesEquipos) == 2:
             equipo = partesEquipos[1]
 
+    # Construcción dinámica
     condiciones = [
-        "(%s = '' OR v.meses ILIKE %s)",
         "(%s = '' OR v.nombre_equipo ILIKE %s)",
-        "(%s = '' OR v.semanas ILIKE %s)",
-        "(%s = '' OR v.cursos ILIKE %s)",
-        "v.nombre_categoria = 'Especializacion'"
+        "(%s = '' OR v.nombre_curso ILIKE %s)",
+        "v.nombre_categoria = 'Esp. Pasadas'"
     ]
-    valores = [
-        mes, mes,
-        equipo, equipo,
-        semana, semana,
-        cursos, cursos
-    ]
+    valores = [equipo, equipo, cursos, cursos]
 
     if fecha_inicio:
         condiciones.append("p.fecha_registro >= %s")
@@ -180,35 +180,40 @@ def participantes_especializacionesP_filtros():
 
     where_sql = " AND ".join(condiciones)
 
-    sql_count = f'''SELECT COUNT(*) 
-                    FROM asistencias_detalladas v
-                    JOIN participantes p ON v.id_participante = p.id_participante
-                    WHERE {where_sql}'''
+    sql_count = f"""
+        SELECT COUNT(*) 
+        FROM asistencias_detalladas v
+        JOIN participantes p ON v.id_participante = p.id_participante
+        WHERE {where_sql}
+    """
 
-    sql_lim = f'''SELECT v.*, p.fecha_registro
-                  FROM asistencias_detalladas v
-                  JOIN participantes p ON v.id_participante = p.id_participante
-                  WHERE {where_sql}
-                  ORDER BY v.nombre_participante DESC
-                  LIMIT %s OFFSET %s'''
+    sql_lim = f"""
+        SELECT v.*, p.fecha_registro
+        FROM asistencias_detalladas v
+        JOIN participantes p ON v.id_participante = p.id_participante
+        WHERE {where_sql}
+        ORDER BY v.nombre_participante DESC
+        LIMIT %s OFFSET %s
+    """
 
-    paginado = paginador3(sql_count, sql_lim, valores, 1, 50)
+    paginado = paginador3(sql_count, sql_lim, tuple(valores), 1, 50)
 
-    return render_template('participantes/participantes_especializaciones_pasadas.html',
-                           formas=lista_formaPago(),
-                           equipos=lista_equipos(),
-                           meses=lista_meses(),
-                           cursos=lista_cursos(),
-                           semanas=lista_semanas(),
-                           sesiones=lista_sesiones(),
-                           paquetes=lista_paquetes(),
-                           cuentas=lista_cuentas(),
-                           participantes=paginado[0],
-                           page=paginado[1],
-                           per_page=paginado[2],
-                           total_items=paginado[3],
-                           total_pages=paginado[4])
-
+    return render_template(
+        'participantes/participantes_especializaciones_pasadas.html',
+        formas=lista_formaPago(),
+        equipos=lista_equipos(),
+        meses=lista_meses(),
+        cursos=lista_cursos(),
+        semanas=lista_semanas(),
+        sesiones=lista_sesiones(),
+        paquetes=lista_paquetes(),
+        cuentas=lista_cuentas(),
+        participantes=paginado[0],
+        page=paginado[1],
+        per_page=paginado[2],
+        total_items=paginado[3],
+        total_pages=paginado[4]
+    )
 
 #-----------------------------------------------------------------------------------------
 

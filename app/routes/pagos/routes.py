@@ -130,11 +130,12 @@ def pagos_actualizar(id):
     if request.method == 'POST':
         clave_rastreo = request.form['clave_rastreo']
         validacion_pago = request.form['validacion_pago']
+        ingresos = request.form['ingreso_real']
 
         con = get_db_connection()
         cur = con.cursor()
-        sql = 'UPDATE pagos SET clave_rastreo = %s, validacion_pago = %s WHERE participante = %s'
-        valores = (clave_rastreo, validacion_pago, id)
+        sql = 'UPDATE pagos SET clave_rastreo = %s, validacion_pago = %s, ingresos = %s WHERE participante = %s'
+        valores = (clave_rastreo, validacion_pago, ingresos, id)
         cur.execute(sql, valores)
         con.commit()
         cur.close()
