@@ -309,19 +309,19 @@
                             <select id="id_sesion" name="id_sesion" style="max-width: 360px;" class="form-select"
                                 required>
                                 <option value="">Seleccione una especialización</option>
-                                {% set categoria = 1 %}
-                                {% set fecha_actual = request.args.get('fecha', '') %}
+                                {% if sesiones %}
+                                {% set categoria = 6 %}
                                 {% for sesion in sesiones %}
-                                {% if sesion.7 == categoria %}
-                                <option value="{{ sesion.0 }}" {% if fecha_actual==sesion.0|string %}selected{% endif
-                                    %}>
-                                    {{ sesion.1 }} || {{ sesion.5 }}
+                                {% if (sesion[7] == categoria) %}
+                                <option value="{{ sesion[0] }}">
+                                    {{ sesion[1] }} || {{ sesion[5] }}
                                 </option>
                                 {% endif %}
                                 {% endfor %}
+                                {% else %}
+                                <option value="">Sin registroa</option>
+                                {% endif %}
                             </select>
-
-
                         </div>
 
                     </div>
