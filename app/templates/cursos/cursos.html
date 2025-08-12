@@ -288,6 +288,15 @@
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                                         <div class="mb-2">
+                                                <input type="text" value="Empresarial: {{ ultima_empresarial }}"
+                                                        class="form-control" readonly>
+                                                <input type="text" value="Publico General: {{ ultima_publico }}"
+                                                        class="form-control" readonly>
+                                                <input type="text" value="Psicologia: {{ ultima_psicologia }}"
+                                                        class="form-control" readonly>
+                                        </div>
+
+                                        <div class="mb-2">
                                                 <div class="input-group">
                                                         <input type="text" name="codigo_curso" class="input-field"
                                                                 id="codigo_curso" placeholder="" required />

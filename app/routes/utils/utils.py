@@ -68,7 +68,7 @@ def get_db_connection():
     except psycopg2.Error as error:
         print(f"Error de conexión: {error}")
         return None
-    
+
 # DATABASE_URL = "postgresql://sacal_user:fkCuAuxYUAyzAg8OPB0HcDxyMFJI35qm@dpg-d1t6h049c44c73d6jmj0-a.oregon-postgres.render.com/sacal"
 # def get_db_connection():
 #     conn = psycopg2.connect(DATABASE_URL)

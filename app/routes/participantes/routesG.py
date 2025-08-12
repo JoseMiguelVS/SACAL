@@ -215,7 +215,6 @@ def participantes_grabaciones_filtros():
                            total_items=paginado[3],
                            total_pages=paginado[4])
 
-
 #-----------------------------------------------------------------------------------------
 
 @participantes.route("/participantesG/agregar")
@@ -296,7 +295,7 @@ def participante_nuevoG():
                                 mes=request.form.get('mes', ''),
                                 semana=request.form.get('semana', ''),
                                 fecha=request.form.get('fecha', ''),
-                                equipos=equipos))
+                                equipos=request.form.get('equipos_filtro', '')))
 
 def to_bool(value):
     return value in [1, '1', True, 'true', 'True']

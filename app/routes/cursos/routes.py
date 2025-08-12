@@ -17,8 +17,25 @@ def cursos_buscar():
     search_query = request.args.get('buscar', '', type=str)
     sql_count = 'SELECT COUNT(*) FROM detalles_curso WHERE estado = true AND (nombre_curso ILIKE %s OR codigo_curso ILIKE %s);'
     sql_lim = 'SELECT * FROM detalles_curso WHERE estado = true AND (nombre_curso ILIKE %s OR codigo_curso ILIKE %s) ORDER BY id_curso DESC LIMIT %s OFFSET %s;'
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT codigo_curso FROM detalles_curso WHERE nombre_tipo = 'Psicologia ' ORDER BY id_curso DESC LIMIT 1")
+    ultima_psicologia  = cur.fetchone()
+    
+    cur.execute("SELECT codigo_curso FROM detalles_curso WHERE nombre_tipo = 'Publico en general' ORDER BY id_curso DESC LIMIT 1")
+    ultima_publico  = cur.fetchone()
+    
+    cur.execute("SELECT codigo_curso FROM detalles_curso WHERE nombre_tipo = 'Empresarial' ORDER BY id_curso DESC LIMIT 1")
+    ultima_empresarial  = cur.fetchone()
+    cur.close()
+    conn.close()
+    
     paginado = paginador1(sql_count,sql_lim, search_query, 1, 5)
     return render_template('cursos/cursos.html',
+                           ultima_empresarial = ultima_empresarial,
+                           ultima_psicologia = ultima_psicologia,   
+                           ultima_publico = ultima_publico,
                            temas = lista_temas(),
                            categorias = lista_categorias(),
                            cursos=paginado[0],

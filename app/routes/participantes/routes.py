@@ -141,6 +141,21 @@ def participantes_filtros():
         1, 50   
     )
     
+    return render_template('participantes/participantes.html',
+                           formas = lista_formaPago(),
+                           equipos=lista_equipos(),
+                           cursos=lista_cursos(),
+                           sesiones=lista_sesiones(),
+                           paquetes=lista_paquetes(),
+                           cuentas=lista_cuentas(),
+                           meses=lista_meses(),
+                           semanas=lista_semanas(),
+                           participantes=paginado[0],
+                           page=paginado[1],
+                           per_page=paginado[2],
+                           total_items=paginado[3],
+                           total_pages=paginado[4],)
+    
 #-----------------------------------------------------------------------------------------
 
 @participantes.route("/participantes/agregar")
@@ -199,7 +214,7 @@ def participante_nuevo():
         sql2 = 'INSERT INTO asistencias (participante, sesion) VALUES (%s, %s) RETURNING id'
         valores2 = (participante_id, sesion)
         cur.execute(sql2, valores2)
-
+ 
         # 3.5 Obtener el id de asistencia
         asistencia_id = cur.fetchone()['id']
 
@@ -221,7 +236,7 @@ def participante_nuevo():
                                 mes=request.form.get('mes', ''),
                                 semana=request.form.get('semana', ''),
                                 fecha=request.form.get('fecha', ''),
-                                equipos=equipos))
+                                equipos=request.form.get('equipos_filtro', '')))
 
 def to_bool(value):
     return value in [1, '1', True, 'true', 'True']

@@ -251,9 +251,8 @@
 
 
                     <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
+                    <input type="hidden" name="equipos_filtro" value="{{ request.args.get('equipos', '') }}">
                     <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
-
-
                     <div class="modal-body">
 
                         <div>
@@ -336,7 +335,7 @@
                             <div class="input-group justify-content-center">
                                 <div class="col-sm-4">
                                     <select id="id_sesion" name="id_sesion" style="max-width: 360px;"
-                                        class="form-select" required>
+                                        class="form-select select-buscable" required>
                                         <option value="">Seleccione una grabacion</option>
                                         {% set categoria = 3 %}
                                         {% set equipo_sel = request.args.get('equipos', '') %}
@@ -348,7 +347,7 @@
                                         (semana_sel == '' or sesion.3 == semana_sel) and
                                         (sesion.7 == categoria) %}
                                         <option value="{{ sesion.0 }}" {% if fecha_actual==valor %}selected{% endif %}>
-                                            {{ sesion.1 }} || {{ sesion.5 }}
+                                            {{ sesion.5 }}
                                         </option>
                                         {% endif %}
                                         {% endfor %}

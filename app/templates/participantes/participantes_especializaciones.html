@@ -257,6 +257,7 @@
                         <p><strong>Equipo:</strong> {{ partes_equipo[1] }}</p>
                         {% endif %}
                         <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
+                        <input type="hidden" name="equipos_filtro" value="{{ request.args.get('equipos', '') }}">
                         <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
                     </div>
 

@@ -117,6 +117,7 @@
                         <th class="text-nowrap">Clave <br>Participante</th>
                         <th class="text-nowrap">Nombre <br>Participante</th>
                         <th class="text-nowrap">Curso</th>
+                        <th class="text-nowrap">Paquete</th>
                         <th class="text-nowrap">Pago validado</th>
                         <th class="text-nowrap">Constancia <br>generada</th>
                         <th class="text-nowrap">Constancia <br>enviada</th>
@@ -162,6 +163,7 @@
                         <td class="text-nowrap">{{ p.clave_participante }}</td>
                         <td class="text-nowrap">{{ p.nombre_participante }} <br> {{ p.apellidos_participante }}</td>
                         <td class="truncate-text">{{ p.nombre_curso }}</td>
+                        <td class="text-nowrap">{{ p.nombre_paquete }}</td>
                         <td>
                             {% if p.validacion_pago == 1 %}
                             Validado
@@ -220,6 +222,7 @@
                         <td class="text-nowrap">{{ p.clave_participante }}</td>
                         <td class="text-nowrap">{{ p.nombre_participante }} <br> {{ p.apellidos_participante }}</td>
                         <td class="truncate-text">{{ p.nombre_curso }}</td>
+                        <td class="truncate-text">{{ p.nombre_paquete }}</td>
                         <td>
                             {% if p.validacion_pago == 1 %}
                             Validado
