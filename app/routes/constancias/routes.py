@@ -37,7 +37,7 @@ def constancias_buscar():
         SELECT COUNT(*) 
         FROM asistencias_detalladas_constancias 
         WHERE constancia_enviada = False AND (validacion_pago = %s OR validacion_pago = %s)
-    ''', ('1', '2'))    
+    ''', (1, 2))    
 
     constancias_por_enviar = cur.fetchone()[0]
     cur.close()

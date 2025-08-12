@@ -111,7 +111,7 @@ def index():
         SELECT COUNT(*) 
         FROM asistencias_detalladas_constancias 
         WHERE constancia_enviada = False AND (validacion_pago = %s OR validacion_pago = %s)
-    ''', ('1', '2'))
+    ''', (1, 2))
     constancias_pendientes = cursor.fetchone()[0]
 
     cursor.execute("SELECT COUNT(*) FROM ponentes")
