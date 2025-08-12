@@ -21,11 +21,11 @@ def constancias_buscar():
     search_query_sql = f"%{search_query}%"
 
     sql_count = '''SELECT COUNT(*) FROM asistencias_detalladas_constancias
-                   WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
+                   WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s) AND (validacion_pago = 1 OR validacion_pago = 2)
                    AND constancia_enviada = False'''
 
     sql_lim = '''SELECT * FROM asistencias_detalladas_constancias
-                 WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s)
+                 WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s) AND (validacion_pago = 1 OR validacion_pago = 2)
                  AND constancia_enviada = False
                  ORDER BY nombre_participante DESC
                  LIMIT %s OFFSET %s'''

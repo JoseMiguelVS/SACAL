@@ -128,7 +128,7 @@
                     {% if constancias %}
                     {% set mostrar_una = True %}
                     {% for p in constancias %}
-                    {% if p.validacion_pago in [,1,2] %}
+                    {% if p.validacion_pago in [1,2] %}
                     {% if p.nombre_categoria == 'Especializacion' and p.solo_global and mostrar_una %}
                     {% set mostrar_una = False %}
 
@@ -163,7 +163,7 @@
                         <td class="text-nowrap">{{ p.nombre_participante }} <br> {{ p.apellidos_participante }}</td>
                         <td class="truncate-text">{{ p.nombre_curso }}</td>
                         <td>
-                            {% if p.validacion_pago == 3 %}
+                            {% if p.validacion_pago == 1 %}
                             Validado
                             {% elif p.validacion_pago == 2 %}
                             Pendiente
@@ -221,7 +221,7 @@
                         <td class="text-nowrap">{{ p.nombre_participante }} <br> {{ p.apellidos_participante }}</td>
                         <td class="truncate-text">{{ p.nombre_curso }}</td>
                         <td>
-                            {% if p.validacion_pago == 3 %}
+                            {% if p.validacion_pago == 1 %}
                             Validado
                             {% elif p.validacion_pago == 2 %}
                             Pendiente
