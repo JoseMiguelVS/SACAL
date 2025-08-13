@@ -12,7 +12,7 @@
                     class="img-fluid rounded" style="max-height: 200px" />
                 {% else %} {% for imagen in pagos.comprobantes.split(',') %}
                 <img src="{{ url ~ '/' ~ imagen.strip().lstrip('/') }}" class="img-fluid rounded shadow"
-                    alt="Comprobante de pago" style="max-height: 200px;" />
+                    alt="Comprobante de pago" style="max-width: 200px;" />
                 {% endfor %} {% endif %}
             </div>
         </div>
