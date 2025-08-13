@@ -353,7 +353,7 @@
 
                         <select name="paquete" id="paquete" class="form-select" required>
                             <option value="" selected disabled>Selecciona un paquete</option>
-                            {% set espe = '2' %}
+                            {% set espe = 2 %}
                             {% if paquetes %}
                             {% for paquete in paquetes %}
                             {% if paquete[4] and paquete[3] == espe %}

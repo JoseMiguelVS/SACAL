@@ -21,31 +21,6 @@ BUCKET_NAME = "tickets"
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-con = get_db_connection()
-cur = con.cursor()
-cur.execute('''
-            SELECT id_sesion, fecha_curso, categoria
-	        FROM public.detalles_sesiones;
-            ''')
-sesiones = cur.fetchall()
-
-hoy = date.today()
-ids_para_actualizar =[
-    s[0] for s in sesiones
-    if s[2] == 2 and s[1] < hoy
-]
-
-if ids_para_actualizar:
-    cur.execute('''
-        UPDATE detalles_sesiones
-        SET categoria = 3
-        WHERE id_sesion = ANY(%s);
-    ''', (ids_para_actualizar,))
-    
-con.commit()
-cur.close()
-con.close()
-
 #---------------------------------------------------------------PARTICIPANTES--------------------------------------------------------------------------
 @participantes.route("/participantes/grabaciones")
 @login_required
