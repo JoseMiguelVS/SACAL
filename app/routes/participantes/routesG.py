@@ -282,7 +282,7 @@ def participante_nuevoG():
         cur.execute(sql3, valores3)
 
         sql4 = "INSERT INTO pagos (ingresos, participante, validacion_pago, concepto_factura) VALUES (%s, %s, %s, %s)"
-        valores4 = (precio_paquete, participante_id,'1','3')
+        valores4 = (precio_paquete, participante_id,'3','3')
         cur.execute(sql4, valores4)
 
         # 4. Guardar cambios y cerrar conexión

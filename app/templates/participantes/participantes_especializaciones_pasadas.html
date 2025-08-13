@@ -119,7 +119,6 @@
                 <tbody class="small">
                     {% if participantes %}
                     {% for p in participantes %}
-                    {% if p.estado == True %}
                     <tr data-id="{{ p.id_participante }}">
                         <td><input type="text" name="clave_participante" value="{{ p.clave_participante }}"
                                 onchange="guardarFila(this)"></td>
@@ -144,7 +143,7 @@
                             </select>
                         </td>
                         <td>
-                            {% if p.validacion_pago == 3 %}
+                            {% if p.validacion_pago == 1 %}
                             Validado
                             {% elif p.validacion_pago == 2 %}
                             Pendiente
@@ -207,7 +206,6 @@
                         </td>
                         <!-- <td><button onclick="guardarCambios(this)">Guardar</button></td> -->
                     </tr>
-                    {% endif %}
                     {% endfor %}
                     {% else %}
                     <tr>

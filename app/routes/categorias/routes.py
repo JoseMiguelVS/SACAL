@@ -98,7 +98,7 @@ def categoria_editar(id):
 @login_required
 def categoria_actualizar(id):
     if request.method == 'POST':
-        nombre_categoria = request.form['nombre_categoria']
+        nombre_categoria = request.form['categoria']
         fecha_modificacion = datetime.now()
 
         con = get_db_connection()

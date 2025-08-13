@@ -154,7 +154,7 @@ def participantes_filtros():
                            page=paginado[1],
                            per_page=paginado[2],
                            total_items=paginado[3],
-                           total_pages=paginado[4],)
+                           total_pages=paginado[4])
     
 #-----------------------------------------------------------------------------------------
 

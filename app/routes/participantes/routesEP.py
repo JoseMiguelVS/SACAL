@@ -136,7 +136,6 @@ def participantes_especializacionP_buscar():
 @login_required
 def participantes_especializacionesP_filtros():
     equipos = request.args.get('equipos', '', type=str)
-    fecha_raw = request.args.get('fecha', '', type=str)
 
     fecha_inicio_str = request.args.get('fecha_inicio', '', type=str)
     fecha_fin_str = request.args.get('fecha_fin', '', type=str)
@@ -151,12 +150,7 @@ def participantes_especializacionesP_filtros():
     except ValueError:
         flash("Fechas inválidas", "warning")
 
-    cursos = ''
     equipo = ''
-    if fecha_raw:
-        partes = fecha_raw.split('/')
-        if len(partes) == 3:
-            cursos = partes[2]
 
     if equipos:
         partesEquipos = equipos.split(',')
@@ -166,10 +160,9 @@ def participantes_especializacionesP_filtros():
     # Construcción dinámica
     condiciones = [
         "(%s = '' OR v.nombre_equipo ILIKE %s)",
-        "(%s = '' OR v.nombre_curso ILIKE %s)",
         "v.nombre_categoria = 'Esp. Pasadas'"
     ]
-    valores = [equipo, equipo, cursos, cursos]
+    valores = [equipo, equipo]
 
     if fecha_inicio:
         condiciones.append("p.fecha_registro >= %s")
@@ -282,7 +275,7 @@ def participante_nuevoEP():
         cur.execute(sql3, valores3)
 
         sql4 = "INSERT INTO pagos (ingresos, participante, validacion_pago, concepto_factura) VALUES (%s, %s, %s, %s)"
-        valores4 = (precio_paquete, participante_id,'1','3')
+        valores4 = (precio_paquete, participante_id,'3','3')
         cur.execute(sql4, valores4)
 
         # 4. Guardar cambios y cerrar conexión
