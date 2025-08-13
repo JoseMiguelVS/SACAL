@@ -110,8 +110,8 @@ def participantes_especializacionP_buscar():
         ORDER BY v.id_participante DESC
         LIMIT %s OFFSET %s
     """
-
-    paginado = paginador3(sql_count, sql_lim, tuple(valores), 1, 50)
+    
+    paginado = paginador3(sql_count, sql_lim, valores, 1, 50)
 
     return render_template(
         'participantes/participantes_especializaciones_pasadas.html',
@@ -189,7 +189,7 @@ def participantes_especializacionesP_filtros():
         LIMIT %s OFFSET %s
     """
 
-    paginado = paginador3(sql_count, sql_lim, tuple(valores), 1, 50)
+    paginado = paginador3(sql_count, sql_lim, valores, 1, 50)
 
     return render_template(
         'participantes/participantes_especializaciones_pasadas.html',
