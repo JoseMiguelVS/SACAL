@@ -182,19 +182,19 @@ def index():
         total_ponentes=total_ponentes
     )
     
-@participantes.route("/actualizar_grabaciones")
+@app.route("/actualizar_grabaciones")
 @login_required
 def actualizar_grabaciones():
     grabaciones_cursos()
     flash("En vivos pasados actualizados correctamente.", "success")
-    return redirect(url_for("app.index"))
+    return redirect(url_for('index'))
 
-@participantes.route("/actualizar_especializaciones")
+@app.route("/actualizar_especializaciones")
 @login_required
 def actualizar_especializaciones():
     pasadas_especializaciones()
     flash("Especializaciones pasadas actualizadas correctamente.", "success")
-    return redirect(url_for("app.index"))
+    return redirect(url_for("index"))
 
 @app.errorhandler(401)
 def unauthorized_error(error):

@@ -67,8 +67,10 @@
                     {% set f = filas[i] %}
                     <tr>
                         {% if i == 0 %}
-                        <td rowspan="{{ rowspan }}">{{ f.nombre_ponente }}</td>
-                        <td rowspan="{{ rowspan }}">{{ f.nombre_curso }}</td>
+                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+                            rowspan="{{ rowspan }}">{{ f.nombre_ponente }}</td>
+                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+                            rowspan="{{ rowspan }}">{{ f.nombre_curso }}</td>
                         {% endif %}
                         <td>${{ f.precio_paquete | float | round(3) }}</td>
                         <td>{{ f.total_promesas }}</td>
