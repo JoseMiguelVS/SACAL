@@ -6,6 +6,8 @@ from app.models.ModelUser import ModuleUser
 from app.models.entities.user import User
 from app.routes.utils.utils import get_db_connection
 
+from datetime import datetime, date
+
 # Importa tus Blueprints
 from app.routes.empleados.routes import empleados
 from app.routes.ponentes.routes import ponentes
@@ -112,6 +114,7 @@ def grabaciones_cursos():
     con.close()
     
 def pasadas_especializaciones():
+    con = get_db_connection()
     cur = con.cursor()
 
     cur.execute('''
@@ -178,6 +181,20 @@ def index():
         constancias_pendientes=constancias_pendientes,
         total_ponentes=total_ponentes
     )
+    
+@participantes.route("/actualizar_grabaciones")
+@login_required
+def actualizar_grabaciones():
+    grabaciones_cursos()
+    flash("En vivos pasados actualizados correctamente.", "success")
+    return redirect(url_for("app.index"))
+
+@participantes.route("/actualizar_especializaciones")
+@login_required
+def actualizar_especializaciones():
+    pasadas_especializaciones()
+    flash("Especializaciones pasadas actualizadas correctamente.", "success")
+    return redirect(url_for("app.index"))
 
 @app.errorhandler(401)
 def unauthorized_error(error):

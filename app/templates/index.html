@@ -37,10 +37,16 @@
             </div>
         </div>
     </div>
+
     <section class="container mb-4 d-flex justify-content-center gap-3">
-        <a href="{{ url('grabaciones_cursos') }}" class="botones-ver">Actualizar En vivos pasados</a>
-        <a href="{{ url('pasadas_especializaciones') }}" class="botones-ver">Actualizar especializaciones pasadas</a>
+        <a href="{{ url_for('participantes.actualizar_grabaciones') }}" class="botones-ver">
+            Actualizar En vivos pasados
+        </a>
+        <a href="{{ url_for('participantes.actualizar_especializaciones') }}" class="botones-ver">
+            Actualizar especializaciones pasadas
+        </a>
     </section>
+
 </main>
 
 {% endblock %}
