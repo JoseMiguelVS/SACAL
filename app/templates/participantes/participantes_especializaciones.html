@@ -155,7 +155,7 @@
                             </select>
                         </td>
                         <td>
-                            {% if p.validacion_pago == 3 %}
+                            {% if p.validacion_pago == 1 %}
                             Validado
                             {% elif p.validacion_pago == 2 %}
                             Pendiente
@@ -319,8 +319,8 @@
                         </div>
 
                         <div class="input-group justify-content-center">
-                            <select id="id_sesion" name="id_sesion" style="max-width: 360px;" class="form-select select-buscable"
-                                required>
+                            <select id="id_sesion" name="id_sesion" style="max-width: 360px;"
+                                class="form-select select-buscable" required>
                                 <option value="">Seleccione una especializacion</option>
                                 {% set categoria = 1 %}
                                 {% set equipo_sel = request.args.get('equipos', '') %}
@@ -415,29 +415,22 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
+                    <input type="hidden" name="equipos_filtro" value="{{ request.args.get('equipos', '') }}">
+                    <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
                     <div class="input-group">
                         <div class="mb-2">
                             <select name="sesion" id="sesion-{{ p.id_participante }}" class="form-select" required>
                                 <option value="" disabled>Sesion</option>
-                                {% set categoria = 1 %}
-                                {% if sesiones %}
-                                {% for sesion in sesiones %} {% if sesion.7 == categoria %}
+                                {% if sesiones %} {% for sesion in sesiones %}
                                 <option value="{{ sesion.0 }} " {% if sesion.5==p.cursos %} selected {% endif %}>
                                     {{ sesion.5 }}
                                 </option>
-                                {% endif %}
                                 {% endfor %} {% else %}
                                 <option disabled>Aun no hay registros</option>
                                 {% endif %}
                             </select>
                             <label for="sesion" class="input-label">Sesion</label>
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" name="grabacion" type="checkbox"
-                                id="flexSwitchCheckDefault">
-                            <label class="form-check-label" for="flexSwitchCheckDefault">Cambiar a grabacion?</label>
                         </div>
                     </div>
                 </div>
@@ -463,6 +456,9 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
+                    <input type="hidden" name="equipos_filtro" value="{{ request.args.get('equipos', '') }}">
+                    <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
                     <input type="hidden" name="nombre_participante" value="{{ p.nombre_participante }}">
                     <input type="hidden" name="apellidos_participante" value="{{ p.apellidos_participante }}">
                     <input type="hidden" name="clave_participante" value="{{ p.clave_participante }}">

@@ -89,7 +89,6 @@
         </form>
     </section>
 
-
     <!-- TABLA DE PARTICIPANTES -->
     <section class="tables_participantes table">
         <div class="table-responsive">
@@ -143,7 +142,7 @@
                             </select>
                         </td>
                         <td>
-                            {% if p.validacion_pago == 3 %}
+                            {% if p.validacion_pago == 1 %}
                             Validado
                             {% elif p.validacion_pago == 2 %}
                             Pendiente
@@ -333,24 +332,24 @@
                             </div>
 
                             <div class="input-group justify-content-center">
-                                    <select id="id_sesion" name="id_sesion" style="max-width: 360px;"
-                                        class="form-select select-buscable" required>
-                                        <option value="">Seleccione una grabacion</option>
-                                        {% set categoria = 3 %}
-                                        {% set equipo_sel = request.args.get('equipos', '') %}
-                                        {% set mes_sel = request.args.get('mes', '') %}
-                                        {% set semana_sel = request.args.get('semana', '') %}
-                                        {% set fecha_actual = request.args.get('fecha', '') %}
-                                        {% for sesion in sesiones %}
-                                        {% if (mes_sel == '' or sesion.4 == mes_sel) and
-                                        (semana_sel == '' or sesion.3 == semana_sel) and
-                                        (sesion.7 == categoria) %}
-                                        <option value="{{ sesion.0 }}" {% if fecha_actual==valor %}selected{% endif %}>
-                                            {{ sesion.5 }}
-                                        </option>
-                                        {% endif %}
-                                        {% endfor %}
-                                    </select>
+                                <select id="id_sesion" name="id_sesion" style="max-width: 360px;"
+                                    class="form-select select-buscable" required>
+                                    <option value="">Seleccione una grabacion</option>
+                                    {% set categoria = 3 %}
+                                    {% set equipo_sel = request.args.get('equipos', '') %}
+                                    {% set mes_sel = request.args.get('mes', '') %}
+                                    {% set semana_sel = request.args.get('semana', '') %}
+                                    {% set fecha_actual = request.args.get('fecha', '') %}
+                                    {% for sesion in sesiones %}
+                                    {% if (mes_sel == '' or sesion.4 == mes_sel) and
+                                    (semana_sel == '' or sesion.3 == semana_sel) and
+                                    (sesion.7 == categoria) %}
+                                    <option value="{{ sesion.0 }}" {% if fecha_actual==valor %}selected{% endif %}>
+                                        {{ sesion.5 }}
+                                    </option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
                             </div>
 
                         </div>
@@ -410,6 +409,114 @@
                 {% endif %}
         </ul>
     </nav>
+
+    {% if participantes %} {% for p in participantes %}
+    <div class="modal fade" id="modalEditar-{{ p.id_participante }}" data-bs-backdrop="static" data-bs-keyboard="false"
+        tabindex="-1" aria-labelledby="modalEditarLabel-{{ p.id_participante }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="post" action="{{ url_for('participantes.participante_actualizarG', id = p.id_participante) }}"
+                class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="idEditarLabel-{{ p.id_participante }}">Cambiar de sesion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
+                    <input type="hidden" name="equipos_filtro" value="{{ request.args.get('equipos', '') }}">
+                    <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
+                    <div class="input-group">
+                        <div class="mb-2">
+                            <select name="sesion" id="sesion-{{ p.id_participante }}" class="form-select" required>
+                                <option value="" disabled>Sesion</option>
+                                {% if sesiones %} {% for sesion in sesiones %}
+                                <option value="{{ sesion.0 }} " {% if sesion.5==p.cursos %} selected {% endif %}>
+                                    {{ sesion.5 }}
+                                </option>
+                                {% endfor %} {% else %}
+                                <option disabled>Aun no hay registros</option>
+                                {% endif %}
+                            </select>
+                            <label for="sesion" class="input-label">Sesion</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="botones-cancelar" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="botones-guardar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Comprobante -->
+    <div class="modal fade" id="modalComprobante-{{ p.id_participante }}" data-bs-backdrop="static"
+        data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalComprobanteLabel-{{ p.id_participante }}"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="post" action="{{ url_for('participantes.participante_comprobanteG', id=p.id_participante) }}"
+                class="modal-content" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="idEditarLabel-{{ p.id_participante }}">Registrar Comprobante de
+                        Participante</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
+                    <input type="hidden" name="equipos_filtro" value="{{ request.args.get('equipos', '') }}">
+                    <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
+                    <input type="hidden" name="nombre_participante" value="{{ p.nombre_participante }}">
+                    <input type="hidden" name="apellidos_participante" value="{{ p.apellidos_participante }}">
+                    <input type="hidden" name="clave_participante" value="{{ p.clave_participante }}">
+
+                    <!-- Forma de pago -->
+                    <div class="input-group justify-content-center">
+                        <div class="col-md-6 mb-3">
+                            <select name="id_forma" id="id_forma" class="form-select" required>
+                                <option value="" disabled {% if not p.forma_pago %}selected{% endif %}>Seleccione la
+                                    forma de pago</option>
+                                {% for forma in formas %}
+                                <option value="{{ forma[0] }}" {% if p.forma_pago==forma[0] %}selected{% endif %}>{{
+                                    forma[1] }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="id_forma" class="input-label">Forma de pago</label>
+                        </div>
+                    </div>
+
+                    <!-- Cuenta destino -->
+                    <div class="input-group justify-content-center">
+                        <div class="col-md-6 mb-3">
+                            <select name="id_cuenta" id="id_cuenta" class="form-select" required>
+                                <option value="" disabled {% if not p.cuenta_pago %}selected{% endif %}>Selecciona una
+                                    cuenta</option>
+                                {% for cuenta in cuentas %}
+                                <option value="{{ cuenta[0] }}" {% if p.cuenta_destino==cuenta[1] %}selected{% endif %}>
+                                    {{
+                                    cuenta[1] }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="id_cuenta" class="input-label">Cuenta destino</label>
+                        </div>
+                    </div>
+
+                    <!-- Zona drag and drop -->
+                    <div class="drop-zone" id="drop-zone-{{ p.id_participante }}">
+                        <p>Arrastra y suelta tus imágenes aquí o haz clic para elegir archivos</p>
+                        <input type="file" id="file-input-{{ p.id_participante }}" name="fotos" multiple
+                            accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="botones-cancelar" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="botones-guardar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% endfor %} {% endif %}
 
 </main>
 

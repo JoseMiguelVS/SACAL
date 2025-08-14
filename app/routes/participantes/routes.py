@@ -310,9 +310,6 @@ def actualizar_participante(id):
 @login_required
 def participante_actualizar(id):
     sesion = request.form['sesion']
-    grabacion = request.form.get('grabacion')  # None si no existe
-
-    grabacion_new = True if grabacion == 'on' else False
 
     con = get_db_connection()
     cur = con.cursor()
@@ -322,17 +319,15 @@ def participante_actualizar(id):
         (sesion, id)
     )
 
-    cur.execute(
-        "UPDATE participantes SET grabacion = %s WHERE id_participante = %s",
-        (grabacion_new, id)
-    )
-
     con.commit()
     cur.close()
     con.close()
 
     flash("Participante cambiado de sesión")
-    return redirect(url_for('participantes.participantes_buscar'))
+    return redirect(url_for('participantes.participantes_buscar', 
+                                mes=request.form.get('mes', ''),
+                                semana=request.form.get('semana', ''),
+                                equipos=request.form.get('equipos_filtro', '')))
 
 @participantes.route('/participantes/comprobante/<string:id>', methods=['POST'])
 @login_required
@@ -394,4 +389,8 @@ def participante_comprobante(id):
     con.close()
 
     flash('Comprobantes subidos correctamente')
-    return redirect(url_for('participantes.participantes_buscar'))
+    return redirect(url_for('participantes.participantes_buscar',
+                                mes=request.form.get('mes', ''),
+                                semana=request.form.get('semana', ''),
+                                fecha=request.form.get('fecha', ''),
+                                equipos=request.form.get('equipos_filtro', '')))

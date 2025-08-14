@@ -202,7 +202,7 @@ def participante_nuevoE():
         cur.execute(sql3, valores3)
 
         sql4 = "INSERT INTO pagos (ingresos, participante, validacion_pago, concepto_factura) VALUES (%s, %s, %s, %s)"
-        valores4 = (precio_paquete, participante_id,'1','3')
+        valores4 = (precio_paquete, participante_id,'3','3')
         cur.execute(sql4, valores4)
 
         # 4. Guardar cambios y cerrar conexión
@@ -311,10 +311,7 @@ def actualizar_participanteE(id):
 @participantes.route('/participantesE/actualizar/sesion/<string:id>', methods=['POST'])
 @login_required
 def participante_actualizarE(id):
-    sesion = request.form['sesion']
-    grabacion = request.form.get('grabacion')  # None si no existe
-
-    grabacion_new = True if grabacion == 'on' else False
+    sesion = request.form['sesion']    
 
     con = get_db_connection()
     cur = con.cursor()
@@ -324,17 +321,16 @@ def participante_actualizarE(id):
         (sesion, id)
     )
 
-    cur.execute(
-        "UPDATE participantes SET grabacion = %s WHERE id_participante = %s",
-        (grabacion_new, id)
-    )
-
     con.commit()
     cur.close()
     con.close()
 
     flash("Participante cambiado de sesión")
-    return redirect(url_for('participantes.participantes_especializacion_buscar'))
+    return redirect(url_for('participantes.participantes_especializacion_buscar',
+                                mes=request.form.get('mes', ''),
+                                semana=request.form.get('semana', ''),
+                                fecha=request.form.get('fecha', ''),
+                                equipos=request.form.get('equipos_filtro', '')))
 
 @participantes.route('/participantesE/comprobante/<string:id>', methods=['POST'])
 @login_required
@@ -396,4 +392,8 @@ def participante_comprobanteE(id):
     con.close()
 
     flash('Comprobantes subidos correctamente')
-    return redirect(url_for('participantes.participantes_especializacion_buscar'))
+    return redirect(url_for('participantes.participantes_especializacion_buscar',
+                                mes=request.form.get('mes', ''),
+                                semana=request.form.get('semana', ''),
+                                fecha=request.form.get('fecha', ''),
+                                equipos=request.form.get('equipos_filtro', '')))
