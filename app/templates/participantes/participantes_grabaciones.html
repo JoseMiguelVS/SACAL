@@ -218,6 +218,115 @@
         </div>
     </section>
 
+    {% if participantes %}
+    {% for p in participantes %}
+    <div class="modal fade" id="modalEditar-{{ p.id_participante }}" data-bs-backdrop="static" data-bs-keyboard="false"
+        tabindex="-1" aria-labelledby="modalEditarLabel-{{ p.id_participante }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form method="post" action="{{ url_for('participantes.participante_actualizarG', id = p.id_participante) }}"
+                class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditarLabel-{{ p.id_participante }}"> Cambiar de sesion </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" name="equipos_filtro" value="{{ request.args.get('equipos', '') }}">
+                    <div class="input-group">
+                        <div class="mb-2">
+                            <select name="sesion" id="sesion-{{ p.id_participante }}" class="form-select" required>
+                                <option value="" disabled>Sesion</option>
+                                {% if sesiones %} {% for sesion in sesiones %}
+                                <option value="{{ sesion.0 }} " {% if sesion.5==p.cursos %} selected {% endif %}>
+                                    {{ sesion.5 }}
+                                </option>
+                                {% endfor %} {% else %}
+                                <option disabled>Aun no hay registros</option>
+                                {% endif %}
+                            </select>
+                            <label for="sesion" class="input-label">Sesion</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="botones-cancelar" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="botones-guardar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Comprobante -->
+    <div class="modal fade" id="modalComprobante-{{ p.id_participante }}" data-bs-backdrop="static"
+        data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalComprobanteLabel-{{ p.id_participante }}"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <form method="post" action="{{ url_for('participantes.participante_comprobanteG', id=p.id_participante) }}"
+                class="modal-content" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalComprobanteLabel-{{ p.id_participante }}">Registro de comprobantes
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
+                    <input type="hidden" name="equipos_filtro" value="{{ request.args.get('equipos', '') }}">
+                    <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
+                    <input type="hidden" name="nombre_participante" value="{{ p.nombre_participante }}">
+                    <input type="hidden" name="apellidos_participante" value="{{ p.apellidos_participante }}">
+                    <input type="hidden" name="clave_participante" value="{{ p.clave_participante }}">
+
+                    <!-- Forma de pago -->
+                    <div class="input-group justify-content-center">
+                        <div class="col-md-6 mb-3">
+                            <select name="id_forma" id="id_forma" class="form-select" required>
+                                <option value="" disabled {% if not p.forma_pago %}selected{% endif %}>
+                                    Seleccione la
+                                    forma de pago</option>
+                                {% for forma in formas %}
+                                <option value="{{ forma[0] }}" {% if p.forma_pago==forma[0] %}selected{% endif %}>{{
+                                    forma[1] }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="id_forma" class="input-label">Forma de pago</label>
+                        </div>
+                    </div>
+
+                    <!-- Cuenta destino -->
+                    <div class="input-group justify-content-center">
+                        <div class="col-md-6 mb-3">
+                            <select name="id_cuenta" id="id_cuenta" class="form-select" required>
+                                <option value="" disabled {% if not p.cuenta_pago %}selected{% endif %}>
+                                    Selecciona una
+                                    cuenta</option>
+                                {% for cuenta in cuentas %}
+                                <option value="{{ cuenta[0] }}" {% if p.cuenta_destino==cuenta[1] %}selected{% endif %}>
+                                    {{
+                                    cuenta[1] }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="id_cuenta" class="input-label">Cuenta destino</label>
+                        </div>
+                    </div>
+
+                    <!-- Zona drag and drop -->
+                    <div class="drop-zone" id="drop-zone-{{ p.id_participante }}">
+                        <p>Arrastra y suelta tus imágenes aquí o haz clic para elegir archivos</p>
+                        <input type="file" id="file-input-{{ p.id_participante }}" name="fotos" multiple
+                            accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="botones-cancelar" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="botones-guardar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+
     <div class="modal fade" id="modalAgregarParticipante" data-bs-backdrop="static" data-bs-keyboard="false"
         tabindex="-1" aria-labelledby="modalAgregarParticipanteLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
@@ -368,39 +477,39 @@
         <ul class="pagination justify-content-center" style="margin:20px 0">
             {% if page > 1 %}
             <li class="page-item">
-                <a class="page-link bg-warning"
+                <a class="page-link "
                     href="{{url_for('participantes.participantes_grabaciones_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
                     aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
             {% if page != 1 and page != 2 %}
-            <li class="page-item"><a class="page-link bg-warning"
+            <li class="page-item"><a class="page-link   "
                     href="{{url_for('participantes.participantes_grabaciones_buscar')}}">1</a></li>
             {% if page != 3 %}
-            <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
+            <li class="page-item"><a class="page-link disabled  ">...</a></li>
             {% endif %}
             {% endif %}
-            <li class="page-item"><a class="page-link bg-warning"
+            <li class="page-item"><a class="page-link   "
                     href="{{url_for('participantes.participantes_grabaciones_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
             </li>
             {% endif %}
 
-            <li class="page-item"><a class="page-link active bg-warning" href="#">{{page}}</a></li>
+            <li class="page-item"><a class="page-link active    " href="#">{{page}}</a></li>
 
-            {% if page < total_pages %} <li class="page-item"><a class="page-link bg-warning"
+            {% if page < total_pages %} <li class="page-item"><a class="page-link   "
                     href="{{url_for('participantes.participantes_grabaciones_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
                 </li>
                 {% if page != total_pages and page != total_pages-1 %}
                 {% if page != total_pages-2 %}
-                <li class="page-item"><a class="page-link disabled bg-warning">...</a></li>
+                <li class="page-item"><a class="page-link disabled  ">...</a></li>
                 {% endif %}
-                <li class="page-item"><a class="page-link bg-warning"
+                <li class="page-item"><a class="page-link   "
                         href="{{url_for('participantes.participantes_grabaciones_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
                 </li>
                 {% endif %}
                 <li class="page-item">
-                    <a class="page-link bg-warning"
+                    <a class="page-link "
                         href="{{url_for('participantes.participantes_grabaciones_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
                         aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
@@ -410,115 +519,38 @@
         </ul>
     </nav>
 
-    {% if participantes %} {% for p in participantes %}
-    <div class="modal fade" id="modalEditar-{{ p.id_participante }}" data-bs-backdrop="static" data-bs-keyboard="false"
-        tabindex="-1" aria-labelledby="modalEditarLabel-{{ p.id_participante }}" aria-hidden="true">
-        <div class="modal-dialog">
-            <form method="post" action="{{ url_for('participantes.participante_actualizarG', id = p.id_participante) }}"
-                class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="idEditarLabel-{{ p.id_participante }}">Cambiar de sesion</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                    <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
-                    <input type="hidden" name="equipos_filtro" value="{{ request.args.get('equipos', '') }}">
-                    <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
-                    <div class="input-group">
-                        <div class="mb-2">
-                            <select name="sesion" id="sesion-{{ p.id_participante }}" class="form-select" required>
-                                <option value="" disabled>Sesion</option>
-                                {% if sesiones %} {% for sesion in sesiones %}
-                                <option value="{{ sesion.0 }} " {% if sesion.5==p.cursos %} selected {% endif %}>
-                                    {{ sesion.5 }}
-                                </option>
-                                {% endfor %} {% else %}
-                                <option disabled>Aun no hay registros</option>
-                                {% endif %}
-                            </select>
-                            <label for="sesion" class="input-label">Sesion</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="botones-cancelar" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="botones-guardar">Guardar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Modal Comprobante -->
-    <div class="modal fade" id="modalComprobante-{{ p.id_participante }}" data-bs-backdrop="static"
-        data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalComprobanteLabel-{{ p.id_participante }}"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <form method="post" action="{{ url_for('participantes.participante_comprobanteG', id=p.id_participante) }}"
-                class="modal-content" enctype="multipart/form-data">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="idEditarLabel-{{ p.id_participante }}">Registrar Comprobante de
-                        Participante</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                    <input type="hidden" name="mes" value="{{ request.args.get('mes', '') }}">
-                    <input type="hidden" name="equipos_filtro" value="{{ request.args.get('equipos', '') }}">
-                    <input type="hidden" name="semana" value="{{ request.args.get('semana', '') }}">
-                    <input type="hidden" name="nombre_participante" value="{{ p.nombre_participante }}">
-                    <input type="hidden" name="apellidos_participante" value="{{ p.apellidos_participante }}">
-                    <input type="hidden" name="clave_participante" value="{{ p.clave_participante }}">
-
-                    <!-- Forma de pago -->
-                    <div class="input-group justify-content-center">
-                        <div class="col-md-6 mb-3">
-                            <select name="id_forma" id="id_forma" class="form-select" required>
-                                <option value="" disabled {% if not p.forma_pago %}selected{% endif %}>Seleccione la
-                                    forma de pago</option>
-                                {% for forma in formas %}
-                                <option value="{{ forma[0] }}" {% if p.forma_pago==forma[0] %}selected{% endif %}>{{
-                                    forma[1] }}</option>
-                                {% endfor %}
-                            </select>
-                            <label for="id_forma" class="input-label">Forma de pago</label>
-                        </div>
-                    </div>
-
-                    <!-- Cuenta destino -->
-                    <div class="input-group justify-content-center">
-                        <div class="col-md-6 mb-3">
-                            <select name="id_cuenta" id="id_cuenta" class="form-select" required>
-                                <option value="" disabled {% if not p.cuenta_pago %}selected{% endif %}>Selecciona una
-                                    cuenta</option>
-                                {% for cuenta in cuentas %}
-                                <option value="{{ cuenta[0] }}" {% if p.cuenta_destino==cuenta[1] %}selected{% endif %}>
-                                    {{
-                                    cuenta[1] }}</option>
-                                {% endfor %}
-                            </select>
-                            <label for="id_cuenta" class="input-label">Cuenta destino</label>
-                        </div>
-                    </div>
-
-                    <!-- Zona drag and drop -->
-                    <div class="drop-zone" id="drop-zone-{{ p.id_participante }}">
-                        <p>Arrastra y suelta tus imágenes aquí o haz clic para elegir archivos</p>
-                        <input type="file" id="file-input-{{ p.id_participante }}" name="fotos" multiple
-                            accept="image/*">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="botones-cancelar" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="botones-guardar">Guardar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    {% endfor %} {% endif %}
-
 </main>
+
+{% if participantes %} {% for p in participantes %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dropZone = document.getElementById('drop-zone-{{ p.id_participante }}');
+        const fileInput = document.getElementById('file-input-{{ p.id_participante }}');
+
+        // Click en zona = click en input
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        // Añadir clases visuales al arrastrar
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+            }
+        });
+    });
+</script>
+{% endfor %} {% endif %}
 
 <script>
     document.getElementById('flexSwitchCheckDefault').addEventListener('change', function () {
@@ -543,14 +575,15 @@
 <script>
     function guardarFila(elemento) {
         const fila = elemento.closest('tr');
-        const id = fila.dataset.id;
+        const id = fila.dataset.id || fila.getAttribute('data-id');
         const datos = {};
 
-        fila.querySelectorAll('input, select').forEach(el => {
-            if (el.type === 'checkbox') {
-                datos[el.name] = el.checked;
+        // Recolecta todos los campos de la fila
+        fila.querySelectorAll('input, select').forEach(input => {
+            if (input.type === 'checkbox') {
+                datos[input.name] = input.checked ? 1 : 0;
             } else {
-                datos[el.name] = el.value;
+                datos[input.name] = input.value;
             }
         });
 
@@ -558,14 +591,16 @@
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token() }}'  // Si estás usando CSRF con Flask-WTF
+                'X-CSRFToken': '{{ csrf_token() }}'
             },
             body: JSON.stringify(datos)
         })
-            .then(res => res.json())
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return response.json();
+            })
             .then(data => {
-                console.log(data.alert);
-                // Aquí podrías mostrar una notificación visual si deseas
+                console.log('Actualizado:', data);
             })
             .catch(error => {
                 console.error('Error al guardar:', error);
