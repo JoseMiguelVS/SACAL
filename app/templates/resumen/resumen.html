@@ -1,36 +1,36 @@
-{% extends './layout.html' %} {% block body %}
+{% extends './layout.html' %}
+{% block body %}
 <main class="w-100 d-flex flex-column">
-    <h2 class="text-center mb-4">Resumen generales</h2>
+    <h2 class="text-center mb-4">Resumen semanal</h2>
 
-    {% with messages = get_flashed_messages() %} {% if messages %} {% for
-    message in messages %}
-    <div class="alert alert-dismissible fade show alert-fixed {% if 'Error' in message %}alert-danger{% elif 'Advertencia' in message %}alert-warning{% else %}alert-success{% endif %}"
-        role="alert">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-dismissible fade show alert-fixed 
+                    {% if 'Error' in message %}alert-danger
+                    {% elif 'Advertencia' in message %}alert-warning
+                    {% else %}alert-success{% endif %}" role="alert">
         <strong>{{ message }}</strong>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-    {% endfor %} {% endif %} {% endwith %}
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
 
     <section class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
         <form method="get" action="{{ url_for('resumen_semanal.resumen') }}"
             class="d-flex flex-wrap align-items-center gap-2" id="filtroForm">
-
-            <!-- Fecha inicio -->
             <div class="d-flex flex-column">
                 <label for="fechaInicio" class="form-label mb-1">Fecha inicio</label>
                 <input type="date" id="fechaInicio" name="fecha_inicio" class="form-control form-control-sm"
                     value="{{ request.args.get('fecha_inicio', '') }}">
             </div>
-
-            <!-- Fecha fin -->
             <div class="d-flex flex-column">
                 <label for="fechaFin" class="form-label mb-1">Fecha fin</label>
                 <input type="date" id="fechaFin" name="fecha_fin" class="form-control form-control-sm filtro-auto"
                     value="{{ request.args.get('fecha_fin', '') }}">
             </div>
         </form>
-
-        <!-- Limpiar -->
         <a href="{{ url_for('resumen_semanal.resumen') }}" class="botones ml-2">Limpiar</a>
     </section>
 
@@ -46,7 +46,7 @@
                         <th>Precio</th>
                         <th>Promesas</th>
                         <th>Pagos</th>
-                        <th>Género</th>
+                        <th>Ingreso estimado</th>
                         <th>Total Generado</th>
                         <th>Publicidad</th>
                         <th>Gasto Ponente</th>
@@ -67,20 +67,18 @@
                     {% set f = filas[i] %}
                     <tr>
                         {% if i == 0 %}
-                        <td  style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
-                            rowspan="{{ rowspan }}">{{ f.nombre_ponente }}</td>
-                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
-                            rowspan="{{ rowspan }}">{{ f.nombre_curso }}</td>
+                        <td rowspan="{{ rowspan }}">{{ f.nombre_ponente }}</td>
+                        <td rowspan="{{ rowspan }}">{{ f.nombre_curso }}</td>
                         {% endif %}
-                        <td>${{ f.precio_paquete | float | round(3) }}</td>
+                        <td>${{ f.precio_paquete | float | round(2) }}</td>
                         <td>{{ f.total_promesas }}</td>
                         <td>{{ f.total_pagados }}</td>
-                        <td>{{ f.total_pagados * (f.precio_paquete or 0) }}</td>
-                        <td>${{ f.total_generado | float | round(3) }}</td>
-                        <td>$-{{ f.publicidad | float | round(3) }}</td>
-                        <td>$-{{ f.gasto_ponente | float | round(3) }}</td>
-                        <td>$-{{ f.iva | float | round(3) }}</td>
-                        <td>${{ f.diferencia | float | round(3) }}</td>
+                        <td>${{ (f.total_pagados * f.precio_paquete) | float | round(2) }}</td>
+                        <td>${{ f.total_generado | float | round(2) }}</td>
+                        <td>${{ f.publicidad | float | round(2) }}</td>
+                        <td>${{ f.gasto_ponente | float | round(2) }}</td>
+                        <td>${{ f.iva | float | round(2) }}</td>
+                        <td>${{ f.diferencia | float | round(2) }}</td>
                         {% if i == 0 %}
                         <td rowspan="{{ rowspan }}">{{ total_promesas }}</td>
                         <td rowspan="{{ rowspan }}">{{ total_pagados }}</td>
@@ -117,7 +115,7 @@
             </tr>
             <tr>
                 <td>falta</td>
-                <td>${{suma_total + meta - gasto_semanal}}</td>
+                <td>${{ ingreso_faltante | float | round(2) }}</td>
                 <td>${{ sueldos | float | round(2) }}</td>
                 <td class="text-start">sueldos</td>
             </tr>
@@ -127,27 +125,24 @@
                 <td class="text-start fw-bold">suma total gastos</td>
             </tr>
             <tr>
-                <td class="bg-danger text-white text-center fw-bold" colspan="1">1000</td>
+                <td class="bg-danger text-white text-center fw-bold">1000</td>
                 <td class="bg-danger text-white fw-bold text-center">{{ porcentaje | round(1) }}%</td>
                 <td class="bg-primary text-white fw-bold">${{ ingreso_faltante | float | round(2) }}</td>
                 <td class="text-start fw-bold">ingreso faltante</td>
             </tr>
         </table>
     </section>
-
 </main>
 
 <script>
     let debounceTimeout = null;
-
     document.querySelectorAll('.filtro-auto').forEach(select => {
         select.addEventListener('change', () => {
             clearTimeout(debounceTimeout);
             debounceTimeout = setTimeout(() => {
                 document.getElementById('filtroForm').submit();
-            }, 400); // Espera 400ms tras el último cambio
+            }, 400);
         });
     });
 </script>
-
 {% endblock %}
