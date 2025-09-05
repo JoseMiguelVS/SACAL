@@ -10,13 +10,13 @@ from ..constancias.qr import generar_qr_memoria
 from app.utils.listas import lista_categorias, lista_cuentas, lista_cursos, lista_equipos, lista_meses, lista_paquetes, lista_ponente, lista_privilegios, lista_semanas, lista_sesiones
 
 from ..utils.utils import get_db_connection, paginador1, paginador2, paginador3
+from .routes import constancias
 
-constancias = Blueprint('constancias', __name__) 
 
 #-----------------------------------------PRINCIPAL-------------------------------------------------
-@constancias.route("/constancias")
+@constancias.route("/constancias_especializacion")
 @login_required
-def constancias_buscar():
+def constancias_especializacion():
     search_query = request.args.get('buscar', '', type=str).strip()
     search_query_sql = f"%{search_query}%"
 
@@ -26,7 +26,7 @@ def constancias_buscar():
 
     sql_lim = '''SELECT * FROM asistencias_detalladas_constancias
                  WHERE (nombre_participante ILIKE %s OR clave_participante ILIKE %s) AND (validacion_pago = 1 OR validacion_pago = 2)
-                 AND constancia_enviada = False AND nombre_categoria = 'En vivo' 
+                 AND constancia_enviada =  AND nombre_categoria = 'En vivo' 
                  ORDER BY nombre_participante DESC
                  LIMIT %s OFFSET %s'''
 
@@ -45,7 +45,7 @@ def constancias_buscar():
 
     paginado = paginador3(sql_count, sql_lim, [search_query_sql, search_query_sql], 1, 25)
 
-    return render_template('constancias/constancias.html',
+    return render_template('constancias/constancias_especializacion.html',
                            equipos=lista_equipos(),
                            categorias=lista_categorias(),
                            cursos=lista_cursos(),
@@ -63,9 +63,9 @@ def constancias_buscar():
                            search_query=search_query,
                            constancias_por_enviar=constancias_por_enviar)
 
-@constancias.route("/constancias/filtros") 
+@constancias.route("/constancias_especializacion/filtros") 
 @login_required
-def constancias_filtros():
+def constancias_especializacion_filtros():
     # search_query = request.args.get('buscar', '', type=str)
     nombre_mes = request.args.get('mes', '', type=str)
     semana = request.args.get('semana', '', type=str)
@@ -99,7 +99,7 @@ def constancias_filtros():
         1, 25
     )
 
-    return render_template('constancias/constancias.html',
+    return render_template('constancias/constancias_especializacion.html',
                            equipos=lista_equipos(),
                            categorias=lista_categorias(),
                            cursos=lista_cursos(),
@@ -116,9 +116,9 @@ def constancias_filtros():
                            total_pages=paginado[4])
 
 #------------------------------------------------------DETALLES-----------------------------------------------------
-@constancias.route("/constancias/detalles/<int:id>")
+@constancias.route("/constancias_especializacion/detalles/<int:id>")
 @login_required
-def constancias_detalles(id):
+def constancias_especializacion_detalles(id):
      with get_db_connection() as con:
         with con.cursor(cursor_factory=RealDictCursor) as cur:
             # Asegúrate de usar parámetros para evitar inyección SQL
@@ -126,12 +126,12 @@ def constancias_detalles(id):
             participantes = cur.fetchone()
         if participantes is None:
             flash('El participante no exite o ha sido eliminado.')
-            return redirect(url_for('constancias.constancias_buscar'))
-        return render_template('constancias/constancias_detalles.html', 
+            return redirect(url_for('constancias.constancias_especializacion'))
+        return render_template('constancias/constancias_especializacion_detalles.html', 
                                participantes = participantes)
      
 #----------------------------------------------------------GENERADOR DE CONSTANCIAS-------------------------------------------------------------
-@constancias.route('/constancias/folio/', methods=["POST"])
+@constancias.route('/constancias_especializacion/folio/', methods=["POST"])
 @login_required
 def folio_constancia():
     folio = request.form.get("folio_constancia")
@@ -141,7 +141,7 @@ def folio_constancia():
 
     if not id or not curso or not fecha_curso or not folio:
         flash('Datos incompletos', 'Error')
-        return redirect(url_for('constancias.constancias_buscar'))
+        return redirect(url_for('constancias.constancias_especializacion'))
 
     with get_db_connection() as con:
         with con.cursor() as cur:
@@ -161,16 +161,16 @@ def folio_constancia():
 ))
 
 # ------------------------------------FOLIO DEL PARTICIPANTE------------------------------------
-@constancias.route("/constancias/folio/generar")
+@constancias.route("/constancias_especializacion/folio/generar")
 @login_required 
-def constancias_generar():
+def constancias_especializacion_generar():
     id = request.args.get("id")
     curso = request.args.get("curso")
     fecha_curso = request.args.get("fecha_curso")  # formato ISO: 'YYYY-MM-DD'
 
     if not id or not curso or not fecha_curso:
         flash('Datos incompletos')
-        return redirect(url_for('constancias.constancias_buscar'))
+        return redirect(url_for('constancias.constancias_especializacion'))
 
     with get_db_connection() as con:
         with con.cursor(cursor_factory=RealDictCursor) as cur:
@@ -202,9 +202,9 @@ def constancias_generar():
     )
 
 #--------------------------------------------------------------EDITAR PARTICIPANTE----------------------------------------------------------------------------
-@constancias.route("/constancias/participantes")
+@constancias.route("/constancias_especializacion/participantes")
 @login_required
-def constancias_editar():
+def constancias_especializacion_editar():
     id = request.args.get("id")
     curso = request.args.get("curso")
     con = get_db_connection()
@@ -214,15 +214,15 @@ def constancias_editar():
     con.commit()
     cur.close()
     con.close()
-    return render_template('constancias/constancias_editar.html', 
+    return render_template('constancias/constancias_especializacion_editar.html', 
                            participante = participante[0], 
                            cursos = lista_cursos(), 
                            categorias = lista_categorias(), 
                            ponentes = lista_ponente())
 
-@constancias.route("/constancias/actualizar/<int:id>", methods = ['POST'])
+@constancias.route("/constancias_especializacion/actualizar/<int:id>", methods = ['POST'])
 @login_required
-def constancias_actualizar(id):
+def constancias_especializacion_actualizar(id):
     datos = request.form
     con = get_db_connection()
     cur = con.cursor()
@@ -246,19 +246,19 @@ def constancias_actualizar(id):
     cur.close()
     con.close()
     flash('Datos para constancia actualizados correctamente')
-    return redirect(url_for('constancias.constancias_buscar'))
+    return redirect(url_for('constancias.constancias_especializacion'))
 
 #-----------------------------------------------------------------------------------------------------------------
-@constancias.route('/constancias/modificar', methods=['POST'])
+@constancias.route('/constancias_especializacion/modificar', methods=['POST'])
 @login_required
-def modificar_constancia():
+def modificar_constancias_especializacion():
     id_participante = request.args.get("id")
     constancia_enviada = True
     datos = request.form
 
     if not id_participante:
         flash("Faltan parámetros", "Error")
-        return redirect(url_for("constancias.constancias_buscar"))
+        return redirect(url_for("constancias.constancias_especializacion"))
 
     con = get_db_connection()
     cur = con.cursor()
@@ -286,10 +286,10 @@ def modificar_constancia():
         cur.close()
         con.close()
 
-    return redirect(url_for("constancias.constancias_buscar"))
+    return redirect(url_for("constancias.constancias_especializacion"))
 
 #----------------------------------------------------------------------------------------------------------------------------------
-@constancias.route("/constancias/hechas&enviadas")
+@constancias.route("/constancias_especializacion/hechas&enviadas")
 @login_required
 def constancias_hechas():
     search_query = request.args.get('buscar', '', type=str).strip()
@@ -324,7 +324,7 @@ def constancias_hechas():
                            total_pages=paginado[4],
                            search_query=search_query)
 
-@constancias.route("/constancias/filtros/hechas&enviadas") 
+@constancias.route("/constancias_especializacion/filtros/hechas&enviadas") 
 @login_required
 def constancias_hechas_filtros():
     # search_query = request.args.get('buscar', '', type=str)

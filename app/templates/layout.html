@@ -88,7 +88,7 @@
                         <a href="{{ url_for('constancias.constancias_buscar') }}">Constancias</a>
                     </li>
                     {% if current_user.rol == 1 %}
-                    <li><a href="{{ url_for('pagos.pagos_buscar') }}">Pagos</a></li>
+                    <li><a href="{{ url_for('pagos.pagos_buscar') }}">Pagos/Gastos</a></li>
                     <li>
                         <a href="{{ url_for('resumen_semanal.resumen') }}">Resumen</a>
                     </li>
@@ -146,7 +146,7 @@
                                 style="color: white;">Constancias</a>
                         </li>
                         {% if current_user.rol == 1 %}
-                        <li><a href="{{ url_for('pagos.pagos_buscar') }}" style="color: white;">Pagos</a></li>
+                        <li><a href="{{ url_for('pagos.pagos_buscar') }}" style="color: white;">Pagos/Gastos</a></li>
                         <li>
                             <a href="{{ url_for('resumen_semanal.resumen') }}" style="color: white;">Resumen</a>
                         </li>

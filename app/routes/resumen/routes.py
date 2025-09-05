@@ -1,201 +1,120 @@
-from flask import Blueprint, flash, render_template, request
+from flask import Blueprint, render_template, request
 from flask_login import login_required
-from datetime import datetime, timedelta, date
 from psycopg2.extras import RealDictCursor
 from collections import defaultdict
 from ..utils.utils import get_db_connection, rol_admin_required
-from app.utils.listas import lista_categorias, lista_meses
-from collections import defaultdict
-from decimal import Decimal
-resumen_semanal = Blueprint('resumen_semanal', __name__)
+from app.utils.listas import lista_categorias, lista_paquetes
 
-def lista_semanas(year=None):
-    if year is None:
-        year = date.today().year
-    d = date(year, 1, 1)
-    d -= timedelta(days=d.weekday())  # lunes igual o anterior al 1ro enero
-    semanas = []
-    semana_id = 1
-    while d.year <= year:
-        inicio = d
-        fin = d + timedelta(days=6)
-        if inicio.year > year:
-            break
-        texto = f"{inicio.day:02d} {inicio.strftime('%b')} - {fin.day:02d} {fin.strftime('%b')}"
-        semanas.append((semana_id, texto))
-        semana_id += 1
-        d += timedelta(weeks=1)
-    return semanas
+resumen_semanal = Blueprint('resumen_semanal', __name__)
 
 @resumen_semanal.route('/resumen', methods=['GET'])
 @login_required
 @rol_admin_required
 def resumen():
-    def safe_float(value):
-        try:
-            return float(value)
-        except (TypeError, ValueError):
-            return 0.0
-
     fecha_inicio_str = request.args.get('fecha_inicio', '', type=str)
     fecha_fin_str = request.args.get('fecha_fin', '', type=str)
-
-    fecha_inicio = None
-    fecha_fin = None
-
-    try:
-        if fecha_inicio_str:
-            fecha_inicio = datetime.strptime(fecha_inicio_str, "%Y-%m-%d")
-        if fecha_fin_str:
-            fecha_fin = datetime.strptime(fecha_fin_str, "%Y-%m-%d")
-    except ValueError:
-        flash("Fechas inválidas", "warning")
 
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
-    cur.execute("SELECT * FROM asistencias_detalladas")
-    asistencias = cur.fetchall()
+    # Obtener cursos y su categoría
+    query_cursos = "SELECT * FROM vista_gastos_detallados"
+    params = []
+    if fecha_inicio_str:
+        query_cursos += " WHERE fecha_curso >= %s"
+        params.append(fecha_inicio_str)
+    if fecha_fin_str:
+        query_cursos += " AND fecha_curso <= %s" if "WHERE" in query_cursos else " WHERE fecha_curso <= %s"
+        params.append(fecha_fin_str)
+    cur.execute(query_cursos, params)
+    registros = cur.fetchall()
 
-    cur.execute("SELECT * FROM detalles_pagos")
-    pagos = cur.fetchall()
+    # Traer paquetes directamente de la base de datos
+    cur.execute("""
+        SELECT id_paquete, nombre_paquete, precio_paquete, categoria_paquete
+        FROM paquetes
+    """)
+    todos_paquetes = cur.fetchall()  # lista de dicts gracias a RealDictCursor
 
-    cur.execute("SELECT * FROM detalles_gastos")
-    gastos = cur.fetchall()
+    datos_finales = []
+    for r in registros: 
+        fila = {}
+        fila['fecha_obj'] = r['fecha_curso']
+        fila['nombre_curso'] = r['cursos']
+        fila['nombre_ponente'] = r['ponentes']
+        fila['categoria'] = int(r['categoria'])
+        
+        # Filtrar paquetes de la categoría del curso
+        paquetes_categoria = [p for p in todos_paquetes if int(p['categoria_paquete']) == fila['categoria']]
+        
+        fila['paquetes'] = []
+        fila['total_promesas'] = 0
+        fila['total_pagados'] = 0
+        fila['total_generado'] = 0.0
+
+    for p in paquetes_categoria:
+        # Contar participantes de ese curso y paquete
+        cur.execute("""
+            SELECT 
+                COUNT(*) AS total_promesas,
+                COUNT(*) FILTER (WHERE validacion_pago = 1) AS total_pagados
+            FROM asistencias_detalladas
+            WHERE cursos = %s AND nombre_paquete = %s
+        """, (fila['nombre_curso'], p['nombre_paquete']))
+        conteo = cur.fetchone()
+
+        fila['paquetes'].append({
+            'nombre_paquete': p['nombre_paquete'],
+            'precio_paquete': float(p['precio_paquete']),
+            'total_promesas': conteo['total_promesas'],
+            'total_pagados': conteo['total_pagados']
+        })
+
+        fila['total_promesas'] += conteo['total_promesas']
+        fila['total_pagados'] += conteo['total_pagados']
+        fila['total_generado'] += conteo['total_pagados'] * float(p['precio_paquete'])
+
+    # Gastos
+    fila['publicidad'] = float(r.get('publicidad') or 0)
+    fila['honorarios'] = float(r.get('honorarios') or 0)
+    fila['iva'] = float(r.get('iva') or 0)
+    fila['gasto_ponente'] = float(r.get('gasto_ponente') or 0)
+    fila['diferencia'] = fila['total_generado'] - fila['publicidad'] - fila['honorarios'] - fila['iva'] - fila['gasto_ponente']
+
+    datos_finales.append(fila)
+
+    # Agrupar por categoría para la plantilla
+    cursos_por_categoria = defaultdict(list)
+    for fila in datos_finales:
+        cursos_por_categoria[fila['categoria']].append(fila)
+
+    # Totales generales
+    suma_total = sum(f['total_generado'] for f in datos_finales)
+    publicidad_total = sum(f['publicidad'] for f in datos_finales)
+    honorarios_total = sum(f['honorarios'] for f in datos_finales)
+    iva_total = sum(f['iva'] for f in datos_finales)
+    sueldos_total = sum(f['gasto_ponente'] for f in datos_finales)
+    total_gastos = publicidad_total + honorarios_total + iva_total + sueldos_total
+    meta = 100000.0
+    porcentaje = (suma_total / meta) * 100 if meta > 0 else 0
+    ingreso_faltante = max(0, meta - suma_total)
 
     cur.close()
     conn.close()
 
-    # Inicialización segura del resumen
-    resumen_datos = defaultdict(lambda: {
-        "total_promesas": 0,
-        "total_pagados": 0,
-        "total_generado": 0.0,
-        "iva": 0.0,
-        "gastos": 0.0,
-        "publicidad": 0.0,
-        "gasto_ponente": 0.0,
-        "honorarios": 0.0,
-        "gastos_ventas": 0.0,
-        "gastos_admin": 0.0,
-        "nombre_ponente": set(),
-        "nombre_curso": set(),
-        "nombre_categoria": set(),
-        "precio_paquete": 0.0
-    })
-
-    # Procesar asistencias
-    for a in asistencias:
-        fecha = a['fecha']
-        if fecha_inicio and fecha < fecha_inicio.date():
-            continue
-        if fecha_fin and fecha > fecha_fin.date():
-            continue
-
-        resumen = resumen_datos[fecha]
-        resumen["nombre_ponente"].update(str(x).strip() for x in a.get('ponentes', '').split(",") if x)
-        resumen["nombre_curso"].update(str(x).strip() for x in a.get('cursos', '').split(",") if x)
-        resumen["nombre_categoria"].add(str(a.get('nombre_categoria', '')).strip())
-        resumen["precio_paquete"] = safe_float(a.get('precio_paquete'))
-        resumen["precio_paquete"] = safe_float(a.get('precio_paquete'))
-
-        # Procesar pagos
-    for p in pagos:
-        fecha = p['fecha_pago']
-        if fecha_inicio and fecha < fecha_inicio.date():
-            continue
-        if fecha_fin and fecha > fecha_fin.date():
-            continue
-
-        resumen = resumen_datos[fecha]
-        ingresos = safe_float(p.get('ingresos'))
-        iva_valor = safe_float(p.get('iva'))
-
-        resumen["total_pagados"] += int(ingresos > 0)
-        resumen["total_promesas"] += int(ingresos == 0)
-        resumen["total_generado"] += ingresos
-        resumen["iva"] += ingresos * iva_valor
-
-    # Procesar gastos
-    for g in gastos:
-        fecha = g['fecha']
-        if fecha_inicio and fecha < fecha_inicio.date():
-            continue
-        if fecha_fin and fecha > fecha_fin.date():
-            continue
-
-        resumen = resumen_datos[fecha]
-        monto = safe_float(g.get('monto_gasto'))
-        concepto = g.get('nombre_gasto', '').lower()
-
-        resumen["gastos"] += monto
-        if "publicidad" in concepto:
-            resumen["publicidad"] += monto
-        elif "sueldos" in concepto:
-            resumen["gasto_ponente"] += monto
-        elif "honorarios" in concepto:
-            resumen["honorarios"] += monto
-        elif "ventas" in concepto:
-            resumen["gastos_ventas"] += monto
-        elif "administrativos" in concepto:
-            resumen["gastos_admin"] += monto
-
-    # Convertir sets a texto y calcular diferencia
-    datos_finales = []
-    for fecha, datos in resumen_datos.items():
-        datos["fecha"] = fecha
-        datos["nombre_ponente"] = ", ".join(sorted(datos["nombre_ponente"]))
-        datos["nombre_curso"] = ", ".join(sorted(datos["nombre_curso"]))
-        datos["nombre_categoria"] = ", ".join(sorted(datos["nombre_categoria"]))
-        datos["diferencia"] = round(
-            datos["total_generado"]
-            - datos["gastos_ventas"]
-            - datos["gastos_admin"]
-            - datos["iva"],
-            2
-        )
-        datos_finales.append(datos)
-
-    datos_finales.sort(key=lambda x: x["fecha"], reverse=True)
-
-    for fila in datos_finales:
-        fecha = fila['fecha']
-        fila['nombre_mes'] = fecha.strftime('%B').capitalize()
-        fila['fecha_obj'] = fecha
-
-    agrupado = defaultdict(list)
-    for fila in datos_finales:
-        clave = f"{fila['fecha']}_{fila['nombre_ponente']}_{fila['nombre_curso']}"
-        agrupado[clave].append(fila)
-
-    suma_total = sum(f['total_generado'] for f in datos_finales)
-    publicidad_total = sum(f['publicidad'] for f in datos_finales)
-    honorarios = sum(f['honorarios'] for f in datos_finales)
-    gasto_total = sum(f['gastos'] for f in datos_finales)
-    iva = sum(f['iva'] for f in datos_finales)
-    sueldos = sum(f['gasto_ponente'] for f in datos_finales)
-
-    total_gastos = publicidad_total + honorarios + iva + sueldos
-    meta = 100000.0
-    porcentaje = (suma_total / meta) * 100 if meta > 0 else 0
-    ingreso_faltante = meta - suma_total if suma_total < meta else 0
-
     return render_template(
         'resumen/resumen.html',
-        datos=datos_finales,
-        agrupado=agrupado,
+        cursos_por_categoria=cursos_por_categoria,
+        categorias=lista_categorias(),
         fecha_inicio=fecha_inicio_str,
         fecha_fin=fecha_fin_str,
-        categorias=lista_categorias(),
-        meses=lista_meses(),
         suma_total=suma_total,
         publicidad_total=publicidad_total,
-        honorarios=honorarios,
-        iva=iva,
-        sueldos=sueldos,
+        honorarios=honorarios_total,
+        iva=iva_total,
+        sueldos=sueldos_total,
         total_gastos=total_gastos,
         meta=meta,
         porcentaje=porcentaje,
-        ingreso_faltante=ingreso_faltante,
-        gasto_semanal=gasto_total
+        ingreso_faltante=ingreso_faltante
     )

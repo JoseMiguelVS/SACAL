@@ -89,6 +89,15 @@ def sesion_nuevo():
         valores_sesion = (categoria, mes, semana, estado)
         cur.execute(sql_sesion, valores_sesion)
         sesion_id = cur.fetchone()['id_sesion']
+        
+        sql_gastos = '''
+            INSERT INTO gastos_sesiones
+            (sesion_id, publicidad, honorarios  )
+            VALUES (%s, %s, %s)
+            '''
+            
+        valores_gastos = (sesion_id, 0, 0)
+        cur.execute(sql_gastos, valores_gastos)
 
         # Insertar cursos y ponentes
         sql_relacion = '''

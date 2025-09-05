@@ -8,12 +8,12 @@ from app.utils.listas import lista_conceptos, lista_gastos, lista_meses, lista_s
 from ..utils.utils import get_db_connection, paginador3
 
 # Blueprint
-pagos = Blueprint('pagos', __name__)
+from .routes import pagos
 
 # ---------------------------------BUSCAR PAGOS---------------------------------
-@pagos.route("/pagos")
+@pagos.route("/pagos_validados")
 @login_required
-def pagos_buscar():
+def pagos_validados():
     # Búsqueda
     search_query = request.args.get('buscar', '', type=str).strip()
     search_query_sql = f"%{search_query}%"
@@ -23,13 +23,13 @@ def pagos_buscar():
     # Pagos con búsqueda
     sql_count = '''
         SELECT COUNT(*) FROM detalles_pagos 
-        WHERE (clave_participante ILIKE %s OR nombre_participante ILIKE %s)
+        WHERE (clave_participante ILIKE %s OR nombre_participante ILIKE %s AND validacion_pago = 1)
     '''
     sql_lim = '''
         SELECT dp.*, pa.factura_pago
         FROM detalles_pagos dp
         JOIN participantes pa ON dp.clave_participante = pa.clave_participante
-        WHERE (dp.clave_participante ILIKE %s OR dp.nombre_participante ILIKE %s)
+        WHERE (dp.clave_participante ILIKE %s OR dp.nombre_participante ILIKE %s AND validacion_pago = 1)
         ORDER BY dp.id_pago DESC
         LIMIT %s OFFSET %s
 
@@ -40,7 +40,7 @@ def pagos_buscar():
                           ], 
                           page, per_page)
 
-    return render_template('pagos/pagos.html',
+    return render_template('pagos/pagos_validados.html',
                            meses=lista_meses(),
                            semanas=lista_semanas(),
                            pagos=paginado[0],
@@ -52,9 +52,9 @@ def pagos_buscar():
                            gasto=lista_gastos(),
                            search_query=search_query)
 
-@pagos.route("/pagos/filtros")
+@pagos.route("/pagos_validados/filtros")
 @login_required
-def pagos_filtros():
+def pagos_validados_filtros():
     fecha_inicio = request.args.get('fecha_inicio', '', type=str)
     fecha_fin = request.args.get('fecha_fin', '', type=str)
     page = request.args.get('page', 1, type=int)
@@ -81,18 +81,39 @@ def pagos_filtros():
         page, per_page
     )
 
+    # -------------------- GASTOS --------------------
+    sql_countG = '''
+        SELECT COUNT(*) FROM detalles_gastos
+        WHERE (%s = '' OR fecha >= %s)
+        AND (%s = '' OR fecha <= %s)
+    '''
+
+    sql_limG = '''
+        SELECT * FROM detalles_gastos
+        WHERE (%s = '' OR fecha >= %s)
+        AND (%s = '' OR fecha <= %s)
+        ORDER BY fecha DESC
+        LIMIT %s OFFSET %s
+    '''
+
+    paginado_gastos = paginador3(
+        sql_countG, sql_limG,
+        [fecha_inicio, fecha_inicio, fecha_fin, fecha_fin],
+        1, 10
+    )
+
     return render_template(
-        'pagos/pagos.html',
+        'pagos/pagos_validados.html',
         paginado=paginado,
+        paginado_gastos=paginado_gastos,
         fecha_inicio=fecha_inicio,
         fecha_fin=fecha_fin
     )
 
-
 # -----------------------------COMPROBANTES-----------------------------
-@pagos.route("/pagos/comprobantes/<string:id>")
+@pagos.route("/pagos_validados/comprobantes/<string:id>")
 @login_required
-def pagos_comprobantes(id):
+def pagos_validados_comprobantes(id):
     supabase_url="https://ipecmsarkhzdzkkanxvj.supabase.co/storage/v1/object/public/tickets"
     with get_db_connection() as conn:
         with conn.cursor(cursor_factory=RealDictCursor) as cur:
@@ -100,12 +121,12 @@ def pagos_comprobantes(id):
             pagos = cur.fetchone()
     if pagos is None:
         flash('El particiante no existe o ha sido eliminado.')
-        return redirect(url_for('pagos.pagos_buscar'))
-    return render_template('pagos/pagos_detalles.html', pagos = pagos, url = supabase_url)
+        return redirect(url_for('pagos.pagos__validados'))
+    return render_template('pagos/pagos_validados_detalles.html', pagos = pagos, url = supabase_url)
 
-@pagos.route("/pagos/comprobantes/editar/<string:id>", methods=['POST'])
+@pagos.route("/pagos_validados/comprobantes/editar/<string:id>", methods=['POST'])
 @login_required
-def pagos_actualizar(id):
+def pagos_validados_actualizar(id):
     if request.method == 'POST':
         clave_rastreo = request.form['clave_rastreo']
         validacion_pago = request.form['validacion_pago']
@@ -120,12 +141,12 @@ def pagos_actualizar(id):
         cur.close()
         con.close()
         flash('Pago actualizado correctamente')
-    return redirect(url_for('pagos.pagos_buscar'))
+    return redirect(url_for('pagos.pagos__validados'))
 
 #----------------------------------------------DEVOLUCION----------------------------------------------
-@pagos.route("/pagos/devolucion/<string:id>", methods=['POST'])
+@pagos.route("/pagos_validados/devolucion/<string:id>", methods=['POST'])
 @login_required
-def pagos_devolucion(id):
+def pagos_validados_devolucion(id):
     devolucion = request.form.get('devolucion', '0')
 
     try:
@@ -148,12 +169,12 @@ def pagos_devolucion(id):
         cur.close()
         con.close()
 
-    return redirect(url_for('pagos.pagos_buscar'))
+    return redirect(url_for('pagos.pagos__validados'))
 
 # -----------------------------------DETALLES DE PAGOS-----------------------------------
-@pagos.route("/pagos/detalles/<int:id>")
+@pagos.route("/pagos_validados/detalles/<int:id>")
 @login_required
-def pagos_detalles(id):
+def pagos_validados_detalles(id):
     with get_db_connection() as con:
         with con.cursor(cursor_factory=RealDictCursor) as cur:
             cur.execute('SELECT * FROM detalles_pagos2 WHERE id_pago = %s', (id,))
@@ -161,12 +182,43 @@ def pagos_detalles(id):
     if pago is None:
         flash('El pago no existe o ha sido eliminado.')
         return redirect(url_for('pagos.pagos_buscar'))
-    return render_template('pagos/pagos_detalles.html', pagos=pago)
+    return render_template('pagos/pagos_validados_detalles.html', pagos=pago)
 
-#-----------------------------------------AGREGAR FACTURA PAGOS-----------------------------------------
-@pagos.route("/pagos/agregar/factura/<string:id>", methods=["POST"])
+# ----------------------------------------AGREGAR----------------------------------------
+@pagos.route("/pagos_validados/agregar/gasto", methods = ("GET", "POST"))
 @login_required
-def factura_nueva(id):
+def pagos_validados_nuevo():
+    if request.method == 'POST':
+        monto_gasto = request.form['gasto']
+        concepto_gasto = request.form['conceptos']
+        mes = request.form['mes']
+        semana = request.form['semana']
+        fecha = datetime.now().date()
+
+        con = get_db_connection()
+        cur = con.cursor(cursor_factory=RealDictCursor)
+
+        sql = '''
+                    INSERT INTO gastos
+                        (fecha, monto_gasto, concepto_gasto)
+                        VALUES (%s, %s, %s)
+              '''
+        valores = (fecha, monto_gasto, concepto_gasto)
+        cur.execute(sql, valores)
+
+        con.commit()
+        cur.close()
+        con.close()
+
+        flash("Gasto registrado correctamente.")
+        return redirect(url_for('pagos.pagos_filtros'))
+    
+    return redirect(url_for('pagos.pagos_validados'))
+
+#-----------------------------------------AGREGAR FACTURA-----------------------------------------
+@pagos.route("/pagos_validados/agregar/factura/<string:id>", methods=["POST"])
+@login_required
+def factura_validados_nueva(id):
     if request.method == 'POST':
         ingreso_factura = request.form['ingreso_factura']
         concepto_factura = request.form['concepto_factura']
@@ -184,4 +236,4 @@ def factura_nueva(id):
         con.close()
 
         flash("Factura registrada con exito")
-    return redirect(url_for("pagos.pagos_buscar"))
+    return redirect(url_for("pagos.pagos_validados"))

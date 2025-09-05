@@ -7,9 +7,9 @@
     {% if messages %}
     {% for message in messages %}
     <div class="alert alert-dismissible fade show alert-fixed 
-                    {% if 'Error' in message %}alert-danger
-                    {% elif 'Advertencia' in message %}alert-warning
-                    {% else %}alert-success{% endif %}" role="alert">
+                {% if 'Error' in message %}alert-danger
+                {% elif 'Advertencia' in message %}alert-warning
+                {% else %}alert-success{% endif %}" role="alert">
         <strong>{{ message }}</strong>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
@@ -17,33 +17,42 @@
     {% endif %}
     {% endwith %}
 
+    <!-- Filtro de fechas -->
     <section class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
         <form method="get" action="{{ url_for('resumen_semanal.resumen') }}"
             class="d-flex flex-wrap align-items-center gap-2" id="filtroForm">
             <div class="d-flex flex-column">
                 <label for="fechaInicio" class="form-label mb-1">Fecha inicio</label>
                 <input type="date" id="fechaInicio" name="fecha_inicio" class="form-control form-control-sm"
-                    value="{{ request.args.get('fecha_inicio', '') }}">
+                    value="{{ fecha_inicio }}">
             </div>
             <div class="d-flex flex-column">
                 <label for="fechaFin" class="form-label mb-1">Fecha fin</label>
                 <input type="date" id="fechaFin" name="fecha_fin" class="form-control form-control-sm filtro-auto"
-                    value="{{ request.args.get('fecha_fin', '') }}">
+                    value="{{ fecha_fin }}">
             </div>
         </form>
         <a href="{{ url_for('resumen_semanal.resumen') }}" class="botones ml-2">Limpiar</a>
     </section>
 
+    <!-- Tabla por categorías -->
     <section class="tables_participantes table">
         <div class="table-responsive">
             {% for categoria in categorias %}
-            <h4 class="text-center my-4">Cursos en {{ categoria[1] }}</h4>
+            {% set categoria_id = categoria[0] %}
+            {% set categoria_nombre = categoria[1] %}
+            {% set cursos_categoria = cursos_por_categoria[categoria_id] if categoria_id in cursos_por_categoria else []
+            %}
+
+            {% if cursos_categoria %}
+            <h4 class="text-center my-4">Cursos en {{ categoria_nombre }}</h4>
             <table class="table table-hover table-bordered align-middle text-nowrap">
                 <thead class="table-light small">
                     <tr>
+                        <th>Fecha</th>
                         <th>Ponente</th>
                         <th>Curso</th>
-                        <th>Precio</th>
+                        <th>Paquete / Precio</th>
                         <th>Promesas</th>
                         <th>Pagos</th>
                         <th>Ingreso estimado</th>
@@ -52,47 +61,44 @@
                         <th>Gasto Ponente</th>
                         <th>IVA</th>
                         <th>Diferencia</th>
-                        <th>Total Promesas</th>
-                        <th>Total Pagados</th>
                     </tr>
                 </thead>
                 <tbody class="small">
-                    {% for key, filas in agrupado.items() %}
-                    {% set f0 = filas[0] %}
-                    {% if f0.nombre_categoria == categoria[1] %}
-                    {% set rowspan = filas | length %}
-                    {% set total_promesas = filas | map(attribute='total_promesas') | sum %}
-                    {% set total_pagados = filas | map(attribute='total_pagados') | sum %}
-                    {% for i in range(filas | length) %}
-                    {% set f = filas[i] %}
+                    {% for f in cursos_categoria %}
+                    {% set paquete_count = f.paquetes | length %}
+                    {% for p in f.paquetes %}
                     <tr>
-                        {% if i == 0 %}
-                        <td rowspan="{{ rowspan }}">{{ f.nombre_ponente }}</td>
-                        <td rowspan="{{ rowspan }}">{{ f.nombre_curso }}</td>
+                        {% if loop.first %}
+                        <td rowspan="{{ paquete_count }}">{{ f.fecha_obj }}</td>
+                        <td rowspan="{{ paquete_count }}">{{ f.nombre_ponente }}</td>
+                        <td rowspan="{{ paquete_count }}">{{ f.nombre_curso }}</td>
                         {% endif %}
-                        <td>${{ f.precio_paquete | float | round(2) }}</td>
-                        <td>{{ f.total_promesas }}</td>
-                        <td>{{ f.total_pagados }}</td>
-                        <td>${{ (f.total_pagados * f.precio_paquete) | float | round(2) }}</td>
-                        <td>${{ f.total_generado | float | round(2) }}</td>
-                        <td>${{ f.publicidad | float | round(2) }}</td>
-                        <td>${{ f.gasto_ponente | float | round(2) }}</td>
-                        <td>${{ f.iva | float | round(2) }}</td>
-                        <td>${{ f.diferencia | float | round(2) }}</td>
-                        {% if i == 0 %}
-                        <td rowspan="{{ rowspan }}">{{ total_promesas }}</td>
-                        <td rowspan="{{ rowspan }}">{{ total_pagados }}</td>
+
+                        <td>{{ p.nombre_paquete }}: ${{ p.precio_paquete | round(2) }}</td>
+                        <td>{{ p.total_promesas }}</td>
+                        <td>{{ p.total_pagados }}</td>
+                        <td>${{ (p.total_pagados * p.precio_paquete) | round(2) }}</td>
+
+                        {% if loop.first %}
+                        <td rowspan="{{ paquete_count }}">${{ f.total_generado | round(2) }}</td>
+                        <td rowspan="{{ paquete_count }}">${{ f.publicidad | round(2) }}</td>
+                        <td rowspan="{{ paquete_count }}">${{ f.gasto_ponente | round(2) }}</td>
+                        <td rowspan="{{ paquete_count }}">${{ f.iva | round(2) }}</td>
+                        <td rowspan="{{ paquete_count }}">${{ (f.total_generado - f.publicidad - f.gasto_ponente -
+                            f.iva) | round(2) }}</td>
                         {% endif %}
                     </tr>
                     {% endfor %}
-                    {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
+
+            {% endif %}
             {% endfor %}
         </div>
     </section>
 
+    <!-- Totales generales -->
     <section class="table-responsive table-sm">
         <table class="table table-bordered text-end align-middle" style="width: auto;">
             <tr>
@@ -109,7 +115,7 @@
             </tr>
             <tr>
                 <td>gasto semanal</td>
-                <td>${{ gasto_semanal | float | round(2) }}</td>
+                <td>${{ gasto_semanal | float | round(2) if gasto_semanal is defined else 0 }}</td>
                 <td>${{ iva | float | round(2) }}</td>
                 <td class="text-start">iva</td>
             </tr>

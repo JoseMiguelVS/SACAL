@@ -1,6 +1,6 @@
 {% extends './layout.html' %} {% block body %}
 <main class="container my-4 ">
-    <h2 class="text-center mb-4">Constancias</h2>
+    <h2 class="text-center mb-4">Constancias de Especializaciones</h2>
     <!-- Alertas -->
     {% with messages = get_flashed_messages() %} {% if messages %} {% for
     message in messages %}
@@ -13,7 +13,7 @@
 
     <section class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
         <!-- Buscador por clave a la derecha -->
-        <form id="formBuscar" method="get" action="{{ url_for('constancias.constancias_buscar') }}"
+        <form id="formBuscar" method="get" action="{{ url_for('constancias.constancias_especializacion') }}"
             class="d-flex flex-grow-1 justify-content-end">
             <div class="input-group" style="max-width: 300px;">
                 <input class="form-control mr-2" type="text" name="buscar" value="{{ search_query }}"
@@ -28,7 +28,7 @@
 
     <section class="container mb-4">
         <!-- Filtros principales -->
-        <form method="get" action="{{ url_for('constancias.constancias_filtros') }}" id="filtroForm">
+        <form method="get" action="{{ url_for('constancias.constancias_especializacion_filtros') }}" id="filtroForm">
             <div class="row g-3 align-items-end">
                 <!-- Mes -->
                 <div class="col-sm-3">
@@ -96,7 +96,7 @@
             <!-- Fila inferior: botón Limpiar -->
             <div class="row mt-3">
                 <div class="col-auto">
-                    <a href="{{ url_for('constancias.constancias_buscar') }}"
+                    <a href="{{ url_for('constancias.constancias_especializacion') }}"
                         class="btn btn-outline-secondary btn-sm">Limpiar</a>
                 </div>
             </div>
@@ -137,7 +137,7 @@
                         <!-- Botón Detalles -->
                         <td>
                             <a class="botones-ver"
-                                href="{{ url_for('constancias.constancias_detalles', id=p.id_participante) }}">
+                                href="{{ url_for('constancias.constancias_especializacion_detalles', id=p.id_participante) }}">
                                 <li class="fa fa-eye" style="font-size: 18px;"></li>
                             </a>
                         </td>
@@ -154,7 +154,7 @@
                         <!-- Botón Editar -->
                         <td>
                             <a class="botones-editar"
-                                href="{{ url_for('constancias.constancias_editar', id=p.id_participante, curso=p.nombre_curso) }}">
+                                href="{{ url_for('constancias.constancias_especializacion_editar', id=p.id_participante, curso=p.nombre_curso) }}">
                                 <li class="fa fa-edit" style="font-size: 18px;"></li>
                             </a>
                         </td>
@@ -177,7 +177,7 @@
                         </td>
 
                         <form class="d-flex" method="post"
-                            action="{{ url_for('constancias.modificar_constancia') }}?id={{ p.id_participante }}&id_curso={{ p.curso_id }}">
+                            action="{{ url_for('constancias.modificar_constancias_especializacion') }}?id={{ p.id_participante }}&id_curso={{ p.curso_id }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <td class="text-nowrap">
                                 <input type="checkbox" name="constancia_enviada" {% if p.constancia_enviada %}checked{%
@@ -199,7 +199,7 @@
                     <!-- Mostrar normalmente -->
                     <tr data-id="{{ p.id_participante }}">
                         <td>
-                            <a href="{{ url_for('constancias.constancias_detalles', id=p.id_participante) }}"
+                            <a href="{{ url_for('constancias.constancias_especializacion_detalles', id=p.id_participante) }}"
                                 class="botones-ver">
                                 <li class="fa fa-eye" style="font-size: 18px;"></li>
                             </a>
@@ -213,7 +213,7 @@
                         </td>
                         <td>
                             <a class="botones-editar"
-                                href="{{ url_for('constancias.constancias_editar', id=p.id_participante, curso=p.nombre_curso) }}">
+                                href="{{ url_for('constancias.constancias_especializacion_editar', id=p.id_participante, curso=p.nombre_curso) }}">
                                 <li class="fa fa-edit" style="font-size: 18px;"></li>
                             </a>
                         </td>
@@ -236,7 +236,7 @@
                         </td>
 
                         <form class="d-flex" method="post"
-                            action="{{ url_for('constancias.modificar_constancia') }}?id={{ p.id_participante }}&id_curso={{ p.curso_id }}">
+                            action="{{ url_for('constancias.modificar_constancias_especializacion') }}?id={{ p.id_participante }}&id_curso={{ p.curso_id }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <td class="text-nowrap">
                                 <input type="checkbox" name="constancia_enviada" {% if p.constancia_enviada %}checked{%
@@ -277,19 +277,20 @@
             {% if page > 1 %}
             <li class="page-item">
                 <a class="page-link"
-                    href="{{url_for('constancias.constancias_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                    href="{{url_for('constancias.constancias_especializacion')}}?page={{ page - 1 }}&per_page={{ per_page }}"
                     aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
             {% if page != 1 and page != 2 %}
-            <li class="page-item"><a class="page-link" href="{{url_for('constancias.constancias_buscar')}}">1</a></li>
+            <li class="page-item"><a class="page-link"
+                    href="{{url_for('constancias.constancias_especializacion')}}">1</a></li>
             {% if page != 3 %}
             <li class="page-item"><a class="page-link disabled">...</a></li>
             {% endif %}
             {% endif %}
             <li class="page-item"><a class="page-link"
-                    href="{{url_for('constancias.constancias_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+                    href="{{url_for('constancias.constancias_especializacion')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
             </li>
             {% endif %}
 
@@ -299,19 +300,19 @@
 
 
             {% if page < total_pages %} <li class="page-item"><a class="page-link"
-                    href="{{url_for('constancias.constancias_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+                    href="{{url_for('constancias.constancias_especializacion')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
                 </li>
                 {% if page != total_pages and page != total_pages-1 %}
                 {% if page != total_pages-2 %}
                 <li class="page-item"><a class="page-link disabled">...</a></li>
                 {% endif %}
                 <li class="page-item"><a class="page-link"
-                        href="{{url_for('constancias.constancias_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                        href="{{url_for('constancias.constancias_especializacion')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
                 </li>
                 {% endif %}
                 <li class="page-item">
                     <a class="page-link"
-                        href="{{url_for('constancias.constancias_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                        href="{{url_for('constancias.constancias_especializacion')}}?page={{ page + 1 }}&per_page={{ per_page }}"
                         aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
@@ -325,7 +326,7 @@
     {% set modal_id = 'staticBackdrop-' ~ p.id_participante ~ '-' ~ p.nombre_curso|replace(' ',
     '_')|replace(':', '')|replace(',', '')|replace('.', '') ~ '-' ~ p.fecha_curso %}
     <form method="post"
-        action="{{ url_for('constancias.folio_constancia') }}?id={{ p.id_participante }}&curso={{ p.nombre_curso }}&fecha_curso={{ p.fecha_curso }}">
+        action="{{ url_for('constancias.folio_constancias_especializacion') }}?id={{ p.id_participante }}&curso={{ p.nombre_curso }}&fecha_curso={{ p.fecha_curso }}">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="modal fade" id="{{ modal_id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
             aria-hidden="true">
@@ -359,7 +360,7 @@
             const folio = document.querySelector(`#${modal_id} input[name='folio_constancia']`).value;
             form.append("folio_constancia", folio);
 
-            fetch(`/constancias/folio/?id=${id}&curso=${encodeURIComponent(curso)}&fecha_curso=${fecha_curso}`, {
+            fetch(`/constancias_especializacion/folio/?id=${id}&curso=${encodeURIComponent(curso)}&fecha_curso=${fecha_curso}`, {
                 method: "POST",
                 body: form,
                 headers: {
@@ -416,7 +417,7 @@
                 }
             });
 
-            fetch(`/constancias/actualizar/${id}`, {
+            fetch(`/constancias_especializacion/actualizar/${id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -454,9 +455,9 @@
 
                 // Cambiar la ruta de acción según haya filtros
                 if (hayFiltros) {
-                    formBuscar.action = "{{ url_for('constancias.constancias_filtros') }}";
+                    formBuscar.action = "{{ url_for('constancias.constancias_especializacion_filtros') }}";
                 } else {
-                    formBuscar.action = "{{ url_for('constancias.constancias_buscar') }}";
+                    formBuscar.action = "{{ url_for('constancias.constancias_especializacion') }}";
                 }
             });
         });

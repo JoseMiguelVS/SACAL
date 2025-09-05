@@ -17,8 +17,14 @@ from app.routes.cursos.routes import cursos
 from app.routes.participantes.routes import participantes
 from app.routes.sesiones.routes import sesiones
 from app.routes.constancias.routes import constancias
+# from app.routes.constancias.routesE import constancias
+# from app.routes.constancias.routesEP import constancias
+# from app.routes.constancias.routesG import constancias
 from app.routes.temas.routes import temas
 from app.routes.pagos.routes import pagos
+from app.routes.pagos.routesP import pagos
+from app.routes.pagos.routesG import pagos
+from app.routes.pagos.routesGS import pagos
 from app.routes.resumen.routes import resumen_semanal
 from app.routes.perfil.routes import perfil
 from app.routes.participantes.routesE import participantes

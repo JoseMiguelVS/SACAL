@@ -1,0 +1,224 @@
+{% extends './layout.html' %} {% block body %}
+<main class="w-100 d-flex flex-column">
+    <h2 class="text-center mb-4">Gastos sesiones</h2>
+
+    {% with messages = get_flashed_messages() %} {% if messages %} {% for
+    message in messages %}
+    <div class="alert alert-dismissible fade show alert-fixed {% if 'Error' in message %}alert-danger{% elif 'Advertencia' in message %}alert-warning{% else %}alert-success{% endif %}"
+        role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
+
+    <section class="container mb-4 d-flex justify-content-center gap-3">
+        <a href="{{ url_for('pagos.gastos_filtros') }}" class="botones-guardar btn-sm">Gastos</a>
+
+        <a href="{{ url_for('pagos.pagos_buscar') }}" class="botones-guardar btn-sm">Pagos</a>
+    </section>
+
+    <section class="container mb-4">
+        <form method="get" action="{{ url_for('pagos.gastos_sesiones_filtros') }}" id="filtroForm">
+            <div class="row justify-content-center g-3">
+                <!-- Mes -->
+                <div class="col-sm-3">
+                    <label for="filtroMes" class="form-label">Mes</label>
+                    <select id="filtroMes" name="mes" class="form-select form-select-sm filtro-auto">
+                        <option value="">Todos</option>
+                        {% for mes in meses %}
+                        <option value="{{ mes.1 }}" {% if request.args.get('mes')==mes.1 %}selected{% endif %}>
+                            {{ mes.1 }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Semana -->
+                <div class="col-sm-3">
+                    <label for="filtroSemana" class="form-label">Semana</label>
+                    <select id="filtroSemana" name="semana" class="form-select form-select-sm filtro-auto">
+                        <option value="">Todas</option>
+                        {% for semana in semanas %}
+                        <option value="{{ semana.1 }}" {% if request.args.get('semana')==semana.1 %}selected{% endif %}>
+                            {{ semana.1 }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Botón Limpiar -->
+                <div class="col-sm-2 d-flex align-items-end">
+                    <a href="{{ url_for('pagos.gastos_sesiones_filtros') }}" class="btn btn-sm btn-secondary w-100">
+                        Limpiar
+                    </a>
+                </div>
+            </div>
+        </form>
+    </section>
+
+
+    <section class="table-responsive table-sm">
+        <h5 class="text-center mt-4 mb-2">Gastos por sesión</h5>
+        <table class="table table-hover table-bordered align-middle text-nowrap">
+            <thead class="table-light">
+                <tr align="center">
+                    <th>#</th>
+                    <th>Cursos</th>
+                    <th>Publicidad</th>
+                    <th>Honorarios</th>
+                    <th>Gastos</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if gastos_sesiones %}
+                {% for g in gastos_sesiones %}
+                <tr align="center">
+                    <td>{{ loop.index }}</td>
+                    <td>{{ g.cursos }}</td>
+                    <td>${{ g.publicidad | float | round(2) }}</td>
+                    <td>${{ g.honorarios | float | round(2) }}</td>
+                    <td>
+                        <button type="button" class="botones-editar" data-bs-toggle="modal"
+                            data-bs-target="#modalGastosSesion-{{g.id_gasto_sesion }}" aria-label="Editar publicidad">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td align="center" colspan="12">No existen gastos detallados</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </section>
+
+
+    <!-- -------------------------------------------------PAGINADOR----------------------------------------------- -->
+    <nav class="pagination-container mt-4" aria-label="Page navigation" class="justify-content-center">
+        <ul class="pagination justify-content-center" style="margin:20px 0">
+            {% if page > 1 %}
+            <li class="page-item">
+                <a class="page-link"
+                    href="{{url_for('pagos.gastos_sesiones_filtros')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                    aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% if page != 1 and page != 2 %}
+            <li class="page-item"><a class="page-link" href="{{url_for('pagos.gastos_sesiones_filtros')}}">1</a></li>
+            {% if page != 3 %}
+            <li class="page-item"><a class="page-link disabled">...</a></li>
+            {% endif %}
+            {% endif %}
+            <li class="page-item"><a class="page-link"
+                    href="{{url_for('pagos.gastos_sesiones_filtros')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+            </li>
+            {% endif %}
+
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">{{ page }}</span>
+            </li>
+
+            {% if page < total_pages %} <li class="page-item"><a class="page-link"
+                    href="{{url_for('pagos.gastos_sesiones_filtros')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+                </li>
+                {% if page != total_pages and page != total_pages-1 %}
+                {% if page != total_pages-2 %}
+                <li class="page-item"><a class="page-link disabled">...</a></li>
+                {% endif %}
+                <li class="page-item"><a class="page-link"
+                        href="{{url_for('pagos.gastos_sesiones_filtros')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                </li>
+                {% endif %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="{{url_for('pagos.gastos_sesiones_filtros')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                        aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+        </ul>
+    </nav>
+
+    {% if gastos_sesiones %} {% for g in gastos_sesiones %}
+    <div class="modal fade" id="modalGastosSesion-{{ g.id_gasto_sesion }}" data-bs-backdrop="static"
+        data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalGastosSesionLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form action="{{url_for('pagos.gastos_sesiones', id=g.id_gasto_sesion)}}" method="post"
+                class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalGastosSesionLabel">
+                        Agregar gastos de sesion
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <div class="mb-2">
+                        <label class="form-label">Monto de publicidad</label>
+                        <input type="number" name="gasto_publi" id="gasto_publi" class="form-control"
+                            value="{{ g.publicidad or 0 }}" placeholder="0.00" step="0.01" min="0">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Monto de Honorarios</label>
+                        <input type="number" name="gasto_hono" id="gasto_hono" class="form-control"
+                            value="{{ g.honorarios or 0 }}" placeholder="0.00" step="0.01" min="0">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="botones-cancelar" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="botones-guardar">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endfor %} {% endif %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const inputBuscar = document.querySelector("input[name='buscar']");
+            const form = document.getElementById("formBuscar");
+
+            inputBuscar.addEventListener("change", function () {
+                form.submit();
+            });
+        });
+    </script>
+
+    <script>
+        let debounceTimeout = null;
+
+        document.querySelectorAll('.filtro-auto').forEach(select => {
+            select.addEventListener('change', () => {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(() => {
+                    document.getElementById('filtroForm').submit();
+                }, 400); // Espera 400ms tras el último cambio
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const formBuscar = document.getElementById('formBuscar');
+            const filtroMes = document.getElementById('filtroMes');
+            const filtroSemana = document.getElementById('filtroSemana');
+
+            formBuscar.addEventListener('submit', function (e) {
+                // Detectar si hay filtros activos
+                const hayFiltros =
+                    filtroMes?.value.trim() !== '' ||
+                    filtroSemana?.value.trim() !== ''
+
+                // Cambiar la ruta de acción según haya filtros
+                if (hayFiltros) {
+                    formBuscar.action = "{{ url_for('pagos.gastos_sesiones_filtros') }}";
+                }
+            });
+        });
+    </script>
+</main>
+{% endblock %}

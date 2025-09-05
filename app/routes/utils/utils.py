@@ -60,6 +60,7 @@ def get_db_connection():
     try:
         conn = psycopg2.connect(
             host=os.environ.get('db_host'),
+            port=5433,
             dbname=os.environ.get('db_name'),
             user=os.environ.get('db_username'),
             password=os.environ.get('db_password')
@@ -68,11 +69,6 @@ def get_db_connection():
     except psycopg2.Error as error:
         print(f"Error de conexión: {error}")
         return None
-
-# DATABASE_URL = "postgresql://sacal_user:fkCuAuxYUAyzAg8OPB0HcDxyMFJI35qm@dpg-d1t6h049c44c73d6jmj0-a.oregon-postgres.render.com/sacal"
-# def get_db_connection():
-#     conn = psycopg2.connect(DATABASE_URL)
-#     return conn
 
 #-----------------------------EMPLEADOS / USUARIOS
 def allowed_username(nombre_usuario):

@@ -1,6 +1,9 @@
 {% extends './layout.html' %} {% block body %}
+<a href="{{url_for('pagos.pagos_buscar')}}" class="botones m-2">
+    <i class="fas fa-arrow-left"></i>
+</a>
 <main class="w-100 d-flex flex-column">
-    <h2 class="text-center mb-4">Pagos</h2>
+    <h2 class="text-center mb-4">Pagos Validados</h2>
 
     {% with messages = get_flashed_messages() %} {% if messages %} {% for
     message in messages %}
@@ -11,16 +14,9 @@
     </div>
     {% endfor %} {% endif %} {% endwith %}
 
-    <section class="container mb-4 d-flex justify-content-center gap-3">
-        <a href="{{ url_for('pagos.gastos_filtros') }}"
-            class="botones-guardar btn-sm">Gastos</a>
-
-        <a href="{{ url_for('pagos.gastos_sesiones_filtros') }}"
-            class="botones-guardar btn-sm">Gastos sesiones</a>
-    </section>
-
     <section class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
-        <form id="formBuscar" method="get" action="{{ url_for('pagos.pagos_buscar') }}"
+
+        <form id="formBuscar" method="get" action="{{ url_for('pagos.pagos_validados') }}"
             class="d-flex flex-grow-1 justify-content-end">
             <div class="input-group mr-2" style="max-width: 300px;">
                 <input class="form-control mr-2" type="text" name="buscar" value="{{ search_query }}"
@@ -34,8 +30,8 @@
     </section>
 
     <section class="d-flex justify-content-center align-items-end flex-wrap gap-3 mb-3">
-        <form method="get" action="{{ url_for('pagos.pagos_filtros') }}" class="d-flex flex-wrap align-items-end gap-3"
-            id="filtroForm">
+        <form method="get" action="{{ url_for('pagos.pagos_validados_filtros') }}"
+            class="d-flex flex-wrap align-items-end gap-3" id="filtroForm">
 
             <!-- Fecha inicio -->
             <div class="d-flex flex-column">
@@ -54,12 +50,11 @@
 
         <!-- Botón Limpiar -->
         <div>
-            <a href="{{ url_for('pagos.pagos_buscar') }}" class="btn btn-sm btn-secondary ml-2">Limpiar</a>
+            <a href="{{ url_for('pagos.pagos_validados') }}" class="btn btn-sm btn-secondary ml-2">Limpiar</a>
         </div>
     </section>
 
     <section class="table-responsive tables_participantes table-sm">
-        <h5 class="text-center mt-4 mb-2">Pagos de participantes</h5>
         <table class="table table-hover">
             <thead>
                 <tr>
@@ -82,7 +77,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% if pagos %} {% for p in pagos %} {% if p.validacion_pago != 1 %}
+                {% if pagos %} {% for p in pagos %} {% if p.validacion_pago == 1 %}
                 <tr>
                     <!-- <td>
                         <a href="{{ url_for('pagos.pagos_detalles', id = p.id_pago) }}" class="botones-ver"
@@ -120,7 +115,8 @@
                         </button>
                     </td>
                     <td>
-                        <a class="botones-editar" href="{{ url_for('pagos.pagos_comprobantes', id = p.id_pago) }}"><i
+                        <a class="botones-editar"
+                            href="{{ url_for('pagos.pagos_validados_comprobantes', id = p.id_pago) }}"><i
                                 class="fas fa-receipt"></i></a>
                     </td>
                     <td>
@@ -141,31 +137,25 @@
         </table>
     </section>
 
-    <aside class="mt-3">
-        <a href="{{ url_for('pagos.pagos_validados') }}" class="btn botones d-inline-flex align-items-center">
-            <li class="fa fa-folder" style="font-size: 18px;"></li> Validados
-        </a>
-    </aside>
-
     <!-- -------------------------------------------------PAGINADOR----------------------------------------------- -->
     <nav class="pagination-container mt-4" aria-label="Page navigation" class="justify-content-center">
         <ul class="pagination justify-content-center" style="margin:20px 0">
             {% if page > 1 %}
             <li class="page-item">
                 <a class="page-link"
-                    href="{{url_for('pagos.pagos_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                    href="{{url_for('pagos.pagos_validados')}}?page={{ page - 1 }}&per_page={{ per_page }}"
                     aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
             {% if page != 1 and page != 2 %}
-            <li class="page-item"><a class="page-link" href="{{url_for('pagos.pagos_buscar')}}">1</a></li>
+            <li class="page-item"><a class="page-link" href="{{url_for('pagos.pagos_validados')}}">1</a></li>
             {% if page != 3 %}
             <li class="page-item"><a class="page-link disabled">...</a></li>
             {% endif %}
             {% endif %}
             <li class="page-item"><a class="page-link"
-                    href="{{url_for('pagos.pagos_buscar')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+                    href="{{url_for('pagos.pagos_validados')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
             </li>
             {% endif %}
 
@@ -174,19 +164,19 @@
             </li>
 
             {% if page < total_pages %} <li class="page-item"><a class="page-link"
-                    href="{{url_for('pagos.pagos_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+                    href="{{url_for('pagos.pagos_validados')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
                 </li>
                 {% if page != total_pages and page != total_pages-1 %}
                 {% if page != total_pages-2 %}
                 <li class="page-item"><a class="page-link disabled">...</a></li>
                 {% endif %}
                 <li class="page-item"><a class="page-link"
-                        href="{{url_for('pagos.pagos_buscar')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                        href="{{url_for('pagos.pagos_validados')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
                 </li>
                 {% endif %}
                 <li class="page-item">
                     <a class="page-link"
-                        href="{{url_for('pagos.pagos_buscar')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                        href="{{url_for('pagos.pagos_validados')}}?page={{ page + 1 }}&per_page={{ per_page }}"
                         aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
@@ -199,7 +189,8 @@
     <div class="modal fade" id="modalAgregar-{{p.id_pago}}" data-bs-backdrop="static" data-bs-keyboard="false"
         tabindex="-1" aria-labelledby="modalAgregarFacturaLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <form action="{{ url_for('pagos.factura_nueva', id=p.id_pago) }}" method="post" class="modal-content">
+            <form action="{{ url_for('pagos.factura_validados_nueva', id=p.id_pago) }}" method="post"
+                class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalEditarLabel-{{p.nombre_participante}}">
                         Agregar Factura
@@ -247,7 +238,8 @@
     <div class="modal fade" id="modalEditarDevolucion-{{ p.id_pago }}" data-bs-backdrop="static"
         data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalEditarDevolucionLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <form action="{{url_for('pagos.pagos_devolucion', id=p.id_pago)}}" method="post" class="modal-content">
+            <form action="{{url_for('pagos.pagos_validados_devolucion', id=p.id_pago)}}" method="post"
+                class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="modalEditarLabel-{{p.nombre_participante}}">
                         Agregar devolucion
@@ -277,7 +269,6 @@
             </form>
         </div>
     </div>
-
     {% endfor %} {% endif %}
 
     <script>
@@ -345,9 +336,9 @@
 
                 // Cambiar la ruta de acción según haya filtros
                 if (hayFiltros) {
-                    formBuscar.action = "{{ url_for('pagos.pagos_filtros') }}";
+                    formBuscar.action = "{{ url_for('pagos.pagos_validados_filtros') }}";
                 } else {
-                    formBuscar.action = "{{ url_for('pagos.pagos_buscar') }}";
+                    formBuscar.action = "{{ url_for('pagos.pagos_validados') }}";
                 }
             });
         });

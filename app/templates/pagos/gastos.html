@@ -1,0 +1,220 @@
+{% extends './layout.html' %} {% block body %}
+<main class="w-100 d-flex flex-column">
+    <h2 class="text-center mb-4">Gastos</h2>
+
+    {% with messages = get_flashed_messages() %} {% if messages %} {% for
+    message in messages %}
+    <div class="alert alert-dismissible fade show alert-fixed {% if 'Error' in message %}alert-danger{% elif 'Advertencia' in message %}alert-warning{% else %}alert-success{% endif %}"
+        role="alert">
+        <strong>{{ message }}</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
+
+    <section class="container mb-4 d-flex justify-content-center gap-3">
+        <a href="{{ url_for('pagos.pagos_buscar') }}" class="botones-guardar btn-sm">Pagos</a>
+
+        <a href="{{ url_for('pagos.gastos_sesiones_filtros') }}" class="botones-guardar btn-sm">Gastos sesiones</a>
+    </section>
+
+    <section class="d-flex justify-content-center align-items-center flex-wrap gap-3 mb-3">
+
+        <button type="button" class="botones m-2" data-bs-toggle="modal" data-bs-target="#modalAgregarGasto">
+            <i class="fa fa-plus mr-2"></i> Nuevo gasto
+        </button>
+    </section>
+
+    <section class="d-flex justify-content-center align-items-end flex-wrap gap-3 mb-3">
+        <form method="get" action="{{ url_for('pagos.gastos_filtros') }}" class="d-flex flex-wrap align-items-end gap-3"
+            id="filtroForm">
+
+            <!-- Fecha inicio -->
+            <div class="d-flex flex-column">
+                <label for="fechaInicio" class="form-label mb-1">Fecha inicio</label>
+                <input type="date" id="fechaInicio" name="fecha_inicio" class="form-control form-control-sm"
+                    value="{{ request.args.get('fecha_inicio', '') }}">
+            </div>
+
+            <!-- Fecha fin -->
+            <div class="d-flex flex-column">
+                <label for="fechaFin" class="form-label mb-1">Fecha fin</label>
+                <input type="date" id="fechaFin" name="fecha_fin" class="form-control form-control-sm filtro-auto"
+                    value="{{ request.args.get('fecha_fin', '') }}">
+            </div>
+        </form>
+
+        <!-- Botón Limpiar -->
+        <div>
+            <a href="{{ url_for('pagos.gastos_filtros') }}" class="btn btn-sm btn-secondary ml-2">Limpiar</a>
+        </div>
+    </section>
+
+    <section class="table-responsive table-sm">
+        <h5 class="text-center mt-4 mb-2">Gastos variados</h5>
+        <table class="table table-hover">
+            <thead>
+                <tr style="align-items: center;" align="center">
+                    <th>ID</th>
+                    <th>Fecha</th>
+                    <th>Monto</th>
+                    <th>Concepto</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% if gastos %} {% for g in gastos %}
+                <tr style="align-items: center;" align="center">
+                    <td>{{ loop.index }}</td>
+                    <td>{{ g.fecha }}</td> {# fecha #}
+                    <td>${{ g.monto_gasto }}</td> {# monto_gasto #}
+                    <td>{{ g.nombre_gasto }}</td> {# nombre_gasto #}
+
+                    {% endfor %} {% else %}
+                <tr>
+                    <td align="center" colspan="4">No existen gastos</td>
+                </tr>
+                {% endif %}
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- -------------------------------------------------PAGINADOR----------------------------------------------- -->
+    <nav class="pagination-container mt-4" aria-label="Page navigation" class="justify-content-center">
+        <ul class="pagination justify-content-center" style="margin:20px 0">
+            {% if page > 1 %}
+            <li class="page-item">
+                <a class="page-link"
+                    href="{{url_for('pagos.gastos_filtros')}}?page={{ page - 1 }}&per_page={{ per_page }}"
+                    aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            {% if page != 1 and page != 2 %}
+            <li class="page-item"><a class="page-link" href="{{url_for('pagos.gastos_filtros')}}">1</a></li>
+            {% if page != 3 %}
+            <li class="page-item"><a class="page-link disabled">...</a></li>
+            {% endif %}
+            {% endif %}
+            <li class="page-item"><a class="page-link"
+                    href="{{url_for('pagos.gastos_filtros')}}?page={{ page - 1 }}&per_page={{ per_page }}">{{page-1}}</a>
+            </li>
+            {% endif %}
+
+            <li class="page-item active" aria-current="page">
+                <span class="page-link">{{ page }}</span>
+            </li>
+
+            {% if page < total_pages %} <li class="page-item"><a class="page-link"
+                    href="{{url_for('pagos.gastos_filtros')}}?page={{ page + 1 }}&per_page={{ per_page }}">{{page+1}}</a>
+                </li>
+                {% if page != total_pages and page != total_pages-1 %}
+                {% if page != total_pages-2 %}
+                <li class="page-item"><a class="page-link disabled">...</a></li>
+                {% endif %}
+                <li class="page-item"><a class="page-link"
+                        href="{{url_for('pagos.gastos_filtros')}}?page={{ total_pages }}&per_page={{ per_page }}">{{total_pages}}</a>
+                </li>
+                {% endif %}
+                <li class="page-item">
+                    <a class="page-link"
+                        href="{{url_for('pagos.gastos_filtros')}}?page={{ page + 1 }}&per_page={{ per_page }}"
+                        aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                {% endif %}
+        </ul>
+    </nav>
+
+    <div class="modal fade" id="modalAgregarGasto" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="modalAgregarGastoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4 shadow-lg">
+                <form action="{{ url_for('pagos.gastos_nuevo') }}" method="post">
+                    <div class="modal-header border-bottom-0">
+                        <h5 class="modal-title" id="modalAgregarGastoLabel">Agregar Gasto</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+
+                    <div class="modal-body px-4">
+                        <!-- Tokens y filtros ocultos -->
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        <!-- Campos del formulario -->
+                        <div class="input-group">
+                            <div class="mb-3">
+                                <input type="number" name="gasto" id="gasto" class="input-field" placeholder="0.00"
+                                    min="0" step="1.00" required>
+                                <label for="gasto" class="input-label">Cantidad</label>
+                            </div>
+                        </div>
+
+                        <div class="input-group">
+                            <div class="mb-3">
+                                <select name="conceptos" id="conceptos" class="form-select" required>
+                                    <option value="">Selecciona un concepto</option>
+                                    {% for g in gasto %}
+                                    <option value="{{ g[0] }}">{{ g[1] }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="conceptos" class="input-label">Concepto</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer border-top-0 d-flex justify-content-end gap-2 px-4 pb-4">
+                        <button type="button" class="botones-cancelar rounded-pill px-4"
+                            data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="botones-guardar rounded-pill px-4">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const inputBuscar = document.querySelector("input[name='buscar']");
+            const form = document.getElementById("formBuscar");
+
+            inputBuscar.addEventListener("change", function () {
+                form.submit();
+            });
+        });
+    </script>
+
+    <script>
+        let debounceTimeout = null;
+
+        document.querySelectorAll('.filtro-auto').forEach(select => {
+            select.addEventListener('change', () => {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(() => {
+                    document.getElementById('filtroForm').submit();
+                }, 400); // Espera 400ms tras el último cambio
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const formBuscar = document.getElementById('formBuscar');
+            const filtroMes = document.getElementById('filtroMes');
+            const filtroSemana = document.getElementById('filtroSemana');
+
+            formBuscar.addEventListener('submit', function (e) {
+                // Detectar si hay filtros activos
+                const hayFiltros =
+                    filtroMes?.value.trim() !== '' ||
+                    filtroSemana?.value.trim() !== ''
+
+                // Cambiar la ruta de acción según haya filtros
+                if (hayFiltros) {
+                    formBuscar.action = "{{ url_for('pagos.gastos_filtros') }}";
+                }
+            });
+        });
+    </script>
+</main>
+{% endblock %}
