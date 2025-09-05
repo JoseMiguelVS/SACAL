@@ -60,7 +60,6 @@ def get_db_connection():
     try:
         conn = psycopg2.connect(
             host=os.environ.get('db_host'),
-            port=5433,
             dbname=os.environ.get('db_name'),
             user=os.environ.get('db_username'),
             password=os.environ.get('db_password')
