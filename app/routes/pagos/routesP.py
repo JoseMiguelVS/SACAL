@@ -23,13 +23,13 @@ def pagos_validados():
     # Pagos con búsqueda
     sql_count = '''
         SELECT COUNT(*) FROM detalles_pagos 
-        WHERE (clave_participante ILIKE %s OR nombre_participante ILIKE %s AND validacion_pago = 1)
+        WHERE (clave_participante ILIKE %s OR nombre_participante ILIKE %s)
     '''
     sql_lim = '''
         SELECT dp.*, pa.factura_pago
         FROM detalles_pagos dp
         JOIN participantes pa ON dp.clave_participante = pa.clave_participante
-        WHERE (dp.clave_participante ILIKE %s OR dp.nombre_participante ILIKE %s AND validacion_pago = 1)
+        WHERE (dp.clave_participante ILIKE %s OR dp.nombre_participante ILIKE %s)
         ORDER BY dp.id_pago DESC
         LIMIT %s OFFSET %s
 

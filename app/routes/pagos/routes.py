@@ -85,9 +85,13 @@ def pagos_filtros():
         'pagos/pagos.html',
         paginado=paginado,
         fecha_inicio=fecha_inicio,
-        fecha_fin=fecha_fin
+        fecha_fin=fecha_fin,
+        pagos=paginado[0],
+        page=paginado[1],
+        per_page=paginado[2],
+        total_items=paginado[3],
+        total_pages=paginado[4]
     )
-
 
 # -----------------------------COMPROBANTES-----------------------------
 @pagos.route("/pagos/comprobantes/<string:id>")

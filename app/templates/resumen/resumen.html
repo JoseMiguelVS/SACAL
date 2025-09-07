@@ -44,7 +44,6 @@
             {% set cursos_categoria = cursos_por_categoria[categoria_id] if categoria_id in cursos_por_categoria else []
             %}
 
-            {% if cursos_categoria %}
             <h4 class="text-center my-4">Cursos en {{ categoria_nombre }}</h4>
             <table class="table table-hover table-bordered align-middle text-nowrap">
                 <thead class="table-light small">
@@ -64,6 +63,7 @@
                     </tr>
                 </thead>
                 <tbody class="small">
+                    {% if cursos_categoria %}
                     {% for f in cursos_categoria %}
                     {% set paquete_count = f.paquetes | length %}
                     {% for p in f.paquetes %}
@@ -90,13 +90,17 @@
                     </tr>
                     {% endfor %}
                     {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="12" class="text-center text-muted">Sin registros</td>
+                    </tr>
+                    {% endif %}
                 </tbody>
             </table>
-
-            {% endif %}
             {% endfor %}
         </div>
     </section>
+
 
     <!-- Totales generales -->
     <section class="table-responsive table-sm">
